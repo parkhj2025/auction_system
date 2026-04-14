@@ -1,0 +1,98 @@
+@import "tailwindcss";
+
+/*
+  경매퀵 디자인 토큰
+  - 블루 메인, 노랑·빨강 키컬러. 오렌지 금지, 3색 동시 강조 금지.
+  - 3카테고리 톤: danger(red) / edu(blue) / safe(green)
+  - 4px 기반 스페이싱은 Tailwind 기본 스케일 사용
+*/
+
+@theme {
+  /* 블루 메인 */
+  --color-brand-50:  #eff6ff;
+  --color-brand-100: #dbeafe;
+  --color-brand-200: #bfdbfe;
+  --color-brand-300: #93c5fd;
+  --color-brand-400: #60a5fa;
+  --color-brand-500: #3b82f6;
+  --color-brand-600: #2563eb; /* 메인 */
+  --color-brand-700: #1d4ed8;
+  --color-brand-800: #1e40af;
+  --color-brand-900: #1e3a8a;
+  --color-brand-950: #172554;
+
+  /* 노랑 — 오픈예정, 강조 포인트 */
+  --color-accent-yellow: #ffd600;
+  --color-accent-yellow-soft: #fff4b0;
+
+  /* 빨강 — 위험, 낙찰가 강조 */
+  --color-accent-red: #dc2626;
+  --color-accent-red-soft: #fee2e2;
+
+  /* 그린 — 안전, 수익 긍정 */
+  --color-accent-green: #16a34a;
+  --color-accent-green-soft: #dcfce7;
+
+  /* 3 카테고리 톤 별칭 */
+  --color-cat-danger: var(--color-accent-red);
+  --color-cat-danger-soft: var(--color-accent-red-soft);
+  --color-cat-edu: var(--color-brand-600);
+  --color-cat-edu-soft: var(--color-brand-50);
+  --color-cat-safe: var(--color-accent-green);
+  --color-cat-safe-soft: var(--color-accent-green-soft);
+
+  /* 중립 */
+  --color-ink-900: #0f172a;
+  --color-ink-700: #334155;
+  --color-ink-500: #64748b;
+  --color-ink-300: #cbd5e1;
+  --color-ink-100: #f1f5f9;
+  --color-surface: #ffffff;
+  --color-surface-muted: #f8fafc;
+
+  /* 시맨틱 */
+  --color-background: var(--color-surface);
+  --color-foreground: var(--color-ink-900);
+  --color-border: #e2e8f0;
+  --color-muted: var(--color-surface-muted);
+  --color-muted-foreground: var(--color-ink-500);
+
+  /* 보더 반경 */
+  --radius-xs: 4px;
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 14px;
+  --radius-xl: 20px;
+  --radius-2xl: 28px;
+
+  /* 그림자 — 과하지 않게 */
+  --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04);
+  --shadow-lift: 0 4px 14px rgba(15, 23, 42, 0.08);
+
+  /* 폰트 */
+  --font-sans: var(--font-noto-kr), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+}
+
+:root {
+  color-scheme: light;
+}
+
+html,
+body {
+  background: var(--color-background);
+  color: var(--color-foreground);
+  font-family: var(--font-sans);
+  -webkit-font-smoothing: antialiased;
+}
+
+/* 포커스 링: WCAG 가시성 확보 */
+:where(a, button, input, textarea, select, summary):focus-visible {
+  outline: 2px solid var(--color-brand-600);
+  outline-offset: 2px;
+  border-radius: var(--radius-xs);
+}
+
+/* 숫자 tabular 정렬 — 가격·수치 테이블 가독성 */
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}

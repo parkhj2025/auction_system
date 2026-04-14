@@ -1,0 +1,98 @@
+"use client";
+
+import { ArrowLeft, ArrowRight, Info } from "lucide-react";
+import type { ApplyFormData, ApplyDocuments } from "@/types/apply";
+import { FileUpload } from "../FileUpload";
+
+export function Step3Documents({
+  data,
+  onDocumentsChange,
+  onNext,
+  onBack,
+}: {
+  data: ApplyFormData;
+  onDocumentsChange: (patch: Partial<ApplyDocuments>) => void;
+  onNext: () => void;
+  onBack: () => void;
+}) {
+  const { eSignFile, idFile } = data.documents;
+  const canProceed = !!eSignFile && !!idFile;
+
+  return (
+    <div className="flex flex-col gap-6">
+      <header>
+        <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+          Step 3
+        </p>
+        <h2 className="mt-1 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+          서류를 업로드해주세요
+        </h2>
+        <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
+          대법원 전자민원에서 발급한 전자본인서명확인서와 신분증 사본이
+          필요합니다. 두 서류는 위임장 작성과 본인 확인에 사용됩니다.
+        </p>
+      </header>
+
+      <div className="flex items-start gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-5 py-4 text-sm">
+        <Info
+          size={16}
+          className="mt-0.5 shrink-0 text-brand-600"
+          aria-hidden="true"
+        />
+        <p className="leading-6 text-[var(--color-ink-700)]">
+          전자본인서명확인서는{" "}
+          <strong className="text-[var(--color-ink-900)]">
+            대법원 전자민원센터
+          </strong>
+          에서 공동인증서 또는 금융인증서로 발급받을 수 있습니다. 발급 후 PDF
+          파일을 그대로 업로드하시면 됩니다.
+        </p>
+      </div>
+
+      <div className="grid gap-5 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)] md:grid-cols-2">
+        <FileUpload
+          label="전자본인서명확인서"
+          description="대법원 전자민원센터에서 발급한 PDF 파일을 올려주세요."
+          file={eSignFile}
+          onFileChange={(f) => onDocumentsChange({ eSignFile: f })}
+          helperLink={{
+            href: "https://ecfs.scourt.go.kr",
+            text: "발급 방법 안내",
+          }}
+        />
+        <FileUpload
+          label="신분증 사본"
+          description="주민등록증 · 운전면허증 · 여권 중 하나. PDF 또는 이미지."
+          file={idFile}
+          onFileChange={(f) => onDocumentsChange({ idFile: f })}
+        />
+      </div>
+
+      <p className="text-xs leading-5 text-[var(--color-ink-500)]">
+        업로드된 파일은 입찰 대리 업무 수행 목적으로만 사용되며, 법정 보관
+        기간(접수일로부터 3년) 경과 후 즉시 파기됩니다. 접수 완료 후 파일
+        저장은 보안이 확보된 내부 저장소에만 이루어집니다.
+      </p>
+
+      <div className="flex items-center justify-between gap-3 pt-2">
+        <button
+          type="button"
+          onClick={onBack}
+          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)]"
+        >
+          <ArrowLeft size={16} aria-hidden="true" />
+          이전
+        </button>
+        <button
+          type="button"
+          onClick={onNext}
+          disabled={!canProceed}
+          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
+        >
+          다음: 확인·제출
+          <ArrowRight size={16} aria-hidden="true" />
+        </button>
+      </div>
+    </div>
+  );
+}

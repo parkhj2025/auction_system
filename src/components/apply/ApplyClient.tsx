@@ -1,0 +1,199 @@
+"use client";
+
+import { useEffect, useMemo, useState } from "react";
+import { useSearchParams } from "next/navigation";
+import type {
+  ApplyFormData,
+  ApplyBidInfo,
+  ApplyDocuments,
+} from "@/types/apply";
+import { INITIAL_APPLY_DATA } from "@/types/apply";
+import type { AnalysisFrontmatter } from "@/types/content";
+import { APPLY_STEPS, type ApplyStepId } from "@/lib/constants";
+import { ApplyStepIndicator } from "./ApplyStepIndicator";
+import { Step1Property } from "./steps/Step1Property";
+import { Step2BidInfo } from "./steps/Step2BidInfo";
+import { Step3Documents } from "./steps/Step3Documents";
+import { Step4Confirm } from "./steps/Step4Confirm";
+import { Step5Complete } from "./steps/Step5Complete";
+
+const STEP_ORDER: ApplyStepId[] = APPLY_STEPS.map((s) => s.id);
+
+export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
+  const searchParams = useSearchParams();
+  const initialCase = searchParams.get("case") ?? "";
+
+  const [data, setData] = useState<ApplyFormData>({
+    ...INITIAL_APPLY_DATA,
+    caseNumber: initialCase,
+  });
+  const [currentStep, setCurrentStep] = useState<ApplyStepId>("property");
+  const [completed, setCompleted] = useState<Set<ApplyStepId>>(new Set());
+  const [submitting, setSubmitting] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [applicationId, setApplicationId] = useState<string | null>(null);
+
+  // URL ?case= 로 들어왔을 때 자동 매칭
+  useEffect(() => {
+    if (initialCase && !data.matchedPost) {
+      const match = posts.find((p) => p.caseNumber === initialCase);
+      if (match) {
+        setData((d) => ({
+          ...d,
+          matchedPost: match,
+          caseNumber: match.caseNumber,
+          court: match.court,
+        }));
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
+
+  const merge = (patch: Partial<ApplyFormData>) =>
+    setData((d) => ({ ...d, ...patch }));
+
+  const mergeBidInfo = (patch: Partial<ApplyBidInfo>) =>
+    setData((d) => ({ ...d, bidInfo: { ...d.bidInfo, ...patch } }));
+
+  const mergeDocuments = (patch: Partial<ApplyDocuments>) =>
+    setData((d) => ({ ...d, documents: { ...d.documents, ...patch } }));
+
+  const toggleChecklist = (idx: number, checked: boolean) =>
+    setData((d) => {
+      const next = [...d.checklist];
+      next[idx] = checked;
+      return { ...d, checklist: next };
+    });
+
+  function goNext() {
+    const i = STEP_ORDER.indexOf(currentStep);
+    if (i < 0 || i >= STEP_ORDER.length - 1) return;
+    setCompleted((prev) => new Set(prev).add(currentStep));
+    setCurrentStep(STEP_ORDER[i + 1]);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+
+  function goBack() {
+    const i = STEP_ORDER.indexOf(currentStep);
+    if (i <= 0) return;
+    setCurrentStep(STEP_ORDER[i - 1]);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+  }
+
+  async function submit() {
+    setSubmitting(true);
+    setSubmitError(null);
+    try {
+      const form = new FormData();
+      form.set("caseNumber", data.caseNumber);
+      form.set("court", data.court);
+      form.set("manualEntry", String(data.manualEntry));
+      if (data.matchedPost) {
+        form.set("matchedSlug", data.matchedPost.slug);
+        form.set("matchedTitle", data.matchedPost.title);
+      }
+      form.set("bidAmount", data.bidInfo.bidAmount);
+      form.set("applicantName", data.bidInfo.applicantName);
+      form.set("phone", data.bidInfo.phone);
+      form.set("ssnFront", data.bidInfo.ssnFront);
+      form.set("jointBidding", String(data.bidInfo.jointBidding));
+      if (data.bidInfo.jointBidding) {
+        form.set("jointApplicantName", data.bidInfo.jointApplicantName);
+        form.set("jointApplicantPhone", data.bidInfo.jointApplicantPhone);
+      }
+      if (data.documents.eSignFile)
+        form.set("eSignFile", data.documents.eSignFile);
+      if (data.documents.idFile) form.set("idFile", data.documents.idFile);
+
+      const res = await fetch("/api/apply", { method: "POST", body: form });
+      const json = (await res.json()) as {
+        ok: boolean;
+        applicationId?: string;
+        error?: string;
+      };
+      if (!json.ok || !json.applicationId) {
+        throw new Error(json.error ?? "접수 처리 중 오류가 발생했습니다.");
+      }
+      setApplicationId(json.applicationId);
+      setCompleted((prev) => {
+        const next = new Set(prev);
+        next.add("confirm");
+        next.add("documents");
+        next.add("bid-info");
+        next.add("property");
+        return next;
+      });
+      setCurrentStep("complete");
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+    } catch (err) {
+      setSubmitError(
+        err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
+      );
+    } finally {
+      setSubmitting(false);
+    }
+  }
+
+  const stepView = useMemo(() => {
+    switch (currentStep) {
+      case "property":
+        return (
+          <Step1Property
+            data={data}
+            posts={posts}
+            onChange={merge}
+            onNext={goNext}
+          />
+        );
+      case "bid-info":
+        return (
+          <Step2BidInfo
+            data={data}
+            onBidInfoChange={mergeBidInfo}
+            onNext={goNext}
+            onBack={goBack}
+          />
+        );
+      case "documents":
+        return (
+          <Step3Documents
+            data={data}
+            onDocumentsChange={mergeDocuments}
+            onNext={goNext}
+            onBack={goBack}
+          />
+        );
+      case "confirm":
+        return (
+          <Step4Confirm
+            data={data}
+            onChecklistChange={toggleChecklist}
+            onSubmit={submit}
+            onBack={goBack}
+            submitting={submitting}
+            submitError={submitError}
+          />
+        );
+      case "complete":
+        return applicationId ? (
+          <Step5Complete data={data} applicationId={applicationId} />
+        ) : null;
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [currentStep, data, submitting, submitError, applicationId, posts]);
+
+  return (
+    <>
+      <ApplyStepIndicator current={currentStep} completed={completed} />
+      <section className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+        {stepView}
+      </section>
+    </>
+  );
+}

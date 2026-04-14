@@ -1,0 +1,383 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>경매퀵 — 홈</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{font-family:'Noto Sans KR',-apple-system,sans-serif;background:#fff;color:#18181B;-webkit-font-smoothing:antialiased;}
+a{text-decoration:none;color:inherit;}
+:root{
+  --blu:#2563EB;--blu-b:#3B82F6;--blu-d:#1D4ED8;--blu-bg:#EFF6FF;
+  --blu-grad:linear-gradient(135deg,#3B82F6 0%,#1D4ED8 100%);
+  --ylw:#FFD600;--ylw-bg:#FFFDE7;
+  --red:#EF4444;--red-d:#DC2626;--red-bg:#FEF2F2;
+  --grn:#10B981;--grn-bg:#ECFDF5;
+  --nvy:#1E3A5F;
+  --g25:#FAFAFA;--g50:#F4F4F5;--g100:#E4E4E7;--g200:#D4D4D8;--g300:#A1A1AA;
+  --g400:#71717A;--g500:#52525B;--g600:#3F3F46;--g700:#27272A;--g800:#18181B;
+  --r:16px;--r-sm:10px;--r-xs:6px;
+}
+.container{max-width:1140px;margin:0 auto;padding:0 24px;}
+
+.topnav{position:sticky;top:0;z-index:100;background:rgba(255,255,255,0.96);backdrop-filter:blur(16px);border-bottom:1px solid rgba(0,0,0,0.06);}
+.topnav .container{display:flex;justify-content:space-between;align-items:center;height:60px;}
+.logo-wrap{display:flex;align-items:center;gap:8px;}
+.logo-text{font-size:20px;font-weight:900;letter-spacing:-0.8px;color:var(--g800);}
+.nav-links{display:flex;gap:28px;align-items:center;}
+.nav-link{font-size:14px;font-weight:600;color:var(--g400);transition:color .2s;}
+.nav-link:hover{color:var(--g800);}
+.nav-cta{padding:10px 22px;background:var(--blu-grad);color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:13px;font-weight:700;cursor:pointer;box-shadow:0 1px 3px rgba(37,99,235,0.15),0 4px 12px rgba(37,99,235,0.1);}
+.nav-mobile{display:none;}
+@media(max-width:768px){.nav-links{display:none;}.nav-mobile{display:flex;gap:8px;}}
+.nm-btn{width:38px;height:38px;border-radius:50%;border:1px solid var(--g100);background:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;}
+.nm-btn svg{width:18px;height:18px;color:var(--g500);}
+
+.hero{position:relative;overflow:hidden;padding:52px 0 44px;background:linear-gradient(165deg,#EFF6FF 0%,#DBEAFE 30%,#BFDBFE 60%,#EFF6FF 100%);}
+.hero::before{content:'';position:absolute;top:-120px;right:-80px;width:400px;height:400px;border-radius:50%;background:radial-gradient(circle,rgba(59,130,246,0.06) 0%,transparent 70%);}
+@media(max-width:768px){.hero{padding:28px 0 24px;}}
+.hero-inner{display:grid;grid-template-columns:1fr 400px;gap:40px;align-items:center;position:relative;z-index:1;}
+@media(max-width:960px){.hero-inner{grid-template-columns:1fr;gap:20px;}}
+.hero-h1{font-size:40px;font-weight:900;line-height:1.18;letter-spacing:-2px;color:var(--g800);margin-bottom:12px;}
+.hero-h1 em{font-style:normal;color:var(--blu);}
+@media(max-width:768px){.hero-h1{font-size:30px;letter-spacing:-1.2px;}}
+.hero-sub{font-size:16px;color:var(--g500);line-height:1.65;margin-bottom:24px;}
+@media(max-width:768px){.hero-sub{font-size:14px;}}
+.search-box{display:flex;margin-bottom:16px;border-radius:var(--r-sm);overflow:hidden;border:2px solid rgba(37,99,235,0.12);background:#fff;box-shadow:0 4px 16px rgba(0,0,0,0.03);}
+.search-input{flex:1;padding:15px 18px;border:none;font-family:inherit;font-size:15px;color:var(--g800);outline:none;}
+.search-input::placeholder{color:var(--g300);}
+.search-btn{padding:0 24px;background:var(--blu-grad);color:#fff;border:none;font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;}
+.hero-btns{display:flex;gap:10px;}
+.hb{flex:1;padding:15px 0;text-align:center;border-radius:var(--r-sm);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;border:none;transition:all .15s;}
+.hb-pri{background:var(--blu-grad);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,0.15);}
+.hb-pri:hover{transform:translateY(-1px);box-shadow:0 4px 16px rgba(37,99,235,0.2);}
+.hb-sec{background:rgba(255,255,255,0.8);color:var(--g700);border:1.5px solid rgba(0,0,0,0.08);}
+
+.dash-card{background:rgba(255,255,255,0.8);backdrop-filter:blur(16px);border:1px solid rgba(255,255,255,0.6);border-radius:20px;padding:24px;box-shadow:0 8px 32px rgba(0,0,0,0.03);}
+.dash-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;}
+.dash-label{font-size:13px;font-weight:600;color:var(--g500);}
+.dash-court{font-size:11px;font-weight:700;color:var(--blu-d);background:var(--blu-bg);padding:5px 12px;border-radius:14px;}
+.qfilters{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.qf{padding:14px 8px;text-align:center;background:#fff;border:1px solid var(--g100);border-radius:12px;cursor:pointer;transition:all .2s;}
+.qf:hover{border-color:var(--blu);box-shadow:0 2px 12px rgba(37,99,235,0.06);}
+.qf-num{font-size:22px;font-weight:900;color:var(--g800);line-height:1;}
+.qf-num small{font-size:12px;font-weight:500;color:var(--g300);}
+.qf-label{font-size:11px;font-weight:500;color:var(--g400);margin-top:4px;}
+
+.region-strip{padding:16px 0;border-bottom:1px solid var(--g100);}
+.region-inner{display:flex;align-items:center;gap:10px;overflow-x:auto;scrollbar-width:none;padding:0 24px;}
+.region-inner::-webkit-scrollbar{display:none;}
+.rg-chip{padding:8px 18px;border-radius:20px;font-size:13px;font-weight:600;white-space:nowrap;border:1.5px solid transparent;display:flex;align-items:center;gap:6px;}
+.rg-chip.active{background:var(--blu);color:#fff;border-color:var(--blu);}
+.rg-chip.soon{background:#fff;color:var(--g400);border-color:var(--g200);}
+.rg-soon{font-size:10px;font-weight:700;color:var(--g800);background:var(--ylw);padding:2px 8px;border-radius:8px;}
+
+.section{padding:36px 0;}
+@media(max-width:768px){.section{padding:24px 0;}}
+.sec-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:16px;}
+.sec-title{font-size:20px;font-weight:900;color:var(--g800);letter-spacing:-0.5px;}
+.sec-more{font-size:13px;font-weight:600;color:var(--blu);}
+.carousel-wrap{overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;}
+.carousel-wrap::-webkit-scrollbar{display:none;}
+.carousel{display:flex;gap:14px;padding:0 24px 4px;}
+.carousel>.pcard{min-width:290px;max-width:290px;scroll-snap-align:start;flex-shrink:0;}
+.pcard-end{min-width:140px;max-width:140px;scroll-snap-align:start;flex-shrink:0;display:flex;align-items:center;justify-content:center;border:2px dashed var(--g200);border-radius:var(--r);cursor:pointer;font-size:14px;font-weight:700;color:var(--blu);}
+.pcard{background:#fff;border:1px solid var(--g100);border-radius:var(--r);overflow:hidden;cursor:pointer;transition:all .2s;}
+.pcard:hover{border-color:var(--blu);box-shadow:0 6px 24px rgba(37,99,235,0.06);}
+.pc-top{display:flex;justify-content:space-between;align-items:center;padding:14px 16px 0;}
+.pc-badge{font-size:10px;font-weight:700;padding:4px 9px;border-radius:var(--r-xs);}
+.pc-badge.danger{background:var(--red-bg);color:var(--red);}
+.pc-badge.safe{background:var(--grn-bg);color:var(--grn);}
+.pc-badge.edu{background:var(--blu-bg);color:var(--blu-d);}
+.pc-pct{font-size:11px;font-weight:800;color:#fff;padding:4px 9px;border-radius:var(--r-xs);background:var(--blu-grad);}
+.pc-body{padding:10px 16px 14px;}
+.pc-name{font-size:15px;font-weight:700;color:var(--g800);margin-bottom:3px;}
+.pc-addr{font-size:11px;color:var(--g400);margin-bottom:10px;}
+.pc-prices{display:flex;gap:18px;margin-bottom:10px;}
+.pp{display:flex;flex-direction:column;gap:1px;}.pp-lb{font-size:10px;color:var(--g400);}
+.pp-v{font-size:17px;font-weight:900;color:var(--blu);letter-spacing:-0.5px;}
+.pp-old{font-size:11px;color:var(--g300);text-decoration:line-through;}
+.pc-tags{display:flex;gap:4px;flex-wrap:wrap;}
+.ptag{font-size:10px;font-weight:500;padding:3px 7px;border-radius:4px;background:var(--g50);color:var(--g500);}
+.ptag.r{background:var(--red-bg);color:var(--red-d);}
+.ptag.g{background:var(--grn-bg);color:#059669;}
+.ptag.b{background:var(--blu-bg);color:var(--blu);}
+.pc-foot{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-top:1px solid var(--g50);}
+.pc-meta{font-size:10px;color:var(--g300);}
+.pc-link{font-size:11px;font-weight:700;color:var(--blu);}
+
+.why{background:var(--g25);padding:48px 0;}
+@media(max-width:768px){.why{padding:32px 0;}}
+.why-h2{font-size:26px;font-weight:900;color:var(--g800);text-align:center;letter-spacing:-0.8px;margin-bottom:6px;}
+@media(max-width:768px){.why-h2{font-size:22px;}}
+.why-sub{font-size:14px;color:var(--g400);text-align:center;margin-bottom:32px;}
+.cmp{width:100%;border-collapse:collapse;margin-bottom:32px;font-size:13px;}
+.cmp th{padding:12px 14px;font-weight:600;text-align:center;border-bottom:2px solid var(--g100);}
+.cmp th:first-child{text-align:left;color:var(--g400);font-weight:500;}
+.cmp th:nth-child(2){color:var(--g400);}
+.cmp th:nth-child(3){color:var(--blu);background:var(--blu-bg);border-radius:10px 10px 0 0;}
+.cmp td{padding:11px 14px;text-align:center;border-bottom:1px solid var(--g50);}
+.cmp td:first-child{text-align:left;color:var(--g500);font-weight:500;}
+.cmp td:nth-child(2){color:var(--g300);}
+.cmp td:nth-child(3){font-weight:700;color:var(--blu-d);background:var(--blu-bg);}
+.cmp tr:last-child td{border-bottom:none;}
+.cmp tr:last-child td:nth-child(3){border-radius:0 0 10px 10px;}
+.vals{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:32px;}
+@media(max-width:768px){.vals{grid-template-columns:1fr;gap:10px;}}
+.val{text-align:center;padding:28px 20px;background:#fff;border:1px solid var(--g100);border-radius:var(--r);}
+.val-ic{width:52px;height:52px;border-radius:14px;display:inline-flex;align-items:center;justify-content:center;margin-bottom:14px;background:var(--blu-grad);}
+.val-ic svg{width:24px;height:24px;color:#fff;}
+.val h4{font-size:16px;font-weight:800;color:var(--g800);margin-bottom:6px;}
+.val p{font-size:13px;color:var(--g400);line-height:1.6;}
+
+.rvs{display:flex;flex-direction:column;gap:16px;}
+.rv{display:flex;gap:12px;align-items:flex-start;max-width:520px;}
+.rv:nth-child(2n){align-self:flex-end;flex-direction:row-reverse;}
+.rv-avatar{width:36px;height:36px;border-radius:50%;background:var(--g100);display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:4px;}
+.rv-avatar svg{width:16px;height:16px;color:var(--g300);}
+.rv-content{}
+.rv-bubble{padding:14px 18px;font-size:13px;color:var(--g600);line-height:1.7;white-space:pre-line;background:var(--blu-bg);border-radius:4px 16px 16px 16px;margin-bottom:4px;}
+.rv:nth-child(2n) .rv-bubble{background:var(--g50);border-radius:16px 4px 16px 16px;}
+.rv-meta{font-size:11px;color:var(--g300);padding:0 4px;}
+
+.flow-sec{padding:48px 0;}
+@media(max-width:768px){.flow-sec{padding:32px 0;}}
+.flow{display:flex;align-items:flex-start;gap:0;justify-content:center;}
+@media(max-width:768px){.flow{flex-direction:column;align-items:center;}}
+.flow-step{display:flex;flex-direction:column;align-items:center;text-align:center;width:200px;}
+@media(max-width:768px){.flow-step{width:100%;max-width:300px;}}
+.flow-num{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:800;color:#fff;background:var(--blu-grad);margin-bottom:12px;}
+.flow-step h4{font-size:15px;font-weight:800;color:var(--g800);margin-bottom:4px;}
+.flow-step p{font-size:12px;color:var(--g400);line-height:1.6;}
+.flow-arrow{display:flex;align-items:center;padding:0 8px;margin-top:18px;color:var(--g300);}
+.flow-arrow svg{width:24px;height:24px;}
+@media(max-width:768px){.flow-arrow{transform:rotate(90deg);padding:6px 0;margin-top:0;}}
+
+.pricing{padding:48px 0;background:var(--g25);}
+.pr-h2{font-size:26px;font-weight:900;color:var(--g800);text-align:center;margin-bottom:4px;}
+.pr-sub{font-size:14px;color:var(--g400);text-align:center;margin-bottom:28px;}
+.pr-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;max-width:740px;margin:0 auto;}
+@media(max-width:768px){.pr-grid{grid-template-columns:1fr;max-width:360px;}}
+.pr-card{border:1.5px solid var(--g100);border-radius:var(--r);padding:28px 20px;text-align:center;background:#fff;position:relative;}
+.pr-card.ft{border-color:var(--blu);box-shadow:0 4px 20px rgba(37,99,235,0.06);}
+.pr-card.ft::before{content:'추천';position:absolute;top:-11px;left:50%;transform:translateX(-50%);background:var(--blu-grad);color:#fff;font-size:11px;font-weight:700;padding:3px 14px;border-radius:12px;}
+.pr-name{font-size:13px;font-weight:700;color:var(--g400);margin-bottom:12px;}
+.pr-price{font-size:36px;font-weight:900;color:var(--g800);letter-spacing:-1px;margin-bottom:4px;}
+.pr-price small{font-size:14px;font-weight:500;color:var(--g300);}
+.pr-when{font-size:12px;color:var(--g300);margin-bottom:16px;}
+.pr-feat{font-size:12px;color:var(--g400);line-height:1.8;}
+
+.bottom-sec{padding:36px 0;}
+.trust-row{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:28px;}
+@media(max-width:768px){.trust-row{gap:8px;}}
+.tr-item{text-align:center;padding:18px 10px;background:var(--g25);border:1px solid var(--g100);border-radius:12px;}
+.tr-item h5{font-size:14px;font-weight:800;color:var(--g800);}
+.tr-item span{font-size:11px;color:var(--g400);}
+.cta-block{padding:36px 40px;border-radius:20px;background:linear-gradient(135deg,#1E3A5F 0%,#172554 100%);display:flex;justify-content:space-between;align-items:center;position:relative;overflow:hidden;}
+.cta-block::before{content:'';position:absolute;top:-40px;right:-20px;width:200px;height:200px;border-radius:50%;background:rgba(59,130,246,0.06);}
+@media(max-width:768px){.cta-block{flex-direction:column;gap:18px;text-align:center;padding:28px 24px;}}
+.cta-txt{color:rgba(255,255,255,0.8);font-size:16px;line-height:1.5;position:relative;z-index:1;}
+.cta-txt strong{display:block;color:#fff;font-size:22px;font-weight:900;}
+.cta-btn{padding:16px 32px;background:var(--blu-grad);color:#fff;border:none;border-radius:var(--r-sm);font-family:inherit;font-size:16px;font-weight:700;cursor:pointer;box-shadow:0 4px 20px rgba(59,130,246,0.25);position:relative;z-index:1;white-space:nowrap;}
+
+footer{padding:36px 0;border-top:1px solid var(--g100);}
+.f-grid{display:grid;grid-template-columns:1.3fr 1fr 1fr;gap:24px;}
+@media(max-width:768px){.f-grid{grid-template-columns:1fr;gap:16px;}}
+.f-col h5{font-size:13px;font-weight:700;color:var(--g700);margin-bottom:10px;}
+.f-col p,.f-col a{font-size:12px;color:var(--g400);line-height:1.9;display:block;}
+.f-col a:hover{color:var(--g600);}
+.f-comp{margin-top:24px;padding-top:16px;border-top:1px solid var(--g100);font-size:10px;color:var(--g300);line-height:1.9;}
+.f-comp strong{font-weight:600;color:var(--g500);}
+
+.m-sticky{display:none;position:fixed;bottom:0;left:0;right:0;z-index:90;padding:10px 16px 24px;background:rgba(255,255,255,0.96);backdrop-filter:blur(16px);border-top:1px solid rgba(0,0,0,0.06);}
+@media(max-width:768px){.m-sticky{display:flex;gap:8px;}}
+.m-btn{flex:1;padding:15px 0;text-align:center;border-radius:var(--r-sm);font-family:inherit;font-size:14px;font-weight:700;cursor:pointer;border:none;}
+.m-pri{background:var(--blu-grad);color:#fff;box-shadow:0 2px 8px rgba(37,99,235,0.15);}
+.m-sec{background:#fff;color:var(--g700);border:1.5px solid var(--g100);}
+@media(max-width:768px){footer{padding-bottom:84px;}}
+
+@media(prefers-reduced-motion:no-preference){
+  .pcard,.flow-step,.val,.tr-item,.rv,.pr-card{opacity:0;transform:translateY(14px);animation:rise .45s ease forwards;}
+  @keyframes rise{to{opacity:1;transform:translateY(0);}}
+  .pcard:nth-child(1),.flow-step:nth-child(1),.val:nth-child(1){animation-delay:.05s;}
+  .pcard:nth-child(2),.flow-step:nth-child(3),.val:nth-child(2){animation-delay:.1s;}
+  .pcard:nth-child(3),.flow-step:nth-child(5),.val:nth-child(3){animation-delay:.15s;}
+  .pcard:nth-child(4){animation-delay:.2s;}
+}
+</style>
+</head>
+<body>
+
+<nav class="topnav">
+<div class="container">
+  <a href="/" class="logo-wrap">
+    <svg style="width:28px;height:28px;" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#2563EB"/><path d="M8 22V12a2 2 0 012-2h4l2 3h6a2 2 0 012 2v7a2 2 0 01-2 2H10a2 2 0 01-2-2z" fill="#fff" opacity=".9"/><path d="M18 17l-2.5-2L13 17" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    <span class="logo-text">경매퀵</span>
+  </a>
+  <div class="nav-links">
+    <a href="/analysis" class="nav-link">물건분석</a>
+    <a href="/guide" class="nav-link">경매가이드</a>
+    <a href="/service" class="nav-link">서비스안내</a>
+    <a href="#pricing" class="nav-link">이용요금</a>
+    <button class="nav-cta">입찰 대리 신청</button>
+  </div>
+  <div class="nav-mobile">
+    <button class="nm-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"/></svg></button>
+    <button class="nm-btn"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg></button>
+  </div>
+</div>
+</nav>
+
+<section class="hero">
+<div class="container">
+<div class="hero-inner">
+<div class="hero-left">
+  <h1 class="hero-h1">경매 입찰,<br><em>5만원</em>이면 됩니다.</h1>
+  <p class="hero-sub">사건번호만 알려주세요. 서류는 비대면 처리,<br>결과는 당일 카카오톡으로 통보해드립니다.</p>
+  <div class="search-box">
+    <input class="search-input" type="text" placeholder="사건번호 또는 주소·단지명 검색">
+    <button class="search-btn">검색</button>
+  </div>
+  <div class="hero-btns">
+    <button class="hb hb-pri">입찰 대리 신청</button>
+    <a href="#pricing" class="hb hb-sec" style="display:flex;align-items:center;justify-content:center;">수수료 안내</a>
+  </div>
+</div>
+<div class="dash-card">
+  <div class="dash-head"><span class="dash-label">이번 주 인천지법 경매</span><span class="dash-court">인천지방법원</span></div>
+  <div class="qfilters">
+    <div class="qf"><div class="qf-num">42<small>건</small></div><div class="qf-label">이번 주 입찰</div></div>
+    <div class="qf"><div class="qf-num">18<small>건</small></div><div class="qf-label">1억 이하</div></div>
+    <div class="qf"><div class="qf-num">9<small>건</small></div><div class="qf-label">권리 깨끗</div></div>
+  </div>
+</div>
+</div>
+</div>
+</section>
+
+<div class="region-strip">
+<div class="region-inner">
+  <span class="rg-chip active">인천</span>
+  <span class="rg-chip soon">수원 <span class="rg-soon">오픈예정</span></span>
+  <span class="rg-chip soon">대전 <span class="rg-soon">오픈예정</span></span>
+  <span class="rg-chip soon">부산 <span class="rg-soon">오픈예정</span></span>
+  <span class="rg-chip soon">대구 <span class="rg-soon">오픈예정</span></span>
+</div>
+</div>
+
+<section class="section">
+<div class="container"><div class="sec-head"><span class="sec-title">오늘의 무료 물건분석</span><a href="/analysis" class="sec-more">전체보기 →</a></div></div>
+<div class="carousel-wrap"><div class="carousel">
+<div class="pcard"><div class="pc-top"><span class="pc-badge danger">피해야 할 물건</span><span class="pc-pct">49%</span></div><div class="pc-body"><div class="pc-name">덕산하이츠 302호</div><div class="pc-addr">미추홀구 주안동 · 다세대 · 49㎡ (14.9평)</div><div class="pc-prices"><div class="pp"><span class="pp-lb">감정가</span><span class="pp-old">2억 300만</span></div><div class="pp"><span class="pp-lb">최저가 4차</span><span class="pp-v">9,947만원</span></div></div><div class="pc-tags"><span class="ptag r">임차보증금 인수</span><span class="ptag">강제경매</span></div></div><div class="pc-foot"><span class="pc-meta">04.18 (금)</span><span class="pc-link">분석 보기 →</span></div></div>
+<div class="pcard"><div class="pc-top"><span class="pc-badge safe">투자매력 물건</span><span class="pc-pct">62%</span></div><div class="pc-body"><div class="pc-name">하임빌 201호</div><div class="pc-addr">미추홀구 용현동 · 다세대 · 60㎡ (18.1평)</div><div class="pc-prices"><div class="pp"><span class="pp-lb">감정가</span><span class="pp-old">1억 8,000만</span></div><div class="pp"><span class="pp-lb">최저가 3차</span><span class="pp-v">1억 1,160만</span></div></div><div class="pc-tags"><span class="ptag g">권리 깨끗</span><span class="ptag g">전부 소멸</span></div></div><div class="pc-foot"><span class="pc-meta">04.25 (금)</span><span class="pc-link">분석 보기 →</span></div></div>
+<div class="pcard"><div class="pc-top"><span class="pc-badge edu">정석 물건</span><span class="pc-pct">71%</span></div><div class="pc-body"><div class="pc-name">세원빌라 501호</div><div class="pc-addr">미추홀구 도화동 · 빌라 · 66㎡ (20평)</div><div class="pc-prices"><div class="pp"><span class="pp-lb">감정가</span><span class="pp-old">1억 5,500만</span></div><div class="pp"><span class="pp-lb">최저가 2차</span><span class="pp-v">1억 1,005만</span></div></div><div class="pc-tags"><span class="ptag g">전부 소멸</span><span class="ptag b">도화역 420m</span></div></div><div class="pc-foot"><span class="pc-meta">04.25 (금)</span><span class="pc-link">분석 보기 →</span></div></div>
+<div class="pcard"><div class="pc-top"><span class="pc-badge safe">투자매력 물건</span><span class="pc-pct">55%</span></div><div class="pc-body"><div class="pc-name">동원빌라 203호</div><div class="pc-addr">미추홀구 숭의동 · 다세대 · 53㎡ (16평)</div><div class="pc-prices"><div class="pp"><span class="pp-lb">감정가</span><span class="pp-old">1억 4,200만</span></div><div class="pp"><span class="pp-lb">최저가 3차</span><span class="pp-v">7,810만원</span></div></div><div class="pc-tags"><span class="ptag g">전부 소멸</span><span class="ptag b">숭의역 380m</span></div></div><div class="pc-foot"><span class="pc-meta">05.02 (금)</span><span class="pc-link">분석 보기 →</span></div></div>
+<div class="pcard-end">전체보기 →</div>
+</div></div>
+</section>
+
+<section class="why">
+<div class="container">
+<h2 class="why-h2">경매, 혼자 하기엔 시간이 아깝습니다</h2>
+<p class="why-sub">직접 입찰과 비교해보세요.</p>
+<table class="cmp"><thead><tr><th></th><th>직접 입찰</th><th>경매퀵</th></tr></thead><tbody>
+<tr><td>소요 시간</td><td>5시간+</td><td>5분</td></tr>
+<tr><td>수수료</td><td>0원 (교통비·일당 별도)</td><td>5만원~</td></tr>
+<tr><td>입찰표 실수</td><td>본인 책임</td><td>전문가 검토</td></tr>
+<tr><td>보증금</td><td>은행 방문 수표 발행</td><td>모바일 송금 1회</td></tr>
+<tr><td>서류</td><td>인감증명서 발급</td><td>전자서명 비대면</td></tr>
+<tr><td>결과</td><td>법원에서 직접 대기</td><td>당일 카톡 통보</td></tr>
+</tbody></table>
+<div class="vals">
+<div class="val"><div class="val-ic"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><h4>시간을 아끼세요</h4><p>법원 방문, 수표 발행, 대기 시간.<br>5시간을 5분으로 줄여드립니다.</p></div>
+<div class="val"><div class="val-ic"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 8c-1.66 0-3 .9-3 2s1.34 2 3 2 3 .9 3 2-1.34 2-3 2m0-8c1.11 0 2.08.4 2.6 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.4-2.6-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg></div><h4>합리적인 가격</h4><p>업계 평균 대비 절반 수준의 수수료.<br>D-1 신청도 추가 요금 없습니다.</p></div>
+<div class="val"><div class="val-ic"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"/></svg></div><h4>대표가 직접 입찰</h4><p>플랫폼 매칭이 아닌 직영 서비스.<br>공인중개사가 직접 법원에 갑니다.</p></div>
+</div>
+<div class="rvs" id="reviews"></div>
+</div>
+</section>
+
+<section class="flow-sec">
+<div class="container">
+<div class="sec-head"><span class="sec-title">이용 절차</span></div>
+<div class="flow">
+  <div class="flow-step"><div class="flow-num">1</div><h4>카카오톡 접수</h4><p>사건번호와 입찰가를 알려주세요.<br>전자서명으로 서류 비대면 처리.</p></div>
+  <div class="flow-arrow"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+  <div class="flow-step"><div class="flow-num">2</div><h4>보증금 전달</h4><p>전용계좌로 보증금을 송금해주세요.<br>수수료는 별도 계좌로 입금.</p></div>
+  <div class="flow-arrow"><svg fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></div>
+  <div class="flow-step"><div class="flow-num">3</div><h4>입찰 · 결과통보</h4><p>대표가 직접 법원에서 입찰합니다.<br>결과는 당일 카카오톡으로 통보.</p></div>
+</div>
+</div>
+</section>
+
+<section class="pricing" id="pricing">
+<div class="container">
+<h2 class="pr-h2">합리적인 수수료</h2>
+<p class="pr-sub">업계 평균의 절반 수준입니다. 낙찰 성공보수 +5만원.</p>
+<div class="pr-grid">
+<div class="pr-card"><div class="pr-name">얼리버드</div><div class="pr-price">5<small>만원</small></div><div class="pr-when">입찰일 7일+ 전 신청</div><div class="pr-feat">사전 준비 충분<br>기본 수수료</div></div>
+<div class="pr-card ft"><div class="pr-name">일반</div><div class="pr-price">7<small>만원</small></div><div class="pr-when">입찰일 2~7일 전 신청</div><div class="pr-feat">가장 많이 이용<br>충분한 준비 시간</div></div>
+<div class="pr-card"><div class="pr-name">급건</div><div class="pr-price">10<small>만원</small></div><div class="pr-when">입찰일 2일 이내 신청</div><div class="pr-feat">긴급 프리미엄<br>당일 접수 가능</div></div>
+</div>
+</div>
+</section>
+
+<section class="bottom-sec">
+<div class="container">
+<div class="trust-row">
+<div class="tr-item"><h5>공인중개사</h5><span>자격 보유</span></div>
+<div class="tr-item"><h5>보증보험</h5><span>서울보증보험</span></div>
+<div class="tr-item"><h5>비대면</h5><span>전자서명 처리</span></div>
+</div>
+<div class="cta-block">
+<div class="cta-txt"><strong>법원 방문 없이 입찰</strong>인천지방법원 전문. 수수료 5만원부터.</div>
+<button class="cta-btn">입찰 대리 신청</button>
+</div>
+</div>
+</section>
+
+<footer>
+<div class="container">
+<div class="f-grid">
+<div class="f-col"><div class="logo-wrap" style="margin-bottom:12px;"><svg style="width:24px;height:24px;" viewBox="0 0 32 32" fill="none"><rect width="32" height="32" rx="8" fill="#2563EB"/><path d="M8 22V12a2 2 0 012-2h4l2 3h6a2 2 0 012 2v7a2 2 0 01-2 2H10a2 2 0 01-2-2z" fill="#fff" opacity=".9"/><path d="M18 17l-2.5-2L13 17" stroke="#2563EB" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg><span style="font-size:16px;font-weight:900;color:var(--g800);">경매퀵</span></div><p>경매 입찰대리 서비스 · 인천지방법원 전문</p><p style="margin-top:8px;font-size:11px;">상호: (미정) · 대표: 박형준<br>사업자등록번호: (미정)<br>인천광역시 미추홀구 학익동</p></div>
+<div class="f-col"><h5>서비스</h5><a href="/analysis">물건분석</a><a href="/guide">경매가이드</a><a href="/service">서비스안내</a><a href="#pricing">이용요금</a><a href="/apply">입찰 대리 신청</a></div>
+<div class="f-col"><h5>지원</h5><a href="/faq">자주 묻는 질문</a><a href="/contact">문의하기</a><a href="/terms">이용약관</a><a href="/privacy">개인정보처리방침</a><a href="/refund">환불 규정</a></div>
+</div>
+<div class="f-comp">
+<strong>면책고지</strong> 본 콘텐츠는 대법원 경매정보 및 공공데이터를 기초로 작성된 참고 자료이며, 투자 권유가 아닙니다.<br>
+<strong>업무범위</strong> 본 서비스는 공인중개사법에 따른 매수신청 대리 업무만을 수행합니다.<br>
+<strong>시세정보</strong> 주변 시세는 네○○ 부동산 등 외부 데이터를 참조하였으며, 실시간 시세와 차이가 있을 수 있습니다.<br>
+<strong>전문가 의뢰 권고</strong> 실제 투자 시 반드시 법무사·변호사 등 전문가의 자문을 거치시기 바랍니다.
+</div>
+</div>
+</footer>
+
+<div class="m-sticky">
+<button class="m-btn m-sec">물건분석</button>
+<button class="m-btn m-pri">입찰 대리 신청</button>
+</div>
+
+<script>
+var pool=[
+{text:"평일에 법원 갈 시간이 도저히 안 나서 알아보다가 찾았습니다.\n카톡으로 사건번호 보내고 보증금 송금했더니 끝이더라고요.\n결과도 당일 저녁에 바로 받았습니다.",name:"김ㅇㅇ",role:"30대 남성 · 직장인"},
+{text:"경매가 처음이라 걱정이 많았는데\n물건분석 글을 먼저 읽고 연락드렸어요.\n복잡한 물건은 피하라는 조언이 큰 도움이 됐습니다.",name:"이ㅇㅇ",role:"40대 남성 · 경매 입문자"},
+{text:"연차 하루 쓰는 비용이랑 비교하면\n수수료가 오히려 저렴하다는 걸 나중에 깨달았어요.\n두 번째 물건도 맡겼습니다.",name:"박ㅇㅇ",role:"30대 남성 · IT 업계"},
+{text:"보증금 처리가 걱정이었는데\n전용계좌로 송금 한 번이면 끝나더라고요.\n수표 들고 은행 다닐 필요가 없어서 편했습니다.",name:"최ㅇㅇ",role:"40대 남성 · 자영업"},
+{text:"세 번째 이용인데 매번 입찰 결과를 바로 알려주셔서\n법원 앞에서 두 시간씩 기다리던 때가 생각나요.\n시간 아끼는 게 이런 거구나 싶습니다.",name:"정ㅇㅇ",role:"50대 남성 · 부동산 투자자"},
+{text:"남편 출장 중이라 대신 알아봤는데\n서류도 전자서명으로 되고 전화 한 통 없이 끝났어요.\n생각보다 훨씬 간단했습니다.",name:"한ㅇㅇ",role:"30대 · 맞벌이 가정"}
+];
+function shuffle(a){for(var i=a.length-1;i>0;i--){var j=Math.floor(Math.random()*(i+1));var t=a[i];a[i]=a[j];a[j]=t;}return a;}
+var picked=shuffle(pool.slice()).slice(0,3);
+var personSvg='<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/></svg>';
+var html='';
+picked.forEach(function(r){
+html+='<div class="rv"><div class="rv-avatar">'+personSvg+'</div><div class="rv-content"><div class="rv-bubble">'+r.text+'</div><div class="rv-meta">'+r.name+' · '+r.role+'</div></div></div>';
+});
+document.getElementById('reviews').innerHTML=html;
+</script>
+</body>
+</html>
