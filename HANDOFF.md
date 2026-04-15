@@ -1,9 +1,83 @@
 # 경매퀵 웹사이트 핸드오프 문서
 
 > **용도**: 다음 Claude Code 세션이 이 문서 하나만 읽고도 작업을 이어갈 수 있도록 현재 상태를 정리한다.
-> **작성일**: 2026-04-14
-> **빌드 상태**: Phase 1 전 단계(0~7) 완료, 프로덕션 빌드 성공
-> **함께 읽을 문서**: `CLAUDE.md` (원칙·컴플라이언스), `BUILD_GUIDE.md` (구조·토큰), `경매 입찰대리 사업 — 사업계획서.md` (사업 컨텍스트), `C:\Users\User\.claude\plans\fuzzy-growing-shell.md` (전체 빌드 플랜·결정 히스토리)
+> **최종 업데이트**: 2026-04-15
+> **현재 빌드 상태**: **Phase 2 전 단계(P2-0 ~ P2-6) + P2-7 Stage 1 완료**, 프로덕션 배포 중
+> **함께 읽을 문서**: `CLAUDE.md` (원칙·컴플라이언스), `BUILD_GUIDE.md` (구조·토큰), `C:\Users\User\.claude\plans\glimmering-hopping-aurora.md` (Phase 2 빌드 플랜 — 전체 결정 히스토리와 P2-7 설계 상세)
+
+---
+
+## ⚡ 2026-04-15 핫 스냅샷 — 다음 세션 시작 시 여기부터 읽기
+
+### 지금 어디인가
+
+**Phase 1 완료 → Phase 2 전 단계 완료 → P2-7 Stage 1 완료**의 상태. 이게 의미하는 것:
+
+- 고객이 Google 로그인 후 `/apply` 5단계 접수까지 완료 가능 (orders·documents·order_status_log DB 저장 + Storage 서류 업로드 + 1물건1고객 DB 강제)
+- 고객 마이페이지(`/my`)에서 본인 접수 현황·상태 타임라인·서류 다운로드 가능
+- 형준님(admin)이 `/admin`에서 접수 확인·상태 변경·SSN 즉시 삭제 가능
+- 물건분석 상세 페이지에 소프트 게이팅(2건째부터 블러) 작동
+- 계좌이체 UI에 수수료+보증금 합산 금액 복사 버튼, "온라인 결제(준비 중)" 영역
+- **대법원 경매정보 직접 크롤링 성공** — 인천 2주 기간 2047건 `court_listings` 테이블 적재 완료
+- 실전 프로덕션 URL: https://auctionsystem-green.vercel.app
+
+### P2-7 Stage 2 — 다음 세션 목표
+
+크롤러로 **텍스트 데이터**는 쌓았지만, 아직 `/apply` Step1은 frontmatter 매칭(`content/analysis/*.mdx` 3건)을 쓰고 있음. 이걸 `court_listings` 조회로 교체하고, 사진 온디맨드 페처를 붙이는 게 Stage 2.
+
+작업 범위(5개):
+1. **사진 페처 API route** — `src/app/api/court-listings/[docid]/photos/route.ts`
+   - `sharp` 설치 + Node 런타임 바이너리 이슈 해결
+   - `selectPicInf.on` 호출 → base64 JPEG 수신 → 800×600 WebP quality 75로 압축(원본 280KB → ~28KB)
+   - Supabase Storage `court-photos/{courtCode}/{docid}/{seq}.webp` 업로드
+   - `court_listings.photos` JSONB 업데이트 + `photos_fetched_at`
+   - 두 번째 요청부터는 캐시 hit으로 즉시 URL 반환
+   - 세션 로직은 `src/lib/courtAuction/session.ts`로 `scripts/crawler/session.mjs` 포팅
+2. **`/api/orders/check` 확장** — court_listings 조인해서 매칭 정보(감정가·최저가·주소 등) 함께 반환
+3. **`Step1Property.tsx` 재수정** — frontmatter 매칭 로직을 court_listings 조회로 교체. 매칭 성공 시 대법원 원본 데이터로 카드 렌더
+4. **`PhotoGallery` 컴포넌트 신규** — "사진 보기" 버튼 + 로딩 + 카테고리별 갤러리 + 한글 캡션 + Lightbox
+5. **`.github/workflows/court-crawler.yml`** — 매일 UTC 00:00(KST 09:00) cron으로 `scripts/crawler/index.mjs` 실행. GitHub Secrets에 `NEXT_PUBLIC_SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` 등록 필요
+
+추정 공수: ~2.5시간 / 1~2 세션.
+
+### 다음 세션 즉시 실행 트리거 (형준님이 복사해서 입력)
+
+**다음 세션 첫 메시지로 이것을 주세요**:
+
+```
+P2-7 Stage 2 착수. 지금 상태:
+- Phase 2 전단계(P2-0~P2-6) + P2-7 Stage 1 완료
+- court_listings 테이블에 인천 2주 2047건 이미 적재됨
+- scripts/crawler/ 모듈 작동 검증 완료
+- court-photos Storage 버킷 public read로 생성 완료
+- HANDOFF.md 상단 "2026-04-15 핫 스냅샷" 섹션부터 읽고 Stage 2 5개 작업 순서대로 진행해줘.
+  1번(사진 페처 API + sharp)부터 시작하고, 설치 이슈 생기면 즉시 알려줘.
+```
+
+### 다음 세션 시작 시 환경 체크리스트
+
+1. `pnpm -v` + `node --version` (Node 20.6+ 필수)
+2. `ls scripts/crawler/` — 6개 .mjs 파일 + README.md 확인
+3. `.env.local` 확인: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SITE_URL`
+4. Supabase Dashboard → Storage → `court-photos` 버킷 존재 확인 (public, 500KB limit, image/webp·jpeg)
+5. Supabase Table Editor → `court_listings` 테이블 2000+건 확인
+6. `pnpm dev` 기동 → http://localhost:3000 로드 → Google 로그인 → `/apply` 접근 가능한지
+
+체크 실패 시 HANDOFF.md "2. 기술 스택" + P2-7 관련 섹션 읽고 복구.
+
+### 절대 하지 말 것 (Stage 2에서 지켜야 할 가드레일)
+
+- **frontmatter 콘텐츠(`content/analysis/*.mdx`) 삭제 금지**. `/analysis` 콘텐츠는 court_listings와 별개의 편집 콘텐츠로 유지. 두 시스템 공존.
+- **`court_listings` 테이블을 클라이언트에서 직접 mutate 금지**. service_role 키는 서버 전용, 노출 금지.
+- **사진 전체를 크롤러가 배치로 수집하지 말 것**. 온디맨드 정책 (고객 요청 시점에만 fetch + 압축 + 저장).
+- **Stage 1 크롤러의 세션/페이로드 구조 변경 금지**. 2026-04-15 검증된 최소 작동 조합이므로 Stage 2에서 library 포팅 시 로직을 정확히 복제해야 함.
+- **Vercel Cron 대신 GitHub Actions 사용**. Vercel 서버리스는 10~60초 제한으로 크롤러 풀런(~5분) 불가.
+
+### P2-7 설계 전체 문서
+
+`C:\Users\User\.claude\plans\glimmering-hopping-aurora.md`의 "P2-7" 섹션에 Stage 1·2 설계, DB 스키마, 리스크, 검증 기준이 전부 있음. 다음 세션이 이 파일을 먼저 읽으면 맥락을 완전히 복원할 수 있다.
+
+---
 
 ---
 
@@ -382,13 +456,14 @@ npx tsc --noEmit    # 타입 체크
 
 ---
 
-## 15. 최근 세션 종료 상태
+## 15. 최근 세션 종료 상태 (2026-04-15 업데이트)
 
-- **커밋**: 없음 (사용자가 별도로 관리)
-- **마지막 작업**: 7단계 최종 검수 완료, 프로덕션 빌드 성공 보고
-- **대기**: 사용자가 이 핸드오프 문서를 ChatGPT/Claude 채팅과 조정 후 다음 세션 트리거로 사용
-- **플랜 파일**: `C:\Users\User\.claude\plans\fuzzy-growing-shell.md` (전체 결정 히스토리 포함, 참조용)
+- **최신 커밋**: `0437594` P2-7 stage 1 + `d3da44b` P2-6 마무리 + Step1 UX 재설계 (main 브랜치)
+- **마지막 작업**: P2-7 Stage 1 완료. 인천 2047건 `court_listings` 실적재 + 프로덕션 검증
+- **대기**: P2-7 Stage 2 — 사진 페처 API route + Step1 court_listings 통합 + PhotoGallery + GitHub Actions
+- **플랜 파일 (현행)**: `C:\Users\User\.claude\plans\glimmering-hopping-aurora.md` (Phase 2 + P2-7 결정 히스토리 포함)
+- **상단 "2026-04-15 핫 스냅샷" 섹션이 다음 세션의 첫 진입점**
 
 ---
 
-**이 문서를 읽은 다음 세션 Claude에게**: CLAUDE.md와 BUILD_GUIDE.md를 먼저 읽어 원칙을 숙지한 후, 사용자의 다음 지시를 기다리세요. 플랜 파일은 필요 시 참조하되, 이 핸드오프 문서가 현재 상태의 단일 진실 소스입니다.
+**이 문서를 읽은 다음 세션 Claude에게**: 상단 "2026-04-15 핫 스냅샷"을 먼저 읽고, CLAUDE.md·BUILD_GUIDE.md로 원칙을 숙지한 뒤, 플랜 파일의 P2-7 섹션에서 Stage 2 상세 설계를 확인하세요. 이 핸드오프 문서가 현재 상태의 단일 진실 소스입니다.
