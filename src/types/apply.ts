@@ -20,6 +20,8 @@ export interface ApplyBidInfo {
   jointBidding: boolean;
   jointApplicantName: string;
   jointApplicantPhone: string;
+  /** 재경매(대금미납 이력) 사건 여부. true면 보증금이 감정가의 20%로 계산됨. */
+  rebid: boolean;
 }
 
 export interface ApplyDocuments {
@@ -57,6 +59,7 @@ export const INITIAL_APPLY_DATA: ApplyFormData = {
     jointBidding: false,
     jointApplicantName: "",
     jointApplicantPhone: "",
+    rebid: false,
   },
   documents: {
     eSignFile: null,

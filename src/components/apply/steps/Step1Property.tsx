@@ -19,8 +19,42 @@ export function Step1Property({
   onNext: () => void;
 }) {
   const [lookupError, setLookupError] = useState<string | null>(null);
+  const [caseTaken, setCaseTaken] = useState(false);
+  const [checkingAvailability, setCheckingAvailability] = useState(false);
 
-  function handleLookup() {
+  /**
+   * /api/orders/check 호출. true 반환 = 신규 접수 가능.
+   * false 반환 = 이미 활성 접수가 존재하여 중복 불가.
+   * 네트워크 에러 시 일단 true를 반환(서버가 DB UNIQUE INDEX로 2차 방어).
+   */
+  async function checkCaseAvailability(caseNumber: string): Promise<boolean> {
+    setCheckingAvailability(true);
+    try {
+      const res = await fetch("/api/orders/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ caseNumber }),
+      });
+      if (res.status === 401) {
+        setCaseTaken(false);
+        return true; // 미로그인 에러는 상위 미들웨어가 처리
+      }
+      const json = (await res.json()) as {
+        available?: boolean | null;
+        reason?: string;
+      };
+      const available = json.available !== false;
+      setCaseTaken(!available);
+      return available;
+    } catch {
+      setCaseTaken(false);
+      return true;
+    } finally {
+      setCheckingAvailability(false);
+    }
+  }
+
+  async function handleLookup() {
     const q = data.caseNumber.trim();
     if (!q) {
       setLookupError("사건번호를 입력해주세요.");
@@ -37,25 +71,45 @@ export function Step1Property({
         manualEntry: false,
       });
       setLookupError(null);
+      await checkCaseAvailability(match.caseNumber);
     } else {
       onChange({ matchedPost: null, manualEntry: false });
+      setCaseTaken(false);
       setLookupError(
         "일치하는 물건분석을 찾지 못했습니다. 사건번호를 다시 확인하거나 수동 입력으로 계속 진행할 수 있습니다."
       );
     }
   }
 
-  function handleManual() {
-    if (!data.caseNumber.trim()) {
+  async function handleManual() {
+    const q = data.caseNumber.trim();
+    if (!q) {
       setLookupError("사건번호를 입력해주세요.");
       return;
+    }
+    const available = await checkCaseAvailability(q);
+    if (!available) {
+      setLookupError(null);
+      return; // caseTaken 배너가 표시되고 버튼 자체가 막힘
     }
     onChange({ matchedPost: null, manualEntry: true });
     setLookupError(null);
     onNext();
   }
 
-  const canProceed = !!data.matchedPost || data.manualEntry;
+  /**
+   * 사용자가 사건번호를 다시 편집하면 이전 중복 판정을 초기화.
+   * onChange를 감싸서 caseNumber 변경 시 caseTaken 자동 리셋.
+   */
+  function handleCaseNumberChange(v: string) {
+    if (caseTaken) setCaseTaken(false);
+    onChange({ caseNumber: v });
+  }
+
+  const canProceed =
+    (!!data.matchedPost || data.manualEntry) &&
+    !caseTaken &&
+    !checkingAvailability;
   const post = data.matchedPost;
 
   return (
@@ -107,7 +161,7 @@ export function Step1Property({
             type="text"
             placeholder="예: 2021타경521675"
             value={data.caseNumber}
-            onChange={(e) => onChange({ caseNumber: e.target.value })}
+            onChange={(e) => handleCaseNumberChange(e.target.value)}
             onKeyDown={(e) => {
               if (e.key === "Enter") {
                 e.preventDefault();
@@ -119,10 +173,11 @@ export function Step1Property({
           <button
             type="button"
             onClick={handleLookup}
-            className="flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-5 text-sm font-bold text-white hover:bg-[var(--color-ink-700)]"
+            disabled={checkingAvailability}
+            className="flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-5 text-sm font-bold text-white hover:bg-[var(--color-ink-700)] disabled:cursor-not-allowed disabled:opacity-60"
           >
             <Search size={16} aria-hidden="true" />
-            물건 확인
+            {checkingAvailability ? "확인 중..." : "물건 확인"}
           </button>
         </div>
         {lookupError && (
@@ -135,6 +190,32 @@ export function Step1Property({
           </p>
         )}
       </div>
+
+      {/* 이미 접수 진행 중 배너 */}
+      {caseTaken && (
+        <div
+          role="alert"
+          className="rounded-[var(--radius-xl)] border-2 border-[var(--color-accent-red)] bg-red-50 p-5"
+        >
+          <div className="flex items-start gap-3">
+            <AlertCircle
+              size={20}
+              className="mt-0.5 shrink-0 text-[var(--color-accent-red)]"
+              aria-hidden="true"
+            />
+            <div>
+              <p className="text-sm font-black text-[var(--color-accent-red)]">
+                이미 접수가 진행 중인 물건입니다
+              </p>
+              <p className="mt-1 text-xs leading-5 text-[var(--color-ink-700)]">
+                경매퀵은 한 물건에 한 고객만 대리 접수합니다 (이해충돌 방지).
+                같은 사건번호의 회차가 끝난 뒤 다음 회차부터 다시 접수 가능합니다.
+                궁금하신 점은 카카오톡으로 문의해주세요.
+              </p>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* 매칭된 물건 표시 */}
       {post && (

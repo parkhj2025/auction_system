@@ -105,6 +105,7 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
         form.set("jointApplicantName", data.bidInfo.jointApplicantName);
         form.set("jointApplicantPhone", data.bidInfo.jointApplicantPhone);
       }
+      form.set("isRebid", String(data.bidInfo.rebid));
       if (data.documents.eSignFile)
         form.set("eSignFile", data.documents.eSignFile);
       if (data.documents.idFile) form.set("idFile", data.documents.idFile);
@@ -115,6 +116,15 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
         applicationId?: string;
         error?: string;
       };
+      if (res.status === 401) {
+        throw new Error("로그인 세션이 만료되었습니다. 다시 로그인 후 시도해주세요.");
+      }
+      if (res.status === 409) {
+        throw new Error(
+          json.error ??
+            "해당 물건은 이미 다른 고객의 접수가 진행 중입니다. 중복 접수는 불가합니다."
+        );
+      }
       if (!json.ok || !json.applicationId) {
         throw new Error(json.error ?? "접수 처리 중 오류가 발생했습니다.");
       }

@@ -204,6 +204,30 @@ export function Step2BidInfo({
             )}
           </div>
 
+          {/* 재경매 물건 여부 */}
+          <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4">
+            <label className="flex cursor-pointer items-start gap-3">
+              <input
+                type="checkbox"
+                checked={bid.rebid}
+                onChange={(e) =>
+                  onBidInfoChange({ rebid: e.target.checked })
+                }
+                className="mt-0.5 h-5 w-5 rounded border-[var(--color-border)] accent-brand-600"
+              />
+              <div>
+                <span className="text-sm font-bold text-[var(--color-ink-900)]">
+                  재경매 물건 (보증금 20%)
+                </span>
+                <p className="mt-0.5 text-xs leading-5 text-[var(--color-ink-500)]">
+                  법원이 지정한 재경매(대금미납 이력) 사건인 경우 체크하세요.
+                  보증금이 감정가의 20%로 계산됩니다. 잘 모르시면 체크하지
+                  말고 접수 후 확인 시 안내받으시면 됩니다.
+                </p>
+              </div>
+            </label>
+          </div>
+
           {/* 공동입찰 */}
           <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4">
             <label className="flex cursor-pointer items-center gap-3">

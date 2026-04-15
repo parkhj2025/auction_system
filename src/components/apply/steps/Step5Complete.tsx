@@ -18,10 +18,11 @@ export function Step5Complete({
   const [copied, setCopied] = useState(false);
   const fee = data.matchedPost
     ? computeFee(data.matchedPost.bidDate)
-    : { baseFee: 50000, tierLabel: "얼리버드", successBonus: 50000, daysUntilBid: 0, tier: "earlybird" as const, description: "" };
+    : { baseFee: 70000, tierLabel: "일반", successBonus: 50000, daysUntilBid: 0, tier: "standard" as const, description: "" };
   const deposit = data.matchedPost
-    ? computeDeposit(data.matchedPost.appraisal)
+    ? computeDeposit(data.matchedPost.appraisal, data.bidInfo.rebid)
     : null;
+  const depositPercentLabel = data.bidInfo.rebid ? "20%" : "10%";
 
   async function copyAccount() {
     try {
@@ -87,14 +88,15 @@ export function Step5Complete({
           </h3>
           <div className="mt-4">
             <p className="text-xs text-[var(--color-ink-500)]">
-              감정가의 10% · {bidDateLabel}
+              감정가의 {depositPercentLabel} · {bidDateLabel}
             </p>
             <p className="mt-1 text-3xl font-black tabular-nums text-[var(--color-ink-900)]">
               {formatKoreanWon(deposit)}
             </p>
             <p className="mt-3 text-xs leading-5 text-[var(--color-ink-500)]">
-              재경매(대금미납 이력) 사건의 경우 보증금이 감정가의 20%로 상향될
-              수 있으며, 해당 시 확인 연락 시 별도로 안내드립니다.{" "}
+              {data.bidInfo.rebid
+                ? "재경매 사건으로 체크하셔서 보증금이 감정가의 20%로 계산되었습니다. "
+                : "일반 경매 기준 감정가의 10%로 계산되었습니다. 재경매 사건이면 접수 확인 시 안내 후 20%로 재계산됩니다. "}
               <strong className="text-[var(--color-ink-900)]">
                 패찰 시 보증금은 전액 반환
               </strong>

@@ -71,6 +71,34 @@ RETURNS BOOLEAN AS $$
 $$ LANGUAGE sql SECURITY DEFINER STABLE;
 
 
+-- 사건번호가 현재 활성 접수 상태인지 확인 (1물건 1고객 사전 검증용)
+-- SECURITY DEFINER로 orders RLS 우회하여 본인 접수뿐 아니라 타인 접수도 체크 가능.
+-- 반환은 boolean만이므로 타인 접수의 상세 내용은 노출되지 않음.
+CREATE OR REPLACE FUNCTION public.is_case_active(case_no TEXT)
+RETURNS BOOLEAN AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.orders
+    WHERE case_number = case_no
+      AND status NOT IN ('cancelled', 'settled', 'deposit_returned')
+      AND deleted_at IS NULL
+  );
+$$ LANGUAGE sql SECURITY DEFINER STABLE;
+
+
+-- 주문 생성 시 order_status_log에 초기 row 자동 삽입 (RLS 우회)
+-- order_status_log INSERT 정책이 admin 전용이므로, 사용자가 /api/apply로
+-- orders를 생성한 직후 log row를 만들려면 RLS를 우회할 필요가 있음.
+-- SECURITY DEFINER로 postgres 권한으로 INSERT 수행.
+CREATE OR REPLACE FUNCTION public.log_order_creation()
+RETURNS TRIGGER AS $$
+BEGIN
+  INSERT INTO public.order_status_log (order_id, from_status, to_status, changed_by)
+  VALUES (NEW.id, NULL, NEW.status, NEW.user_id);
+  RETURN NEW;
+END;
+$$ LANGUAGE plpgsql SECURITY DEFINER;
+
+
 -- 주문 상태가 종료 상태로 전이될 때 ssn_front 자동 NULL
 CREATE OR REPLACE FUNCTION public.auto_delete_ssn()
 RETURNS TRIGGER AS $$
@@ -238,6 +266,11 @@ DROP TRIGGER IF EXISTS auto_delete_ssn_on_status_change ON public.orders;
 CREATE TRIGGER auto_delete_ssn_on_status_change
   BEFORE UPDATE ON public.orders
   FOR EACH ROW EXECUTE FUNCTION public.auto_delete_ssn();
+
+DROP TRIGGER IF EXISTS on_order_created ON public.orders;
+CREATE TRIGGER on_order_created
+  AFTER INSERT ON public.orders
+  FOR EACH ROW EXECUTE FUNCTION public.log_order_creation();
 
 -- RLS
 ALTER TABLE public.orders ENABLE ROW LEVEL SECURITY;
