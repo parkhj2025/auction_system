@@ -12,6 +12,7 @@ import { DetailSidebar } from "@/components/analysis/DetailSidebar";
 import { ApplyCTA } from "@/components/analysis/ApplyCTA";
 import { RelatedCards } from "@/components/analysis/RelatedCards";
 import { buildAnalysisMdxComponents } from "@/components/analysis/mdx-components";
+import { GatingWrapper } from "@/components/analysis/GatingWrapper";
 
 export const dynamicParams = false;
 
@@ -93,15 +94,19 @@ export default async function AnalysisDetailPage({
       <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
         <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px]">
           <article className="min-w-0">
-            <MDXRemote
-              source={post.content}
-              components={components}
-              options={{
-                mdxOptions: {
-                  remarkPlugins: [remarkGfm],
-                },
-              }}
-            />
+            {/* MDX 본문만 게이팅 대상. ApplyCTA/RelatedCards는 전환 경로 보호 목적으로
+                게이팅 영역 밖에 유지 (CLAUDE.md 판단기준 ① 전환 경로 유지). */}
+            <GatingWrapper slug={slug}>
+              <MDXRemote
+                source={post.content}
+                components={components}
+                options={{
+                  mdxOptions: {
+                    remarkPlugins: [remarkGfm],
+                  },
+                }}
+              />
+            </GatingWrapper>
 
             <ApplyCTA fm={fm} />
             <RelatedCards posts={related} />
