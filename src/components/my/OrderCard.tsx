@@ -13,10 +13,6 @@ import { cn } from "@/lib/utils";
  */
 export function OrderCard({ order }: { order: OrderRow }) {
   const snapshot = order.property_snapshot ?? {};
-  const title =
-    (snapshot as { title?: string }).title ||
-    (snapshot as { buildingName?: string }).buildingName ||
-    order.case_number;
   const address = (snapshot as { address?: string }).address || null;
   const bidDate = (snapshot as { bidDate?: string }).bidDate || null;
 
@@ -40,14 +36,13 @@ export function OrderCard({ order }: { order: OrderRow }) {
               {order.application_id}
             </span>
           </div>
-          <h3 className="mt-2 truncate text-base font-black text-[var(--color-ink-900)] sm:text-lg">
-            {title}
-          </h3>
-          <p className="mt-1 truncate text-xs text-[var(--color-ink-500)]">
+          {/* 주문의 정체성은 콘텐츠 제목이 아니라 "법원 + 사건번호" */}
+          <p className="mt-2 text-xs font-bold text-[var(--color-ink-700)]">
             {order.court}
-            {" · "}
-            <span className="tabular-nums">{order.case_number}</span>
           </p>
+          <h3 className="mt-0.5 truncate font-mono text-base font-black tabular-nums text-[var(--color-ink-900)] sm:text-lg">
+            {order.case_number}
+          </h3>
         </div>
         <ChevronRight
           size={18}

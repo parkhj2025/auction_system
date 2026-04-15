@@ -65,10 +65,9 @@ export default async function OrderDetailPage({
 
   const row = order as OrderRow;
   const snapshot = row.property_snapshot ?? {};
-  const title =
-    (snapshot as { title?: string }).title ||
-    (snapshot as { buildingName?: string }).buildingName ||
-    row.case_number;
+  // 주문의 정체성은 "법원 + 사건번호". 콘텐츠 제목은 매칭된 경우에만 보조로 노출.
+  const matchedContentTitle =
+    (snapshot as { title?: string }).title ?? null;
   const address = (snapshot as { address?: string }).address || null;
   const bidDate = (snapshot as { bidDate?: string }).bidDate || null;
   const appraisal = (snapshot as { appraisal?: number }).appraisal ?? null;
@@ -106,16 +105,23 @@ export default async function OrderDetailPage({
               {row.application_id}
             </span>
           </div>
-          <h1 className="mt-3 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
-            {title}
-          </h1>
-          <p className="mt-1 text-sm text-[var(--color-ink-500)]">
+          <p className="mt-3 text-sm font-bold text-[var(--color-ink-700)]">
             {row.court}
-            {" · "}
-            <span className="tabular-nums">{row.case_number}</span>
-            {" · 접수 "}
-            {formatKoreanDate(row.created_at)}
           </p>
+          <h1 className="mt-1 font-mono text-2xl font-black tabular-nums tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+            {row.case_number}
+          </h1>
+          <p className="mt-2 text-sm text-[var(--color-ink-500)]">
+            접수 {formatKoreanDate(row.created_at)}
+          </p>
+          {matchedContentTitle && (
+            <p className="mt-2 text-xs text-[var(--color-ink-500)]">
+              매칭 콘텐츠:{" "}
+              <span className="text-[var(--color-ink-700)]">
+                {matchedContentTitle}
+              </span>
+            </p>
+          )}
         </div>
         <a
           href="https://pf.kakao.com/"
