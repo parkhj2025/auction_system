@@ -6,6 +6,9 @@ import { getAllAnalysisPosts } from "@/lib/content";
 import { ApplyClient } from "@/components/apply/ApplyClient";
 import { ApplyChecklist } from "@/components/apply/ApplyChecklist";
 
+// 로그인 상태에 따라 달라지는 페이지이므로 정적 캐싱 금지
+export const dynamic = "force-dynamic";
+
 export const metadata: Metadata = {
   title: "입찰 대리 신청",
   description:

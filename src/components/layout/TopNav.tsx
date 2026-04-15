@@ -5,8 +5,9 @@ import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { PRIMARY_NAV, PRIMARY_CTA } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
+import { UserMenu, type UserMenuProps } from "@/components/auth/UserMenu";
 
-export function TopNav() {
+export function TopNav({ user }: { user: UserMenuProps | null }) {
   const [open, setOpen] = useState(false);
 
   useEffect(() => {
@@ -55,12 +56,32 @@ export function TopNav() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link
-            href={PRIMARY_CTA.href}
-            className="hidden h-10 items-center rounded-[var(--radius-md)] bg-brand-600 px-4 text-sm font-bold text-white shadow-[var(--shadow-card)] transition hover:bg-brand-700 md:inline-flex"
-          >
-            {PRIMARY_CTA.label}
-          </Link>
+          {user ? (
+            <div className="hidden md:flex md:items-center md:gap-2">
+              <Link
+                href={PRIMARY_CTA.href}
+                className="inline-flex h-10 items-center rounded-[var(--radius-md)] bg-brand-600 px-4 text-sm font-bold text-white shadow-[var(--shadow-card)] transition hover:bg-brand-700"
+              >
+                {PRIMARY_CTA.label}
+              </Link>
+              <UserMenu {...user} />
+            </div>
+          ) : (
+            <div className="hidden md:flex md:items-center md:gap-2">
+              <Link
+                href="/login"
+                className="inline-flex h-10 items-center rounded-[var(--radius-md)] px-4 text-sm font-bold text-[var(--color-ink-700)] transition hover:bg-[var(--color-ink-100)]"
+              >
+                로그인
+              </Link>
+              <Link
+                href={PRIMARY_CTA.href}
+                className="inline-flex h-10 items-center rounded-[var(--radius-md)] bg-brand-600 px-4 text-sm font-bold text-white shadow-[var(--shadow-card)] transition hover:bg-brand-700"
+              >
+                {PRIMARY_CTA.label}
+              </Link>
+            </div>
+          )}
           <button
             type="button"
             onClick={() => setOpen((v) => !v)}
@@ -114,6 +135,35 @@ export function TopNav() {
           >
             {PRIMARY_CTA.label}
           </Link>
+          {user ? (
+            <div className="mt-3 rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 py-3">
+              <p className="truncate text-sm font-bold text-[var(--color-ink-900)]">
+                {user.displayName}
+              </p>
+              {user.email && (
+                <p className="mt-0.5 truncate text-xs text-[var(--color-ink-500)]">
+                  {user.email}
+                </p>
+              )}
+              <div className="mt-3 flex flex-col gap-2">
+                <Link
+                  href="/my"
+                  onClick={() => setOpen(false)}
+                  className="flex min-h-11 items-center justify-center rounded-[var(--radius-sm)] border border-[var(--color-border)] px-4 text-sm font-bold text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)]"
+                >
+                  마이페이지
+                </Link>
+              </div>
+            </div>
+          ) : (
+            <Link
+              href="/login"
+              onClick={() => setOpen(false)}
+              className="mt-3 flex min-h-12 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 text-base font-bold text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)]"
+            >
+              로그인
+            </Link>
+          )}
         </div>
       </div>
     </header>
