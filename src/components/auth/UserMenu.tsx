@@ -79,6 +79,22 @@ export function UserMenu({ displayName, email, initial }: UserMenuProps) {
               마이페이지
             </Link>
             <Link
+              href="/my/orders"
+              onClick={() => setOpen(false)}
+              className="block px-4 py-2.5 text-sm font-medium text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)]"
+              role="menuitem"
+            >
+              접수 내역
+            </Link>
+            <Link
+              href="/my/profile"
+              onClick={() => setOpen(false)}
+              className="block px-4 py-2.5 text-sm font-medium text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)]"
+              role="menuitem"
+            >
+              내 정보
+            </Link>
+            <Link
               href="/apply"
               onClick={() => setOpen(false)}
               className="block px-4 py-2.5 text-sm font-medium text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)]"
