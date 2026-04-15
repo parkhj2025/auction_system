@@ -2,11 +2,18 @@
 
 import Link from "next/link";
 import { useState } from "react";
-import { CheckCircle2, Copy, Check, Home, FileText } from "lucide-react";
+import {
+  CheckCircle2,
+  Copy,
+  Check,
+  Home,
+  FileText,
+  CreditCard,
+} from "lucide-react";
 import type { ApplyFormData } from "@/types/apply";
 import { computeDeposit, computeFee } from "@/lib/apply";
 import { formatKoreanWon } from "@/lib/utils";
-import { BANK_INFO } from "@/lib/constants";
+import { BANK_INFO, PAYMENT_PG_ENABLED } from "@/lib/constants";
 
 export function Step5Complete({
   data,
@@ -15,7 +22,9 @@ export function Step5Complete({
   data: ApplyFormData;
   applicationId: string;
 }) {
-  const [copied, setCopied] = useState(false);
+  const [copiedField, setCopiedField] = useState<
+    "account" | "amount" | null
+  >(null);
   const fee = data.matchedPost
     ? computeFee(data.matchedPost.bidDate)
     : { baseFee: 70000, tierLabel: "일반", successBonus: 50000, daysUntilBid: 0, tier: "standard" as const, description: "" };
@@ -23,14 +32,26 @@ export function Step5Complete({
     ? computeDeposit(data.matchedPost.appraisal, data.bidInfo.rebid)
     : null;
   const depositPercentLabel = data.bidInfo.rebid ? "20%" : "10%";
+  // 수수료 + 보증금 합계 (송금 시 한 번에 보낼 금액)
+  const totalToSend = deposit !== null ? fee.baseFee + deposit : fee.baseFee;
 
   async function copyAccount() {
     try {
       await navigator.clipboard.writeText(
         `${BANK_INFO.bank} ${BANK_INFO.accountNumber}`
       );
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2000);
+      setCopiedField("account");
+      setTimeout(() => setCopiedField(null), 2000);
+    } catch {
+      // ignore
+    }
+  }
+
+  async function copyAmount() {
+    try {
+      await navigator.clipboard.writeText(String(totalToSend));
+      setCopiedField("amount");
+      setTimeout(() => setCopiedField(null), 2000);
     } catch {
       // ignore
     }
@@ -106,10 +127,52 @@ export function Step5Complete({
         </section>
       )}
 
-      <section className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-6">
-        <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
-          전용계좌
+      <section className="rounded-[var(--radius-xl)] border-2 border-brand-600 bg-brand-50/30 p-6">
+        <h3 className="text-sm font-black uppercase tracking-wider text-brand-700">
+          전용계좌 송금
         </h3>
+
+        {/* 송금 금액 강조 */}
+        <div className="mt-4 rounded-[var(--radius-lg)] border border-brand-600 bg-white p-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+            <div>
+              <p className="text-xs font-bold text-[var(--color-ink-500)]">
+                총 송금 금액 (수수료{deposit !== null ? " + 보증금" : ""})
+              </p>
+              <p className="mt-1 text-3xl font-black tabular-nums text-[var(--color-ink-900)] sm:text-4xl">
+                {formatKoreanWon(totalToSend)}
+              </p>
+              <p className="mt-1 text-xs text-[var(--color-ink-500)]">
+                수수료 {formatKoreanWon(fee.baseFee)}
+                {deposit !== null && (
+                  <>
+                    {" + 보증금 "}
+                    {formatKoreanWon(deposit)}
+                  </>
+                )}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={copyAmount}
+              className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-sm font-bold text-[var(--color-ink-900)] hover:border-brand-600 hover:text-brand-700"
+            >
+              {copiedField === "amount" ? (
+                <>
+                  <Check size={14} aria-hidden="true" />
+                  금액 복사됨
+                </>
+              ) : (
+                <>
+                  <Copy size={14} aria-hidden="true" />
+                  금액 복사
+                </>
+              )}
+            </button>
+          </div>
+        </div>
+
+        {/* 계좌 정보 */}
         <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <p className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
@@ -128,7 +191,7 @@ export function Step5Complete({
             onClick={copyAccount}
             className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-sm font-bold text-[var(--color-ink-900)] hover:border-brand-600 hover:text-brand-700"
           >
-            {copied ? (
+            {copiedField === "account" ? (
               <>
                 <Check size={14} aria-hidden="true" />
                 복사됨
@@ -142,6 +205,33 @@ export function Step5Complete({
           </button>
         </div>
       </section>
+
+      {/* 온라인 결제 (준비 중) — PAYMENT_PG_ENABLED 플래그 기반 */}
+      {!PAYMENT_PG_ENABLED && (
+        <section className="rounded-[var(--radius-xl)] border border-dashed border-[var(--color-border)] bg-[var(--color-surface-muted)] p-6">
+          <div className="flex items-start gap-4">
+            <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-100)] text-[var(--color-ink-500)]">
+              <CreditCard size={18} aria-hidden="true" />
+            </span>
+            <div className="flex-1">
+              <h3 className="text-sm font-black text-[var(--color-ink-700)]">
+                온라인 결제 (준비 중)
+              </h3>
+              <p className="mt-1 text-xs leading-5 text-[var(--color-ink-500)]">
+                신용카드·간편결제 서비스를 준비하고 있습니다. 당분간은 위 전용계좌
+                이체로 진행해주시고, 서비스 오픈 시 마이페이지에서 안내드립니다.
+              </p>
+            </div>
+            <button
+              type="button"
+              disabled
+              className="inline-flex min-h-9 shrink-0 items-center rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-white px-3 text-xs font-bold text-[var(--color-ink-500)]"
+            >
+              준비 중
+            </button>
+          </div>
+        </section>
+      )}
 
       <section className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6">
         <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
