@@ -427,10 +427,132 @@ CREATE POLICY "storage_select_admin"
 
 
 -- ============================================================================
--- 9. 운영 메모 (실행자용)
+-- 9. TABLE: court_listings (P2-7 대법원 크롤러 적재 대상)
 -- ============================================================================
--- 1. 이 파일 실행 후 Storage 버킷 order-documents를 Dashboard에서 생성할 것.
+-- 대법원 경매정보 사이트(courtauction.go.kr)에서 일일 배치로 수집되는
+-- 경매 물건 목록. 크롤러가 service_role로 upsert하고, anon/authenticated
+-- 사용자는 SELECT만 가능(공개 데이터).
+--
+-- 사진(photos JSONB)은 크롤링 시점에는 채우지 않고, 고객이 /apply에서
+-- "사진 보기"를 누르는 시점에 별도 API가 selectPicInf.on 호출 → sharp로
+-- 1/10 WebP 압축 → Supabase Storage(court-photos 버킷)에 업로드 →
+-- 결과 URL을 이 컬럼에 저장하는 온디맨드 방식.
+
+CREATE TABLE IF NOT EXISTS public.court_listings (
+  -- 식별자 (대법원 응답 그대로)
+  docid TEXT PRIMARY KEY,                      -- 대법원 고유 ID (B000240... 형식)
+  court_code TEXT NOT NULL,                    -- cortOfcCd (예: B000240)
+  court_name TEXT NOT NULL,                    -- jiwonNm (예: 인천지방법원)
+  case_number TEXT NOT NULL,                   -- srnSaNo (예: 2021타경515069)
+  internal_case_no TEXT,                       -- saNo (내부 표기, 조인용)
+  item_sequence INT DEFAULT 1,                 -- maemulSer (물건 순번)
+  mokmul_sequence INT DEFAULT 1,               -- mokmulSer
+  group_id TEXT,                                -- groupmaemulser (사건별 그룹)
+
+  -- 주소
+  sido TEXT,                                    -- hjguSido
+  sigungu TEXT,                                 -- hjguSigu
+  dong TEXT,                                    -- hjguDong
+  ri_name TEXT,                                 -- hjguRd (리)
+  lot_number TEXT,                              -- daepyoLotno (지번)
+  building_name TEXT,                           -- buldNm
+  address_display TEXT,                         -- printSt (완성 주소)
+
+  -- 면적 / 지목 / 용도
+  area_display TEXT,                            -- areaList (예: "2645㎡")
+  area_m2 NUMERIC,                              -- maxArea / minArea
+  land_category TEXT,                           -- jimokList (예: "임야")
+  usage_name TEXT,                              -- dspslUsgNm (예: "다세대")
+  usage_large_code TEXT,                        -- lclsUtilCd
+  usage_medium_code TEXT,                       -- mclsUtilCd
+  usage_small_code TEXT,                        -- sclsUtilCd
+
+  -- 경매 정보
+  appraisal_amount BIGINT,                      -- gamevalAmt (감정가)
+  min_bid_amount BIGINT,                        -- minmaePrice (최저매각가)
+  next_min_bid_amount BIGINT,                   -- notifyMinmaePrice1
+  next_min_bid_rate INT,                        -- notifyMinmaePriceRate1
+  failed_count INT DEFAULT 0,                   -- yuchalCnt (유찰횟수)
+  bid_date DATE,                                -- maeGiil YYYYMMDD → DATE
+  bid_time TEXT,                                -- maeHh1 (예: "1000")
+  result_decision_date DATE,                    -- maegyuljGiil
+  bid_place TEXT,                               -- maePlace (예: "219호법정")
+  status_code TEXT,                             -- mulStatcd
+  progress_status_code TEXT,                    -- jinstatCd
+  is_progressing BOOLEAN,                       -- mulJinYn = 'Y'
+  bigo TEXT,                                    -- mulBigo (특이사항)
+
+  -- 담당
+  dept_code TEXT,                               -- jpDeptCd
+  dept_name TEXT,                               -- jpDeptNm (예: "경매14계")
+  dept_tel TEXT,                                -- tel
+
+  -- 좌표
+  wgs84_lon NUMERIC,                            -- wgs84Xcordi
+  wgs84_lat NUMERIC,                            -- wgs84Ycordi
+
+  -- 사진 (온디맨드로 채워짐)
+  photos JSONB,                                 -- [{seq,category,caption,url,thumbnailUrl}]
+  photos_fetched_at TIMESTAMPTZ,                -- 사진 수집 시점 (null = 미수집)
+  photos_count INT DEFAULT 0,                   -- 업로드된 사진 개수
+
+  -- 원본 보존 (스키마 변경 대응용)
+  raw_snapshot JSONB NOT NULL,                  -- 크롤러 응답 record 전체
+
+  -- 운영 메타
+  first_seen_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  last_seen_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+  is_active BOOLEAN NOT NULL DEFAULT true       -- 배치에서 안 보이면 false (소프트 비활성화)
+);
+
+-- 인덱스
+CREATE INDEX IF NOT EXISTS court_listings_court_active_idx
+  ON public.court_listings (court_code, is_active, bid_date);
+CREATE INDEX IF NOT EXISTS court_listings_case_number_idx
+  ON public.court_listings (case_number);
+CREATE INDEX IF NOT EXISTS court_listings_bid_date_idx
+  ON public.court_listings (bid_date)
+  WHERE is_active = true;
+CREATE INDEX IF NOT EXISTS court_listings_usage_idx
+  ON public.court_listings (usage_large_code, usage_medium_code)
+  WHERE is_active = true;
+
+-- RLS: 공공 공개 데이터 → 모든 사용자(anon 포함) SELECT 허용
+-- INSERT/UPDATE/DELETE 정책 없음 → service_role key만 쓰기 가능
+ALTER TABLE public.court_listings ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "court_listings_public_read" ON public.court_listings;
+CREATE POLICY "court_listings_public_read" ON public.court_listings
+  FOR SELECT USING (is_active = true);
+
+
+-- ============================================================================
+-- 10. STORAGE POLICIES (bucket: court-photos)
+-- ============================================================================
+-- 사전 준비: Supabase Dashboard → Storage → New bucket
+--   name: court-photos
+--   public: true               (공공 경매 사진이라 익명 조회 허용)
+--   file size limit: 500 KB    (1/10 WebP 압축 후 평균 30KB)
+--   allowed mime types: image/webp, image/jpeg
+
+DROP POLICY IF EXISTS "court_photos_public_read" ON storage.objects;
+CREATE POLICY "court_photos_public_read"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'court-photos');
+
+-- INSERT/UPDATE는 정책 없음 → service_role key로만 업로드 가능
+-- (크롤러·사진 페처가 SUPABASE_SERVICE_ROLE_KEY로 직접 업로드)
+
+
+-- ============================================================================
+-- 11. 운영 메모 (실행자용)
+-- ============================================================================
+-- 1. 이 파일 실행 후 Storage 버킷 2개를 Dashboard에서 생성할 것:
+--    - order-documents (private, 10MB, PDF/JPG/PNG/WebP) — P2-2에서 사용
+--    - court-photos (public, 500KB, WebP/JPG) — P2-7에서 사용
 -- 2. 형준님 계정 최초 로그인 후 다음 쿼리로 admin 권한 부여:
 --      UPDATE public.profiles SET role = 'admin' WHERE email = '형준님이메일';
 -- 3. 애플리케이션 레벨 상태 전이 규칙은 /api/orders/[id]/status 핸들러가 관리.
 --    DB 트리거는 ssn_front 자동 삭제만 담당.
+-- 4. court_listings는 크롤러(scripts/crawler/)가 service_role로 upsert.
+--    anon 사용자도 SELECT 가능(공공 데이터).
