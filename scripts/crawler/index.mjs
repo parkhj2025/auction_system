@@ -316,18 +316,27 @@ async function main() {
   } else {
     try {
       // 해당 court_code의 기존 active docid 전부 조회
-      const { data: dbRows, error: dbErr } = await (
-        await import("./upsert.mjs")
-      )
-        .getClient()
-        .from("court_listings")
-        .select("docid")
-        .eq("court_code", courtInfo.code)
-        .eq("is_active", true);
+      // Supabase 기본 limit=1000이므로 range 페이지네이션 필수
+      const client = (await import("./upsert.mjs")).getClient();
+      const allDbDocids = [];
+      const DB_BATCH = 1000;
+      let offset = 0;
 
-      if (dbErr) throw new Error(dbErr.message);
+      while (true) {
+        const { data: batch, error: batchErr } = await client
+          .from("court_listings")
+          .select("docid")
+          .eq("court_code", courtInfo.code)
+          .eq("is_active", true)
+          .range(offset, offset + DB_BATCH - 1);
 
-      existingDocids = new Set((dbRows ?? []).map((r) => r.docid));
+        if (batchErr) throw new Error(batchErr.message);
+        allDbDocids.push(...(batch ?? []));
+        if (!batch || batch.length < DB_BATCH) break;
+        offset += DB_BATCH;
+      }
+
+      existingDocids = new Set(allDbDocids.map((r) => r.docid));
       info(`DB 기존 active: ${existingDocids.size}건`);
 
       // 분류
