@@ -1,0 +1,169 @@
+name: Crawler API Probe
+
+on:
+  workflow_dispatch:
+
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Show runner external IP
+        run: curl -s https://ifconfig.me && echo ""
+
+      - name: Single search API call
+        run: |
+          # 1. Session init
+          echo "=== Session Init ==="
+          COOKIES=$(curl -s -D - -o /dev/null \
+            -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36" \
+            "https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F00.xml" \
+            | grep -i "^set-cookie:" | sed 's/set-cookie: //i' | cut -d';' -f1)
+
+          # Parse cookies into a single string
+          COOKIE_STR=""
+          while IFS= read -r line; do
+            line=$(echo "$line" | tr -d '\r')
+            val=$(echo "$line" | cut -d'=' -f2-)
+            if [ -n "$val" ]; then
+              if [ -n "$COOKIE_STR" ]; then
+                COOKIE_STR="$COOKIE_STR; $line"
+              else
+                COOKIE_STR="$line"
+              fi
+            fi
+          done <<< "$COOKIES"
+          echo "Cookies: $COOKIE_STR"
+
+          sleep 2
+
+          # 2. Search API single call
+          echo ""
+          echo "=== Single Search API Call ==="
+          TODAY=$(date +%Y%m%d)
+          END=$(date -d "+14 days" +%Y%m%d)
+
+          RESPONSE=$(curl -s -w "\nHTTP_CODE:%{http_code}" \
+            -X POST "https://www.courtauction.go.kr/pgj/pgjsearch/searchControllerMain.on" \
+            -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36" \
+            -H "Content-Type: application/json;charset=UTF-8" \
+            -H "Accept: application/json, text/plain, */*" \
+            -H "Origin: https://www.courtauction.go.kr" \
+            -H "Referer: https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F00.xml" \
+            -H "SC-Userid: SYSTEM" \
+            -H "submissionid: mf_wfm_mainFrame_sbm_selectGdsDtlSrch" \
+            -H "Sec-Fetch-Dest: empty" \
+            -H "Sec-Fetch-Mode: cors" \
+            -H "Sec-Fetch-Site: same-origin" \
+            -H "Cookie: $COOKIE_STR" \
+            -d '{
+              "dma_pageInfo":{"pageNo":1,"pageSize":1,"totalYn":"Y","bfPageNo":"","startRowNo":"","totalCnt":"","groupTotalCount":""},
+              "dma_srchGdsDtlSrchInfo":{
+                "cortOfcCd":"B000240","bidBgngYmd":"'"$TODAY"'","bidEndYmd":"'"$END"'",
+                "bidDvsCd":"000331","mvprpRletDvsCd":"00031R","cortAuctnSrchCondCd":"0004601",
+                "cortStDvs":"1","statNum":1,"notifyLoc":"off","pgmId":"PGJ151F01",
+                "csNo":"","rletDspslSpcCondCd":"","rprsAdongSdCd":"","rprsAdongSggCd":"","rprsAdongEmdCd":"",
+                "rdnmSdCd":"","rdnmSggCd":"","rdnmNo":"",
+                "mvprpDspslPlcAdongSdCd":"","mvprpDspslPlcAdongSggCd":"","mvprpDspslPlcAdongEmdCd":"",
+                "rdDspslPlcAdongSdCd":"","rdDspslPlcAdongSggCd":"","rdDspslPlcAdongEmdCd":"",
+                "jdbnCd":"","execrOfcDvsCd":"",
+                "lclDspslGdsLstUsgCd":"","mclDspslGdsLstUsgCd":"","sclDspslGdsLstUsgCd":"",
+                "cortAuctnMbrsId":"","aeeEvlAmtMin":"","aeeEvlAmtMax":"",
+                "lwsDspslPrcRateMin":"","lwsDspslPrcRateMax":"","flbdNcntMin":"","flbdNcntMax":"",
+                "objctArDtsMin":"","objctArDtsMax":"","mvprpArtclKndCd":"","mvprpArtclNm":"",
+                "mvprpAtchmPlcTypCd":"","lafjOrderBy":"",
+                "dspslDxdyYmd":"","fstDspslHm":"","scndDspslHm":"","thrdDspslHm":"","fothDspslHm":"",
+                "dspslPlcNm":"","lwsDspslPrcMin":"","lwsDspslPrcMax":"","grbxTypCd":"","gdsVendNm":"",
+                "fuelKndCd":"","carMdyrMax":"","carMdyrMin":"","carMdlNm":"","sideDvsCd":""
+              }
+            }')
+
+          HTTP_CODE=$(echo "$RESPONSE" | tail -1 | sed 's/HTTP_CODE://')
+          BODY=$(echo "$RESPONSE" | sed '$d')
+          echo "HTTP: $HTTP_CODE"
+          echo "Body (first 200): $(echo "$BODY" | head -c 200)"
+
+          # Save cookie string for next step
+          echo "$COOKIE_STR" > /tmp/probe_cookies.txt
+          echo "$HTTP_CODE" > /tmp/single_result.txt
+
+      - name: Burst test (50 calls, 1.5s interval)
+        run: |
+          COOKIE_STR=$(cat /tmp/probe_cookies.txt 2>/dev/null || echo "")
+          SINGLE=$(cat /tmp/single_result.txt 2>/dev/null || echo "unknown")
+
+          if [ "$SINGLE" != "200" ]; then
+            echo "Single call returned $SINGLE, not 200. Skipping burst test."
+            echo "The search API is not accessible from this runner IP."
+            exit 1
+          fi
+
+          echo "=== Burst Test: 50 calls at 1.5s interval ==="
+          TODAY=$(date +%Y%m%d)
+          END=$(date -d "+14 days" +%Y%m%d)
+
+          SUCCESS=0
+          FAIL=0
+          BLOCKED=0
+
+          for i in $(seq 1 50); do
+            CODE=$(curl -s -o /dev/null -w "%{http_code}" \
+              -X POST "https://www.courtauction.go.kr/pgj/pgjsearch/searchControllerMain.on" \
+              -H "User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36" \
+              -H "Content-Type: application/json;charset=UTF-8" \
+              -H "Accept: application/json, text/plain, */*" \
+              -H "Origin: https://www.courtauction.go.kr" \
+              -H "Referer: https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F00.xml" \
+              -H "SC-Userid: SYSTEM" \
+              -H "submissionid: mf_wfm_mainFrame_sbm_selectGdsDtlSrch" \
+              -H "Sec-Fetch-Dest: empty" \
+              -H "Sec-Fetch-Mode: cors" \
+              -H "Sec-Fetch-Site: same-origin" \
+              -H "Cookie: $COOKIE_STR" \
+              -d '{
+                "dma_pageInfo":{"pageNo":'"$i"',"pageSize":1,"totalYn":"Y","bfPageNo":"","startRowNo":"","totalCnt":"","groupTotalCount":""},
+                "dma_srchGdsDtlSrchInfo":{
+                  "cortOfcCd":"B000240","bidBgngYmd":"'"$TODAY"'","bidEndYmd":"'"$END"'",
+                  "bidDvsCd":"000331","mvprpRletDvsCd":"00031R","cortAuctnSrchCondCd":"0004601",
+                  "cortStDvs":"1","statNum":1,"notifyLoc":"off","pgmId":"PGJ151F01",
+                  "csNo":"","rletDspslSpcCondCd":"","rprsAdongSdCd":"","rprsAdongSggCd":"","rprsAdongEmdCd":"",
+                  "rdnmSdCd":"","rdnmSggCd":"","rdnmNo":"",
+                  "mvprpDspslPlcAdongSdCd":"","mvprpDspslPlcAdongSggCd":"","mvprpDspslPlcAdongEmdCd":"",
+                  "rdDspslPlcAdongSdCd":"","rdDspslPlcAdongSggCd":"","rdDspslPlcAdongEmdCd":"",
+                  "jdbnCd":"","execrOfcDvsCd":"",
+                  "lclDspslGdsLstUsgCd":"","mclDspslGdsLstUsgCd":"","sclDspslGdsLstUsgCd":"",
+                  "cortAuctnMbrsId":"","aeeEvlAmtMin":"","aeeEvlAmtMax":"",
+                  "lwsDspslPrcRateMin":"","lwsDspslPrcRateMax":"","flbdNcntMin":"","flbdNcntMax":"",
+                  "objctArDtsMin":"","objctArDtsMax":"","mvprpArtclKndCd":"","mvprpArtclNm":"",
+                  "mvprpAtchmPlcTypCd":"","lafjOrderBy":"",
+                  "dspslDxdyYmd":"","fstDspslHm":"","scndDspslHm":"","thrdDspslHm":"","fothDspslHm":"",
+                  "dspslPlcNm":"","lwsDspslPrcMin":"","lwsDspslPrcMax":"","grbxTypCd":"","gdsVendNm":"",
+                  "fuelKndCd":"","carMdyrMax":"","carMdyrMin":"","carMdlNm":"","sideDvsCd":""
+                }
+              }')
+
+            if [ "$CODE" = "200" ]; then
+              SUCCESS=$((SUCCESS + 1))
+            elif [ "$CODE" = "400" ]; then
+              BLOCKED=$((BLOCKED + 1))
+            else
+              FAIL=$((FAIL + 1))
+            fi
+
+            echo "  [$i/50] HTTP $CODE (success=$SUCCESS blocked=$BLOCKED fail=$FAIL)"
+            sleep 1.5
+          done
+
+          echo ""
+          echo "=== Burst Test Results ==="
+          echo "Success (200): $SUCCESS"
+          echo "Blocked (400): $BLOCKED"
+          echo "Other: $FAIL"
+          echo "Total: 50"
+
+          if [ "$BLOCKED" -gt 0 ]; then
+            echo ""
+            echo "WARNING: Rate limiting detected after $SUCCESS successful calls."
+            echo "Crawler needs pattern adjustment (longer intervals or smaller batches)."
+          fi
