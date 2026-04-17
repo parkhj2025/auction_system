@@ -3,11 +3,11 @@ import { ArrowRight } from "lucide-react";
 import type { AnalysisFrontmatter, TagItem } from "@/types/content";
 import { formatKoreanWon } from "@/lib/utils";
 
+/* 카테고리 배지 — 중립화 (B안: 텍스트 라벨만, 회색 통일) */
 const CAT_STYLE: Record<AnalysisFrontmatter["category"], string> = {
-  danger:
-    "bg-[var(--color-cat-danger-soft)] text-[var(--color-cat-danger)]",
-  safe: "bg-[var(--color-cat-safe-soft)] text-[var(--color-cat-safe)]",
-  edu: "bg-[var(--color-cat-edu-soft)] text-[var(--color-cat-edu)]",
+  danger: "bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
+  safe: "bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
+  edu: "bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
 };
 
 const CAT_LABEL: Record<AnalysisFrontmatter["category"], string> = {
@@ -16,13 +16,14 @@ const CAT_LABEL: Record<AnalysisFrontmatter["category"], string> = {
   edu: "교육",
 };
 
+/* 태그 — 중립화 (전부 neutral 스타일로 통일) */
 const TAG_STYLE: Record<TagItem["type"], string> = {
   danger:
-    "border-[var(--color-accent-red)]/25 bg-[var(--color-accent-red-soft)] text-[var(--color-accent-red)]",
+    "border-[var(--color-border)] bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
   warn:
-    "border-[var(--color-accent-yellow)]/40 bg-[var(--color-accent-yellow-soft)] text-[var(--color-ink-900)]",
+    "border-[var(--color-border)] bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
   safe:
-    "border-[var(--color-accent-green)]/25 bg-[var(--color-accent-green-soft)] text-[var(--color-accent-green)]",
+    "border-[var(--color-border)] bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
   neutral:
     "border-[var(--color-border)] bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
 };

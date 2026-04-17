@@ -10,19 +10,17 @@ const CATEGORY_META: Record<
 > = {
   danger: {
     label: "주의 물건",
-    className:
-      "bg-[var(--color-cat-danger-soft)] text-[var(--color-cat-danger)]",
+    className: "bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
     Icon: AlertTriangle,
   },
   safe: {
     label: "안정 물건",
-    className:
-      "bg-[var(--color-cat-safe-soft)] text-[var(--color-cat-safe)]",
+    className: "bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
     Icon: ShieldCheck,
   },
   edu: {
     label: "교육 물건",
-    className: "bg-[var(--color-cat-edu-soft)] text-[var(--color-cat-edu)]",
+    className: "bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
     Icon: BookOpen,
   },
 };
