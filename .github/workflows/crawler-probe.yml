@@ -51,7 +51,8 @@ jobs:
             -H "Accept: application/json, text/plain, */*" \
             -H "Origin: https://www.courtauction.go.kr" \
             -H "Referer: https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F00.xml" \
-            -H "SC-Userid: SYSTEM" \
+            -H "SC-Userid: NONUSER" \
+            -H "SC-Pgmid: PGJ151F01" \
             -H "submissionid: mf_wfm_mainFrame_sbm_selectGdsDtlSrch" \
             -H "Sec-Fetch-Dest: empty" \
             -H "Sec-Fetch-Mode: cors" \
@@ -115,7 +116,8 @@ jobs:
               -H "Accept: application/json, text/plain, */*" \
               -H "Origin: https://www.courtauction.go.kr" \
               -H "Referer: https://www.courtauction.go.kr/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F00.xml" \
-              -H "SC-Userid: SYSTEM" \
+              -H "SC-Userid: NONUSER" \
+              -H "SC-Pgmid: PGJ151F01" \
               -H "submissionid: mf_wfm_mainFrame_sbm_selectGdsDtlSrch" \
               -H "Sec-Fetch-Dest: empty" \
               -H "Sec-Fetch-Mode: cors" \
