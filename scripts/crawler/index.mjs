@@ -1,40 +1,73 @@
 /**
- * 대법원 경매정보 크롤러 — 메인 오케스트레이터.
+ * 대법원 경매정보 증분 크롤러.
  *
  * 사용법:
  *   node --env-file=.env.local scripts/crawler/index.mjs \
- *     --court incheon \
- *     --days 14 \
- *     [--dry-run]
+ *     --court incheon --days 14
  *
- * 기본 동작:
- *   - 지정 법원의 지정 기간(오늘 ~ N일 후) 경매 물건 전체 수집
- *   - court_listings 테이블에 docid 기준 upsert
- *   - 요청 간 1.5초 간격 (WAF 부담 최소화)
- *   - 각 페이지 완료마다 진행 로그
- *   - dry-run 모드: Supabase 쓰지 않고 출력만
+ * 또는 바탕화면 바로가기:
+ *   scripts/run-crawler.bat (Windows)
+ *   scripts/run-crawler.sh  (Mac/Linux)
+ *
+ * 4단계 증분 수집:
+ *   0. 네트워크 사전 체크 (검색 API 단일 호출)
+ *   1. 목록 수집 (검색 API 페이지네이션)
+ *   2. DB 대조 (신규/기존/비활성 분류)
+ *   3. Supabase 저장 (upsert + 비활성화)
+ *   4. 종합 리포트
  *
  * 종료 코드:
  *   0 — 성공
- *   1 — 실패 (WAF 차단, 네트워크 에러, 응답 파싱 실패 등)
+ *   1 — 실패
  */
 
 import { createSession } from "./session.mjs";
 import { callSearch } from "./api.mjs";
 import { mapRecordToRow } from "./mapper.mjs";
-import { upsertListings, markStaleInactive, countListings } from "./upsert.mjs";
-import { COURT_CODES, ACTIVE_CRAWL_COURTS } from "./codes.mjs";
+import {
+  upsertListings,
+  markStaleInactive,
+  countListings,
+} from "./upsert.mjs";
+import { COURT_CODES } from "./codes.mjs";
 
-// ----- CLI 파싱 -----
+// ─── ANSI 색상 ───────────────────────────────────────────────
+
+const C = {
+  reset: "\x1b[0m",
+  green: "\x1b[32m",
+  red: "\x1b[31m",
+  yellow: "\x1b[33m",
+  cyan: "\x1b[36m",
+  dim: "\x1b[2m",
+  bold: "\x1b[1m",
+};
+
+function ok(msg) {
+  process.stdout.write(`${C.green}  OK${C.reset} ${msg}\n`);
+}
+function fail(msg) {
+  process.stdout.write(`${C.red}  FAIL${C.reset} ${msg}\n`);
+}
+function warn(msg) {
+  process.stdout.write(`${C.yellow}  --${C.reset} ${msg}\n`);
+}
+function info(msg) {
+  process.stdout.write(`${C.cyan}  >>>${C.reset} ${msg}\n`);
+}
+function header(msg) {
+  process.stdout.write(`\n${C.bold}${msg}${C.reset}\n`);
+}
+
+// ─── CLI 파싱 ────────────────────────────────────────────────
 
 function parseArgs(argv) {
-  const args = { court: "incheon", days: 14, dryRun: false, verbose: false };
+  const args = { court: "incheon", days: 14, dryRun: false };
   for (let i = 2; i < argv.length; i++) {
     const a = argv[i];
     if (a === "--court") args.court = argv[++i];
     else if (a === "--days") args.days = parseInt(argv[++i], 10);
     else if (a === "--dry-run") args.dryRun = true;
-    else if (a === "--verbose" || a === "-v") args.verbose = true;
     else if (a === "--help" || a === "-h") {
       console.log(`
 사용법:
@@ -42,10 +75,8 @@ function parseArgs(argv) {
 
 옵션:
   --court <key>    법원 키 (default: incheon)
-                   사용 가능: ${Object.keys(COURT_CODES).join(", ")}
   --days <n>       오늘부터 N일 후까지 수집 (default: 14)
   --dry-run        Supabase 쓰지 않고 출력만
-  --verbose, -v    레코드 샘플 출력
   --help, -h       이 도움말
       `);
       process.exit(0);
@@ -61,64 +92,144 @@ function formatDate(date) {
   return `${y}${m}${d}`;
 }
 
+function formatDateTime(date) {
+  return date.toLocaleString("ko-KR", {
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
+    hour12: false,
+  });
+}
+
+function formatDuration(ms) {
+  const sec = Math.floor(ms / 1000);
+  const min = Math.floor(sec / 60);
+  const remSec = sec % 60;
+  if (min === 0) return `${sec}초`;
+  return `${min}분 ${remSec}초`;
+}
+
 function sleep(ms) {
   return new Promise((r) => setTimeout(r, ms));
 }
 
-// ----- 메인 -----
+/** "아무 키나 누르면 종료" 대기 */
+function waitForKey() {
+  return new Promise((resolve) => {
+    process.stdout.write(
+      `\n${C.dim}  아무 키나 누르면 종료...${C.reset}\n`
+    );
+    if (process.stdin.isTTY) {
+      process.stdin.setRawMode(true);
+      process.stdin.resume();
+      process.stdin.once("data", () => {
+        process.stdin.setRawMode(false);
+        resolve();
+      });
+    } else {
+      // 파이프 등 non-TTY 환경
+      resolve();
+    }
+  });
+}
+
+// ─── 상수 ────────────────────────────────────────────────────
+
+const PAGE_SIZE = 50;
+const RATE_LIMIT_MS = 3000;
+const BATCH_SIZE = 100;
+
+// ─── 메인 ────────────────────────────────────────────────────
 
 async function main() {
+  const startedAt = new Date();
   const args = parseArgs(process.argv);
 
   const courtInfo = COURT_CODES[args.court];
   if (!courtInfo) {
-    console.error(`❌ Unknown court key: ${args.court}`);
-    console.error(`   available: ${Object.keys(COURT_CODES).join(", ")}`);
+    fail(`알 수 없는 법원 키: "${args.court}"`);
+    fail(`사용 가능: ${Object.keys(COURT_CODES).join(", ")}`);
+    await waitForKey();
     process.exit(1);
   }
 
   const today = new Date();
   const endDate = new Date(today);
   endDate.setDate(endDate.getDate() + args.days);
-
   const bidStart = formatDate(today);
   const bidEnd = formatDate(endDate);
 
-  console.log("═".repeat(60));
-  console.log("  대법원 경매정보 크롤러");
-  console.log("═".repeat(60));
-  console.log(`  법원: ${courtInfo.name} (${courtInfo.code})`);
-  console.log(`  기간: ${bidStart} ~ ${bidEnd} (${args.days}일)`);
-  console.log(`  모드: ${args.dryRun ? "DRY-RUN (DB 쓰지 않음)" : "실제 upsert"}`);
-  console.log("═".repeat(60));
-  console.log();
+  process.stdout.write("\n");
+  process.stdout.write(
+    `${C.bold}${"═".repeat(50)}${C.reset}\n`
+  );
+  process.stdout.write(
+    `${C.bold}  경매퀵 크롤러 — 증분 수집${C.reset}\n`
+  );
+  process.stdout.write(
+    `${C.bold}${"═".repeat(50)}${C.reset}\n`
+  );
+  info(`법원: ${courtInfo.name} (${courtInfo.code})`);
+  info(`기간: ${bidStart} ~ ${bidEnd} (${args.days}일)`);
+  info(`모드: ${args.dryRun ? "DRY-RUN" : "실제 저장"}`);
+  info(`시작: ${formatDateTime(startedAt)}`);
 
-  const batchStartedAt = new Date().toISOString();
+  // ─── 0단계: 네트워크 사전 체크 ─────────────────────────────
 
-  // 1. 세션 초기화
-  console.log("[1/3] 세션 초기화...");
+  header("[0/4] 네트워크 사전 체크");
+
   const session = createSession();
   try {
-    const initResult = await session.init();
-    console.log(`  ✅ 쿠키 획득: ${Object.keys(initResult.cookies).join(", ")}`);
+    await session.init();
+    ok("세션 쿠키 획득");
   } catch (err) {
-    console.error(`  ❌ 세션 초기화 실패: ${err.message}`);
+    fail("대법원 사이트에 연결할 수 없습니다.");
+    fail("인터넷 연결을 확인해주세요.");
+    fail(`상세: ${err.message}`);
+    await waitForKey();
     process.exit(1);
   }
 
-  // 2. 페이지네이션 루프
-  console.log();
-  console.log("[2/3] 물건 목록 수집...");
+  // 단일 검색 API 호출로 차단 여부 확인
+  try {
+    const probe = await callSearch(session, {
+      courtCode: courtInfo.code,
+      bidStart,
+      bidEnd,
+      pageNo: 1,
+      pageSize: 1,
+    });
+    const ipcheck = probe.data?.ipcheck;
+    ok(`검색 API 정상 응답 (ipcheck: ${ipcheck})`);
+  } catch (err) {
+    const msg = err.message || "";
+    if (msg.includes("400") || msg.includes("불편을 드려")) {
+      fail("이 네트워크에서는 검색 API가 차단되어 있습니다.");
+      fail("다른 네트워크(모바일 핫스팟, 집 Wi-Fi 등)를 시도해주세요.");
+      fail("24시간 후 자동 해제될 수 있습니다.");
+    } else {
+      fail(`검색 API 오류: ${msg}`);
+    }
+    await waitForKey();
+    process.exit(1);
+  }
 
-  const PAGE_SIZE = 10;
-  const RATE_LIMIT_MS = 1500;
+  await sleep(RATE_LIMIT_MS);
+
+  // ─── 1단계: 목록 수집 ──────────────────────────────────────
+
+  header("[1/4] 목록 수집");
+
   const allRows = [];
   const seenDocids = new Set();
   let pageNo = 1;
   let totalCnt = null;
+  let totalPages = "?";
 
   while (true) {
-    // 세션 TTL 체크 (15분 넘었으면 재초기화)
     await session.ensureFresh();
 
     let response;
@@ -131,9 +242,9 @@ async function main() {
         pageSize: PAGE_SIZE,
       });
     } catch (err) {
-      console.error(`  ❌ 페이지 ${pageNo} 호출 실패: ${err.message}`);
+      warn(`페이지 ${pageNo} 실패: ${err.message}`);
       // 1회 재시도
-      console.log(`  재시도 10초 후...`);
+      warn("10초 후 재시도...");
       await sleep(10000);
       try {
         response = await callSearch(session, {
@@ -144,8 +255,8 @@ async function main() {
           pageSize: PAGE_SIZE,
         });
       } catch (err2) {
-        console.error(`  ❌ 재시도 실패: ${err2.message}`);
-        console.error(`  크롤러 중단. 지금까지 수집된 ${allRows.length}건은 유지.`);
+        fail(`재시도 실패: ${err2.message}`);
+        fail(`지금까지 수집된 ${allRows.length}건으로 계속 진행합니다.`);
         break;
       }
     }
@@ -155,100 +266,195 @@ async function main() {
 
     if (totalCnt === null) {
       totalCnt = parseInt(pageInfo.totalCnt ?? "0", 10);
-      const groupCnt = pageInfo.groupTotalCount ?? "?";
-      console.log(
-        `  ℹ️  totalCnt: ${totalCnt} / groupTotalCount: ${groupCnt} / ipcheck: ${response.data?.ipcheck}`
+      totalPages = Math.ceil(totalCnt / PAGE_SIZE);
+    }
+
+    if (results.length === 0) break;
+
+    for (const raw of results) {
+      if (seenDocids.has(raw.docid)) continue;
+      seenDocids.add(raw.docid);
+      allRows.push(
+        mapRecordToRow(raw, { courtNameFallback: courtInfo.name })
       );
     }
 
-    if (results.length === 0) {
-      console.log(`  페이지 ${pageNo}: 결과 없음 — 종료`);
-      break;
-    }
-
-    for (const raw of results) {
-      if (seenDocids.has(raw.docid)) continue; // 중복 방지
-      seenDocids.add(raw.docid);
-      allRows.push(mapRecordToRow(raw, { courtNameFallback: courtInfo.name }));
-    }
-
-    console.log(
-      `  페이지 ${pageNo}: +${results.length}건 (누적 ${allRows.length}/${totalCnt})`
+    process.stdout.write(
+      `\r  페이지 ${pageNo}/${totalPages} — 누적 ${allRows.length}/${totalCnt}건`
     );
 
-    if (args.verbose && pageNo === 1) {
-      console.log("  샘플 첫 건:");
-      const s = allRows[0];
-      console.log(`    docid: ${s.docid}`);
-      console.log(`    사건: ${s.case_number}`);
-      console.log(`    주소: ${s.address_display}`);
-      console.log(`    감정가: ${s.appraisal_amount?.toLocaleString()}원`);
-      console.log(`    최저가: ${s.min_bid_amount?.toLocaleString()}원`);
-      console.log(`    매각일: ${s.bid_date} ${s.bid_time}`);
-      console.log(`    용도: ${s.usage_name}`);
-      console.log();
-    }
-
-    // 더 이상 페이지 없음
-    if (allRows.length >= totalCnt || results.length < PAGE_SIZE) {
-      break;
-    }
+    if (allRows.length >= totalCnt || results.length < PAGE_SIZE) break;
 
     pageNo++;
     await sleep(RATE_LIMIT_MS);
   }
 
-  console.log();
-  console.log(`  총 수집: ${allRows.length}건`);
+  process.stdout.write("\n");
+  ok(`목록 수집 완료: ${allRows.length}건 (${pageNo}페이지)`);
 
-  // 3. Supabase upsert (dry-run 아니면)
-  console.log();
-  console.log("[3/3] Supabase upsert...");
+  if (allRows.length === 0) {
+    warn("수집된 데이터가 없습니다. 기간이나 법원을 확인해주세요.");
+    await waitForKey();
+    process.exit(0);
+  }
+
+  // ─── 2단계: DB 대조 (증분 필터링) ─────────────────────────
+
+  header("[2/4] DB 대조");
+
+  let existingDocids = new Set();
+  let newRows = [];
+  let existingCount = 0;
+  let staleCount = 0;
 
   if (args.dryRun) {
-    console.log("  ⏭️  DRY-RUN — 건너뜀");
-  } else if (allRows.length === 0) {
-    console.log("  수집된 데이터 없음 — 건너뜀");
+    warn("DRY-RUN — DB 대조 건너뜀");
+    newRows = allRows;
   } else {
     try {
-      // 배치로 upsert (대량 시 Supabase가 한 번에 받을 수 있는 양)
-      const BATCH_SIZE = 100;
+      // 해당 court_code의 기존 active docid 전부 조회
+      const { data: dbRows, error: dbErr } = await (
+        await import("./upsert.mjs")
+      )
+        .getClient()
+        .from("court_listings")
+        .select("docid")
+        .eq("court_code", courtInfo.code)
+        .eq("is_active", true);
+
+      if (dbErr) throw new Error(dbErr.message);
+
+      existingDocids = new Set((dbRows ?? []).map((r) => r.docid));
+      info(`DB 기존 active: ${existingDocids.size}건`);
+
+      // 분류
+      const collectedDocids = new Set(allRows.map((r) => r.docid));
+      newRows = allRows.filter((r) => !existingDocids.has(r.docid));
+      existingCount = allRows.length - newRows.length;
+
+      // 비활성 대상 (DB에 있으나 이번 수집에 없는 것)
+      staleCount = [...existingDocids].filter(
+        (d) => !collectedDocids.has(d)
+      ).length;
+
+      ok(`신규: ${C.bold}${newRows.length}건${C.reset}`);
+      ok(`기존 갱신: ${existingCount}건`);
+      if (staleCount > 0) {
+        warn(`비활성 대상: ${staleCount}건`);
+      }
+    } catch (err) {
+      fail(`DB 조회 실패: ${err.message}`);
+      fail("Supabase 연결을 확인해주세요.");
+      fail(".env.local 파일의 URL과 키를 확인하세요.");
+      await waitForKey();
+      process.exit(1);
+    }
+  }
+
+  // ─── 3단계: Supabase 저장 ─────────────────────────────────
+
+  header("[3/4] Supabase 저장");
+
+  if (args.dryRun) {
+    warn("DRY-RUN — 저장 건너뜀");
+  } else {
+    try {
+      // 전체 upsert (기존 건은 last_seen_at 갱신, 신규 건은 INSERT)
+      const totalBatches = Math.ceil(allRows.length / BATCH_SIZE);
       let totalUpserted = 0;
+
       for (let i = 0; i < allRows.length; i += BATCH_SIZE) {
         const chunk = allRows.slice(i, i + BATCH_SIZE);
+        const batchNum = Math.floor(i / BATCH_SIZE) + 1;
+        process.stdout.write(
+          `\r  배치 ${batchNum}/${totalBatches} 저장 중...`
+        );
         const { upserted } = await upsertListings(chunk);
         totalUpserted += upserted;
-        console.log(
-          `  배치 ${Math.floor(i / BATCH_SIZE) + 1}: ${upserted}건 upsert`
-        );
       }
-      console.log(`  ✅ 총 upsert: ${totalUpserted}건`);
+      process.stdout.write("\n");
+      ok(`upsert 완료: ${totalUpserted}건`);
 
-      // 비활성화 처리
+      // 비활성화
+      const batchStartedAt = startedAt.toISOString();
       const { deactivated } = await markStaleInactive({
         courtCode: courtInfo.code,
         cutoffIso: batchStartedAt,
       });
       if (deactivated > 0) {
-        console.log(`  🗑️  비활성화: ${deactivated}건 (이번 배치에 없던 기존 row)`);
+        warn(`비활성화: ${deactivated}건`);
+      } else {
+        ok("비활성화 대상 없음");
       }
-
-      // 헬스체크
-      const liveCount = await countListings(courtInfo.code);
-      console.log(`  📊 현재 활성 + 비활성 총 row: ${liveCount}건`);
     } catch (err) {
-      console.error(`  ❌ Supabase 에러: ${err.message}`);
+      fail(`저장 실패: ${err.message}`);
+      fail("Supabase 연결을 확인해주세요.");
+      await waitForKey();
       process.exit(1);
     }
   }
 
-  console.log();
-  console.log("═".repeat(60));
-  console.log(`  ✅ 크롤러 완료 — ${allRows.length}건 처리`);
-  console.log("═".repeat(60));
+  // ─── 4단계: 종합 리포트 ────────────────────────────────────
+
+  const endedAt = new Date();
+  const durationMs = endedAt - startedAt;
+
+  let activeCount = "?";
+  if (!args.dryRun) {
+    try {
+      activeCount = await countListings(courtInfo.code);
+    } catch {
+      /* ignore */
+    }
+  }
+
+  process.stdout.write("\n");
+  process.stdout.write(
+    `${C.bold}${"═".repeat(50)}${C.reset}\n`
+  );
+  process.stdout.write(
+    `${C.bold}${C.green}  크롤러 완료${C.reset}\n`
+  );
+  process.stdout.write(
+    `${C.bold}${"═".repeat(50)}${C.reset}\n`
+  );
+  process.stdout.write(
+    `  시작: ${formatDateTime(startedAt)}\n`
+  );
+  process.stdout.write(
+    `  종료: ${formatDateTime(endedAt)}\n`
+  );
+  process.stdout.write(
+    `  소요: ${formatDuration(durationMs)}\n`
+  );
+  process.stdout.write(
+    `  ${"─".repeat(46)}\n`
+  );
+  process.stdout.write(
+    `  목록 수집: ${allRows.length.toLocaleString()}건 (${pageNo}페이지)\n`
+  );
+  process.stdout.write(
+    `  ${C.green}신규 추가: ${newRows.length}건${C.reset}\n`
+  );
+  process.stdout.write(
+    `  기존 갱신: ${existingCount.toLocaleString()}건\n`
+  );
+  process.stdout.write(
+    `  비활성화: ${staleCount}건\n`
+  );
+  process.stdout.write(
+    `  현재 활성: ${typeof activeCount === "number" ? activeCount.toLocaleString() : activeCount}건\n`
+  );
+  process.stdout.write(
+    `${C.bold}${"═".repeat(50)}${C.reset}\n`
+  );
+
+  await waitForKey();
 }
 
-main().catch((err) => {
-  console.error("Unhandled error:", err);
+main().catch(async (err) => {
+  fail(`예기치 않은 오류: ${err.message}`);
+  console.error(err);
+  await waitForKey();
   process.exit(1);
 });
