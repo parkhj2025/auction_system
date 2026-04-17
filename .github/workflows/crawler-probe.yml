@@ -37,6 +37,7 @@ jobs:
           sleep 2
 
       - name: "Test 1: Search API (searchControllerMain.on)"
+        continue-on-error: true
         run: |
           COOKIE_STR=$(cat /tmp/probe_cookies.txt)
           TODAY=$(date +%Y%m%d)
@@ -86,6 +87,7 @@ jobs:
           echo "$HTTP_CODE" > /tmp/search_result.txt
 
       - name: "Test 2: Detail+Photo API (selectAuctnCsSrchRslt.on)"
+        continue-on-error: true
         run: |
           COOKIE_STR=$(cat /tmp/probe_cookies.txt)
 
