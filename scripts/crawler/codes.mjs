@@ -125,7 +125,7 @@ export const SEARCH_API_CONSTANTS = {
   STAT_NUM: 1,
   NOTIFY_LOC: "off",
 
-  // 표준 Chrome UA
+  // Chrome 147 표준 UA (2026-04-17 형준님 cURL 기준)
   USER_AGENT:
-    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/133.0.0.0 Safari/537.36",
+    "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/147.0.0.0 Safari/537.36",
 };

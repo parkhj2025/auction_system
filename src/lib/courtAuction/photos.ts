@@ -88,6 +88,10 @@ export async function fetchAndCachePhotos(
         "SC-Userid": COURT_AUCTION.SC_USERID,
         "SC-Pgmid": COURT_AUCTION.DETAIL_PGM_ID,
         submissionid: COURT_AUCTION.DETAIL_SUBMISSION_ID,
+        "sec-ch-ua":
+          '"Google Chrome";v="147", "Not.A/Brand";v="8", "Chromium";v="147"',
+        "sec-ch-ua-mobile": "?0",
+        "sec-ch-ua-platform": '"Windows"',
         "Sec-Fetch-Dest": "empty",
         "Sec-Fetch-Mode": "cors",
         "Sec-Fetch-Site": "same-origin",

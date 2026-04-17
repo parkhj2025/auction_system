@@ -193,14 +193,17 @@ async function main() {
     process.exit(1);
   }
 
-  // 단일 검색 API 호출로 차단 여부 확인
+  // 세션 초기화 후 추가 대기 (브라우저 동작 모방)
+  await sleep(2000);
+
+  // 단일 검색 API 호출로 차단 여부 확인 (pageSize=10, 자연스러운 요청)
   try {
     const probe = await callSearch(session, {
       courtCode: courtInfo.code,
       bidStart,
       bidEnd,
       pageNo: 1,
-      pageSize: 1,
+      pageSize: 10,
     });
     const ipcheck = probe.data?.ipcheck;
     ok(`검색 API 정상 응답 (ipcheck: ${ipcheck})`);

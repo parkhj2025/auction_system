@@ -50,19 +50,46 @@ export function createSession() {
   let initializedAt = null;
 
   async function init() {
-    const res = await fetch(`${BASE_URL}${INIT_ENDPOINT}`, {
+    const commonHeaders = {
+      "User-Agent": USER_AGENT,
+      "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+      "sec-ch-ua": '"Google Chrome";v="147", "Not.A/Brand";v="8", "Chromium";v="147"',
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": '"Windows"',
+      "Upgrade-Insecure-Requests": "1",
+    };
+
+    // Step 1: GET / (메인 페이지 — 브라우저 최초 접속 모방)
+    const r0 = await fetch(`${BASE_URL}/`, {
       method: "GET",
       headers: {
-        "User-Agent": USER_AGENT,
-        Accept:
-          "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-        "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
-        "Cache-Control": "no-cache",
-        Pragma: "no-cache",
+        ...commonHeaders,
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
         "Sec-Fetch-Dest": "document",
         "Sec-Fetch-Mode": "navigate",
         "Sec-Fetch-Site": "none",
-        "Upgrade-Insecure-Requests": "1",
+      },
+    });
+    // 메인 페이지 쿠키 병합
+    const sc0 = r0.headers.getSetCookie ? r0.headers.getSetCookie() : [];
+    for (const [k, v] of parseSetCookies(sc0).entries()) {
+      jar.set(k, v);
+    }
+
+    // 2초 대기 (자연스러운 브라우저 동작 모방)
+    await new Promise((r) => setTimeout(r, 2000));
+
+    // Step 2: GET /pgj/index.on (WebSquare 초기화 — 세션 쿠키 발급)
+    const res = await fetch(`${BASE_URL}${INIT_ENDPOINT}`, {
+      method: "GET",
+      headers: {
+        ...commonHeaders,
+        Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        Referer: `${BASE_URL}/`,
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "same-origin",
+        Cookie: jar.size > 0 ? serializeCookies(jar) : "",
       },
     });
 
@@ -72,12 +99,14 @@ export function createSession() {
       );
     }
 
-    // Node fetch는 set-cookie를 배열로 getSetCookie()로 제공 (Node 18.14+)
     const setCookieHeaders = res.headers.getSetCookie
       ? res.headers.getSetCookie()
       : res.headers.raw?.()?.["set-cookie"] ?? [];
 
-    jar = parseSetCookies(setCookieHeaders);
+    const newJar = parseSetCookies(setCookieHeaders);
+    for (const [k, v] of newJar.entries()) {
+      jar.set(k, v);
+    }
     initializedAt = Date.now();
 
     return {

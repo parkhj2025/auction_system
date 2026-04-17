@@ -34,24 +34,52 @@ export interface SessionInitResult {
 }
 
 export function createSession() {
-  let jar = new Map<string, string>();
+  const jar = new Map<string, string>();
 
   async function init(): Promise<SessionInitResult> {
+    const commonHeaders = {
+      "User-Agent": COURT_AUCTION.USER_AGENT,
+      "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
+      "sec-ch-ua":
+        '"Google Chrome";v="147", "Not.A/Brand";v="8", "Chromium";v="147"',
+      "sec-ch-ua-mobile": "?0",
+      "sec-ch-ua-platform": '"Windows"',
+      "Upgrade-Insecure-Requests": "1",
+    };
+
+    // Step 1: GET / (메인 페이지)
+    const r0 = await fetch(`${COURT_AUCTION.BASE_URL}/`, {
+      method: "GET",
+      headers: {
+        ...commonHeaders,
+        Accept:
+          "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+        "Sec-Fetch-Dest": "document",
+        "Sec-Fetch-Mode": "navigate",
+        "Sec-Fetch-Site": "none",
+      },
+    });
+    const sc0 = r0.headers.getSetCookie ? r0.headers.getSetCookie() : [];
+    for (const [k, v] of parseSetCookies(sc0).entries()) {
+      jar.set(k, v);
+    }
+
+    await new Promise((r) => setTimeout(r, 2000));
+
+    // Step 2: GET /pgj/index.on (WebSquare 초기화)
     const res = await fetch(
       `${COURT_AUCTION.BASE_URL}${COURT_AUCTION.INIT_ENDPOINT}`,
       {
         method: "GET",
         headers: {
-          "User-Agent": COURT_AUCTION.USER_AGENT,
+          ...commonHeaders,
           Accept:
-            "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8",
-          "Accept-Language": "ko-KR,ko;q=0.9,en-US;q=0.8,en;q=0.7",
-          "Cache-Control": "no-cache",
-          Pragma: "no-cache",
+            "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+          Referer: `${COURT_AUCTION.BASE_URL}/`,
           "Sec-Fetch-Dest": "document",
           "Sec-Fetch-Mode": "navigate",
-          "Sec-Fetch-Site": "none",
-          "Upgrade-Insecure-Requests": "1",
+          "Sec-Fetch-Site": "same-origin",
+          Cookie: jar.size > 0 ? serializeCookies(jar) : "",
         },
       }
     );
@@ -65,8 +93,9 @@ export function createSession() {
     const setCookieHeaders = res.headers.getSetCookie
       ? res.headers.getSetCookie()
       : [];
-
-    jar = parseSetCookies(setCookieHeaders);
+    for (const [k, v] of parseSetCookies(setCookieHeaders).entries()) {
+      jar.set(k, v);
+    }
 
     return {
       status: res.status,
