@@ -5,6 +5,60 @@ import type { CourtListingSummary } from "@/types/apply";
 
 export const dynamic = "force-dynamic";
 
+interface RawListing {
+  docid: string;
+  court_name: string;
+  case_number: string;
+  address_display: string | null;
+  appraisal_amount: number | null;
+  min_bid_amount: number | null;
+  bid_date: string | null;
+  bid_time: string | null;
+  usage_name: string | null;
+  area_display: string | null;
+  failed_count: number;
+  item_sequence: number;
+  mokmul_sequence: number;
+  photos_fetched_at: string | null;
+}
+
+/**
+ * mokmul 단위 row → item 단위로 그룹핑.
+ * 같은 (case_number, item_sequence) 조합의 mokmul들을 통합.
+ * 대표 주소: 건물(도로명) 우선, 면적 있는 것 우선.
+ */
+function groupByItem(rows: RawListing[]): CourtListingSummary[] {
+  const map = new Map<string, RawListing[]>();
+  for (const r of rows) {
+    const key = `${r.case_number}|${r.item_sequence}`;
+    if (!map.has(key)) map.set(key, []);
+    map.get(key)!.push(r);
+  }
+
+  const result: CourtListingSummary[] = [];
+  for (const [, group] of map) {
+    // 대표 row 선택: 건물명이 있는 것 우선, 없으면 첫 번째
+    const representative =
+      group.find((r) => r.address_display?.includes("(")) ??
+      group.find((r) => r.usage_name && !r.usage_name.includes("대지") && !r.usage_name.includes("토지")) ??
+      group[0];
+
+    result.push({
+      ...representative,
+      component_count: group.length,
+    });
+  }
+
+  // bid_date → item_sequence 순 정렬 유지
+  result.sort((a, b) => {
+    const d = (a.bid_date ?? "").localeCompare(b.bid_date ?? "");
+    if (d !== 0) return d;
+    return a.item_sequence - b.item_sequence;
+  });
+
+  return result;
+}
+
 /**
  * 사건번호 중복 확인 + court_listings 매칭 엔드포인트.
  *
@@ -94,9 +148,12 @@ export async function POST(req: Request) {
       console.error("[orders/check] listings query failed", listingsError);
     }
 
+    // item 단위로 그룹핑 (같은 item의 mokmul들을 통합)
+    const grouped = groupByItem(listings ?? []);
+
     return NextResponse.json({
       available: true,
-      listings: (listings ?? []) as CourtListingSummary[],
+      listings: grouped,
     });
   } catch (err) {
     console.error("[orders/check]", err);

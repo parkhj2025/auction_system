@@ -306,6 +306,9 @@ export function Step1Property({
                       최저가 {formatKoreanWon(l.min_bid_amount)}
                     </span>
                   )}
+                  {l.component_count > 1 && (
+                    <span className="text-brand-600">{l.component_count}개 필지 일괄</span>
+                  )}
                 </div>
               </button>
             ))}
@@ -370,6 +373,14 @@ export function Step1Property({
                 {listing.court_name}
               </dd>
             </div>
+            {listing.component_count > 1 && (
+              <div>
+                <dt className="text-xs text-[var(--color-ink-500)]">구성</dt>
+                <dd className="mt-1 font-bold text-brand-600">
+                  {listing.component_count}개 필지 일괄 매각
+                </dd>
+              </div>
+            )}
           </dl>
           {/* 사진 갤러리 (온디맨드 로드) */}
           <PhotoGallery docid={listing.docid} />

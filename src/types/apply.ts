@@ -1,10 +1,12 @@
 import type { AnalysisFrontmatter } from "./content";
 
-/** court_listings 테이블에서 조회한 물건 요약 (Step1 매칭 카드용) */
+/** 매각물건(item) 단위 요약 — 같은 item 내의 mokmul을 통합한 결과 */
 export interface CourtListingSummary {
+  /** 대표 docid (item 내 첫 번째 mokmul) */
   docid: string;
   court_name: string;
   case_number: string;
+  /** 대표 주소 (건물 주소 우선, 없으면 토지) */
   address_display: string | null;
   appraisal_amount: number | null;
   min_bid_amount: number | null;
@@ -16,6 +18,8 @@ export interface CourtListingSummary {
   item_sequence: number;
   mokmul_sequence: number;
   photos_fetched_at: string | null;
+  /** 같은 item 내 구성 부동산 수 (토지+건물 등). 1이면 단독, 2+이면 일괄 */
+  component_count: number;
 }
 
 export type FeeTier = "earlybird" | "standard" | "rush";
