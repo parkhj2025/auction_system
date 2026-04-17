@@ -30,3 +30,16 @@ export function formatKoreanDate(iso: string): string {
   if (!y || !m || !d) return iso;
   return `${y}.${m}.${d}`;
 }
+
+/** 입찰일+시간 포맷: ("2026-04-27", "1000") → "2026-04-27 10:00" */
+export function formatBidDateTime(
+  date: string | null | undefined,
+  time: string | null | undefined
+): string {
+  if (!date) return "";
+  let formattedTime = "";
+  if (time && time.length >= 4) {
+    formattedTime = ` ${time.slice(0, 2)}:${time.slice(2, 4)}`;
+  }
+  return `${date}${formattedTime}`;
+}

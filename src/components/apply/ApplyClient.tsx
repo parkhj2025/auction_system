@@ -16,6 +16,7 @@ import { Step2BidInfo } from "./steps/Step2BidInfo";
 import { Step3Documents } from "./steps/Step3Documents";
 import { Step4Confirm } from "./steps/Step4Confirm";
 import { Step5Complete } from "./steps/Step5Complete";
+import { StickyPropertyBar } from "./StickyPropertyBar";
 
 const STEP_ORDER: ApplyStepId[] = APPLY_STEPS.map((s) => s.id);
 
@@ -198,9 +199,18 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep, data, submitting, submitError, applicationId, posts]);
 
+  const showStickyBar = currentStep !== "property" && currentStep !== "complete";
+
   return (
     <>
       <ApplyStepIndicator current={currentStep} completed={completed} />
+      {showStickyBar && (
+        <StickyPropertyBar
+          listing={data.matchedListing}
+          caseNumber={data.caseNumber}
+          manualEntry={data.manualEntry}
+        />
+      )}
       <section className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
         {stepView}
       </section>
