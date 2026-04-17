@@ -1,20 +1,22 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { Search, FileText, MapPin } from "lucide-react";
 import { COURTS_ACTIVE, COURTS_COMING_SOON, FEES } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { cn, formatKoreanWon } from "@/lib/utils";
 
 type Mode = "case" | "address";
 
-/**
- * 히어로 검색 — 두 세그먼트 동시 지원.
- * - A: 사건번호 → /analysis?court=&case=
- * - B: 주소·단지명 → /analysis?q=
- * Phase 1은 /analysis 목록 페이지로 쿼리 전달. Phase 2에서 실시간 조회 API로 교체.
- * 검색 로직은 onSubmit 한 곳에 모아 두어 교체가 용이하다.
- */
+interface TypeaheadItem {
+  docid: string;
+  case_number: string;
+  address_display: string | null;
+  bid_date: string | null;
+  min_bid_amount: number | null;
+  usage_name: string | null;
+}
+
 export function HeroSearch() {
   const router = useRouter();
   const [mode, setMode] = useState<Mode>("case");
@@ -22,16 +24,102 @@ export function HeroSearch() {
   const [caseNumber, setCaseNumber] = useState("");
   const [keyword, setKeyword] = useState("");
 
+  // Typeahead state
+  const [suggestions, setSuggestions] = useState<TypeaheadItem[]>([]);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const [activeIdx, setActiveIdx] = useState(-1);
+  const [searching, setSearching] = useState(false);
+  const dropdownRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  // 법원 코드 매핑 (COURTS_ACTIVE의 value → courtCode)
+  const courtCodeMap: Record<string, string> = { incheon: "B000240" };
+
+  // 디바운스 typeahead
+  useEffect(() => {
+    if (mode !== "case" || caseNumber.trim().length < 4) {
+      setSuggestions([]);
+      setShowDropdown(false);
+      return;
+    }
+
+    const handle = setTimeout(async () => {
+      setSearching(true);
+      try {
+        const courtCode = courtCodeMap[court] ?? "";
+        const res = await fetch(
+          `/api/court-listings/search?q=${encodeURIComponent(caseNumber.trim())}&courtCode=${courtCode}&limit=10`
+        );
+        const json = (await res.json()) as { results: TypeaheadItem[] };
+        setSuggestions(json.results);
+        setShowDropdown(json.results.length > 0 || caseNumber.trim().length >= 4);
+        setActiveIdx(-1);
+      } catch {
+        setSuggestions([]);
+      } finally {
+        setSearching(false);
+      }
+    }, 300);
+
+    return () => clearTimeout(handle);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [caseNumber, court, mode]);
+
+  // 외부 클릭 시 드롭다운 닫기
+  useEffect(() => {
+    function handleClickOutside(e: MouseEvent) {
+      if (
+        dropdownRef.current &&
+        !dropdownRef.current.contains(e.target as Node) &&
+        inputRef.current &&
+        !inputRef.current.contains(e.target as Node)
+      ) {
+        setShowDropdown(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
+  function selectSuggestion(item: TypeaheadItem) {
+    setShowDropdown(false);
+    setCaseNumber(item.case_number);
+    const params = new URLSearchParams();
+    params.set("case", item.case_number);
+    params.set("court", court);
+    params.set("docid", item.docid);
+    router.push(`/apply?${params.toString()}`);
+  }
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (!showDropdown || suggestions.length === 0) return;
+
+      if (e.key === "ArrowDown") {
+        e.preventDefault();
+        setActiveIdx((i) => (i + 1) % suggestions.length);
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        setActiveIdx((i) => (i - 1 + suggestions.length) % suggestions.length);
+      } else if (e.key === "Enter" && activeIdx >= 0) {
+        e.preventDefault();
+        selectSuggestion(suggestions[activeIdx]);
+      } else if (e.key === "Escape") {
+        setShowDropdown(false);
+      }
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [showDropdown, suggestions, activeIdx]
+  );
+
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
     if (mode === "case") {
-      // 사건번호 → /apply로 이동 (Step1 자동 입력 + court_listings 매칭)
       const params = new URLSearchParams();
       if (caseNumber.trim()) params.set("case", caseNumber.trim());
       if (court) params.set("court", court);
       router.push(`/apply?${params.toString()}`);
     } else {
-      // 주소·단지명 → /analysis 목록으로 이동 (콘텐츠 탐색)
       const params = new URLSearchParams();
       if (keyword.trim()) params.set("q", keyword.trim());
       const qs = params.toString();
@@ -41,7 +129,6 @@ export function HeroSearch() {
 
   return (
     <section className="relative overflow-hidden bg-brand-700 text-white">
-      {/* 장식: 오른쪽 상단 원형 발광, 과하지 않게 */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-brand-500/30 blur-3xl"
@@ -134,18 +221,70 @@ export function HeroSearch() {
                   </optgroup>
                 </select>
 
-                <label className="sr-only" htmlFor="hero-case">
-                  사건번호
-                </label>
-                <input
-                  id="hero-case"
-                  type="text"
-                  inputMode="text"
-                  placeholder="예: 2021타경521675"
-                  value={caseNumber}
-                  onChange={(e) => setCaseNumber(e.target.value)}
-                  className="h-12 flex-1 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-base text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]"
-                />
+                <div className="relative flex-1">
+                  <label className="sr-only" htmlFor="hero-case">
+                    사건번호
+                  </label>
+                  <input
+                    ref={inputRef}
+                    id="hero-case"
+                    type="text"
+                    inputMode="text"
+                    autoComplete="off"
+                    placeholder="예: 2021타경521675"
+                    value={caseNumber}
+                    onChange={(e) => setCaseNumber(e.target.value)}
+                    onFocus={() => {
+                      if (suggestions.length > 0) setShowDropdown(true);
+                    }}
+                    onKeyDown={handleKeyDown}
+                    className="h-12 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-base text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]"
+                  />
+
+                  {/* Typeahead 드롭다운 */}
+                  {showDropdown && (
+                    <div
+                      ref={dropdownRef}
+                      className="absolute left-0 right-0 top-full z-50 mt-1 max-h-80 overflow-y-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white shadow-[var(--shadow-lift)]"
+                    >
+                      {suggestions.length > 0 ? (
+                        suggestions.map((item, idx) => (
+                          <button
+                            key={item.docid}
+                            type="button"
+                            onClick={() => selectSuggestion(item)}
+                            className={cn(
+                              "flex w-full flex-col gap-0.5 border-b border-[var(--color-border)] px-4 py-3 text-left transition last:border-b-0",
+                              idx === activeIdx
+                                ? "bg-brand-50"
+                                : "hover:bg-[var(--color-surface-muted)]"
+                            )}
+                          >
+                            <span className="text-sm font-bold text-[var(--color-ink-900)]">
+                              {item.case_number}
+                            </span>
+                            <span className="text-xs text-[var(--color-ink-500)]">
+                              {item.address_display}
+                            </span>
+                            <span className="text-xs text-[var(--color-ink-500)]">
+                              {item.bid_date}
+                              {item.min_bid_amount != null &&
+                                ` · 최저가 ${formatKoreanWon(item.min_bid_amount)}`}
+                            </span>
+                          </button>
+                        ))
+                      ) : searching ? (
+                        <p className="px-4 py-3 text-xs text-[var(--color-ink-500)]">
+                          검색 중...
+                        </p>
+                      ) : (
+                        <p className="px-4 py-3 text-xs text-[var(--color-ink-500)]">
+                          해당 사건을 찾을 수 없습니다
+                        </p>
+                      )}
+                    </div>
+                  )}
+                </div>
               </>
             ) : (
               <>
@@ -173,7 +312,6 @@ export function HeroSearch() {
             </button>
           </div>
 
-          {/* 보조 설명 */}
           <p className="mt-3 text-xs text-[var(--color-ink-500)]">
             {mode === "case" ? (
               <>
