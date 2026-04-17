@@ -15,7 +15,7 @@ export function Step3Documents({
   onNext: () => void;
   onBack: () => void;
 }) {
-  const { eSignFile, idFile } = data.documents;
+  const { eSignFile, idFile, eSignCertFile } = data.documents;
   const canProceed = !!eSignFile && !!idFile;
 
   return (
@@ -49,7 +49,7 @@ export function Step3Documents({
         </p>
       </div>
 
-      <div className="grid gap-5 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)] md:grid-cols-2">
+      <div className="grid gap-5 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)] md:grid-cols-2 lg:grid-cols-3">
         <FileUpload
           label="전자본인서명확인서"
           description="대법원 전자민원센터에서 발급한 PDF 파일을 올려주세요."
@@ -65,6 +65,16 @@ export function Step3Documents({
           description="주민등록증 · 운전면허증 · 여권 중 하나. PDF 또는 이미지."
           file={idFile}
           onFileChange={(f) => onDocumentsChange({ idFile: f })}
+        />
+        <FileUpload
+          label="전자본인서명확인서 발급증"
+          description="정부24에서 발급한 발급증 PDF 또는 이미지. 수요기관: 인천지방법원 집행관."
+          file={eSignCertFile ?? null}
+          onFileChange={(f) => onDocumentsChange({ eSignCertFile: f })}
+          helperLink={{
+            href: "https://www.gov.kr",
+            text: "정부24 발급 안내",
+          }}
         />
       </div>
 

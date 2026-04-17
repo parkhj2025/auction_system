@@ -13,6 +13,7 @@ const nextConfig: NextConfig = {
     "remark-gfm",
     "remark-parse",
     "remark-rehype",
+    "sharp",
   ],
 };
 

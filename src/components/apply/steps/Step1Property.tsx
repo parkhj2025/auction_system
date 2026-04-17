@@ -1,24 +1,27 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { AlertCircle, CheckCircle2, ArrowRight, Info } from "lucide-react";
+import {
+  AlertCircle,
+  CheckCircle2,
+  ArrowRight,
+  Info,
+  ChevronDown,
+} from "lucide-react";
 import type { AnalysisFrontmatter } from "@/types/content";
-import type { ApplyFormData } from "@/types/apply";
+import type { ApplyFormData, CourtListingSummary } from "@/types/apply";
 import { COURTS_ALL, groupCourtsByRegion } from "@/lib/constants";
 import { formatKoreanWon } from "@/lib/utils";
+import { PhotoGallery } from "../PhotoGallery";
 
 /**
  * Step 1 — 법원 + 사건번호 입력.
  *
- * 설계 원칙 (2026-04-15 확정):
- * - "검색 UX"가 아니라 "정보 입력 UX"로 설계. 사건번호 매칭은 뒤에서 조용히
- *   동작하고, 매칭 실패는 에러가 아닌 정상 경로.
- * - 수동 입력과 매칭 성공은 동등한 경로. 분기 버튼 없음.
- * - 법원은 전국 전체를 선택 가능. 서비스 불가 지역도 선택 가능하며, 접수 후
- *   관리자가 /admin에서 반려·협력사 안내 처리. (isServiced 플래그는 안내
- *   배너용)
- * - 사건번호가 변경되면 600ms 디바운스 후 자동으로 프론트매터 매칭 + 중복
- *   확인을 수행.
+ * 설계 원칙 (2026-04-17 Stage 2A 확정):
+ * - /api/orders/check → listings 배열 반환. court_listings DB 매칭 우선.
+ * - listings 1건 → 자동 매칭 카드. 2건+ → 선택 UI. 0건 → frontmatter 폴백.
+ * - 수동 입력과 매칭 성공은 동등한 경로.
+ * - court_code 필터 (D2). 복수 매칭 선택 UI (D3).
  */
 export function Step1Property({
   data,
@@ -33,68 +36,105 @@ export function Step1Property({
 }) {
   const [caseTaken, setCaseTaken] = useState(false);
   const [checking, setChecking] = useState(false);
+  const [listings, setListings] = useState<CourtListingSummary[]>([]);
 
-  // 최신 data 참조를 effect에서 안전하게 쓰기 위한 ref
   const latestPatchRef = useRef(onChange);
   latestPatchRef.current = onChange;
+
+  // 법원 선택 → courtCode 조회
+  const selectedCourt = COURTS_ALL.find((c) => c.label === data.court);
+  const courtCode = selectedCourt?.courtCode ?? "";
 
   // 사건번호 변경 시 디바운스된 매칭 + 중복 확인
   useEffect(() => {
     const q = data.caseNumber.trim();
 
-    // 빈 입력이면 이전 상태 초기화
     if (!q) {
       setCaseTaken(false);
       setChecking(false);
-      if (data.matchedPost) {
-        latestPatchRef.current({ matchedPost: null, manualEntry: false });
+      setListings([]);
+      if (data.matchedPost || data.matchedListing) {
+        latestPatchRef.current({
+          matchedPost: null,
+          matchedListing: null,
+          manualEntry: false,
+        });
       }
       return;
     }
 
     const handle = setTimeout(async () => {
-      // 1. 프론트매터 사건번호 매칭 (정확 일치 또는 공백 제거 일치)
-      const match =
-        posts.find((p) => p.caseNumber === q) ??
-        posts.find(
-          (p) => p.caseNumber.replace(/\s/g, "") === q.replace(/\s/g, "")
-        );
-
-      if (match) {
-        // 이미 동일한 매칭이면 onChange 호출하지 않아 루프 방지
-        if (data.matchedPost?.slug !== match.slug) {
-          latestPatchRef.current({
-            matchedPost: match,
-            caseNumber: match.caseNumber,
-            manualEntry: false,
-          });
-        }
-      } else if (data.matchedPost) {
-        // 사건번호가 수정되어 더 이상 매칭되지 않음
-        latestPatchRef.current({ matchedPost: null, manualEntry: false });
-      }
-
-      // 2. 중복 접수 확인 (매칭 여부와 무관)
       setChecking(true);
       try {
+        // /api/orders/check → 중복 확인 + court_listings 매칭
         const res = await fetch("/api/orders/check", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ caseNumber: q }),
+          body: JSON.stringify({ caseNumber: q, courtCode }),
         });
+
         if (res.status === 401) {
-          // 미로그인 — 미들웨어가 이미 /login 리다이렉트를 처리했을 것.
-          // 여기서는 게이팅 해제로 폴백.
           setCaseTaken(false);
+          setListings([]);
+          return;
+        }
+
+        const json = (await res.json()) as {
+          available?: boolean | null;
+          reason?: string;
+          listings?: CourtListingSummary[];
+        };
+
+        setCaseTaken(json.available === false);
+
+        const resultListings = json.listings ?? [];
+        setListings(resultListings);
+
+        if (resultListings.length === 1) {
+          // 단일 매칭 → 자동 선택
+          latestPatchRef.current({
+            matchedListing: resultListings[0],
+            matchedPost: null,
+            manualEntry: false,
+          });
+        } else if (resultListings.length === 0) {
+          // court_listings 매칭 없음 → frontmatter 폴백
+          const fmMatch =
+            posts.find((p) => p.caseNumber === q) ??
+            posts.find(
+              (p) =>
+                p.caseNumber.replace(/\s/g, "") === q.replace(/\s/g, "")
+            );
+
+          if (fmMatch) {
+            if (data.matchedPost?.slug !== fmMatch.slug) {
+              latestPatchRef.current({
+                matchedPost: fmMatch,
+                matchedListing: null,
+                caseNumber: fmMatch.caseNumber,
+                manualEntry: false,
+              });
+            }
+          } else if (data.matchedPost || data.matchedListing) {
+            latestPatchRef.current({
+              matchedPost: null,
+              matchedListing: null,
+              manualEntry: false,
+            });
+          }
         } else {
-          const json = (await res.json()) as {
-            available?: boolean | null;
-          };
-          setCaseTaken(json.available === false);
+          // 복수 매칭 → 선택 대기 (matchedListing은 사용자가 선택해야 설정)
+          if (data.matchedListing || data.matchedPost) {
+            latestPatchRef.current({
+              matchedPost: null,
+              matchedListing: null,
+              manualEntry: false,
+            });
+          }
         }
       } catch {
-        // 네트워크 에러 시 통과 (서버 UNIQUE INDEX가 2차 방어)
         setCaseTaken(false);
+        setListings([]);
       } finally {
         setChecking(false);
       }
@@ -102,9 +142,8 @@ export function Step1Property({
 
     return () => clearTimeout(handle);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.caseNumber, posts]);
+  }, [data.caseNumber, courtCode, posts]);
 
-  const selectedCourt = COURTS_ALL.find((c) => c.label === data.court);
   const isNonServicedCourt = selectedCourt && !selectedCourt.isServiced;
 
   const canProceed =
@@ -115,14 +154,18 @@ export function Step1Property({
 
   function handleNext() {
     if (!canProceed) return;
-    // 매칭된 포스트가 없으면 수동 입력으로 표시 (에러 아님)
-    if (!data.matchedPost && !data.manualEntry) {
+    if (!data.matchedPost && !data.matchedListing && !data.manualEntry) {
       onChange({ manualEntry: true });
     }
     onNext();
   }
 
+  function selectListing(listing: CourtListingSummary) {
+    onChange({ matchedListing: listing, matchedPost: null, manualEntry: false });
+  }
+
   const post = data.matchedPost;
+  const listing = data.matchedListing;
   const regionGroups = groupCourtsByRegion();
 
   return (
@@ -160,7 +203,7 @@ export function Step1Property({
                   {group.courts.map((c) => (
                     <option key={c.label} value={c.label}>
                       {c.label}
-                      {c.isServiced ? " ✓" : ""}
+                      {c.isServiced ? " \u2713" : ""}
                     </option>
                   ))}
                 </optgroup>
@@ -235,8 +278,123 @@ export function Step1Property({
         </div>
       )}
 
-      {/* 매칭된 물건 (보너스 — 있으면 좋고 없어도 정상) */}
-      {post && !caseTaken && (
+      {/* 복수 물건 선택 UI (D3: listings 2건 이상) */}
+      {listings.length >= 2 && !caseTaken && !listing && (
+        <div className="rounded-[var(--radius-xl)] border-2 border-brand-200 bg-brand-50/20 p-5">
+          <div className="flex items-center gap-2 text-brand-700">
+            <ChevronDown size={18} aria-hidden="true" />
+            <p className="text-xs font-black uppercase tracking-wider">
+              이 사건에 {listings.length}개 물건이 있습니다. 선택해주세요
+            </p>
+          </div>
+          <div className="mt-4 grid gap-3">
+            {listings.map((l) => (
+              <button
+                key={l.docid}
+                type="button"
+                onClick={() => selectListing(l)}
+                className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white p-4 text-left transition hover:border-brand-400 hover:shadow-[var(--shadow-card)]"
+              >
+                <p className="text-sm font-bold text-[var(--color-ink-900)]">
+                  {l.address_display}
+                </p>
+                <div className="mt-2 flex flex-wrap gap-x-4 gap-y-1 text-xs text-[var(--color-ink-500)]">
+                  <span>{l.usage_name}</span>
+                  {l.area_display && <span>{l.area_display}</span>}
+                  {l.min_bid_amount != null && (
+                    <span className="font-bold text-[var(--color-accent-red)]">
+                      최저가 {formatKoreanWon(l.min_bid_amount)}
+                    </span>
+                  )}
+                </div>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* court_listings 매칭 카드 (단일 매칭 또는 선택 후) */}
+      {listing && !caseTaken && (
+        <div className="rounded-[var(--radius-xl)] border-2 border-brand-600 bg-brand-50/30 p-6">
+          <div className="flex items-center gap-2 text-brand-700">
+            <CheckCircle2 size={18} aria-hidden="true" />
+            <p className="text-xs font-black uppercase tracking-wider">
+              대법원 경매정보에서 물건을 확인했습니다
+            </p>
+          </div>
+          <h3 className="mt-3 text-xl font-black tracking-tight text-[var(--color-ink-900)]">
+            {listing.address_display}
+          </h3>
+          <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-4 text-sm sm:grid-cols-3">
+            <div>
+              <dt className="text-xs text-[var(--color-ink-500)]">입찰일</dt>
+              <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
+                {listing.bid_date}
+                {listing.bid_time ? ` ${listing.bid_time}` : ""}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs text-[var(--color-ink-500)]">감정가</dt>
+              <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
+                {listing.appraisal_amount != null
+                  ? formatKoreanWon(listing.appraisal_amount)
+                  : "-"}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs text-[var(--color-ink-500)]">
+                최저가 (유찰 {listing.failed_count}회)
+              </dt>
+              <dd className="mt-1 font-black tabular-nums text-[var(--color-accent-red)]">
+                {listing.min_bid_amount != null
+                  ? formatKoreanWon(listing.min_bid_amount)
+                  : "-"}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs text-[var(--color-ink-500)]">용도</dt>
+              <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
+                {listing.usage_name ?? "-"}
+              </dd>
+            </div>
+            {listing.area_display && (
+              <div>
+                <dt className="text-xs text-[var(--color-ink-500)]">면적</dt>
+                <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
+                  {listing.area_display}
+                </dd>
+              </div>
+            )}
+            <div>
+              <dt className="text-xs text-[var(--color-ink-500)]">법원</dt>
+              <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
+                {listing.court_name}
+              </dd>
+            </div>
+          </dl>
+          {/* 사진 갤러리 (온디맨드 로드) */}
+          <PhotoGallery docid={listing.docid} />
+          {/* 복수 물건 사건에서 다른 물건 선택 가능 */}
+          {listings.length >= 2 && (
+            <button
+              type="button"
+              onClick={() =>
+                onChange({
+                  matchedListing: null,
+                  matchedPost: null,
+                  manualEntry: false,
+                })
+              }
+              className="mt-2 ml-3 text-xs font-medium text-[var(--color-ink-500)] underline underline-offset-2 hover:text-[var(--color-ink-700)]"
+            >
+              다른 물건 선택
+            </button>
+          )}
+        </div>
+      )}
+
+      {/* frontmatter 매칭 (폴백, court_listings에 없을 때) */}
+      {post && !listing && !caseTaken && (
         <div className="rounded-[var(--radius-xl)] border-2 border-brand-600 bg-brand-50/30 p-6">
           <div className="flex items-center gap-2 text-brand-700">
             <CheckCircle2 size={18} aria-hidden="true" />

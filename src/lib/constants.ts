@@ -48,6 +48,8 @@ export type CourtOption = {
   label: string;
   region: string;
   isServiced: boolean;
+  /** 대법원 경매정보 법원코드 (cortOfcCd). 크롤러·사진 API에서 사용. */
+  courtCode?: string;
 };
 
 export const COURTS_ALL: CourtOption[] = [
@@ -66,8 +68,8 @@ export const COURTS_ALL: CourtOption[] = [
   { label: "의정부지방법원 동두천지원", region: "경기북부", isServiced: false },
 
   // 인천 (인천지방법원 관할)
-  { label: "인천지방법원", region: "인천", isServiced: true },
-  { label: "인천지방법원 부천지원", region: "인천", isServiced: false },
+  { label: "인천지방법원", region: "인천", isServiced: true, courtCode: "B000240" },
+  { label: "인천지방법원 부천지원", region: "인천", isServiced: false, courtCode: "B000241" },
 
   // 경기남부 (수원지방법원 관할)
   { label: "수원지방법원", region: "경기남부", isServiced: false },

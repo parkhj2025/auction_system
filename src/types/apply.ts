@@ -1,5 +1,23 @@
 import type { AnalysisFrontmatter } from "./content";
 
+/** court_listings 테이블에서 조회한 물건 요약 (Step1 매칭 카드용) */
+export interface CourtListingSummary {
+  docid: string;
+  court_name: string;
+  case_number: string;
+  address_display: string | null;
+  appraisal_amount: number | null;
+  min_bid_amount: number | null;
+  bid_date: string | null;
+  bid_time: string | null;
+  usage_name: string | null;
+  area_display: string | null;
+  failed_count: number;
+  item_sequence: number;
+  mokmul_sequence: number;
+  photos_fetched_at: string | null;
+}
+
 export type FeeTier = "earlybird" | "standard" | "rush";
 
 export interface FeeComputation {
@@ -27,12 +45,16 @@ export interface ApplyBidInfo {
 export interface ApplyDocuments {
   eSignFile: File | null;
   idFile: File | null;
+  /** 전자본인서명확인서 발급증 (정부24 발급) */
+  eSignCertFile?: File | null;
 }
 
 export interface ApplyFormData {
   caseNumber: string;
   court: string;
   matchedPost: AnalysisFrontmatter | null;
+  /** court_listings에서 매칭된 물건 (PoC D10 기반) */
+  matchedListing?: CourtListingSummary | null;
   /** matchedPost 없이 사용자가 수동으로 입력했는지 */
   manualEntry: boolean;
   bidInfo: ApplyBidInfo;
