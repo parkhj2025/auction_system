@@ -26,7 +26,7 @@ export async function GET(req: Request) {
     let query = admin
       .from("court_listings")
       .select(
-        "docid, case_number, address_display, bid_date, min_bid_amount, usage_name, item_sequence"
+        "docid, case_number, court_name, court_code, address_display, bid_date, min_bid_amount, usage_name, item_sequence"
       )
       .ilike("case_number", `%${q}%`)
       .eq("is_active", true)
@@ -34,9 +34,11 @@ export async function GET(req: Request) {
       .order("bid_date", { ascending: true })
       .limit(limit);
 
+    // courtCode가 명시적으로 제공되면 해당 법원만 검색
     if (courtCode) {
       query = query.eq("court_code", courtCode);
     }
+    // courtCode 없으면 전체 법원에서 검색 (typeahead는 법원 무관)
 
     const { data, error } = await query;
 

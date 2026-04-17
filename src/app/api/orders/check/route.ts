@@ -27,10 +27,11 @@ export async function POST(req: Request) {
     }
 
     const body = (await req.json().catch(() => null)) as
-      | { caseNumber?: string; courtCode?: string }
+      | { caseNumber?: string; courtCode?: string; courtName?: string }
       | null;
     const caseNumber = body?.caseNumber?.trim() ?? "";
     const courtCode = body?.courtCode?.trim() ?? "";
+    const courtName = body?.courtName?.trim() ?? "";
 
     if (!caseNumber) {
       return NextResponse.json(
@@ -73,8 +74,12 @@ export async function POST(req: Request) {
       .eq("is_active", true)
       .gte("bid_date", new Date().toISOString().slice(0, 10));
 
+    // court_code 또는 court_name으로 필터 (D2)
+    // 둘 다 없으면 필터 없이 전체 검색 (typeahead에서 법원 무관 검색 시)
     if (courtCode) {
       query = query.eq("court_code", courtCode);
+    } else if (courtName) {
+      query = query.eq("court_name", courtName);
     }
 
     const { data: listings, error: listingsError } = await query.order(

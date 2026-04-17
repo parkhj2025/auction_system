@@ -11,6 +11,8 @@ type Mode = "case" | "address";
 interface TypeaheadItem {
   docid: string;
   case_number: string;
+  court_name: string;
+  court_code: string;
   address_display: string | null;
   bid_date: string | null;
   min_bid_amount: number | null;
@@ -32,10 +34,7 @@ export function HeroSearch() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // 법원 코드 매핑 (COURTS_ACTIVE의 value → courtCode)
-  const courtCodeMap: Record<string, string> = { incheon: "B000240" };
-
-  // 디바운스 typeahead
+  // 디바운스 typeahead — 법원 무관 검색 (결과에 court_name 포함)
   useEffect(() => {
     if (mode !== "case" || caseNumber.trim().length < 4) {
       setSuggestions([]);
@@ -46,9 +45,9 @@ export function HeroSearch() {
     const handle = setTimeout(async () => {
       setSearching(true);
       try {
-        const courtCode = courtCodeMap[court] ?? "";
+        // courtCode 파라미터 없이 전체 법원에서 검색
         const res = await fetch(
-          `/api/court-listings/search?q=${encodeURIComponent(caseNumber.trim())}&courtCode=${courtCode}&limit=10`
+          `/api/court-listings/search?q=${encodeURIComponent(caseNumber.trim())}&limit=10`
         );
         const json = (await res.json()) as { results: TypeaheadItem[] };
         setSuggestions(json.results);
@@ -86,7 +85,8 @@ export function HeroSearch() {
     setCaseNumber(item.case_number);
     const params = new URLSearchParams();
     params.set("case", item.case_number);
-    params.set("court", court);
+    // 사건의 실제 법원명으로 전달 (사용자가 선택한 법원이 아닌 데이터의 법원)
+    params.set("court", item.court_name);
     params.set("docid", item.docid);
     router.push(`/apply?${params.toString()}`);
   }
@@ -262,6 +262,9 @@ export function HeroSearch() {
                           >
                             <span className="text-sm font-bold text-[var(--color-ink-900)]">
                               {item.case_number}
+                              <span className="ml-2 text-xs font-medium text-[var(--color-ink-500)]">
+                                {item.court_name}
+                              </span>
                             </span>
                             <span className="text-xs text-[var(--color-ink-500)]">
                               {item.address_display}

@@ -70,7 +70,7 @@ export function Step1Property({
         const res = await fetch("/api/orders/check", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ caseNumber: q, courtCode }),
+          body: JSON.stringify({ caseNumber: q, courtCode, courtName: data.court }),
         });
 
         if (res.status === 401) {
