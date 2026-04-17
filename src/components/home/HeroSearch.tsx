@@ -24,15 +24,19 @@ export function HeroSearch() {
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const params = new URLSearchParams();
     if (mode === "case") {
-      if (court) params.set("court", court);
+      // 사건번호 → /apply로 이동 (Step1 자동 입력 + court_listings 매칭)
+      const params = new URLSearchParams();
       if (caseNumber.trim()) params.set("case", caseNumber.trim());
+      if (court) params.set("court", court);
+      router.push(`/apply?${params.toString()}`);
     } else {
+      // 주소·단지명 → /analysis 목록으로 이동 (콘텐츠 탐색)
+      const params = new URLSearchParams();
       if (keyword.trim()) params.set("q", keyword.trim());
+      const qs = params.toString();
+      router.push(qs ? `/analysis?${qs}` : "/analysis");
     }
-    const qs = params.toString();
-    router.push(qs ? `/analysis?${qs}` : "/analysis");
   }
 
   return (

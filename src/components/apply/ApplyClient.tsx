@@ -23,10 +23,12 @@ const STEP_ORDER: ApplyStepId[] = APPLY_STEPS.map((s) => s.id);
 export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
   const searchParams = useSearchParams();
   const initialCase = searchParams.get("case") ?? "";
+  const initialCourt = searchParams.get("court") ?? "";
 
   const [data, setData] = useState<ApplyFormData>({
     ...INITIAL_APPLY_DATA,
     caseNumber: initialCase,
+    ...(initialCourt ? { court: initialCourt } : {}),
   });
   const [currentStep, setCurrentStep] = useState<ApplyStepId>("property");
   const [completed, setCompleted] = useState<Set<ApplyStepId>>(new Set());
@@ -204,14 +206,14 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
   return (
     <>
       <ApplyStepIndicator current={currentStep} completed={completed} />
-      {showStickyBar && (
-        <StickyPropertyBar
-          listing={data.matchedListing}
-          caseNumber={data.caseNumber}
-          manualEntry={data.manualEntry}
-        />
-      )}
       <section className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+        {showStickyBar && (
+          <StickyPropertyBar
+            listing={data.matchedListing}
+            caseNumber={data.caseNumber}
+            manualEntry={data.manualEntry}
+          />
+        )}
         {stepView}
       </section>
     </>

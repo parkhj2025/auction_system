@@ -41,6 +41,40 @@ const PIC_CATEGORY: Record<string, string> = {
   "000247": "기타사진",
 };
 
+/** 카테고리별 최대 N장 선별. 전경 2 + 내부 2 우선, 부족 시 다른 카테고리로 보충. */
+function selectPhotos(pics: RawPicItem[], max: number): RawPicItem[] {
+  const byCategory = new Map<string, RawPicItem[]>();
+  for (const p of pics) {
+    if (!p.picFile) continue;
+    const code = p.cortAuctnPicDvsCd;
+    if (!byCategory.has(code)) byCategory.set(code, []);
+    byCategory.get(code)!.push(p);
+  }
+
+  const result: RawPicItem[] = [];
+
+  // 전경(000241) 최대 2장
+  const exterior = byCategory.get("000241") ?? [];
+  result.push(...exterior.slice(0, 2));
+
+  // 내부(000245) 최대 2장
+  const interior = byCategory.get("000245") ?? [];
+  result.push(...interior.slice(0, 2));
+
+  // 부족 시 다른 카테고리에서 보충
+  if (result.length < max) {
+    const used = new Set(result);
+    for (const p of pics) {
+      if (result.length >= max) break;
+      if (used.has(p) || !p.picFile) continue;
+      result.push(p);
+      used.add(p);
+    }
+  }
+
+  return result.slice(0, max);
+}
+
 interface FetchPhotosParams {
   docid: string;
   caseNumber: string;
@@ -135,12 +169,15 @@ export async function fetchAndCachePhotos(
     return [];
   }
 
-  // 4. 압축 + 업로드
+  // 4. 카테고리별 4장 선별 → 압축 + 업로드
+  const MAX_PHOTOS = 4;
+  const selected = selectPhotos(csPicLst, MAX_PHOTOS);
+
   const photos: PhotoMeta[] = [];
   const storagePath = `${courtCode}/${docid}`;
 
-  for (let i = 0; i < csPicLst.length; i++) {
-    const pic = csPicLst[i];
+  for (let i = 0; i < selected.length; i++) {
+    const pic = selected[i];
     if (!pic.picFile) continue;
 
     try {

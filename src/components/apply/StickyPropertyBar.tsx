@@ -2,7 +2,7 @@
 
 import { MapPin } from "lucide-react";
 import type { CourtListingSummary } from "@/types/apply";
-import { formatKoreanWon, formatBidDateTime } from "@/lib/utils";
+import { formatKoreanWon } from "@/lib/utils";
 
 /**
  * Step2~5에서 선택된 물건 정보를 상단에 고정 표시.
@@ -44,7 +44,7 @@ export function StickyPropertyBar({
           최저가 {listing.min_bid_amount != null ? formatKoreanWon(listing.min_bid_amount) : "-"}
         </span>
         <span className="text-[var(--color-ink-500)]">
-          입찰일 {formatBidDateTime(listing.bid_date, listing.bid_time)}
+          입찰일 {listing.bid_date ?? ""}
         </span>
       </div>
     </div>

@@ -11,7 +11,7 @@ import {
 import type { AnalysisFrontmatter } from "@/types/content";
 import type { ApplyFormData, CourtListingSummary } from "@/types/apply";
 import { COURTS_ALL, groupCourtsByRegion } from "@/lib/constants";
-import { formatKoreanWon, formatBidDateTime } from "@/lib/utils";
+import { formatKoreanWon } from "@/lib/utils";
 import { PhotoGallery } from "../PhotoGallery";
 
 /**
@@ -329,7 +329,7 @@ export function Step1Property({
             <div>
               <dt className="text-xs text-[var(--color-ink-500)]">입찰일</dt>
               <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
-                {formatBidDateTime(listing.bid_date, listing.bid_time)}
+                {listing.bid_date ?? "-"}
               </dd>
             </div>
             <div>
