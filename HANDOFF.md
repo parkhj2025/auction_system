@@ -1,81 +1,107 @@
 # 경매퀵 웹사이트 핸드오프 문서
 
 > **용도**: 다음 Claude Code 세션이 이 문서 하나만 읽고도 작업을 이어갈 수 있도록 현재 상태를 정리한다.
-> **최종 업데이트**: 2026-04-15
-> **현재 빌드 상태**: **Phase 2 전 단계(P2-0 ~ P2-6) + P2-7 Stage 1 완료**, 프로덕션 배포 중
-> **함께 읽을 문서**: `CLAUDE.md` (원칙·컴플라이언스), `BUILD_GUIDE.md` (구조·토큰), `C:\Users\User\.claude\plans\glimmering-hopping-aurora.md` (Phase 2 빌드 플랜 — 전체 결정 히스토리와 P2-7 설계 상세)
+> **최종 업데이트**: 2026-04-17
+> **현재 빌드 상태**: **P2-7 Stage 2A 완료 + 디자인 최소 정리 완료**, 프로덕션 배포 중
+> **함께 읽을 문서**: `CLAUDE.md` (원칙·컴플라이언스), `BUILD_GUIDE.md` (구조·토큰), `C:\Users\User\.claude\plans\staged-jumping-star.md` (Stage 2A/2B/2B-post/2C 빌드 플랜)
 
 ---
 
-## ⚡ 2026-04-15 핫 스냅샷 — 다음 세션 시작 시 여기부터 읽기
+## ⚡ 2026-04-17 핫 스냅샷 — 다음 세션 시작 시 여기부터 읽기
 
 ### 지금 어디인가
 
-**Phase 1 완료 → Phase 2 전 단계 완료 → P2-7 Stage 1 완료**의 상태. 이게 의미하는 것:
+**Phase 2 전단계 + P2-7 Stage 1·2A 완료 + 디자인 최소 정리 완료**. 의미:
 
-- 고객이 Google 로그인 후 `/apply` 5단계 접수까지 완료 가능 (orders·documents·order_status_log DB 저장 + Storage 서류 업로드 + 1물건1고객 DB 강제)
-- 고객 마이페이지(`/my`)에서 본인 접수 현황·상태 타임라인·서류 다운로드 가능
-- 형준님(admin)이 `/admin`에서 접수 확인·상태 변경·SSN 즉시 삭제 가능
-- 물건분석 상세 페이지에 소프트 게이팅(2건째부터 블러) 작동
-- 계좌이체 UI에 수수료+보증금 합산 금액 복사 버튼, "온라인 결제(준비 중)" 영역
-- **대법원 경매정보 직접 크롤링 성공** — 인천 2주 기간 2047건 `court_listings` 테이블 적재 완료
-- 실전 프로덕션 URL: https://auctionsystem-green.vercel.app
+- court_listings 인천 2,047건 적재 + **수동 실행 증분 크롤러** 완비 (`scripts/run-crawler.bat` 더블클릭)
+- `/apply` Step1이 **court_listings 실시간 매칭** 작동 (frontmatter 매칭은 폴백으로 공존)
+- **사진 온디맨드 페처** 작동 — selectAuctnCsSrchRslt.on 단일 호출 + sharp WebP 압축 + Storage 캐싱
+- **히어로 사건번호 Typeahead 자동완성** + StickyPropertyBar + PhotoGallery 인라인 4장
+- **e2e 다수 버그 fix** — 법원 필터, mokmul→item 그룹핑, 1000건 limit, WAF 헤더 등
+- **디자인 최소 정리** 완료 — globals.css 사용 규칙 주석 + 카테고리 배지 회색 통일 + 이미지 그라디언트 중립화
+- 프로덕션 URL: https://auctionsystem-green.vercel.app
 
-### P2-7 Stage 2 — 다음 세션 목표
+### P2-7 Stage 2A 완료 작업 요약
 
-크롤러로 **텍스트 데이터**는 쌓았지만, 아직 `/apply` Step1은 frontmatter 매칭(`content/analysis/*.mdx` 3건)을 쓰고 있음. 이걸 `court_listings` 조회로 교체하고, 사진 온디맨드 페처를 붙이는 게 Stage 2.
+| 영역 | 결과 |
+|------|------|
+| 사진 페처 | `src/lib/courtAuction/{session,codes,photos}.ts` + `/api/court-listings/[docid]/photos` route. sharp 800×600 WebP q75. 캐시 hit 256ms. **카테고리별 4장 선별** (전경 2 + 내부 2 + fallback) |
+| 매칭 API | `/api/orders/check` 확장 — courtCode/courtName 필터 + listings 배열. **mokmul 단위 row → item 단위 그룹핑** (component_count 포함) |
+| Typeahead | `/api/court-listings/search` 신규. 디바운스 300ms, ILIKE, 키보드 네비, 법원 무관 검색, 선택 시 사건의 실제 court_name 전달 |
+| Step1 매칭 | 단일 자동 / 복수 선택 UI / frontmatter 폴백 / 수동 입력 4경로. `component_count > 1`이면 "N개 필지 일괄 매각" 라벨 |
+| StickyBar | Step2~5 상단 고정 (section 내부 위치). 2줄 구조 (체크 아이콘 + 주소 / 메타) + brand-600 좌측 accent |
+| 크롤러 재설계 | GitHub Actions cron 폐기 → **수동 증분 실행**. 4단계 (네트워크 사전 체크 → 목록 → DB 대조 → 저장 → 리포트). ANSI 색상 + waitForKey. `run-crawler.bat`/`.sh` + CRAWLER-README.md |
+| 헤더 보정 | SC-Userid: NONUSER, SC-Pgmid 추가, sec-ch-ua 3종, UA Chrome 147, 세션 2단계 초기화 |
+| 디자인 최소 정리 | globals.css 32줄 컬러 사용 규칙 주석 / DetailHero·PropertyCard 배지 ink 회색 통일 (B안) / AnalysisMdxImage 3색 그라디언트 → ink 회색 단일 |
 
-작업 범위(5개):
-1. **사진 페처 API route** — `src/app/api/court-listings/[docid]/photos/route.ts`
-   - `sharp` 설치 + Node 런타임 바이너리 이슈 해결
-   - `selectPicInf.on` 호출 → base64 JPEG 수신 → 800×600 WebP quality 75로 압축(원본 280KB → ~28KB)
-   - Supabase Storage `court-photos/{courtCode}/{docid}/{seq}.webp` 업로드
-   - `court_listings.photos` JSONB 업데이트 + `photos_fetched_at`
-   - 두 번째 요청부터는 캐시 hit으로 즉시 URL 반환
-   - 세션 로직은 `src/lib/courtAuction/session.ts`로 `scripts/crawler/session.mjs` 포팅
-2. **`/api/orders/check` 확장** — court_listings 조인해서 매칭 정보(감정가·최저가·주소 등) 함께 반환
-3. **`Step1Property.tsx` 재수정** — frontmatter 매칭 로직을 court_listings 조회로 교체. 매칭 성공 시 대법원 원본 데이터로 카드 렌더
-4. **`PhotoGallery` 컴포넌트 신규** — "사진 보기" 버튼 + 로딩 + 카테고리별 갤러리 + 한글 캡션 + Lightbox
-5. **`.github/workflows/court-crawler.yml`** — 매일 UTC 00:00(KST 09:00) cron으로 `scripts/crawler/index.mjs` 실행. GitHub Secrets에 `NEXT_PUBLIC_SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` 등록 필요
+### 다음 세션 진입 옵션 (형준님 결정)
 
-추정 공수: ~2.5시간 / 1~2 세션.
+**옵션 A — Stage 2B 착수 (전자계약 시스템)**
+- 작업 6: 위임장 PDF 생성 (pdf-lib + Noto Sans KR 임베딩)
+- 작업 7: 서명 캔버스 (react-signature-canvas 또는 자체 구현)
+- 작업 8: Step4Confirm 재설계 (요약카드 + 서명 + 3개 동의 체크박스)
+- 작업 9: 주민번호 취급 정책 재설계 (ssn_back DB 저장 vs 메모리 전용 + PDF Storage 보관기간 자동 삭제)
+- 작업 10: 휴대폰 본인인증 mock 구현 (`verifyPhone()` 인터페이스 + NICE/KCB/토스 비교표)
+- 추정 공수: ~5~7시간 / 2~3 세션. 가장 큰 UI 변경 단계
+- **2C 진입 직전 Stage 2B-post (디자인 정지 작업) 1회 배치 예정**
+
+**옵션 B — 런칭 블로커 처리 시작**
+- 사업자등록·도메인 확보가 선행되어야 하는 항목들
+- Google OAuth 도메인 정리, 알림톡, 본인인증 SDK, 동의 팝업 재구성
+- 형준님이 사업자등록 진행 중이면 Stage 2B와 병행 가능
 
 ### 다음 세션 즉시 실행 트리거 (형준님이 복사해서 입력)
 
-**다음 세션 첫 메시지로 이것을 주세요**:
-
+**Stage 2B 착수 시**:
 ```
-P2-7 Stage 2 착수. 지금 상태:
-- Phase 2 전단계(P2-0~P2-6) + P2-7 Stage 1 완료
-- court_listings 테이블에 인천 2주 2047건 이미 적재됨
-- scripts/crawler/ 모듈 작동 검증 완료
-- court-photos Storage 버킷 public read로 생성 완료
-- HANDOFF.md 상단 "2026-04-15 핫 스냅샷" 섹션부터 읽고 Stage 2 5개 작업 순서대로 진행해줘.
-  1번(사진 페처 API + sharp)부터 시작하고, 설치 이슈 생기면 즉시 알려줘.
+P2-7 Stage 2B 착수. 지금 상태:
+- Stage 2A 완료. court_listings 매칭 + 사진 페처 + Typeahead + StickyBar 작동
+- 디자인 최소 정리 완료 (배지 중립화, 사용 규칙 주석)
+- 다음 단계: 전자계약 시스템 (위임장 PDF + 서명 캔버스 + Step4 재설계 + 주민번호 정책 + 본인인증 mock)
+- HANDOFF.md "2026-04-17 핫 스냅샷"부터 읽고 staged-jumping-star.md의 Stage 2B 섹션 확인.
+- 작업 6(위임장 PDF 템플릿 설계 + pdf-lib 파이프라인)부터 시작해줘.
+- 한글 폰트 임베딩 이슈 발생 시 즉시 보고.
+- Stage 2B 완료 후 2B-post(디자인 정지 작업) 1회 배치 예정 — 잊지 말 것.
+```
+
+**런칭 블로커 처리 시**:
+```
+런칭 블로커 처리 시작. project_launch_blockers.md 메모리 + HANDOFF "이월 항목" 섹션 읽고
+어느 블로커부터 처리할지 형준님과 결정. 사업자등록 상태 먼저 확인 필요.
 ```
 
 ### 다음 세션 시작 시 환경 체크리스트
 
-1. `pnpm -v` + `node --version` (Node 20.6+ 필수)
-2. `ls scripts/crawler/` — 6개 .mjs 파일 + README.md 확인
-3. `.env.local` 확인: `NEXT_PUBLIC_SUPABASE_URL`, `NEXT_PUBLIC_SUPABASE_ANON_KEY`, `SUPABASE_SERVICE_ROLE_KEY`, `NEXT_PUBLIC_SITE_URL`
-4. Supabase Dashboard → Storage → `court-photos` 버킷 존재 확인 (public, 500KB limit, image/webp·jpeg)
-5. Supabase Table Editor → `court_listings` 테이블 2000+건 확인
-6. `pnpm dev` 기동 → http://localhost:3000 로드 → Google 로그인 → `/apply` 접근 가능한지
+1. `node --version` (v22), `pnpm -v` (10.33)
+2. `.env.local` 4개 키 존재
+3. Supabase Dashboard: `court_listings` 2,047건+ / `court-photos` 버킷 존재
+4. `pnpm build` 0 에러
+5. 프로덕션 배포 확인: https://auctionsystem-green.vercel.app
+6. (선택) 형준님 집 IP에서 `node --env-file=.env.local scripts/crawler/index.mjs --court incheon --days 14` 실행 → 4단계 정상 완료 확인
 
-체크 실패 시 HANDOFF.md "2. 기술 스택" + P2-7 관련 섹션 읽고 복구.
+### 절대 하지 말 것 (Stage 2A에서 학습한 가드레일)
 
-### 절대 하지 말 것 (Stage 2에서 지켜야 할 가드레일)
+- **frontmatter 콘텐츠(`content/analysis/*.mdx`) 삭제 금지**. court_listings와 공존.
+- **service_role 키 클라이언트 노출 금지**. admin client는 서버 전용.
+- **사진 일괄 수집 금지**. 온디맨드 정책 + 카테고리별 4장 상한.
+- **Supabase `.select()` 1000건 limit 주의**. 전체 조회 시 `.range()` 페이지네이션 필수.
+- **WAF 우회 IP 로테이션 금지** (D9, 법적 리스크). Rate Limit 준수가 정답.
+- **검색 API와 상세 API는 별도 모듈** (pgjsearch vs pgj15B). 한쪽 차단이 다른 쪽에 영향 없음.
+- **Azure/GitHub Actions runner IP는 검색 API 차단됨**. cron 자동화 불가, 수동 실행만.
+- **2B 작업 시 새 색상 추가 금지**. globals.css 주석 규칙 준수. 디자인 최종은 2B-post에서.
 
-- **frontmatter 콘텐츠(`content/analysis/*.mdx`) 삭제 금지**. `/analysis` 콘텐츠는 court_listings와 별개의 편집 콘텐츠로 유지. 두 시스템 공존.
-- **`court_listings` 테이블을 클라이언트에서 직접 mutate 금지**. service_role 키는 서버 전용, 노출 금지.
-- **사진 전체를 크롤러가 배치로 수집하지 말 것**. 온디맨드 정책 (고객 요청 시점에만 fetch + 압축 + 저장).
-- **Stage 1 크롤러의 세션/페이로드 구조 변경 금지**. 2026-04-15 검증된 최소 작동 조합이므로 Stage 2에서 library 포팅 시 로직을 정확히 복제해야 함.
-- **Vercel Cron 대신 GitHub Actions 사용**. Vercel 서버리스는 10~60초 제한으로 크롤러 풀런(~5분) 불가.
+### Stage 2A에서 발견된 데이터 모델 사실들
 
-### P2-7 설계 전체 문서
+- **csNo 포맷**: `court_listings.case_number` = `srnSaNo` = "2023타경547053" (한글 그대로)
+- **item_sequence vs mokmul_sequence**: 다른 컬럼. 사진 API는 `dspslGdsSeq = item_sequence`. 매칭 ORDER BY는 둘 다.
+- **item 단위 그룹핑**: 토지+건물 일괄 매각이 N개 row로 들어옴. UI는 item 단위로 그룹핑하여 1건으로 표시.
+- **사진 카테고리 코드**: 000241=전경, 000242=감정평가, 000243=현황조사, 000244=매각물건, 000245=내부, 000246=등기부, 000247=기타
+- **Stage 1 크롤러 사진 미수집**: photos 컬럼 NULL. 온디맨드로만 수집.
+- **DB 통계 (2026-04-17)**: 인천 871 사건 / 진짜 복수 매각물건 (item 2+) 12건 (1.4%) / 토지+건물 구성 (mokmul 2+) 42건
 
-`C:\Users\User\.claude\plans\glimmering-hopping-aurora.md`의 "P2-7" 섹션에 Stage 1·2 설계, DB 스키마, 리스크, 검증 기준이 전부 있음. 다음 세션이 이 파일을 먼저 읽으면 맥락을 완전히 복원할 수 있다.
+### 플랜 파일
+
+`C:\Users\User\.claude\plans\staged-jumping-star.md` — Stage 2A/2B/2B-post/2C 전체 설계 + e2e 이슈 수정 이력 + 검증 계획. 다음 세션이 이 파일과 본 핫 스냅샷을 읽으면 맥락 완전 복원.
 
 ---
 
@@ -456,14 +482,35 @@ npx tsc --noEmit    # 타입 체크
 
 ---
 
-## 15. 최근 세션 종료 상태 (2026-04-15 업데이트)
+## 15. 최근 세션 종료 상태 (2026-04-17 업데이트)
 
-- **최신 커밋**: `0437594` P2-7 stage 1 + `d3da44b` P2-6 마무리 + Step1 UX 재설계 (main 브랜치)
-- **마지막 작업**: P2-7 Stage 1 완료. 인천 2047건 `court_listings` 실적재 + 프로덕션 검증
-- **대기**: P2-7 Stage 2 — 사진 페처 API route + Step1 court_listings 통합 + PhotoGallery + GitHub Actions
-- **플랜 파일 (현행)**: `C:\Users\User\.claude\plans\glimmering-hopping-aurora.md` (Phase 2 + P2-7 결정 히스토리 포함)
-- **상단 "2026-04-15 핫 스냅샷" 섹션이 다음 세션의 첫 진입점**
+- **최신 커밋**: `1ec28ce` AnalysisMdxImage 그라데이션 중립화 (main 브랜치, push 완료)
+- **마지막 작업**: P2-7 Stage 2A 완료 + e2e 이슈 7건 fix + 디자인 최소 정리 3건 커밋
+- **대기**: Stage 2B (전자계약 시스템) 또는 런칭 블로커 처리 — 형준님 결정
+- **플랜 파일 (현행)**: `C:\Users\User\.claude\plans\staged-jumping-star.md` (Stage 2A/2B/2B-post/2C 설계 + e2e 이슈 이력)
+- **상단 "2026-04-17 핫 스냅샷" 섹션이 다음 세션의 첫 진입점**
+
+### 2026-04-17 세션 누적 커밋 (시간 역순)
+
+| 커밋 | 내용 |
+|------|------|
+| `1ec28ce` | AnalysisMdxImage 그라데이션 중립화 (3색 → ink 회색) |
+| `c006edd` | 카테고리 배지 중립화 (B안 — 텍스트 라벨, ink 회색) |
+| `1fc6f16` | globals.css 컬러 토큰 사용 규칙 주석 추가 |
+| `16d5372` | 매칭 단위 mokmul → item 그룹핑 |
+| `f330c99` | 법원 필터 누락 버그 수정 (타법원이 인천 데이터로 매칭) |
+| `fe27fee` | Typeahead 자동완성 + StickyBar 강화 + 사진 인라인 |
+| `6e1749a` | e2e 이슈 4건 (히어로 라우팅, StickyBar 위치, 시간 제거, 사진 4장) |
+| `8078329` | StickyPropertyBar 신규 + formatBidDateTime 헬퍼 |
+| `ffbbdbf` | Supabase 1000건 limit 버그 → range 페이지네이션 |
+| `68eb729` | 크롤러 WAF 우회 (sec-ch-ua + 세션 2단계) |
+| `faa3748` | 크롤러 증분 수집 재설계 + run-crawler.bat/.sh + README |
+| `0f67fb1` | crawler-probe continue-on-error |
+| `3df1df8` | crawler-probe에 상세 API 테스트 추가 |
+| `18e6309` | crawler-probe 헤더 보정 |
+| `6672cc0` | **Stage 2A 메인 커밋** (court_listings 통합 + 사진 페처 + Step1 재설계 + PhotoGallery) |
+| `7309da4` | crawler-probe workflow + probe-photos.mjs |
 
 ---
 
-**이 문서를 읽은 다음 세션 Claude에게**: 상단 "2026-04-15 핫 스냅샷"을 먼저 읽고, CLAUDE.md·BUILD_GUIDE.md로 원칙을 숙지한 뒤, 플랜 파일의 P2-7 섹션에서 Stage 2 상세 설계를 확인하세요. 이 핸드오프 문서가 현재 상태의 단일 진실 소스입니다.
+**이 문서를 읽은 다음 세션 Claude에게**: 상단 "2026-04-17 핫 스냅샷"을 먼저 읽고, CLAUDE.md·BUILD_GUIDE.md로 원칙을 숙지한 뒤, 플랜 파일(`staged-jumping-star.md`)의 Stage 2B 섹션에서 다음 작업 상세 설계를 확인하세요. 이 핸드오프 문서가 현재 상태의 단일 진실 소스입니다.
