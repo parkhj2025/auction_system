@@ -40,6 +40,9 @@ yarn-error.log*
 *.tsbuildinfo
 next-env.d.ts
 
+# font source (서브셋 입력용 원본, 산출물은 public/fonts/에만 커밋)
+/scripts/font-source/
+
 # AI coding assistant workspace (local only, not part of project)
 .adal/
 .agents/

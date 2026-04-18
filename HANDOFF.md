@@ -471,10 +471,7 @@ npx tsc --noEmit    # 타입 체크
 - 로그인 (카카오/네이버 소셜)
 - 지역 확대 (수원·대전·부산·대구) — 데이터 구조에 이미 `region` 필드 있음
 
-**D. 디자인/UX 폴리싱**
-- 브라우저 실뷰포트 스크린샷 검토 후 조정
-- 애니메이션 추가 (과하지 않게)
-- 다크 모드 (지금은 light only)
+**D. 디자인/UX 폴리싱** — Stage 2B-post로 이동됨 (staged-jumping-star.md 참조)
 
 **E. Cowork 스킬 업데이트**
 - frontmatter 스키마 표준화 지시서 작성
