@@ -1,12 +1,11 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronRight, ArrowRight } from "lucide-react";
-import { APPLY_STEPS } from "@/lib/constants";
+import { APPLY_STEPS, BRAND_NAME } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "신청 가이드",
-  description:
-    "경매퀵 입찰 대리 신청이 처음이신 분을 위한 단계별 가이드. 준비물과 각 단계별 주의사항을 안내합니다.",
+  description: `${BRAND_NAME} 입찰 대리 신청이 처음이신 분을 위한 단계별 가이드. 준비물과 각 단계별 주의사항을 안내합니다.`,
 };
 
 const STEP_DETAILS: Record<

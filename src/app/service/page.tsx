@@ -11,13 +11,12 @@ import {
   Bell,
 } from "lucide-react";
 import { ApplyChecklist } from "@/components/apply/ApplyChecklist";
-import { FEES } from "@/lib/constants";
+import { BRAND_NAME, FEES } from "@/lib/constants";
 import { formatKoreanWon } from "@/lib/utils";
 
 export const metadata: Metadata = {
   title: "서비스 안내",
-  description:
-    "경매퀵은 공인중개사법에 따른 매수신청 대리(입찰 대리) 업무만 수행합니다. 업무 범위, 진행 절차, 수수료 체계, 안심 근거를 확인하세요.",
+  description: `${BRAND_NAME}은 공인중개사법에 따른 매수신청 대리(입찰 대리) 업무만 수행합니다. 업무 범위, 진행 절차, 수수료 체계, 안심 근거를 확인하세요.`,
 };
 
 const WE_DO = [

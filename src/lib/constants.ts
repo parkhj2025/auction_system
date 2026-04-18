@@ -1,6 +1,15 @@
 /**
  * 경매퀵 서비스 상수
  * 수수료·회사 정보는 여기서만 관리한다.
+ *
+ * -- 브랜드명 / 수임인 정보 변경 절차 (2026-04-18 env 상수화 적용) --
+ * 1. 변경 대상: NEXT_PUBLIC_BRAND_NAME, NEXT_PUBLIC_AGENT_REGISTRATION_NUMBER,
+ *    NEXT_PUBLIC_AGENT_OFFICE_ADDRESS, NEXT_PUBLIC_AGENT_CONTACT
+ * 2. 로컬: .env.local 값 수정 → pnpm build 재실행 → 클라이언트 번들에 inline됨
+ * 3. 프로덕션: Vercel Dashboard → Environment Variables 수정 → 재배포 → 모든
+ *    페이지/PDF/메타에 일괄 반영. 코드 수정 불필요.
+ * 4. NEXT_PUBLIC_ 접두사이지만 런타임 클라이언트에서 process.env 접근하지 않고,
+ *    constants.ts의 빌드 타임 평가 결과(BRAND_NAME 등)만 export하여 안전.
  */
 
 export const FEES = {
@@ -10,14 +19,36 @@ export const FEES = {
   successBonus: 50_000, // 낙찰 성공보수
 } as const;
 
+/**
+ * 서비스 브랜드명. 사용처: 풋터, 메타 title/description, FAQ 본문, PDF Author 등.
+ * 사업자등록 후 또는 브랜드 결정 변경 시 NEXT_PUBLIC_BRAND_NAME 환경변수만 교체.
+ */
+export const BRAND_NAME = process.env.NEXT_PUBLIC_BRAND_NAME ?? "경매퀵";
+
+/**
+ * 수임인(공인중개사) 정보. 위임장 PDF에 표기되는 값들.
+ * 사업자등록 완료 시점에 NEXT_PUBLIC_AGENT_* 환경변수로 실제 값 교체.
+ * COMPANY 객체와 분리한 이유: 단일 출처(SSOT) 유지 + env 그룹화 가독성.
+ */
+export const AGENT_INFO = {
+  registrationNo:
+    process.env.NEXT_PUBLIC_AGENT_REGISTRATION_NUMBER ??
+    "공인중개사 등록번호 미정 (사업자등록 후 갱신)",
+  address:
+    process.env.NEXT_PUBLIC_AGENT_OFFICE_ADDRESS ??
+    "사무소 주소 미정 (사업자등록 후 갱신)",
+  phone:
+    process.env.NEXT_PUBLIC_AGENT_CONTACT ??
+    "연락처 미정 (사업자등록 후 갱신)",
+} as const;
+
 export const COMPANY = {
-  name: "경매퀵",
+  name: BRAND_NAME,
   ceo: "박형준",
   court: "인천지방법원",
   comingSoonRegions: ["수원지방법원", "대전지방법원", "부산지방법원", "대구지방법원"] as const,
-  kakaoChannelUrl: "#", // TODO: 실채널 URL
-  phone: "", // TODO
-  address: "", // TODO
+  kakaoChannelUrl: "#", // TODO: 실채널 URL — 향후 NEXT_PUBLIC_KAKAO_CHANNEL_URL env 후보
+  // address, phone 필드는 AGENT_INFO로 단일 출처화 (Phase 1-FINAL 2026-04-18)
 } as const;
 
 /** 법원 선택 드롭다운. 활성 법원은 현재 인천만. */

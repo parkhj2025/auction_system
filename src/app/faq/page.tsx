@@ -2,11 +2,11 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { ChevronDown, ArrowRight } from "lucide-react";
 import { FAQ_CATEGORIES } from "@/lib/faq-data";
+import { BRAND_NAME } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "자주 묻는 질문",
-  description:
-    "경매퀵 서비스·수수료·진행 절차·보증금·법적 사항에 대한 자주 묻는 질문. 패찰 시 보증금은 전액 반환됩니다.",
+  description: `${BRAND_NAME} 서비스·수수료·진행 절차·보증금·법적 사항에 대한 자주 묻는 질문. 패찰 시 보증금은 전액 반환됩니다.`,
 };
 
 export default function FaqPage() {

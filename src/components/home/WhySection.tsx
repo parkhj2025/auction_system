@@ -1,5 +1,6 @@
 import { Check, X, Clock, ShieldCheck, Wallet } from "lucide-react";
 import reviewsData from "@/data/reviews.json";
+import { BRAND_NAME } from "@/lib/constants";
 
 type Review = {
   id: string;
@@ -74,7 +75,7 @@ export function WhySection() {
       <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
         <div className="max-w-2xl">
           <p className="text-xs font-bold uppercase tracking-wider text-brand-600">
-            왜 경매퀵인가
+            왜 {BRAND_NAME}인가
           </p>
           <h2
             id="why-heading"
@@ -109,7 +110,7 @@ export function WhySection() {
                   scope="col"
                   className="px-5 py-4 text-left text-sm font-bold text-brand-700"
                 >
-                  경매퀵 입찰 대리
+                  {BRAND_NAME} 입찰 대리
                 </th>
               </tr>
             </thead>

@@ -7,7 +7,7 @@ import {
   ArrowRight,
   Building2,
 } from "lucide-react";
-import { COMPANY, COURTS_ACTIVE, COURTS_COMING_SOON } from "@/lib/constants";
+import { BRAND_NAME, COMPANY, COURTS_ACTIVE, COURTS_COMING_SOON } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "대표 소개",
@@ -47,7 +47,7 @@ export default function AboutPage() {
           <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--color-ink-500)] sm:text-lg sm:leading-8">
             경매는 시세보다 저렴하게 부동산을 취득할 수 있는 합리적인 시스템입니다.
             그런데 입찰일에 법원에 직접 가야 한다는 물리적 제약이 대부분의 참여를
-            막습니다. 이 불편을 합리적인 가격으로 해결하는 것이 경매퀵의 일입니다.
+            막습니다. 이 불편을 합리적인 가격으로 해결하는 것이 {BRAND_NAME}의 일입니다.
           </p>
         </div>
       </section>

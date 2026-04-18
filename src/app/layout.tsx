@@ -6,6 +6,7 @@ import { Footer } from "@/components/layout/Footer";
 import { MobileSticky } from "@/components/layout/MobileSticky";
 import { createClient } from "@/lib/supabase/server";
 import type { UserMenuProps } from "@/components/auth/UserMenu";
+import { BRAND_NAME } from "@/lib/constants";
 
 const notoSansKr = Noto_Sans_KR({
   variable: "--font-noto-kr",
@@ -19,8 +20,8 @@ export const metadata: Metadata = {
     process.env.NEXT_PUBLIC_SITE_URL ?? "https://example.com"
   ),
   title: {
-    default: "경매퀵 — 법원 안 가는 부동산 경매 입찰 대리",
-    template: "%s | 경매퀵",
+    default: `${BRAND_NAME} — 법원 안 가는 부동산 경매 입찰 대리`,
+    template: `%s | ${BRAND_NAME}`,
   },
   description:
     "법원 안 가는 부동산 경매 입찰 대리. 얼리버드 5만원, 패찰 시 보증금 전액 반환. 공인중개사·서울보증보험 가입. 현재 인천지방법원 서비스 중이며, 서비스 지역은 확대됩니다.",

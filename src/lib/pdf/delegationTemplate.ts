@@ -1,4 +1,4 @@
-import { COMPANY } from "@/lib/constants";
+import { AGENT_INFO, COMPANY } from "@/lib/constants";
 
 export interface DelegationData {
   delegator: {
@@ -28,9 +28,9 @@ export interface DelegateInfo {
 export const DELEGATE_INFO: DelegateInfo = {
   officeName: COMPANY.name,
   ceoName: COMPANY.ceo,
-  registrationNo: "공인중개사 등록번호 미정 (사업자등록 후 갱신)",
-  address: COMPANY.address || "사무소 주소 미정 (사업자등록 후 갱신)",
-  phone: COMPANY.phone || "연락처 미정",
+  registrationNo: AGENT_INFO.registrationNo,
+  address: AGENT_INFO.address,
+  phone: AGENT_INFO.phone,
 };
 
 export const DELEGATION_TITLE = "매수신청대리위임장";

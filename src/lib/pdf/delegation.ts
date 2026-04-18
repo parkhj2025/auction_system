@@ -1,6 +1,7 @@
 import fs from "node:fs";
 import path from "node:path";
 import PDFDocument from "pdfkit";
+import { BRAND_NAME } from "@/lib/constants";
 import {
   formatDelegation,
   type DelegationData,
@@ -107,7 +108,7 @@ export async function generateDelegationPdf(
       autoFirstPage: true,
       info: {
         Title: formatted.title,
-        Author: formatted.delegate.rows[0]?.value ?? "경매퀵",
+        Author: formatted.delegate.rows[0]?.value ?? BRAND_NAME,
         Subject: `${formatted.caseInfo.rows[1]?.value ?? ""} 매수신청대리위임장`,
         CreationDate: new Date(data.createdAt),
       },

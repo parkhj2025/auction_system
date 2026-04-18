@@ -6,6 +6,7 @@ import { Menu, X } from "lucide-react";
 import { PRIMARY_NAV, PRIMARY_CTA } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 import { UserMenu, type UserMenuProps } from "@/components/auth/UserMenu";
+import { BRAND_NAME } from "@/lib/constants";
 
 export function TopNav({ user }: { user: UserMenuProps | null }) {
   const [open, setOpen] = useState(false);
@@ -30,13 +31,13 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
         <Link
           href="/"
           className="flex items-center gap-2"
-          aria-label="경매퀵 홈"
+          aria-label={`${BRAND_NAME} 홈`}
         >
           <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-brand-600 text-sm font-black text-white">
             경
           </span>
           <span className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
-            경매퀵
+            {BRAND_NAME}
           </span>
         </Link>
 

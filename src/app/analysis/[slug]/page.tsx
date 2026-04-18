@@ -13,6 +13,7 @@ import { ApplyCTA } from "@/components/analysis/ApplyCTA";
 import { RelatedCards } from "@/components/analysis/RelatedCards";
 import { buildAnalysisMdxComponents } from "@/components/analysis/mdx-components";
 import { GatingWrapper } from "@/components/analysis/GatingWrapper";
+import { BRAND_NAME } from "@/lib/constants";
 
 export const dynamicParams = false;
 
@@ -69,11 +70,11 @@ export default async function AnalysisDetailPage({
     dateModified: fm.updatedAt,
     author: {
       "@type": "Organization",
-      name: "경매퀵",
+      name: BRAND_NAME,
     },
     publisher: {
       "@type": "Organization",
-      name: "경매퀵",
+      name: BRAND_NAME,
     },
     about: {
       "@type": "Thing",

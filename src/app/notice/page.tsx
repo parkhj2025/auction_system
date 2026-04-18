@@ -4,11 +4,11 @@ import { ChevronRight } from "lucide-react";
 import { getAllNoticePosts } from "@/lib/content";
 import { EmptyState } from "@/components/common/EmptyState";
 import { formatKoreanDate } from "@/lib/utils";
+import { BRAND_NAME } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "공지사항",
-  description:
-    "경매퀵 서비스 공지, 정책 변경, 서비스 지역 확대 안내 등 공식 공지사항을 확인하실 수 있습니다.",
+  description: `${BRAND_NAME} 서비스 공지, 정책 변경, 서비스 지역 확대 안내 등 공식 공지사항을 확인하실 수 있습니다.`,
 };
 
 export default async function NoticeListPage() {
@@ -32,7 +32,7 @@ export default async function NoticeListPage() {
             공지사항
           </p>
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
-            경매퀵 공식 공지
+            {BRAND_NAME} 공식 공지
           </h1>
           <p className="mt-3 text-base leading-7 text-[var(--color-ink-500)]">
             서비스 변경, 수수료 정책, 지역 확대 등 중요한 사항을 안내합니다.

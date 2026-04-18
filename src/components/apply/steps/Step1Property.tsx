@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import type { AnalysisFrontmatter } from "@/types/content";
 import type { ApplyFormData, CourtListingSummary } from "@/types/apply";
-import { COURTS_ALL, groupCourtsByRegion } from "@/lib/constants";
+import { BRAND_NAME, COURTS_ALL, groupCourtsByRegion } from "@/lib/constants";
 import { formatKoreanWon } from "@/lib/utils";
 import { PhotoGallery } from "../PhotoGallery";
 
@@ -269,7 +269,7 @@ export function Step1Property({
                 이미 접수가 진행 중인 물건입니다
               </p>
               <p className="mt-1 text-xs leading-5 text-[var(--color-ink-700)]">
-                경매퀵은 한 물건에 한 고객만 대리 접수합니다 (이해충돌 방지).
+                {BRAND_NAME}은 한 물건에 한 고객만 대리 접수합니다 (이해충돌 방지).
                 같은 사건번호의 회차가 끝난 뒤 다음 회차부터 다시 접수 가능합니다.
                 궁금하신 점은 카카오톡으로 문의해주세요.
               </p>
