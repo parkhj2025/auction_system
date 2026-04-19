@@ -1,21 +1,21 @@
 "use client";
 
 import { useEffect, useMemo, useRef } from "react";
-import { ArrowLeft, FileText, Send, Info } from "lucide-react";
+import { Check, X, Info } from "lucide-react";
 import { AGENT_SEAL_PENDING_NOTICE } from "@/lib/legal";
 
 /**
- * 클라이언트 pdf-lib로 생성된 위임장 PDF의 최종 확인 모달 (Phase 6.5-POST 작업 4).
+ * 위임장 PDF 미리보기 모달 (Phase 6.5-POST-FIX, 2026-04-19).
  *
- * 흐름: Step4Confirm "최종 확인" → 클라이언트 PDF 생성 → 본 모달 → "이 PDF로 제출" → 서버 재생성
+ * 흐름: Step4Confirm 동의 체크박스 클릭 → /api/preview-delegation POST → 본 모달 →
+ *       "확인" → 동의 체크박스 ON / "취소" → 체크박스 OFF
  *
- * - iframe + blob URL로 PDF 시각 노출 (브라우저 내장 PDF 뷰어)
- * - "수정"(좌)으로 Step4 복귀 / "이 PDF로 제출"(우)로 실제 submit
- * - 제출 중 (submitting): 두 버튼 disabled, Esc/배경 dismiss 차단
+ * - iframe + blob URL로 서버 생성 PDF 시각 노출 (브라우저 내장 PDF 뷰어)
+ * - "취소"(좌) = 동의 보류 (체크박스 미체크 유지) / "확인"(우) = 위임장 내용 동의 확정
  * - 하단 배너: AGENT_SEAL_PENDING_NOTICE (legal.ts 단일 소스)
  *
- * 보안: 본 모달의 PDF blob은 미리보기 전용. Storage 저장 PDF는 onConfirm 호출 시
- * 서버가 동일 데이터로 재생성한다 (PDF 바이너리는 서버로 전송하지 않음).
+ * 보안: PDF는 서버 PDFKit 단일 소스 생성. 본 모달은 시각 확인 + 동의 확정 게이트.
+ * Storage 저장은 별도 /api/orders/[id]/generate-delegation에서 수행 (제출 시점).
  */
 interface Props {
   pdfBytes: Uint8Array | null;
@@ -82,16 +82,11 @@ export function PDFPreviewModal({
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center gap-2 border-b border-[var(--color-border)] px-6 py-4">
-          <FileText
-            size={18}
-            aria-hidden="true"
-            className="text-brand-600"
-          />
           <h2
             id="pdf-preview-title"
             className="text-base font-black text-[var(--color-ink-900)]"
           >
-            최종 PDF 확인
+            위임장 내용 확인
           </h2>
         </div>
 
@@ -129,8 +124,8 @@ export function PDFPreviewModal({
             disabled={submitting}
             className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)] disabled:cursor-not-allowed disabled:opacity-50"
           >
-            <ArrowLeft size={16} aria-hidden="true" />
-            수정
+            <X size={16} aria-hidden="true" />
+            취소
           </button>
           <button
             type="button"
@@ -138,8 +133,8 @@ export function PDFPreviewModal({
             disabled={submitting || !pdfBytes}
             className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
           >
-            {submitting ? "제출 중..." : "이 PDF로 제출"}
-            {!submitting && <Send size={16} aria-hidden="true" />}
+            확인
+            <Check size={16} aria-hidden="true" />
           </button>
         </div>
       </div>

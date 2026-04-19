@@ -507,7 +507,31 @@ Phase 2 (목표)
 ### 코드 컨벤션
 
 - **날짜·시간**: 서버 사이드 날짜/시간 생성 시 반드시 `src/lib/datetime.ts` 유틸 사용. `new Date().toISOString()` 직접 호출 금지. 모든 날짜 처리는 Asia/Seoul 기준. (Vercel 서버는 UTC라 한국 새벽 0~9시 KST 시각이 전날로 기록되는 버그 발생)
-- **PDF 생성 검증 (서버/클라이언트 양쪽 스모크 필수)**: 위임장 PDF 생성 코드(`src/lib/pdf/delegation.ts` 서버 PDFKit 또는 `src/lib/pdf/delegation.client.ts` 클라이언트 pdf-lib) 수정 시 **반드시 양쪽 스모크 테스트 PASS 후 커밋**. 서버: `pnpm dlx tsx scripts/gen-sample-delegation.ts` + `node scripts/verify-pdf-text.mjs`. 클라이언트: `node scripts/smoke-delegation-client.mjs` (pdf-lib + @pdf-lib/fontkit + NotoSansKR 통합 검증). tsc/lint/build PASS만으로는 클라이언트 런타임 회귀(예: registerFontkit 누락) catch 불가 — Phase 6.5-POST 회귀(2026-04-19)로 학습.
+- **PDF 생성 검증 (서버 PDFKit 단일 소스)**: 위임장 PDF 생성 코드(`src/lib/pdf/delegation.ts`) 수정 시 **서버 PDFKit 스모크 PASS 후 커밋**. 절차: `pnpm dlx tsx scripts/gen-sample-delegation.ts` 실행 → `node scripts/verify-pdf-text.mjs` 1페이지 + 한글 + 도메인 키워드 검증. 클라이언트 PDF 생성은 폐기됨 (Phase 6.5-POST-FIX, 2026-04-19) — 미리보기는 `/api/preview-delegation` 서버 호출로 일원화.
+
+## Lessons Learned (Phase 경계마다 갱신)
+
+### [A] 이중 엔진 설계 금지 원칙 (Phase 6.5-POST → 6.5-POST-FIX, 2026-04-19)
+2개 이상 엔진(라이브러리)이 "같은 시각적 결과물"을 만들도록 설계 시:
+1. 매 커밋 자동 시각 비교 검증 체계 없으면 drift 발생 (tsc/lint/build/byte-verify는 클라이언트 런타임 회귀 catch 불가)
+2. 의심되면 단일 엔진 통합. 이중 운영은 검증 체계 완비 후에만
+3. 구체 사례: pdf-lib(client) + PDFKit(server) 이중 운영 → 수시간 내 drift (라벨 미렌더, 서명 미임베드) → 서버 PDFKit 단일 통합 + `/api/preview-delegation` 도입 (Phase 6.5-POST-FIX)
+
+### [B] UX 무언화 원칙 (Phase 6.5-POST-FIX, 2026-04-19)
+"시스템 데이터 결핍 자인" 문구 금지:
+- 금지 어휘: "매칭이 되지 않아", "찾을 수 없습니다", "수집되지 않은", "데이터 준비 중", "매뉴얼", "직접 입력이 필요합니다"
+- 허용 어휘: "입력", "확인", "진행", "수정"
+- 사용자 관점: 매칭 성공/실패 경로 차이를 인식조차 하지 않아야 함
+- 시스템 관점 어휘(매칭/매뉴얼/자동) 대신 사용자 관점 어휘(입력/확인/진행) 사용
+
+### [C] 기획 보고와 실제 구현 괴리 방지 (Phase 6.5-POST, 2026-04-19)
+"tsc/lint/build/sample byte verify 4종 PASS"는 코드 문법·타입·번들 이상만 검증. UI 렌더 품질은 검증 범위 밖.
+Phase 경계마다 다음 자가 검증 필수:
+1. dev 서버 기동
+2. 핵심 UI 경로 렌더 확인 (E2E 시나리오 1건 이상)
+3. DevTools Console 에러 0건 확인
+4. 핵심 컴포넌트의 시각적 산출물 (PDF, 모달, 페이지) 스크린샷 또는 텍스트 기반 확인
+위 4종 미수행 시 "기능 완료" 보고 금지.
 
 ### 내부 자료 보호
 

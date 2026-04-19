@@ -136,15 +136,15 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
             id="case-confirm-modal-title"
             className="text-base font-black text-[var(--color-ink-900)]"
           >
-            사건 정보 직접 입력
+            사건 정보 입력
           </h2>
         </div>
 
         <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-5">
           <p className="text-xs leading-5 text-[var(--color-ink-500)]">
-            대법원 경매정보 매칭이 되지 않아 직접 입력이 필요합니다. 매각기일은
-            법원 공고를 직접 확인해주세요. 입력 완료 + 책임 조항 동의 후 &ldquo;확인&rdquo;
-            버튼을 눌러야 다음 단계로 진행할 수 있습니다.
+            법원, 사건번호, 매각기일, 물건 종류, 주소를 입력해주세요. 아래 정보가
+            본인이 의뢰하려는 사건과 일치하는지 확인 후 &ldquo;확인&rdquo; 버튼으로
+            진행해주세요.
           </p>
 
           <div>
@@ -259,7 +259,7 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
               onClick={onReturn}
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-sm font-bold text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)]"
             >
-              사건번호 다시 입력
+              사건번호 수정
             </button>
             <button
               ref={submitRef}

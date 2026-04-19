@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowLeft, AlertCircle, FileText } from "lucide-react";
+import { ArrowLeft, AlertCircle, FileText, Send } from "lucide-react";
 import type { ApplyFormData } from "@/types/apply";
 import { FeeCalculator } from "../FeeCalculator";
 import { SignatureCanvas } from "../SignatureCanvas";
@@ -13,7 +13,6 @@ import { formatKoreanWon } from "@/lib/utils";
 import { getKSTDateTimeIso } from "@/lib/datetime";
 import { VerifiedBadge } from "../VerifiedBadge";
 import type { DelegationData } from "@/lib/pdf/delegationTemplate";
-import { generateDelegationPdfClient } from "@/lib/pdf/delegation.client";
 
 type AgreementKey = "agreedDelegation" | "agreedPrivacy" | "agreedTerms";
 
@@ -37,13 +36,14 @@ export function Step4Confirm({
   submitting: boolean;
   submitError: string | null;
 }) {
+  // 위임장 내용 미리보기 (HTML, 서명 전 동의 시점 참고용 — 보조 링크)
   const [previewOpen, setPreviewOpen] = useState(false);
-  // Phase 6.5-POST 작업 5: 클라이언트 PDF 생성 + 최종 확인 모달
-  const [generating, setGenerating] = useState(false);
-  const [pdfBytes, setPdfBytes] = useState<Uint8Array | null>(null);
-  const [pdfModalOpen, setPdfModalOpen] = useState(false);
-  const [pdfGenError, setPdfGenError] = useState<string | null>(null);
-  // Phase 6.5-POST 작업 7: 개인정보/이용약관 모달
+  // Phase 6.5-POST-FIX (2026-04-19): 위임장 동의 체크박스 클릭 시 서버 PDF fetch + 모달
+  const [delegationPdfFetching, setDelegationPdfFetching] = useState(false);
+  const [delegationPdfBytes, setDelegationPdfBytes] = useState<Uint8Array | null>(null);
+  const [delegationPdfModalOpen, setDelegationPdfModalOpen] = useState(false);
+  const [delegationPdfError, setDelegationPdfError] = useState<string | null>(null);
+  // 개인정보/이용약관 모달
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
 
@@ -51,8 +51,8 @@ export function Step4Confirm({
   const bidAmount = Number(bid.bidAmount.replace(/[^\d]/g, "")) || 0;
   const allAgreed = data.agreedDelegation && data.agreedPrivacy && data.agreedTerms;
   const hasSignature = !!data.signature;
-  // 최종 확인 버튼 활성화: 서명 + 3 동의 + 제출/PDF 생성 중 아님
-  const canFinalCheck = hasSignature && allAgreed && !submitting && !generating;
+  // 제출 버튼 활성화: 서명 + 3 동의 + 제출 중 아님
+  const canSubmit = hasSignature && allAgreed && !submitting;
 
   function maskSsn(v: string) {
     if (!v) return "";
@@ -85,35 +85,78 @@ export function Step4Confirm({
   }, [data, bid, bidAmount]);
 
   /**
-   * 최종 확인 — 클라이언트 pdf-lib로 미리보기 PDF 생성 → PDFPreviewModal 노출.
-   * 실패 시 토스트 + 재시도 가능 (Fallback으로 HTML Modal 건너뛰기 금지 — 보안/법적 신뢰).
+   * 위임장 동의 체크박스 클릭 핸들러 (Phase 6.5-POST-FIX, 2026-04-19).
+   *
+   * - 이미 ON 상태에서 클릭 → 단순 OFF (Modal 안 띄움, 서버 호출 없음)
+   * - OFF 상태에서 클릭 (서명 완료 전제) → /api/preview-delegation POST → PDFPreviewModal 노출
+   * - 실패 시 에러 토스트 + 체크박스 OFF 유지
+   * - 재체크 시 매번 새로 서버 왕복 (no-cache)
    */
-  async function handleFinalCheck() {
-    if (!canFinalCheck) return;
-    setGenerating(true);
-    setPdfGenError(null);
+  async function handleAgreeDelegationClick() {
+    // 현재 ON → 단순 OFF
+    if (data.agreedDelegation) {
+      onAgreementChange("agreedDelegation", false);
+      return;
+    }
+    // 서명 미완료 시 클릭 무시 (UI에서 disabled 처리하지만 이중 가드)
+    if (!hasSignature) return;
+
+    setDelegationPdfFetching(true);
+    setDelegationPdfError(null);
     try {
-      const bytes = await generateDelegationPdfClient(previewData);
-      setPdfBytes(bytes);
-      setPdfModalOpen(true);
+      const res = await fetch("/api/preview-delegation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          ssnBack: bid.ssnBack,
+          signatureDataUrl: data.signature,
+          applyData: {
+            delegator: {
+              name: previewData.delegator.name,
+              ssnFront: previewData.delegator.ssnFront,
+              address: previewData.delegator.address,
+              phone: previewData.delegator.phone,
+            },
+            caseNumber: previewData.caseNumber,
+            courtLabel: previewData.courtLabel,
+            bidDate: previewData.bidDate,
+            bidAmount: previewData.bidAmount,
+            deposit: previewData.deposit,
+            createdAt: previewData.createdAt,
+          },
+        }),
+      });
+      if (!res.ok) {
+        const errJson = await res.json().catch(() => ({}));
+        throw new Error(
+          errJson.error ?? "위임장 미리보기 생성에 실패했습니다.",
+        );
+      }
+      const buf = await res.arrayBuffer();
+      setDelegationPdfBytes(new Uint8Array(buf));
+      setDelegationPdfModalOpen(true);
     } catch (err) {
-      console.error("[Step4Confirm] client PDF generation failed", err);
-      setPdfGenError(
-        "위임장 PDF 생성에 실패했습니다. 다시 시도해주세요.",
+      console.error("[Step4Confirm] preview fetch failed");
+      setDelegationPdfError(
+        err instanceof Error
+          ? err.message
+          : "위임장 미리보기 생성에 실패했습니다. 다시 시도해주세요.",
       );
     } finally {
-      setGenerating(false);
+      setDelegationPdfFetching(false);
     }
   }
 
   function handlePdfModalCancel() {
-    if (submitting) return;
-    setPdfModalOpen(false);
-    setPdfBytes(null);
+    setDelegationPdfModalOpen(false);
+    setDelegationPdfBytes(null);
+    // 체크박스 미체크 상태 유지 (agreedDelegation 변경 없음)
   }
 
   function handlePdfModalConfirm() {
-    onSubmit();
+    setDelegationPdfModalOpen(false);
+    setDelegationPdfBytes(null);
+    onAgreementChange("agreedDelegation", true);
   }
 
   return (
@@ -218,11 +261,25 @@ export function Step4Confirm({
                   id="agree-delegation"
                   type="checkbox"
                   checked={data.agreedDelegation}
-                  onChange={(e) => onAgreementChange("agreedDelegation", e.target.checked)}
-                  className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-brand-600"
+                  onChange={handleAgreeDelegationClick}
+                  disabled={!hasSignature || delegationPdfFetching || submitting}
+                  className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
                 />
-                <label htmlFor="agree-delegation" className="flex-1 cursor-pointer">
+                <label
+                  htmlFor="agree-delegation"
+                  className={`flex-1 ${!hasSignature ? "cursor-not-allowed text-[var(--color-ink-500)]" : "cursor-pointer"}`}
+                >
                   위임장 내용을 확인하였으며, 위 서명으로 매수신청대리를 위임합니다.
+                  {delegationPdfFetching && (
+                    <span className="ml-2 text-xs text-[var(--color-ink-500)]">
+                      (위임장 PDF 불러오는 중...)
+                    </span>
+                  )}
+                  {!hasSignature && (
+                    <span className="ml-2 text-xs text-[var(--color-accent-red)]">
+                      먼저 서명을 완료해주세요
+                    </span>
+                  )}
                   <button
                     type="button"
                     onClick={() => setPreviewOpen(true)}
@@ -282,13 +339,13 @@ export function Step4Confirm({
         </aside>
       </div>
 
-      {(submitError || pdfGenError) && (
+      {(submitError || delegationPdfError) && (
         <div
           role="alert"
           className="flex items-start gap-2 rounded-[var(--radius-md)] border border-[var(--color-accent-red)] bg-[var(--color-accent-red-soft)] px-5 py-4 text-sm text-[var(--color-accent-red)]"
         >
           <AlertCircle size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
-          {submitError ?? pdfGenError}
+          {submitError ?? delegationPdfError}
         </div>
       )}
 
@@ -296,7 +353,7 @@ export function Step4Confirm({
         <button
           type="button"
           onClick={onBack}
-          disabled={submitting || generating}
+          disabled={submitting || delegationPdfFetching}
           className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)] disabled:opacity-50"
         >
           <ArrowLeft size={16} aria-hidden="true" />
@@ -304,12 +361,12 @@ export function Step4Confirm({
         </button>
         <button
           type="button"
-          onClick={handleFinalCheck}
-          disabled={!canFinalCheck}
+          onClick={onSubmit}
+          disabled={!canSubmit}
           className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
         >
-          {generating ? "PDF 생성 중..." : "최종 확인"}
-          {!generating && <FileText size={16} aria-hidden="true" />}
+          {submitting ? "제출 중..." : "제출"}
+          {!submitting && <Send size={16} aria-hidden="true" />}
         </button>
       </div>
 
@@ -319,9 +376,9 @@ export function Step4Confirm({
         data={previewData}
       />
 
-      {pdfModalOpen && (
+      {delegationPdfModalOpen && (
         <PDFPreviewModal
-          pdfBytes={pdfBytes}
+          pdfBytes={delegationPdfBytes}
           onConfirm={handlePdfModalConfirm}
           onCancel={handlePdfModalCancel}
           submitting={submitting}
