@@ -68,6 +68,21 @@ export interface ApplyFormData {
   matchedListing?: CourtListingSummary | null;
   /** matchedPost 없이 사용자가 수동으로 입력했는지 */
   manualEntry: boolean;
+  /**
+   * 매각기일 (YYYY-MM-DD).
+   * 매칭 성공 시 matchedPost.bidDate 또는 matchedListing.bid_date에서 자동 복사,
+   * manualEntry 시 사용자가 직접 입력. 빈 문자열 ""이 미입력 상태.
+   * (Phase 4-CONFIRM 정책 — 2026-04-19, Phase 4-DATETIME (B) throw → (A) 타입 강제 자연 전환)
+   */
+  bidDate: string;
+  /** 물건 종류 — PropertyType 9종 + 자유 텍스트 합성("기타: ..."). 매칭 시 자동 복사. */
+  propertyType: string;
+  /** 물건 주소. 매칭 시 자동 복사, manualEntry 시 사용자 직접 입력. */
+  propertyAddress: string;
+  /** 사건 정보 확인 체크박스 동의 여부 (매칭 성공/실패 두 경로 공통 게이트). */
+  caseConfirmedByUser: boolean;
+  /** 사건 정보 확인 시점 KST ISO timestamp. 분쟁 시 위임인의 정보 입력·확인 시각 입증 근거. */
+  caseConfirmedAt: string | null;
   bidInfo: ApplyBidInfo;
   documents: ApplyDocuments;
   /** 위임인 서명 (PNG base64 dataURL). 빈 캔버스면 null. Phase 3. */
@@ -97,6 +112,11 @@ export const INITIAL_APPLY_DATA: ApplyFormData = {
   court: "인천지방법원",
   matchedPost: null,
   manualEntry: false,
+  bidDate: "",
+  propertyType: "",
+  propertyAddress: "",
+  caseConfirmedByUser: false,
+  caseConfirmedAt: null,
   bidInfo: {
     bidAmount: "",
     applicantName: "",

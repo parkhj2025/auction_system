@@ -1,0 +1,11 @@
+/**
+ * HTML/PDF 단일 소스용 법률 문구 모듈.
+ * 변호사 검토 후 문구 수정 시 1곳만 변경하면 PDF/Modal/CaseConfirmCard/privacy/terms 모두 자동 반영
+ * (= 1곳 수정 = 5곳 반영). Phase 4-POST의 buildRetentionNotice() 패턴(delegationTemplate.ts) 동일 적용.
+ */
+
+export const USER_INPUT_LIABILITY_NOTICE =
+  "위임인이 직접 확인·입력한 사건 정보(법원·사건번호·매각기일·물건 종류·주소)에 대한 책임은 위임인에게 있으며, 잘못된 정보로 인한 입찰 무효·보증금 손실 등의 불이익은 위임인이 부담합니다.";
+
+export const CASE_CONFIRM_CHECKBOX_LABEL =
+  "위 사건 정보가 본인이 의뢰하려는 사건과 일치함을 확인합니다";

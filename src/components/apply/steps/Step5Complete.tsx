@@ -25,8 +25,10 @@ export function Step5Complete({
   const [copiedField, setCopiedField] = useState<
     "account" | "amount" | null
   >(null);
-  const fee = data.matchedPost
-    ? computeFee(data.matchedPost.bidDate)
+  // Phase 4-CONFIRM: bidDate non-null 승격으로 매칭/manualEntry 모두 동일 경로.
+  // 보증금은 감정가 필요 → 매칭 성공 경로만 자동 계산, manualEntry는 안내 표기.
+  const fee = data.bidDate
+    ? computeFee(data.bidDate)
     : { baseFee: 70000, tierLabel: "일반", successBonus: 50000, daysUntilBid: 0, tier: "standard" as const, description: "" };
   const deposit = data.matchedPost
     ? computeDeposit(data.matchedPost.appraisal, data.bidInfo.rebid)
@@ -57,8 +59,8 @@ export function Step5Complete({
     }
   }
 
-  const bidDateLabel = data.matchedPost?.bidDate
-    ? `입찰일(${data.matchedPost.bidDate}) 전일 오후까지`
+  const bidDateLabel = data.bidDate
+    ? `입찰일(${data.bidDate}) 전일 오후까지`
     : "입찰일 전일 오후까지";
 
   return (

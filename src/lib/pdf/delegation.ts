@@ -264,13 +264,16 @@ export async function generateDelegationPdf(
         agent: { x: agentBoxX, y: boxY, w: SIG_BOX_W, h: SIG_BOX_H },
       };
 
-      // 보존·파기 경고문 (서명 박스 하단, 본문 폰트의 ~70%, 연한 톤)
+      // Phase 4-CONFIRM: 위임인 책임 조항 + 보존·파기 경고문을 한 paragraph로 합성하여 단일 텍스트 블록으로 렌더.
+      // 별도 블록으로 분리 시 1페이지 가드 위반 우려 (사전 보고 #3 분석). 공백 1개 join으로 wrap 통합.
+      // formatDelegation()은 두 필드를 별도 반환 (Modal은 별도 블록 렌더). PDF에서만 합성.
       const noticeY = boxY + SIG_BOX_H + 14;
+      const noticeText = `${formatted.userLiabilityNotice} ${formatted.retentionNotice}`;
       doc
         .font("Regular")
         .fontSize(7)
         .fillColor(COLOR.ink500)
-        .text(formatted.retentionNotice, x, noticeY, {
+        .text(noticeText, x, noticeY, {
           width: innerW,
           align: "left",
           lineGap: 1.2,

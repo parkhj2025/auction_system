@@ -13,15 +13,19 @@ import type { ApplyFormData, CourtListingSummary } from "@/types/apply";
 import { BRAND_NAME, COURTS_ALL, groupCourtsByRegion } from "@/lib/constants";
 import { formatKoreanWon } from "@/lib/utils";
 import { PhotoGallery } from "../PhotoGallery";
+import { CaseConfirmCard } from "../CaseConfirmCard";
 
 /**
- * Step 1 — 법원 + 사건번호 입력.
+ * Step 1 — 법원 + 사건번호 입력 + 사건 정보 확인.
  *
- * 설계 원칙 (2026-04-17 Stage 2A 확정):
+ * 설계 원칙 (2026-04-19 Phase 4-CONFIRM 확정):
  * - /api/orders/check → listings 배열 반환. court_listings DB 매칭 우선.
  * - listings 1건 → 자동 매칭 카드. 2건+ → 선택 UI. 0건 → frontmatter 폴백.
- * - 수동 입력과 매칭 성공은 동등한 경로.
- * - court_code 필터 (D2). 복수 매칭 선택 UI (D3).
+ * - 매칭 성공/실패 무관 모든 경로에서 CaseConfirmCard 통일 UX 적용.
+ * - 매칭 성공 시 bidDate/propertyType/propertyAddress 자동 복사,
+ *   manualEntry 시 사용자 직접 입력 (네이티브 input[type=date], select, text).
+ * - data.bidDate && data.caseConfirmedByUser 둘 다 truthy일 때만 다음 Step 진입.
+ * - case 변경 시 매칭/입력값 + caseConfirmedByUser/caseConfirmedAt 모두 reset.
  */
 export function Step1Property({
   data,
@@ -41,11 +45,9 @@ export function Step1Property({
   const latestPatchRef = useRef(onChange);
   latestPatchRef.current = onChange;
 
-  // 법원 선택 → courtCode 조회
   const selectedCourt = COURTS_ALL.find((c) => c.label === data.court);
   const courtCode = selectedCourt?.courtCode ?? "";
 
-  // 사건번호 변경 시 디바운스된 매칭 + 중복 확인
   useEffect(() => {
     const q = data.caseNumber.trim();
 
@@ -53,11 +55,24 @@ export function Step1Property({
       setCaseTaken(false);
       setChecking(false);
       setListings([]);
-      if (data.matchedPost || data.matchedListing) {
+      if (
+        data.matchedPost ||
+        data.matchedListing ||
+        data.manualEntry ||
+        data.bidDate ||
+        data.propertyType ||
+        data.propertyAddress ||
+        data.caseConfirmedByUser
+      ) {
         latestPatchRef.current({
           matchedPost: null,
           matchedListing: null,
           manualEntry: false,
+          bidDate: "",
+          propertyType: "",
+          propertyAddress: "",
+          caseConfirmedByUser: false,
+          caseConfirmedAt: null,
         });
       }
       return;
@@ -66,7 +81,6 @@ export function Step1Property({
     const handle = setTimeout(async () => {
       setChecking(true);
       try {
-        // /api/orders/check → 중복 확인 + court_listings 매칭
         const res = await fetch("/api/orders/check", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -91,14 +105,18 @@ export function Step1Property({
         setListings(resultListings);
 
         if (resultListings.length === 1) {
-          // 단일 매칭 → 자동 선택
+          const l = resultListings[0];
           latestPatchRef.current({
-            matchedListing: resultListings[0],
+            matchedListing: l,
             matchedPost: null,
             manualEntry: false,
+            bidDate: l.bid_date ?? "",
+            propertyType: l.usage_name ?? "",
+            propertyAddress: l.address_display ?? "",
+            caseConfirmedByUser: false,
+            caseConfirmedAt: null,
           });
         } else if (resultListings.length === 0) {
-          // court_listings 매칭 없음 → frontmatter 폴백
           const fmMatch =
             posts.find((p) => p.caseNumber === q) ??
             posts.find(
@@ -113,22 +131,49 @@ export function Step1Property({
                 matchedListing: null,
                 caseNumber: fmMatch.caseNumber,
                 manualEntry: false,
+                bidDate: fmMatch.bidDate,
+                propertyType: fmMatch.propertyType,
+                propertyAddress: fmMatch.address,
+                caseConfirmedByUser: false,
+                caseConfirmedAt: null,
               });
             }
-          } else if (data.matchedPost || data.matchedListing) {
-            latestPatchRef.current({
-              matchedPost: null,
-              matchedListing: null,
-              manualEntry: false,
-            });
+          } else {
+            // 매칭 0건 → manualEntry 모드 자동 진입
+            if (
+              data.matchedPost ||
+              data.matchedListing ||
+              !data.manualEntry
+            ) {
+              latestPatchRef.current({
+                matchedPost: null,
+                matchedListing: null,
+                manualEntry: true,
+                bidDate: "",
+                propertyType: "",
+                propertyAddress: "",
+                caseConfirmedByUser: false,
+                caseConfirmedAt: null,
+              });
+            }
           }
         } else {
-          // 복수 매칭 → 선택 대기 (matchedListing은 사용자가 선택해야 설정)
-          if (data.matchedListing || data.matchedPost) {
+          // 복수 매칭 → 선택 대기
+          if (
+            data.matchedListing ||
+            data.matchedPost ||
+            data.manualEntry ||
+            data.caseConfirmedByUser
+          ) {
             latestPatchRef.current({
               matchedPost: null,
               matchedListing: null,
               manualEntry: false,
+              bidDate: "",
+              propertyType: "",
+              propertyAddress: "",
+              caseConfirmedByUser: false,
+              caseConfirmedAt: null,
             });
           }
         }
@@ -146,42 +191,43 @@ export function Step1Property({
 
   const isNonServicedCourt = selectedCourt && !selectedCourt.isServiced;
 
+  // Phase 4-CONFIRM 게이트: bidDate + caseConfirmedByUser 둘 다 truthy 필수.
+  // manualEntry/매칭 두 경로 모두 동일 게이트 적용.
   const canProceed =
     !!data.caseNumber.trim() &&
     !!data.court &&
     !caseTaken &&
-    !checking;
+    !checking &&
+    !!data.bidDate &&
+    !!data.caseConfirmedByUser;
 
   function handleNext() {
     if (!canProceed) return;
-    // TODO(Phase 4-CONFIRM, 2026-04-19):
-    // 현재 manualEntry 경로는 검증 없이 통과. Phase 4-CONFIRM에서
-    // 아래 흐름으로 재설계 예정:
-    // - 크롤러 매칭 성공/실패 무관하게 고객에게 사건 정보 재확인
-    //   UX 통일 ("다음 사건이 맞습니까?" 체크박스)
-    // - manualEntry 경로에서 매각기일·물건종류 수기 입력 필드 추가
-    // - 고객 확인 체크 + KST 타임스탬프를 ApplyFormData에 저장
-    // - bidDate를 ApplyFormData 레벨 non-null string으로 승격 →
-    //   Phase 4-DATETIME의 (B) throw를 (A) 타입 강제로 자연 전환
-    // - 위임장 PDF에 "위임인이 직접 확인·입력" 책임 조항 추가
-    // - 착수 시점: Phase 5(본인인증 mock) 완료 후
-    // - 추정 공수: 5~6시간 (Step1 UI + 타입 + PDF + privacy/terms)
-    //
-    // 현재 (Phase 4-DATETIME) 단계에서는 위임장 PDF 생성 시점
-    // throw로 차단 (보강 2).
-    if (!data.matchedPost && !data.matchedListing && !data.manualEntry) {
-      onChange({ manualEntry: true });
-    }
     onNext();
   }
 
   function selectListing(listing: CourtListingSummary) {
-    onChange({ matchedListing: listing, matchedPost: null, manualEntry: false });
+    onChange({
+      matchedListing: listing,
+      matchedPost: null,
+      manualEntry: false,
+      bidDate: listing.bid_date ?? "",
+      propertyType: listing.usage_name ?? "",
+      propertyAddress: listing.address_display ?? "",
+      caseConfirmedByUser: false,
+      caseConfirmedAt: null,
+    });
   }
 
   const post = data.matchedPost;
   const listing = data.matchedListing;
   const regionGroups = groupCourtsByRegion();
+
+  // CaseConfirmCard 표시 조건:
+  // - matched: listing 또는 post 매칭 성공 시
+  // - manual: manualEntry=true (매칭 0건으로 자동 전환) 시
+  const showMatchedConfirm = !caseTaken && (!!listing || !!post);
+  const showManualConfirm = !caseTaken && data.manualEntry;
 
   return (
     <div className="flex flex-col gap-6">
@@ -408,6 +454,11 @@ export function Step1Property({
                   matchedListing: null,
                   matchedPost: null,
                   manualEntry: false,
+                  bidDate: "",
+                  propertyType: "",
+                  propertyAddress: "",
+                  caseConfirmedByUser: false,
+                  caseConfirmedAt: null,
                 })
               }
               className="mt-2 ml-3 text-xs font-medium text-[var(--color-ink-500)] underline underline-offset-2 hover:text-[var(--color-ink-700)]"
@@ -471,6 +522,14 @@ export function Step1Property({
             </div>
           </dl>
         </div>
+      )}
+
+      {/* Phase 4-CONFIRM: 사건 정보 확인 카드 (두 경로 동일 UX) */}
+      {showMatchedConfirm && (
+        <CaseConfirmCard data={data} onChange={onChange} mode="matched" />
+      )}
+      {showManualConfirm && (
+        <CaseConfirmCard data={data} onChange={onChange} mode="manual" />
       )}
 
       <div className="flex items-center justify-end gap-3 pt-2">

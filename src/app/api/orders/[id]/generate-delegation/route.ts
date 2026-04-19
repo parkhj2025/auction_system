@@ -89,6 +89,15 @@ export async function POST(
       bidDate?: string;
     };
 
+    // Phase 4-CONFIRM: bidDate는 모든 경로(매칭/manualEntry)에서 propertySnapshot에 저장됨.
+    // 누락은 schema 위반 또는 옛 데이터 → throw 대신 400으로 안전 응답.
+    if (!snapshot.bidDate) {
+      return NextResponse.json(
+        { ok: false, error: "사건 정보(매각기일)가 누락되어 위임장을 생성할 수 없습니다. 새로 접수해주세요." },
+        { status: 400 },
+      );
+    }
+
     const data: DelegationData = {
       delegator: {
         name: order.applicant_name,
@@ -99,11 +108,7 @@ export async function POST(
       },
       caseNumber: order.case_number,
       courtLabel: order.court,
-      // 보강 2 (Phase 4-DATETIME): bidDate 누락은 Step1 매칭 미완료 비정상 경로.
-      // 클라이언트의 보강 1(Step4 진입 가드)이 정상 작동하면 도달 불가능한 안전장치.
-      bidDate: snapshot.bidDate ?? (() => {
-        throw new Error("Step1 매칭 미완료 상태에서 위임장 PDF 생성 요청");
-      })(),
+      bidDate: snapshot.bidDate,
       bidAmount: Number(order.bid_amount),
       deposit: Number(order.deposit_amount ?? 0),
       signatureDataUrl,

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LegalLayout, Article, Clauses } from "@/components/common/LegalLayout";
 import { COMPANY } from "@/lib/constants";
+import { USER_INPUT_LIABILITY_NOTICE } from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: "이용약관",
@@ -196,6 +197,7 @@ export default function TermsPage() {
             웹사이트에 게시된 물건분석·가이드·시황 콘텐츠는 참고 자료이며 투자
             권유가 아닙니다. 투자 판단에 대한 책임은 이용자 본인에게 있습니다.
           </li>
+          <li>{USER_INPUT_LIABILITY_NOTICE}</li>
         </Clauses>
       </Article>
 

@@ -1,5 +1,6 @@
 import { AGENT_INFO, COMPANY, PRIVACY_CONTACT } from "@/lib/constants";
 import { formatKSTDate } from "@/lib/datetime";
+import { USER_INPUT_LIABILITY_NOTICE } from "@/lib/legal";
 
 export interface DelegationData {
   delegator: {
@@ -92,6 +93,13 @@ export interface DelegationFormatted {
   };
   /** PDF 본문 하단 + Modal 하단에 동일하게 표기되는 보존·파기·연락처 경고문 */
   retentionNotice: string;
+  /**
+   * 위임인 직접 입력 책임 조항 (Phase 4-CONFIRM, 2026-04-19).
+   * legal.ts의 USER_INPUT_LIABILITY_NOTICE 단일 출처. 변호사 검토 후 1곳 수정으로 5곳 자동 반영.
+   * delegation.ts(PDF)에서는 retentionNotice와 한 paragraph로 합성 렌더 (1페이지 가드 통과용).
+   * Modal에서는 별도 블록으로 분리 렌더 (페이지 오버플로우 무관).
+   */
+  userLiabilityNotice: string;
 }
 
 function formatKrwAmount(value: number): string {
@@ -147,5 +155,6 @@ export function formatDelegation(data: DelegationData): DelegationFormatted {
       delegateSignLabel: `수임인: ${DELEGATE_INFO.ceoName} (인)`,
     },
     retentionNotice: buildRetentionNotice(),
+    userLiabilityNotice: USER_INPUT_LIABILITY_NOTICE,
   };
 }

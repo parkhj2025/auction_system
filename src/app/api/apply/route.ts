@@ -63,6 +63,11 @@ export async function POST(req: Request) {
     const isRebid = form.get("isRebid") === "true";
     const eSignFile = form.get("eSignFile") as File | null;
     const idFile = form.get("idFile") as File | null;
+    // Phase 4-CONFIRM: 사건 정보 4종 (매칭/manualEntry 모두 전송)
+    const bidDate = ((form.get("bidDate") as string | null) ?? "").trim();
+    const propertyType = ((form.get("propertyType") as string | null) ?? "").trim();
+    const propertyAddress = ((form.get("propertyAddress") as string | null) ?? "").trim();
+    const caseConfirmedAt = ((form.get("caseConfirmedAt") as string | null) ?? "").trim();
 
     // ---- 서버 측 검증 ----
     const bidAmount = Number(bidAmountRaw.replace(/[^\d]/g, ""));
@@ -91,6 +96,13 @@ export async function POST(req: Request) {
     }
     if (!idFile || idFile.size === 0) {
       return fail("신분증 사본이 첨부되지 않았습니다.", 400);
+    }
+    // Phase 4-CONFIRM: bidDate는 위임장 PDF 필수, manualEntry/매칭 모두 적용
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(bidDate)) {
+      return fail("매각기일이 올바른 형식(YYYY-MM-DD)이 아닙니다.", 400);
+    }
+    if (!caseConfirmedAt) {
+      return fail("사건 정보 확인 동의가 누락되었습니다.", 400);
     }
 
     // 파일 서버 측 재검증 (클라이언트 검증은 신뢰 가능하지만 boundary 필수)
@@ -136,35 +148,50 @@ export async function POST(req: Request) {
     let baseFee: number = FEES.standard;
     let depositAmount: number | null = null;
 
+    // Phase 4-CONFIRM: bidDate가 항상 클라이언트에서 전송됨 (매칭/manualEntry 통일).
+    // computeFee/Deposit는 bidDate 기반으로 모든 경로에서 동작.
+    const fee = computeFee(bidDate);
+    feeTier = fee.tier;
+    baseFee = fee.baseFee;
+
     if (matchedSlug) {
       const post = getAnalysisBySlug(matchedSlug);
       if (post) {
         propertySnapshot = {
           ...post.frontmatter,
+          // 클라이언트 사용자 확인값으로 덮어쓰기 (frontmatter와 거의 동일하지만 일관성 보장)
+          bidDate,
+          propertyType,
+          address: propertyAddress || post.frontmatter.address,
+          caseConfirmedAt,
           snapshotAt: new Date().toISOString(),
         };
-        const fee = computeFee(post.frontmatter.bidDate);
-        feeTier = fee.tier;
-        baseFee = fee.baseFee;
         depositAmount = computeDeposit(post.frontmatter.appraisal, isRebid);
       } else {
-        // slug가 있으나 콘텐츠를 찾지 못함 — 수동 접수로 폴백
+        // slug가 있으나 콘텐츠를 찾지 못함 — manualEntry 폴백 (사용자 입력값 사용)
         propertySnapshot = {
           manual: true,
           caseNumber,
           court,
+          bidDate,
+          propertyType,
+          address: propertyAddress,
+          caseConfirmedAt,
           note: "matchedSlug provided but content not found",
           snapshotAt: new Date().toISOString(),
         };
       }
     } else {
-      // 수동 접수: bidDate를 알 수 없으므로 fee_tier='standard' 고정.
-      // 관리자가 접수 확인 후 실제 입찰일 기준으로 필요 시 수동 조정한다.
-      // Phase 3에서 수동 접수 시 입찰일 직접 입력 필드 추가를 검토.
+      // manualEntry: 사용자가 Step1 CaseConfirmCard에서 직접 입력한 값.
+      // 감정가는 알 수 없으므로 depositAmount는 null (Step5에서 안내).
       propertySnapshot = {
         manual: true,
         caseNumber,
         court,
+        bidDate,
+        propertyType,
+        address: propertyAddress,
+        caseConfirmedAt,
         snapshotAt: new Date().toISOString(),
       };
     }

@@ -36,7 +36,7 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [applicationId, setApplicationId] = useState<string | null>(null);
 
-  // URL ?case= 로 들어왔을 때 자동 매칭
+  // URL ?case= 로 들어왔을 때 자동 매칭 (Phase 4-CONFIRM: bidDate 등 자동 복사 포함)
   useEffect(() => {
     if (initialCase && !data.matchedPost) {
       const match = posts.find((p) => p.caseNumber === initialCase);
@@ -46,6 +46,11 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
           matchedPost: match,
           caseNumber: match.caseNumber,
           court: match.court,
+          bidDate: match.bidDate,
+          propertyType: match.propertyType,
+          propertyAddress: match.address,
+          caseConfirmedByUser: false,
+          caseConfirmedAt: null,
         }));
       }
     }
@@ -84,11 +89,11 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
     const i = STEP_ORDER.indexOf(currentStep);
     if (i < 0 || i >= STEP_ORDER.length - 1) return;
     const nextStep = STEP_ORDER[i + 1];
-    // 보강 1 (Phase 4-DATETIME): Step4 진입 시 bidDate(법원 공고 매각기일) 보장.
-    // manualEntry 경로는 matchedPost가 null이라 위임장 PDF에 박을 매각기일이 없음 → Step1로 되돌리고 안내.
-    if (nextStep === "confirm" && !data.matchedPost?.bidDate) {
+    // Phase 4-CONFIRM: Step4 진입 시 bidDate + caseConfirmedByUser 둘 다 보장.
+    // manualEntry 경로도 Step1 CaseConfirmCard에서 채운 값으로 통과 가능.
+    if (nextStep === "confirm" && (!data.bidDate || !data.caseConfirmedByUser)) {
       setSubmitError(
-        "Step1에서 매각기일이 확인된 사건만 위임장을 작성할 수 있습니다. 사건번호를 다시 입력해 매칭을 완료해주세요.",
+        "Step1에서 매각기일 확인 + 사건 정보 동의 체크박스를 모두 완료해주세요.",
       );
       setCurrentStep("property");
       if (typeof window !== "undefined") {
@@ -124,6 +129,13 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
       if (data.matchedPost) {
         form.set("matchedSlug", data.matchedPost.slug);
         form.set("matchedTitle", data.matchedPost.title);
+      }
+      // Phase 4-CONFIRM: 사건 정보 4종을 모든 경로에서 전송 (manualEntry 시 사용자 입력값 보장)
+      form.set("bidDate", data.bidDate);
+      form.set("propertyType", data.propertyType);
+      form.set("propertyAddress", data.propertyAddress);
+      if (data.caseConfirmedAt) {
+        form.set("caseConfirmedAt", data.caseConfirmedAt);
       }
       form.set("bidAmount", data.bidInfo.bidAmount);
       form.set("applicantName", data.bidInfo.applicantName);

@@ -1,6 +1,15 @@
 export type AnalysisCategory = "danger" | "safe" | "edu";
 export type RiskLevel = "high" | "mid" | "low";
-export type PropertyType = "아파트" | "다세대주택" | "빌라" | "오피스텔";
+export type PropertyType =
+  | "아파트"
+  | "다세대주택"
+  | "빌라"
+  | "오피스텔"
+  | "단독주택"
+  | "토지"
+  | "상가"
+  | "공장"
+  | "기타";
 export type AuctionType = "강제경매" | "임의경매";
 export type PostStatus = "draft" | "published" | "archived";
 

@@ -47,15 +47,9 @@ export function Step4Confirm({
   }
 
   // 미리보기 모달용 DelegationData 구성. ssnBack과 signatureDataUrl은 placeholder.
-  // 보강 2 (Phase 4-DATETIME): bidDate 누락 시 throw로 차단.
-  // 보강 1(Step4 진입 가드)이 정상 작동하면 이 throw는 발생하지 않는 안전장치.
+  // Phase 4-CONFIRM: data.bidDate non-null 승격으로 boundary throw 제거.
+  // bidDate/propertyAddress는 매칭/manualEntry 모두 data.* 직접 사용 (Step1에서 채움).
   const previewData: DelegationData = useMemo(() => {
-    const bidDate = data.matchedPost?.bidDate;
-    if (!bidDate) {
-      throw new Error(
-        "Step1 매칭 미완료 상태에서 Step4 도달 — 위임장 PDF 생성 불가",
-      );
-    }
     const appraisal = data.matchedPost?.appraisal ?? 0;
     const depositRate = bid.rebid ? REBID_DEPOSIT_RATE : NORMAL_DEPOSIT_RATE;
     const deposit = Math.floor(appraisal * depositRate);
@@ -64,12 +58,12 @@ export function Step4Confirm({
         name: bid.applicantName,
         ssnFront: bid.ssnFront,
         ssnBack: bid.ssnBack,
-        address: data.matchedPost?.address ?? "",
+        address: data.propertyAddress || data.matchedPost?.address || "",
         phone: bid.phone,
       },
       caseNumber: data.caseNumber,
       courtLabel: data.court,
-      bidDate,
+      bidDate: data.bidDate,
       bidAmount,
       deposit,
       signatureDataUrl: null,
@@ -112,7 +106,7 @@ export function Step4Confirm({
               <div>
                 <dt className="text-xs text-[var(--color-ink-500)]">입찰일</dt>
                 <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
-                  {data.matchedPost?.bidDate ?? "상담원 확인 필요"}
+                  {data.bidDate || "상담원 확인 필요"}
                 </dd>
               </div>
               <div>

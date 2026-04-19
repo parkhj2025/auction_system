@@ -103,7 +103,13 @@ export function DelegationPreviewModal({ isOpen, onClose, data }: Props) {
             </div>
           </div>
 
+          {/* Phase 4-CONFIRM: 책임 조항을 별도 블록으로 분리 렌더 (Modal은 페이지 오버플로우 무관).
+              PDF는 delegation.ts에서 한 paragraph로 합성 (1페이지 가드 통과용). */}
           <p className="mt-6 text-xs leading-5 text-[var(--color-ink-500)]">
+            {formatted.userLiabilityNotice}
+          </p>
+
+          <p className="mt-3 text-xs leading-5 text-[var(--color-ink-500)]">
             {formatted.retentionNotice}
           </p>
 

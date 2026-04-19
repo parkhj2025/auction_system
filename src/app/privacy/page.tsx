@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { LegalLayout, Article, Clauses } from "@/components/common/LegalLayout";
 import { COMPANY } from "@/lib/constants";
+import { USER_INPUT_LIABILITY_NOTICE } from "@/lib/legal";
 
 export const metadata: Metadata = {
   title: "개인정보처리방침",
@@ -57,6 +58,14 @@ export default function PrivacyPage() {
               공동입찰 시
             </strong>
             : 공동입찰인의 성명 및 연락처
+          </li>
+          <li>
+            <strong className="font-black text-[var(--color-ink-900)]">
+              사건 정보 확인 시점
+            </strong>
+            (KST 타임스탬프): 위임장 분쟁 시 위임인의 정보 입력·확인 시각 입증
+            근거. 매수신청대리 업무 기록의 일부로 위임장 PDF와 동일한 보관 정책
+            적용.
           </li>
         </Clauses>
       </Article>
@@ -290,7 +299,17 @@ export default function PrivacyPage() {
         </Clauses>
       </Article>
 
-      <Article number="10" title="변경 공지">
+      <Article number="10" title="위임인의 사건 정보 입력 책임">
+        <p>{USER_INPUT_LIABILITY_NOTICE}</p>
+        <p className="mt-3 text-xs leading-5 text-[var(--color-ink-500)]">
+          이용자가 신청 화면(Step 1 사건 정보 확인)에서 직접 입력하거나 확인한
+          매각기일·물건 종류·주소 등 사건 정보는 위임장 PDF와 매수신청대리
+          업무 진행의 근거가 됩니다. 회사는 이용자가 확인 체크박스를 누른 시각을
+          기록하여 분쟁 시 입증 근거로 활용합니다.
+        </p>
+      </Article>
+
+      <Article number="11" title="변경 공지">
         <p>
           본 개인정보처리방침은 법령·정책 또는 회사 내부 방침의 변경에 따라
           수정될 수 있으며, 변경 시 웹사이트 공지사항을 통해 시행일 7일 전부터
