@@ -9,7 +9,7 @@ import type {
 } from "@/types/apply";
 import { INITIAL_APPLY_DATA } from "@/types/apply";
 import type { AnalysisFrontmatter } from "@/types/content";
-import { APPLY_STEPS, type ApplyStepId } from "@/lib/constants";
+import { APPLY_STEPS, COURTS_ALL, type ApplyStepId } from "@/lib/constants";
 import { ApplyStepIndicator } from "./ApplyStepIndicator";
 import { Step1Property } from "./steps/Step1Property";
 import { Step2BidInfo } from "./steps/Step2BidInfo";
@@ -23,7 +23,14 @@ const STEP_ORDER: ApplyStepId[] = APPLY_STEPS.map((s) => s.id);
 export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
   const searchParams = useSearchParams();
   const initialCase = searchParams.get("case") ?? "";
-  const initialCourt = searchParams.get("court") ?? "";
+  // Phase 6.5-POST 작업 1: court 영문/courtCode/한글 무엇이 와도 한글 label로 정규화.
+  // 매칭 실패 시 빈 문자열 → INITIAL_APPLY_DATA.court 기본값(="인천지방법원") 유지.
+  const initialCourtRaw = searchParams.get("court") ?? "";
+  const initialCourt = initialCourtRaw
+    ? COURTS_ALL.find(
+        (c) => c.label === initialCourtRaw || c.courtCode === initialCourtRaw,
+      )?.label ?? ""
+    : "";
 
   const [data, setData] = useState<ApplyFormData>({
     ...INITIAL_APPLY_DATA,
@@ -35,6 +42,10 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [applicationId, setApplicationId] = useState<string | null>(null);
+  // Phase 6.5-POST 작업 6: PDF 단계 부분 실패 시 좀비 orders 회복.
+  // /api/apply 성공 후 lastOrderId 보존 → 재시도 시 /api/apply 스킵, PDF 단계만 재호출.
+  // PDF 성공 시 null clear. /api/apply 실패 시 lastOrderId 미set 상태 유지.
+  const [lastOrderId, setLastOrderId] = useState<string | null>(null);
 
   // URL ?case= 로 들어왔을 때 자동 매칭 (Phase 4-CONFIRM: bidDate 등 자동 복사 포함)
   useEffect(() => {
@@ -138,59 +149,69 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
     setSubmitting(true);
     setSubmitError(null);
     try {
-      const form = new FormData();
-      form.set("caseNumber", data.caseNumber);
-      form.set("court", data.court);
-      form.set("manualEntry", String(data.manualEntry));
-      if (data.matchedPost) {
-        form.set("matchedSlug", data.matchedPost.slug);
-        form.set("matchedTitle", data.matchedPost.title);
-      }
-      // Phase 4-CONFIRM: 사건 정보 4종을 모든 경로에서 전송 (manualEntry 시 사용자 입력값 보장)
-      form.set("bidDate", data.bidDate);
-      form.set("propertyType", data.propertyType);
-      form.set("propertyAddress", data.propertyAddress);
-      if (data.caseConfirmedAt) {
-        form.set("caseConfirmedAt", data.caseConfirmedAt);
-      }
-      form.set("bidAmount", data.bidInfo.bidAmount);
-      form.set("applicantName", data.bidInfo.applicantName);
-      form.set("phone", data.bidInfo.phone);
-      form.set("ssnFront", data.bidInfo.ssnFront);
-      form.set("jointBidding", String(data.bidInfo.jointBidding));
-      if (data.bidInfo.jointBidding) {
-        form.set("jointApplicantName", data.bidInfo.jointApplicantName);
-        form.set("jointApplicantPhone", data.bidInfo.jointApplicantPhone);
-      }
-      form.set("isRebid", String(data.bidInfo.rebid));
-      if (data.documents.eSignFile)
-        form.set("eSignFile", data.documents.eSignFile);
-      if (data.documents.idFile) form.set("idFile", data.documents.idFile);
+      // Phase 6.5-POST 작업 6: lastOrderId 분기로 부분 실패 회복.
+      // 신규: /api/apply 호출 + lastOrderId 보존 → PDF 단계 호출
+      // 재시도: /api/apply 스킵 + PDF 단계만 재호출 (좀비 orders 회복)
+      let orderId = lastOrderId;
 
-      const res = await fetch("/api/apply", { method: "POST", body: form });
-      const json = (await res.json()) as {
-        ok: boolean;
-        applicationId?: string;
-        orderId?: string;
-        error?: string;
-      };
-      if (res.status === 401) {
-        throw new Error("로그인 세션이 만료되었습니다. 다시 로그인 후 시도해주세요.");
-      }
-      if (res.status === 409) {
-        throw new Error(
-          json.error ??
-            "해당 물건은 이미 다른 고객의 접수가 진행 중입니다. 중복 접수는 불가합니다."
-        );
-      }
-      if (!json.ok || !json.applicationId || !json.orderId) {
-        throw new Error(json.error ?? "접수 처리 중 오류가 발생했습니다.");
+      if (!orderId) {
+        const form = new FormData();
+        form.set("caseNumber", data.caseNumber);
+        form.set("court", data.court);
+        form.set("manualEntry", String(data.manualEntry));
+        if (data.matchedPost) {
+          form.set("matchedSlug", data.matchedPost.slug);
+          form.set("matchedTitle", data.matchedPost.title);
+        }
+        form.set("bidDate", data.bidDate);
+        form.set("propertyType", data.propertyType);
+        form.set("propertyAddress", data.propertyAddress);
+        if (data.caseConfirmedAt) {
+          form.set("caseConfirmedAt", data.caseConfirmedAt);
+        }
+        form.set("bidAmount", data.bidInfo.bidAmount);
+        form.set("applicantName", data.bidInfo.applicantName);
+        form.set("phone", data.bidInfo.phone);
+        form.set("ssnFront", data.bidInfo.ssnFront);
+        form.set("jointBidding", String(data.bidInfo.jointBidding));
+        if (data.bidInfo.jointBidding) {
+          form.set("jointApplicantName", data.bidInfo.jointApplicantName);
+          form.set("jointApplicantPhone", data.bidInfo.jointApplicantPhone);
+        }
+        form.set("isRebid", String(data.bidInfo.rebid));
+        if (data.documents.eSignFile)
+          form.set("eSignFile", data.documents.eSignFile);
+        if (data.documents.idFile) form.set("idFile", data.documents.idFile);
+
+        const res = await fetch("/api/apply", { method: "POST", body: form });
+        const json = (await res.json()) as {
+          ok: boolean;
+          applicationId?: string;
+          orderId?: string;
+          error?: string;
+        };
+        if (res.status === 401) {
+          throw new Error(
+            "로그인 세션이 만료되었습니다. 다시 로그인 후 시도해주세요.",
+          );
+        }
+        if (res.status === 409) {
+          throw new Error(
+            json.error ??
+              "해당 물건은 이미 다른 고객의 접수가 진행 중입니다. 중복 접수는 불가합니다.",
+          );
+        }
+        if (!json.ok || !json.applicationId || !json.orderId) {
+          throw new Error(json.error ?? "접수 처리 중 오류가 발생했습니다.");
+        }
+        orderId = json.orderId;
+        setLastOrderId(orderId);
+        setApplicationId(json.applicationId);
       }
 
-      // 위임장 PDF 생성 + Storage 업로드. ssnBack은 이 호출의 응답이 ok일 때만 클리어.
-      // 네트워크/서버 오류로 업로드 실패 시 ssnBack을 보존하여 재시도 가능하게 한다.
+      // 위임장 PDF 생성 + Storage 업로드 (재시도 가능 단계)
       const pdfRes = await fetch(
-        `/api/orders/${json.orderId}/generate-delegation`,
+        `/api/orders/${orderId}/generate-delegation`,
         {
           method: "POST",
           headers: { "Content-Type": "application/json" },
@@ -198,20 +219,21 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
             ssnBack: data.bidInfo.ssnBack,
             signatureDataUrl: data.signature,
           }),
-        }
+        },
       );
       if (!pdfRes.ok) {
         const pdfErr = await pdfRes
           .json()
           .catch(() => ({ error: "위임장 PDF 생성 중 오류가 발생했습니다." }));
         throw new Error(
-          pdfErr.error ?? "위임장 PDF 생성 중 오류가 발생했습니다.",
+          pdfErr.error ??
+            "위임장 PDF 생성에 실패했습니다. '이 PDF로 제출' 버튼을 다시 눌러 재시도하면 PDF 단계만 재호출됩니다.",
         );
       }
-      // Storage 업로드 완료 → ssnBack을 메모리에서 즉시 클리어.
-      mergeBidInfo({ ssnBack: "" });
 
-      setApplicationId(json.applicationId);
+      // 성공: ssnBack 메모리 클리어 + lastOrderId clear + complete 진입
+      mergeBidInfo({ ssnBack: "" });
+      setLastOrderId(null);
       setCompleted((prev) => {
         const next = new Set(prev);
         next.add("confirm");
@@ -226,8 +248,9 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
       }
     } catch (err) {
       setSubmitError(
-        err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다."
+        err instanceof Error ? err.message : "알 수 없는 오류가 발생했습니다.",
       );
+      // PDF 단계 실패 시 lastOrderId 유지 (재시도 가능). /api/apply 단계 실패 시 미set 상태 유지.
     } finally {
       setSubmitting(false);
     }

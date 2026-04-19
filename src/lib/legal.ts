@@ -9,3 +9,12 @@ export const USER_INPUT_LIABILITY_NOTICE =
 
 export const CASE_CONFIRM_CHECKBOX_LABEL =
   "위 사건 정보가 본인이 의뢰하려는 사건과 일치함을 확인합니다";
+
+/**
+ * 위임장 PDF 수임인 인(印) 영역 placeholder 안내.
+ * Phase 6.5-POST (2026-04-19): 사업자등록 완료 전 인감 미삽입 상태에 대한 고객 안내.
+ * 위치: PDF 본문 수임인 박스 직하 (delegation.ts) + PDFPreviewModal 하단 배너 (단일 소스).
+ * 사업자등록 완료 + 도장 이미지 정식 임베드 시 본 상수 + 호출처 일괄 제거 가능.
+ */
+export const AGENT_SEAL_PENDING_NOTICE =
+  "수임인 인감은 사업자등록 완료 후 자동 삽입됩니다.";

@@ -1,15 +1,19 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import { ArrowLeft, Send, AlertCircle, ExternalLink, FileText } from "lucide-react";
+import { ArrowLeft, AlertCircle, FileText } from "lucide-react";
 import type { ApplyFormData } from "@/types/apply";
 import { FeeCalculator } from "../FeeCalculator";
 import { SignatureCanvas } from "../SignatureCanvas";
 import { DelegationPreviewModal } from "../DelegationPreviewModal";
+import { PDFPreviewModal } from "../PDFPreviewModal";
+import { PrivacyPreviewModal } from "../PrivacyPreviewModal";
+import { TermsPreviewModal } from "../TermsPreviewModal";
 import { formatKoreanWon } from "@/lib/utils";
 import { getKSTDateTimeIso } from "@/lib/datetime";
 import { VerifiedBadge } from "../VerifiedBadge";
 import type { DelegationData } from "@/lib/pdf/delegationTemplate";
+import { generateDelegationPdfClient } from "@/lib/pdf/delegation.client";
 
 type AgreementKey = "agreedDelegation" | "agreedPrivacy" | "agreedTerms";
 
@@ -34,12 +38,21 @@ export function Step4Confirm({
   submitError: string | null;
 }) {
   const [previewOpen, setPreviewOpen] = useState(false);
+  // Phase 6.5-POST 작업 5: 클라이언트 PDF 생성 + 최종 확인 모달
+  const [generating, setGenerating] = useState(false);
+  const [pdfBytes, setPdfBytes] = useState<Uint8Array | null>(null);
+  const [pdfModalOpen, setPdfModalOpen] = useState(false);
+  const [pdfGenError, setPdfGenError] = useState<string | null>(null);
+  // Phase 6.5-POST 작업 7: 개인정보/이용약관 모달
+  const [privacyOpen, setPrivacyOpen] = useState(false);
+  const [termsOpen, setTermsOpen] = useState(false);
 
   const bid = data.bidInfo;
   const bidAmount = Number(bid.bidAmount.replace(/[^\d]/g, "")) || 0;
   const allAgreed = data.agreedDelegation && data.agreedPrivacy && data.agreedTerms;
   const hasSignature = !!data.signature;
-  const canSubmit = hasSignature && allAgreed && !submitting;
+  // 최종 확인 버튼 활성화: 서명 + 3 동의 + 제출/PDF 생성 중 아님
+  const canFinalCheck = hasSignature && allAgreed && !submitting && !generating;
 
   function maskSsn(v: string) {
     if (!v) return "";
@@ -70,6 +83,38 @@ export function Step4Confirm({
       createdAt: getKSTDateTimeIso(),
     };
   }, [data, bid, bidAmount]);
+
+  /**
+   * 최종 확인 — 클라이언트 pdf-lib로 미리보기 PDF 생성 → PDFPreviewModal 노출.
+   * 실패 시 토스트 + 재시도 가능 (Fallback으로 HTML Modal 건너뛰기 금지 — 보안/법적 신뢰).
+   */
+  async function handleFinalCheck() {
+    if (!canFinalCheck) return;
+    setGenerating(true);
+    setPdfGenError(null);
+    try {
+      const bytes = await generateDelegationPdfClient(previewData);
+      setPdfBytes(bytes);
+      setPdfModalOpen(true);
+    } catch (err) {
+      console.error("[Step4Confirm] client PDF generation failed", err);
+      setPdfGenError(
+        "위임장 PDF 생성에 실패했습니다. 다시 시도해주세요.",
+      );
+    } finally {
+      setGenerating(false);
+    }
+  }
+
+  function handlePdfModalCancel() {
+    if (submitting) return;
+    setPdfModalOpen(false);
+    setPdfBytes(null);
+  }
+
+  function handlePdfModalConfirm() {
+    onSubmit();
+  }
 
   return (
     <div className="flex flex-col gap-6">
@@ -184,7 +229,7 @@ export function Step4Confirm({
                     className="ml-2 inline-flex items-center gap-1 text-xs font-bold text-brand-600 underline-offset-2 hover:underline"
                   >
                     <FileText size={12} aria-hidden="true" />
-                    위임장 미리보기
+                    위임장 내용 미리보기
                   </button>
                 </label>
               </li>
@@ -198,15 +243,14 @@ export function Step4Confirm({
                 />
                 <label htmlFor="agree-privacy" className="flex-1 cursor-pointer">
                   개인정보 처리방침에 동의합니다.
-                  <a
-                    href="/privacy"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={() => setPrivacyOpen(true)}
                     className="ml-2 inline-flex items-center gap-1 text-xs font-bold text-brand-600 underline-offset-2 hover:underline"
                   >
-                    <ExternalLink size={12} aria-hidden="true" />
+                    <FileText size={12} aria-hidden="true" />
                     내용 보기
-                  </a>
+                  </button>
                 </label>
               </li>
               <li className="flex items-start gap-3">
@@ -219,15 +263,14 @@ export function Step4Confirm({
                 />
                 <label htmlFor="agree-terms" className="flex-1 cursor-pointer">
                   서비스 이용약관에 동의합니다.
-                  <a
-                    href="/terms"
-                    target="_blank"
-                    rel="noopener noreferrer"
+                  <button
+                    type="button"
+                    onClick={() => setTermsOpen(true)}
                     className="ml-2 inline-flex items-center gap-1 text-xs font-bold text-brand-600 underline-offset-2 hover:underline"
                   >
-                    <ExternalLink size={12} aria-hidden="true" />
+                    <FileText size={12} aria-hidden="true" />
                     내용 보기
-                  </a>
+                  </button>
                 </label>
               </li>
             </ul>
@@ -239,13 +282,13 @@ export function Step4Confirm({
         </aside>
       </div>
 
-      {submitError && (
+      {(submitError || pdfGenError) && (
         <div
           role="alert"
           className="flex items-start gap-2 rounded-[var(--radius-md)] border border-[var(--color-accent-red)] bg-[var(--color-accent-red-soft)] px-5 py-4 text-sm text-[var(--color-accent-red)]"
         >
           <AlertCircle size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
-          {submitError}
+          {submitError ?? pdfGenError}
         </div>
       )}
 
@@ -253,7 +296,7 @@ export function Step4Confirm({
         <button
           type="button"
           onClick={onBack}
-          disabled={submitting}
+          disabled={submitting || generating}
           className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)] disabled:opacity-50"
         >
           <ArrowLeft size={16} aria-hidden="true" />
@@ -261,12 +304,12 @@ export function Step4Confirm({
         </button>
         <button
           type="button"
-          onClick={onSubmit}
-          disabled={!canSubmit}
+          onClick={handleFinalCheck}
+          disabled={!canFinalCheck}
           className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
         >
-          {submitting ? "제출 중..." : "신청 제출"}
-          {!submitting && <Send size={16} aria-hidden="true" />}
+          {generating ? "PDF 생성 중..." : "최종 확인"}
+          {!generating && <FileText size={16} aria-hidden="true" />}
         </button>
       </div>
 
@@ -274,6 +317,24 @@ export function Step4Confirm({
         isOpen={previewOpen}
         onClose={() => setPreviewOpen(false)}
         data={previewData}
+      />
+
+      {pdfModalOpen && (
+        <PDFPreviewModal
+          pdfBytes={pdfBytes}
+          onConfirm={handlePdfModalConfirm}
+          onCancel={handlePdfModalCancel}
+          submitting={submitting}
+        />
+      )}
+
+      <PrivacyPreviewModal
+        isOpen={privacyOpen}
+        onClose={() => setPrivacyOpen(false)}
+      />
+      <TermsPreviewModal
+        isOpen={termsOpen}
+        onClose={() => setTermsOpen(false)}
       />
     </div>
   );

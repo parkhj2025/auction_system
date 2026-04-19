@@ -2,6 +2,7 @@ import fs from "node:fs";
 import path from "node:path";
 import PDFDocument from "pdfkit";
 import { BRAND_NAME } from "@/lib/constants";
+import { AGENT_SEAL_PENDING_NOTICE } from "@/lib/legal";
 import {
   formatDelegation,
   type DelegationData,
@@ -244,31 +245,76 @@ export async function generateDelegationPdf(
       doc.rect(applicantBoxX, boxY, SIG_BOX_W, SIG_BOX_H).stroke();
       doc.rect(agentBoxX, boxY, SIG_BOX_W, SIG_BOX_H).stroke();
 
-      // placeholder
+      // 위임인 박스: 서명 이미지 임베드 (Phase 6.5-POST 작업 2) 또는 placeholder 폴백
+      if (data.signatureDataUrl) {
+        try {
+          const sigBase64 = data.signatureDataUrl.replace(
+            /^data:image\/\w+;base64,/,
+            "",
+          );
+          const sigBuffer = Buffer.from(sigBase64, "base64");
+          doc.image(sigBuffer, applicantBoxX, boxY, {
+            fit: [SIG_BOX_W, SIG_BOX_H],
+            align: "center",
+            valign: "center",
+          });
+        } catch {
+          doc
+            .font("Regular")
+            .fontSize(8)
+            .fillColor(COLOR.ink500)
+            .text("(서명 임베드 실패)", applicantBoxX, boxY + SIG_BOX_H / 2 - 4, {
+              width: SIG_BOX_W,
+              align: "center",
+              lineBreak: false,
+            });
+        }
+      } else {
+        doc
+          .font("Regular")
+          .fontSize(8)
+          .fillColor(COLOR.ink500)
+          .text("(서명 영역)", applicantBoxX, boxY + SIG_BOX_H / 2 - 4, {
+            width: SIG_BOX_W,
+            align: "center",
+            lineBreak: false,
+          });
+      }
+
+      // 수임인 박스: 사업자등록 완료 후 인감 이미지 임베드 예정. 현재 placeholder 유지.
       doc
         .font("Regular")
         .fontSize(8)
         .fillColor(COLOR.ink500)
-        .text("(서명 영역)", applicantBoxX, boxY + SIG_BOX_H / 2 - 4, {
+        .text("(인 영역)", agentBoxX, boxY + SIG_BOX_H / 2 - 4, {
           width: SIG_BOX_W,
           align: "center",
           lineBreak: false,
         });
-      doc.text("(인 영역)", agentBoxX, boxY + SIG_BOX_H / 2 - 4, {
-        width: SIG_BOX_W,
-        align: "center",
-        lineBreak: false,
-      });
 
       coords = {
         applicant: { x: applicantBoxX, y: boxY, w: SIG_BOX_W, h: SIG_BOX_H },
         agent: { x: agentBoxX, y: boxY, w: SIG_BOX_W, h: SIG_BOX_H },
       };
 
+      // Phase 6.5-POST 작업 2 보완 1: 수임인 인감 미삽입 안내 (legal.ts AGENT_SEAL_PENDING_NOTICE 단일 소스).
+      // 수임인 박스 직하 7pt 회색 1줄. 사업자등록 완료 + 도장 임베드 시 본 블록 + legal.ts 상수 일괄 제거.
+      const sealNoticeY = boxY + SIG_BOX_H + 4;
+      doc
+        .font("Regular")
+        .fontSize(7)
+        .fillColor(COLOR.ink500)
+        .text(AGENT_SEAL_PENDING_NOTICE, agentBoxX, sealNoticeY, {
+          width: SIG_BOX_W,
+          align: "center",
+          lineBreak: false,
+        });
+
       // Phase 4-CONFIRM: 위임인 책임 조항 + 보존·파기 경고문을 한 paragraph로 합성하여 단일 텍스트 블록으로 렌더.
       // 별도 블록으로 분리 시 1페이지 가드 위반 우려 (사전 보고 #3 분석). 공백 1개 join으로 wrap 통합.
       // formatDelegation()은 두 필드를 별도 반환 (Modal은 별도 블록 렌더). PDF에서만 합성.
-      const noticeY = boxY + SIG_BOX_H + 14;
+      // 인감 안내가 박스 직하 +4~13pt 점유하므로 retentionNotice 시작점을 +14 → +16으로 미룸.
+      const noticeY = boxY + SIG_BOX_H + 16;
       const noticeText = `${formatted.userLiabilityNotice} ${formatted.retentionNotice}`;
       doc
         .font("Regular")
