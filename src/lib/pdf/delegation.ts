@@ -19,7 +19,7 @@ const COLOR = {
 };
 
 const SIG_BOX_W = 150;
-const SIG_BOX_H = 50;
+const SIG_BOX_H = 42;
 const SIG_GAP = 50;
 
 let regularBytes: Buffer | null = null;
@@ -202,10 +202,10 @@ export async function generateDelegationPdf(
       });
 
       // 작성일 (조문 끝난 후 동적 위치)
-      const dateY = y + 18;
+      const dateY = y + 14;
       doc
         .font("Regular")
-        .fontSize(11)
+        .fontSize(10.5)
         .fillColor(COLOR.ink900)
         .text(formatted.footer.dateLabel, x, dateY, {
           width: innerW,
@@ -214,8 +214,8 @@ export async function generateDelegationPdf(
         });
 
       // 서명 블록 (병렬 배치 — 위임인 좌, 수임인 우)
-      const labelY = dateY + 22;
-      const boxY = labelY + 14;
+      const labelY = dateY + 18;
+      const boxY = labelY + 12;
 
       const totalSigW = SIG_BOX_W * 2 + SIG_GAP;
       const sigStartX = x + (innerW - totalSigW) / 2;
@@ -263,6 +263,18 @@ export async function generateDelegationPdf(
         applicant: { x: applicantBoxX, y: boxY, w: SIG_BOX_W, h: SIG_BOX_H },
         agent: { x: agentBoxX, y: boxY, w: SIG_BOX_W, h: SIG_BOX_H },
       };
+
+      // 보존·파기 경고문 (서명 박스 하단, 본문 폰트의 ~70%, 연한 톤)
+      const noticeY = boxY + SIG_BOX_H + 14;
+      doc
+        .font("Regular")
+        .fontSize(7)
+        .fillColor(COLOR.ink500)
+        .text(formatted.retentionNotice, x, noticeY, {
+          width: innerW,
+          align: "left",
+          lineGap: 1.2,
+        });
 
       // 1페이지 강제
       const range = doc.bufferedPageRange();

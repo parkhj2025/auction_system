@@ -74,34 +74,104 @@ export default function PrivacyPage() {
 
       <Article number="03" title="보유 및 이용 기간">
         <p>
-          회사는 수집한 개인정보를 관련 법령 및 회사 내부 정책에 따라 아래
-          기간 동안 보관한 후 지체 없이 파기합니다.
+          회사는 처리 목적이 달성된 개인정보는 지체 없이 파기하는 것을 원칙으로
+          합니다. 다만, 아래 항목은 관련 법령에 근거해 정해진 기간 동안 보관한
+          후 자동 파기합니다.
         </p>
-        <Clauses>
-          <li>
-            <strong className="font-black text-[var(--color-ink-900)]">
-              접수 정보 및 서류
-            </strong>
-            : 접수일로부터 <strong>3년</strong> (매수신청대리인 업무 기록
-            보존 의무에 따름)
-          </li>
-          <li>
-            <strong className="font-black text-[var(--color-ink-900)]">
-              결제·정산 기록
-            </strong>
-            : 5년 (전자상거래법에 따라 보존)
-          </li>
-          <li>
-            <strong className="font-black text-[var(--color-ink-900)]">
-              접속 로그
-            </strong>
-            : 3개월 (통신비밀보호법)
-          </li>
-          <li>
-            이용자가 삭제를 요청하는 경우, 법령상 보존 의무가 없는 항목은 즉시
-            파기합니다.
-          </li>
-        </Clauses>
+        <div className="mt-4 overflow-x-auto rounded-[var(--radius-md)] border border-[var(--color-border)]">
+          <table className="w-full min-w-[36rem] text-sm">
+            <thead className="bg-[var(--color-surface-muted)]">
+              <tr>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--color-ink-500)]"
+                >
+                  보관 항목
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--color-ink-500)]"
+                >
+                  근거 법령
+                </th>
+                <th
+                  scope="col"
+                  className="px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--color-ink-500)]"
+                >
+                  보관 기간
+                </th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[var(--color-border)]">
+              <tr>
+                <td className="px-4 py-3 align-top">
+                  <p className="font-bold text-[var(--color-ink-900)]">위임장 PDF</p>
+                  <p className="mt-1 text-xs text-[var(--color-ink-500)]">
+                    주민등록번호 13자리 전체가 본문에 포함됨. 비공개 Storage
+                    영역에 분리 저장.
+                  </p>
+                </td>
+                <td className="px-4 py-3 align-top text-xs leading-5 text-[var(--color-ink-700)]">
+                  전자상거래법 제6조 +<br />
+                  공인중개사의 매수신청대리인 등록 등에 관한 규칙 제15조
+                </td>
+                <td className="px-4 py-3 align-top">
+                  <strong className="font-black text-[var(--color-ink-900)]">5년</strong>
+                </td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 align-top">
+                  <p className="font-bold text-[var(--color-ink-900)]">
+                    계약 및 대금 결제 기록
+                  </p>
+                  <p className="mt-1 text-xs text-[var(--color-ink-500)]">
+                    수수료·보증금 송금·반환·정산 기록.
+                  </p>
+                </td>
+                <td className="px-4 py-3 align-top text-xs leading-5 text-[var(--color-ink-700)]">
+                  전자상거래법 제6조
+                </td>
+                <td className="px-4 py-3 align-top">
+                  <strong className="font-black text-[var(--color-ink-900)]">5년</strong>
+                </td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 align-top">
+                  <p className="font-bold text-[var(--color-ink-900)]">
+                    소비자 불만·분쟁 처리 기록
+                  </p>
+                </td>
+                <td className="px-4 py-3 align-top text-xs leading-5 text-[var(--color-ink-700)]">
+                  전자상거래법 제6조
+                </td>
+                <td className="px-4 py-3 align-top">
+                  <strong className="font-black text-[var(--color-ink-900)]">3년</strong>
+                </td>
+              </tr>
+              <tr>
+                <td className="px-4 py-3 align-top">
+                  <p className="font-bold text-[var(--color-ink-900)]">접속 로그</p>
+                </td>
+                <td className="px-4 py-3 align-top text-xs leading-5 text-[var(--color-ink-700)]">
+                  통신비밀보호법
+                </td>
+                <td className="px-4 py-3 align-top">
+                  <strong className="font-black text-[var(--color-ink-900)]">3개월</strong>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+        <p className="mt-3 text-xs leading-5 text-[var(--color-ink-500)]">
+          개인정보보호법 제21조 제3항에 따라 위 보존 항목은 다른 개인정보와
+          분리하여 저장·관리합니다. 위임장 PDF는 비공개 버킷의 RLS 정책으로
+          접근이 차단되며, 본인 열람 시에는 60초 만료 임시 URL로만 발급됩니다.
+        </p>
+        <p className="mt-2 text-xs leading-5 text-[var(--color-ink-500)]">
+          이용자가 삭제를 요청하는 경우, 법령상 보존 의무가 없는 항목은 즉시
+          파기합니다. 보존 의무가 있는 항목은 위 기간 만료 시까지 다른 용도로
+          활용되지 않으며, 만료 즉시 자동 파기됩니다.
+        </p>
       </Article>
 
       <Article number="04" title="제3자 제공">
@@ -149,19 +219,28 @@ export default function PrivacyPage() {
         <Clauses>
           <li>
             <strong className="font-black text-[var(--color-ink-900)]">
-              전자적 파일
+              파기 절차
             </strong>
-            : 복구 및 재생이 불가능한 방법으로 영구 삭제
+            : 보존 기간이 만료되거나 처리 목적이 달성된 개인정보는 일 1회 자동
+            스케줄러가 식별하여 즉시 파기합니다. 별도의 사유로 즉시 파기가
+            필요한 경우 담당자가 수동으로 처리합니다.
           </li>
           <li>
             <strong className="font-black text-[var(--color-ink-900)]">
-              종이 문서
+              파기 방법
             </strong>
-            : 분쇄기로 분쇄하거나 소각
+            : 전자적 파일은 복구 및 재생이 불가능한 방법으로 영구 삭제합니다.
+            위임장 PDF는 비공개 Storage 버킷에서 파일 자체를 삭제하며, 데이터
+            베이스에서 해당 파일 경로 참조도 동시에 NULL 처리되어 dead link가
+            남지 않습니다. 종이 문서는 분쇄기로 분쇄하거나 소각합니다.
           </li>
           <li>
-            보존 기간이 경과하거나 처리 목적이 달성된 개인정보는 지체 없이
-            파기합니다.
+            <strong className="font-black text-[var(--color-ink-900)]">
+              파기 기한
+            </strong>
+            : 보존 기간 종료일로부터 늦어도 24시간 이내에 자동 파기됩니다.
+            처리 목적 달성에 따른 즉시 파기 항목은 사유 발생 시점에 즉시
+            처리됩니다.
           </li>
         </Clauses>
       </Article>

@@ -4,9 +4,19 @@ import { createAdminClient } from "@/lib/supabase/admin";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
-const RETENTION_YEARS = 3;
+/**
+ * 위임장 PDF 자동 파기 크론.
+ * 근거: 전자상거래법 제6조 + 「공인중개사의 매수신청대리인 등록 등에 관한 규칙」
+ *       제15조 → 5년 보관 후 파기.
+ *
+ * 실행 흐름:
+ *   1. orders 테이블에서 5년 경과 + delegation_pdf_path가 NULL이 아닌 row 조회
+ *   2. Storage에서 해당 객체 삭제
+ *   3. orders.delegation_pdf_path = NULL로 업데이트 (dead link 방지)
+ */
+const RETENTION_YEARS = 5;
 const BUCKET = "delegations";
-const PAGE_SIZE = 1000;
+const PAGE_SIZE = 200;
 
 function isAuthorized(request: Request): boolean {
   const secret = process.env.CRON_SECRET;
@@ -26,44 +36,61 @@ export async function GET(request: Request) {
   const cutoffIso = cutoff.toISOString();
 
   let scanned = 0;
-  let deleted = 0;
+  let deletedFiles = 0;
+  let updatedRows = 0;
   const errors: string[] = [];
 
-  let offset = 0;
+  let from = 0;
   while (true) {
-    const { data: objects, error: listError } = await supabase.storage
-      .from(BUCKET)
-      .list("", { limit: PAGE_SIZE, offset, sortBy: { column: "created_at", order: "asc" } });
+    const { data: rows, error: listError } = await supabase
+      .from("orders")
+      .select("id, delegation_pdf_path")
+      .not("delegation_pdf_path", "is", null)
+      .lt("created_at", cutoffIso)
+      .order("created_at", { ascending: true })
+      .range(from, from + PAGE_SIZE - 1);
 
     if (listError) {
-      errors.push(`list: ${listError.message}`);
+      errors.push(`orders.select: ${listError.message}`);
       break;
     }
-    if (!objects || objects.length === 0) break;
+    if (!rows || rows.length === 0) break;
 
-    scanned += objects.length;
-    const expired = objects
-      .filter((o) => o.created_at && o.created_at < cutoffIso)
-      .map((o) => o.name);
+    scanned += rows.length;
 
-    if (expired.length > 0) {
-      const { error: removeError } = await supabase.storage.from(BUCKET).remove(expired);
+    for (const row of rows) {
+      const path = row.delegation_pdf_path as string | null;
+      if (!path) continue;
+
+      const { error: removeError } = await supabase.storage.from(BUCKET).remove([path]);
       if (removeError) {
-        errors.push(`remove: ${removeError.message}`);
-      } else {
-        deleted += expired.length;
+        errors.push(`storage.remove(${row.id}): ${removeError.message}`);
+        continue;
       }
+      deletedFiles += 1;
+
+      const { error: updateError } = await supabase
+        .from("orders")
+        .update({ delegation_pdf_path: null })
+        .eq("id", row.id);
+      if (updateError) {
+        errors.push(`orders.update(${row.id}): ${updateError.message}`);
+        continue;
+      }
+      updatedRows += 1;
     }
 
-    if (objects.length < PAGE_SIZE) break;
-    offset += PAGE_SIZE;
+    if (rows.length < PAGE_SIZE) break;
+    from += PAGE_SIZE;
   }
 
   return NextResponse.json({
     ok: errors.length === 0,
     cutoff: cutoffIso,
+    retentionYears: RETENTION_YEARS,
     scanned,
-    deleted,
+    deletedFiles,
+    updatedRows,
     errors,
   });
 }

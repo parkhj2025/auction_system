@@ -42,6 +42,14 @@ export const AGENT_INFO = {
     "연락처 미정 (사업자등록 후 갱신)",
 } as const;
 
+/**
+ * 개인정보 열람·정정·삭제 요청 연락처. PDF 경고문, /privacy 페이지에 사용.
+ * 사업자등록 후 NEXT_PUBLIC_PRIVACY_CONTACT 환경변수로 실제 값 교체.
+ */
+export const PRIVACY_CONTACT =
+  process.env.NEXT_PUBLIC_PRIVACY_CONTACT ??
+  "연락처 준비 중 (사업자등록 후 갱신)";
+
 export const COMPANY = {
   name: BRAND_NAME,
   ceo: "박형준",

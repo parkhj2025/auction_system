@@ -1,4 +1,4 @@
-import { AGENT_INFO, COMPANY } from "@/lib/constants";
+import { AGENT_INFO, COMPANY, PRIVACY_CONTACT } from "@/lib/constants";
 
 export interface DelegationData {
   delegator: {
@@ -54,6 +54,20 @@ export const DELEGATION_CLAUSES: ReadonlyArray<string> = [
   "위임인은 수임인이 본 위임에 따라 한 매수신청을 위임인 본인의 행위로 인정합니다.",
 ];
 
+/**
+ * PDF 본문 하단에 인쇄되는 보존·파기·연락처 경고문.
+ * 근거: 전자상거래법 제6조 + 매수신청대리인 등록 등에 관한 규칙 제15조 → 5년 보관.
+ * Modal과 PDF 양쪽이 동일 데이터(formatted.retentionNotice)를 소비.
+ */
+export function buildRetentionNotice(): string {
+  return (
+    "본 문서는 매수신청대리 업무 기록으로 전자상거래법 제6조 및 「공인중개사의 " +
+    "매수신청대리인 등록 등에 관한 규칙」 제15조에 따라 5년간 보관되며, 기간 " +
+    "만료 후 자동 파기됩니다. 개인정보 열람·정정·삭제 요청: " +
+    PRIVACY_CONTACT
+  );
+}
+
 export interface DelegationFormatted {
   title: string;
   intro: string;
@@ -75,6 +89,8 @@ export interface DelegationFormatted {
     delegatorSignLabel: string;
     delegateSignLabel: string;
   };
+  /** PDF 본문 하단 + Modal 하단에 동일하게 표기되는 보존·파기·연락처 경고문 */
+  retentionNotice: string;
 }
 
 function formatKrwAmount(value: number): string {
@@ -135,5 +151,6 @@ export function formatDelegation(data: DelegationData): DelegationFormatted {
       delegatorSignLabel: `위임인: ${data.delegator.name} (서명)`,
       delegateSignLabel: `수임인: ${DELEGATE_INFO.ceoName} (인)`,
     },
+    retentionNotice: buildRetentionNotice(),
   };
 }

@@ -103,6 +103,10 @@ export function DelegationPreviewModal({ isOpen, onClose, data }: Props) {
             </div>
           </div>
 
+          <p className="mt-6 text-xs leading-5 text-[var(--color-ink-500)]">
+            {formatted.retentionNotice}
+          </p>
+
           <p className="mt-4 rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] p-3 text-xs leading-5 text-[var(--color-ink-500)]">
             * 미리보기에는 입력하신 주민번호 13자리가 그대로 표시됩니다. 실제
             제출 시 PDF의 서명 영역에는 서명 캔버스의 서명 이미지가 함께 인쇄되며,

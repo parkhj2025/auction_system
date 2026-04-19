@@ -46,10 +46,10 @@ async function generate(label: string, data: DelegationData, outPath: string) {
 }
 
 async function main() {
-  // PDF 뷰어 lock 회피용. 검증 후 형준님이 닫고 본 파일명(...-v2/-long.pdf)으로
-  // rename 또는 다음 빌드에서 자연 덮어쓰기.
-  await generate("default", baseSample, "scripts/sample-delegation-v3.pdf");
-  await generate("long-address", longAddressSample, "scripts/sample-delegation-long-v2.pdf");
+  // PDF 뷰어 lock 회피용. 검증 후 형준님이 닫고 본 파일명으로 rename 또는
+  // 다음 빌드에서 자연 덮어쓰기.
+  await generate("default", baseSample, "scripts/sample-delegation-v4.pdf");
+  await generate("long-address", longAddressSample, "scripts/sample-delegation-long-v3.pdf");
 }
 
 main().catch((err) => {

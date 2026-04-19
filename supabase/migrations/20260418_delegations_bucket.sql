@@ -7,6 +7,8 @@
 --       마이페이지에서 createSignedUrl(path, 60)으로 60초 만료 URL 발급.
 -- 기본 정책: anon/authenticated 직접 read 차단 (정책 미생성 + RLS 활성화).
 --           모든 read는 서버 측 service_role을 거쳐 signed URL로만 발급.
+-- 보존 기간: 5년 (전자상거래법 제6조 + 「공인중개사의 매수신청대리인 등록 등에
+--            관한 규칙」 제15조). cron 라우트 RETENTION_YEARS 상수 동기화 필요.
 -- ============================================================================
 
 -- 1. 버킷 생성 (private, 5MB 제한, application/pdf만 허용)
