@@ -8,6 +8,7 @@ import { SignatureCanvas } from "../SignatureCanvas";
 import { DelegationPreviewModal } from "../DelegationPreviewModal";
 import { formatKoreanWon } from "@/lib/utils";
 import { getKSTDateTimeIso } from "@/lib/datetime";
+import { VerifiedBadge } from "../VerifiedBadge";
 import type { DelegationData } from "@/lib/pdf/delegationTemplate";
 
 type AgreementKey = "agreedDelegation" | "agreedPrivacy" | "agreedTerms";
@@ -79,9 +80,12 @@ export function Step4Confirm({
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <p className="text-xs font-black uppercase tracking-wider text-brand-600">
-          Step 4
-        </p>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+            Step 4
+          </p>
+          <VerifiedBadge verified={data.verified} verifiedName={data.verifiedName} />
+        </div>
         <h2 className="mt-1 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
           서명하고 위임에 동의해 주세요
         </h2>

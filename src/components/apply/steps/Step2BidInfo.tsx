@@ -6,20 +6,38 @@ import type { ApplyFormData, ApplyBidInfo } from "@/types/apply";
 import { formatPhone } from "@/lib/apply";
 import { formatKoreanWon } from "@/lib/utils";
 import { FeeCalculator } from "../FeeCalculator";
+import { PhoneVerifyModal } from "../PhoneVerifyModal";
+import { VerifiedBadge } from "../VerifiedBadge";
+import type { PhoneVerifyResult } from "@/lib/auth/phoneVerify";
 
 export function Step2BidInfo({
   data,
   onBidInfoChange,
+  onVerified,
   onNext,
   onBack,
 }: {
   data: ApplyFormData;
   onBidInfoChange: (patch: Partial<ApplyBidInfo>) => void;
+  onVerified: (result: PhoneVerifyResult, verifiedName: string) => void;
   onNext: () => void;
   onBack: () => void;
 }) {
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // Step2 mount 시 미인증이면 모달 자동 오픈. verified=true면 처음부터 닫힘.
+  // 인증 후 닫힌 모달은 "본인인증 시작하기" 버튼으로 재오픈 가능 (verified=false인 경우).
+  const [verifyModalOpen, setVerifyModalOpen] = useState(!data.verified);
   const bid = data.bidInfo;
+  const inputsDisabled = !data.verified;
+
+  function handleVerified(result: PhoneVerifyResult, verifiedName: string) {
+    onVerified(result, verifiedName);
+    setVerifyModalOpen(false);
+    // 인증 시 입력한 이름을 신청인 이름에도 자동 채움 (수정 가능)
+    if (!bid.applicantName.trim()) {
+      onBidInfoChange({ applicantName: verifiedName });
+    }
+  }
   const bidAmountNum = Number(bid.bidAmount.replace(/[^\d]/g, "")) || 0;
   const minPrice = data.matchedPost?.minPrice ?? 0;
   const belowMin =
@@ -60,20 +78,37 @@ export function Step2BidInfo({
 
   return (
     <div className="flex flex-col gap-6">
-      <header>
-        <p className="text-xs font-black uppercase tracking-wider text-brand-600">
-          Step 2
-        </p>
-        <h2 className="mt-1 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
-          입찰 정보를 입력해주세요
-        </h2>
-        <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
-          입찰 희망 금액과 신청인 정보는 위임 서류 작성에 사용됩니다.
-          입력하신 정보는 암호화되어 전달되며 접수 외 용도로 사용되지 않습니다.
-        </p>
+      <header className="flex flex-col gap-3">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+            Step 2
+          </p>
+          <VerifiedBadge verified={data.verified} verifiedName={data.verifiedName} />
+        </div>
+        <div>
+          <h2 className="mt-1 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+            입찰 정보를 입력해주세요
+          </h2>
+          <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
+            입찰 희망 금액과 신청인 정보는 위임 서류 작성에 사용됩니다.
+            입력하신 정보는 암호화되어 전달되며 접수 외 용도로 사용되지 않습니다.
+          </p>
+        </div>
+        {!data.verified && (
+          <button
+            type="button"
+            onClick={() => setVerifyModalOpen(true)}
+            className="inline-flex w-fit items-center gap-2 rounded-[var(--radius-md)] border border-brand-600 bg-brand-50 px-4 py-2 text-xs font-bold text-brand-700 hover:bg-brand-100"
+          >
+            본인인증 시작하기
+          </button>
+        )}
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-[1.2fr_1fr]">
+      <fieldset
+        disabled={inputsDisabled}
+        className="grid gap-6 disabled:opacity-60 lg:grid-cols-[1.2fr_1fr]"
+      >
         <div className="flex flex-col gap-5 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">
           {/* 입찰 금액 */}
           <div>
@@ -320,7 +355,7 @@ export function Step2BidInfo({
         <aside>
           <FeeCalculator fm={data.matchedPost} bidAmount={bidAmountNum} />
         </aside>
-      </div>
+      </fieldset>
 
       <div className="flex items-center justify-between gap-3 pt-2">
         <button
@@ -334,12 +369,22 @@ export function Step2BidInfo({
         <button
           type="button"
           onClick={handleNext}
-          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-brand-700"
+          disabled={inputsDisabled}
+          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
         >
           다음: 서류 업로드
           <ArrowRight size={16} aria-hidden="true" />
         </button>
       </div>
+
+      {verifyModalOpen && (
+        <PhoneVerifyModal
+          initialName={bid.applicantName}
+          initialSsnFront={bid.ssnFront}
+          onVerified={handleVerified}
+          onClose={() => setVerifyModalOpen(false)}
+        />
+      )}
     </div>
   );
 }

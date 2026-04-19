@@ -69,6 +69,17 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
     value: boolean,
   ) => setData((d) => ({ ...d, [key]: value }));
 
+  const handleVerified = (
+    result: import("@/lib/auth/phoneVerify").PhoneVerifyResult,
+    verifiedName: string,
+  ) =>
+    setData((d) => ({
+      ...d,
+      verified: result.ok,
+      verifiedName: result.ok ? verifiedName : null,
+      verifiedAt: result.ok ? (result.mockedAt ?? null) : null,
+    }));
+
   function goNext() {
     const i = STEP_ORDER.indexOf(currentStep);
     if (i < 0 || i >= STEP_ORDER.length - 1) return;
@@ -210,6 +221,7 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
           <Step2BidInfo
             data={data}
             onBidInfoChange={mergeBidInfo}
+            onVerified={handleVerified}
             onNext={goNext}
             onBack={goBack}
           />

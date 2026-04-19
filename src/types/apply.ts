@@ -78,6 +78,12 @@ export interface ApplyFormData {
   agreedPrivacy: boolean;
   /** 서비스 이용약관 동의 */
   agreedTerms: boolean;
+  /** 휴대폰 본인인증 완료 여부 (Phase 5 — Stage 2C에서 실 SDK 결과로 대체) */
+  verified: boolean;
+  /** 본인인증 시점에 입력된 성명. 배지 표기용. */
+  verifiedName: string | null;
+  /** 본인인증 완료 KST ISO timestamp. */
+  verifiedAt: string | null;
 }
 
 export interface ApplySubmissionResult {
@@ -110,4 +116,7 @@ export const INITIAL_APPLY_DATA: ApplyFormData = {
   agreedDelegation: false,
   agreedPrivacy: false,
   agreedTerms: false,
+  verified: false,
+  verifiedName: null,
+  verifiedAt: null,
 };

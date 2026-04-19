@@ -3,6 +3,7 @@
 import { ArrowLeft, ArrowRight, Info } from "lucide-react";
 import type { ApplyFormData, ApplyDocuments } from "@/types/apply";
 import { FileUpload } from "../FileUpload";
+import { VerifiedBadge } from "../VerifiedBadge";
 
 export function Step3Documents({
   data,
@@ -21,9 +22,12 @@ export function Step3Documents({
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <p className="text-xs font-black uppercase tracking-wider text-brand-600">
-          Step 3
-        </p>
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+            Step 3
+          </p>
+          <VerifiedBadge verified={data.verified} verifiedName={data.verifiedName} />
+        </div>
         <h2 className="mt-1 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
           서류를 업로드해주세요
         </h2>
