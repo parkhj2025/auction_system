@@ -132,6 +132,11 @@ export function Step5Complete({
           전용계좌 송금
         </h3>
 
+        <p className="mt-2 rounded-[var(--radius-sm)] bg-white/60 px-3 py-2 text-xs leading-5 text-[var(--color-ink-700)]">
+          아래 전용계좌로 보증금을 송금하시면, 본 입찰 대리가 최종 확정됩니다. 송금
+          행위는 입찰 보증금 납부 및 대리 입찰 진행에 대한 동의로 간주됩니다.
+        </p>
+
         {/* 송금 금액 강조 */}
         <div className="mt-4 rounded-[var(--radius-lg)] border border-brand-600 bg-white p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">

@@ -63,7 +63,14 @@ export interface ApplyFormData {
   manualEntry: boolean;
   bidInfo: ApplyBidInfo;
   documents: ApplyDocuments;
-  checklist: boolean[];
+  /** 위임인 서명 (PNG base64 dataURL). 빈 캔버스면 null. Phase 3. */
+  signature: string | null;
+  /** 위임장 내용 확인 + 서명 위임 동의 */
+  agreedDelegation: boolean;
+  /** 개인정보 처리방침 동의 */
+  agreedPrivacy: boolean;
+  /** 서비스 이용약관 동의 */
+  agreedTerms: boolean;
 }
 
 export interface ApplySubmissionResult {
@@ -91,5 +98,8 @@ export const INITIAL_APPLY_DATA: ApplyFormData = {
     eSignFile: null,
     idFile: null,
   },
-  checklist: [false, false, false, false, false],
+  signature: null,
+  agreedDelegation: false,
+  agreedPrivacy: false,
+  agreedTerms: false,
 };

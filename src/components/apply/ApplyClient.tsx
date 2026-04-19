@@ -61,12 +61,13 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
   const mergeDocuments = (patch: Partial<ApplyDocuments>) =>
     setData((d) => ({ ...d, documents: { ...d.documents, ...patch } }));
 
-  const toggleChecklist = (idx: number, checked: boolean) =>
-    setData((d) => {
-      const next = [...d.checklist];
-      next[idx] = checked;
-      return { ...d, checklist: next };
-    });
+  const setSignature = (signature: string | null) =>
+    setData((d) => ({ ...d, signature }));
+
+  const setAgreement = (
+    key: "agreedDelegation" | "agreedPrivacy" | "agreedTerms",
+    value: boolean,
+  ) => setData((d) => ({ ...d, [key]: value }));
 
   function goNext() {
     const i = STEP_ORDER.indexOf(currentStep);
@@ -186,7 +187,8 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
         return (
           <Step4Confirm
             data={data}
-            onChecklistChange={toggleChecklist}
+            onSignatureChange={setSignature}
+            onAgreementChange={setAgreement}
             onSubmit={submit}
             onBack={goBack}
             submitting={submitting}
