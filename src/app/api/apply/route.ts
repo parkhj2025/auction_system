@@ -308,7 +308,7 @@ export async function POST(req: Request) {
       caseNumber,
     });
 
-    return NextResponse.json({ ok: true, applicationId });
+    return NextResponse.json({ ok: true, applicationId, orderId: order.id });
   } catch (err) {
     console.error("[apply] unexpected", err);
     return NextResponse.json(

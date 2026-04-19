@@ -34,6 +34,8 @@ export function Step2BidInfo({
       next.phone = "010-0000-0000 형식으로 입력해주세요.";
     if (!/^\d{6}$/.test(bid.ssnFront))
       next.ssnFront = "주민등록번호 앞 6자리를 숫자로 입력해주세요.";
+    if (!/^\d{7}$/.test(bid.ssnBack))
+      next.ssnBack = "주민등록번호 뒷 7자리를 숫자로 입력해주세요.";
     if (bid.jointBidding) {
       if (!bid.jointApplicantName.trim())
         next.jointApplicantName = "공동입찰인 이름을 입력해주세요.";
@@ -171,35 +173,54 @@ export function Step2BidInfo({
             </div>
           </div>
 
-          {/* 주민번호 앞 6자리 */}
+          {/* 주민번호 13자리 (앞 6 + 뒷 7) */}
           <div>
-            <label
-              htmlFor="applicant-ssn"
-              className="mb-2 block text-sm font-black text-[var(--color-ink-900)]"
-            >
-              주민등록번호 앞 6자리{" "}
-              <span className="text-[var(--color-accent-red)]">*</span>
+            <label className="mb-2 block text-sm font-black text-[var(--color-ink-900)]">
+              주민등록번호 <span className="text-[var(--color-accent-red)]">*</span>
             </label>
-            <input
-              id="applicant-ssn"
-              type="text"
-              inputMode="numeric"
-              maxLength={6}
-              placeholder="예: 900101"
-              value={bid.ssnFront}
-              onChange={(e) =>
-                onBidInfoChange({
-                  ssnFront: e.target.value.replace(/\D/g, "").slice(0, 6),
-                })
-              }
-              className={`${inputClass("ssnFront")} tabular-nums`}
-            />
+            <div className="flex items-center gap-2">
+              <input
+                id="applicant-ssn-front"
+                aria-label="주민등록번호 앞 6자리"
+                type="text"
+                inputMode="numeric"
+                maxLength={6}
+                placeholder="000000"
+                value={bid.ssnFront}
+                onChange={(e) =>
+                  onBidInfoChange({
+                    ssnFront: e.target.value.replace(/\D/g, "").slice(0, 6),
+                  })
+                }
+                className={`${inputClass("ssnFront")} tabular-nums`}
+              />
+              <span aria-hidden="true" className="text-[var(--color-ink-500)]">
+                -
+              </span>
+              <input
+                id="applicant-ssn-back"
+                aria-label="주민등록번호 뒷 7자리"
+                type="password"
+                inputMode="numeric"
+                maxLength={7}
+                placeholder="0000000"
+                value={bid.ssnBack}
+                onChange={(e) =>
+                  onBidInfoChange({
+                    ssnBack: e.target.value.replace(/\D/g, "").slice(0, 7),
+                  })
+                }
+                className={`${inputClass("ssnBack")} tabular-nums`}
+                autoComplete="off"
+              />
+            </div>
             <p className="mt-1 text-xs text-[var(--color-ink-500)]">
-              위임장 작성에만 사용되며 뒷자리는 받지 않습니다.
+              위임장 PDF 작성에만 사용됩니다. 뒷 7자리는 DB에 저장되지 않으며,
+              PDF 생성 직후 메모리에서 즉시 폐기됩니다.
             </p>
-            {errors.ssnFront && (
+            {(errors.ssnFront || errors.ssnBack) && (
               <p className="mt-1 text-xs text-[var(--color-accent-red)]">
-                {errors.ssnFront}
+                {errors.ssnFront ?? errors.ssnBack}
               </p>
             )}
           </div>

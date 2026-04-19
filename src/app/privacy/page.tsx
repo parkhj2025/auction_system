@@ -13,7 +13,7 @@ export default function PrivacyPage() {
       title="개인정보처리방침"
       intro={`${COMPANY.name}(이하 "회사")은 이용자의 개인정보를 소중히 다루며, 개인정보 보호법 등 관련 법령을 준수합니다. 본 방침은 회사가 수집·이용·보관·파기하는 개인정보의 항목과 처리 방식에 관해 설명합니다.`}
       effectiveDate="2026-04-14"
-      lastUpdated="2026-04-14"
+      lastUpdated="2026-04-19"
     >
       <Article number="01" title="수집하는 개인정보의 항목">
         <p>회사는 서비스 제공을 위해 다음과 같은 개인정보를 수집합니다.</p>
@@ -22,8 +22,23 @@ export default function PrivacyPage() {
             <strong className="font-black text-[var(--color-ink-900)]">
               필수 항목
             </strong>
-            : 성명, 연락처(휴대전화), 주민등록번호 앞 6자리(위임장 작성 목적),
-            사건번호, 입찰 희망 금액
+            : 성명, 연락처(휴대전화), 사건번호, 입찰 희망 금액
+          </li>
+          <li>
+            <strong className="font-black text-[var(--color-ink-900)]">
+              주민등록번호 앞 6자리
+            </strong>
+            : 위임장 작성 목적. 회사 데이터베이스에 보관되며, 입찰이 종료된
+            상태(낙찰·패찰·취하 등)로 전이되는 시점에 자동 NULL 처리됩니다.
+          </li>
+          <li>
+            <strong className="font-black text-[var(--color-ink-900)]">
+              주민등록번호 뒷 7자리
+            </strong>
+            : 위임장 PDF 생성 시점에만 사용됩니다. 회사 데이터베이스에는
+            <strong> 저장되지 않으며</strong>, PDF 생성 직후 메모리에서 즉시
+            폐기됩니다. 생성된 위임장 PDF는 매수신청대리 업무 기록 보존 의무에
+            따라 비공개 보관 영역에 <strong>3년</strong> 보관 후 자동 삭제됩니다.
           </li>
           <li>
             <strong className="font-black text-[var(--color-ink-900)]">

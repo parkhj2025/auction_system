@@ -104,9 +104,10 @@ export function DelegationPreviewModal({ isOpen, onClose, data }: Props) {
           </div>
 
           <p className="mt-4 rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] p-3 text-xs leading-5 text-[var(--color-ink-500)]">
-            * 미리보기에서 주민번호 뒷자리와 서명 이미지는 표시되지 않습니다. 실제
-            제출 시 서명 캔버스의 서명과 입력하신 주민번호 뒷자리가 위임장 PDF에
-            함께 인쇄됩니다.
+            * 미리보기에는 입력하신 주민번호 13자리가 그대로 표시됩니다. 실제
+            제출 시 PDF의 서명 영역에는 서명 캔버스의 서명 이미지가 함께 인쇄되며,
+            주민번호 뒷자리는 PDF 생성 직후 메모리에서 폐기되고 DB에는 저장되지
+            않습니다.
           </p>
         </div>
       </div>

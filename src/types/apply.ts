@@ -38,7 +38,14 @@ export interface ApplyBidInfo {
   bidAmount: string; // 원 단위 문자열. 최종 제출 시 숫자 변환
   applicantName: string;
   phone: string;
-  ssnFront: string; // 주민등록번호 앞 6자리
+  ssnFront: string; // 주민등록번호 앞 6자리 (DB ssn_front, status 종료 시 자동 NULL)
+  /**
+   * 주민등록번호 뒷 7자리.
+   * **메모리 전용** — DB에 저장되지 않는다.
+   * 위임장 PDF 생성 시점에만 사용 → 업로드 성공 후 즉시 클리어.
+   * (Phase 4 정책 — 2026-04-19)
+   */
+  ssnBack: string;
   jointBidding: boolean;
   jointApplicantName: string;
   jointApplicantPhone: string;
@@ -89,6 +96,7 @@ export const INITIAL_APPLY_DATA: ApplyFormData = {
     applicantName: "",
     phone: "",
     ssnFront: "",
+    ssnBack: "",
     jointBidding: false,
     jointApplicantName: "",
     jointApplicantPhone: "",

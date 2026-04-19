@@ -118,6 +118,7 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
       const json = (await res.json()) as {
         ok: boolean;
         applicationId?: string;
+        orderId?: string;
         error?: string;
       };
       if (res.status === 401) {
@@ -129,9 +130,34 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
             "해당 물건은 이미 다른 고객의 접수가 진행 중입니다. 중복 접수는 불가합니다."
         );
       }
-      if (!json.ok || !json.applicationId) {
+      if (!json.ok || !json.applicationId || !json.orderId) {
         throw new Error(json.error ?? "접수 처리 중 오류가 발생했습니다.");
       }
+
+      // 위임장 PDF 생성 + Storage 업로드. ssnBack은 이 호출의 응답이 ok일 때만 클리어.
+      // 네트워크/서버 오류로 업로드 실패 시 ssnBack을 보존하여 재시도 가능하게 한다.
+      const pdfRes = await fetch(
+        `/api/orders/${json.orderId}/generate-delegation`,
+        {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            ssnBack: data.bidInfo.ssnBack,
+            signatureDataUrl: data.signature,
+          }),
+        }
+      );
+      if (!pdfRes.ok) {
+        const pdfErr = await pdfRes
+          .json()
+          .catch(() => ({ error: "위임장 PDF 생성 중 오류가 발생했습니다." }));
+        throw new Error(
+          pdfErr.error ?? "위임장 PDF 생성 중 오류가 발생했습니다.",
+        );
+      }
+      // Storage 업로드 완료 → ssnBack을 메모리에서 즉시 클리어.
+      mergeBidInfo({ ssnBack: "" });
+
       setApplicationId(json.applicationId);
       setCompleted((prev) => {
         const next = new Set(prev);

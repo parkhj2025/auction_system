@@ -53,7 +53,7 @@ export function Step4Confirm({
       delegator: {
         name: bid.applicantName,
         ssnFront: bid.ssnFront,
-        ssnBack: "", // Phase 4에서 입력. 모달은 placeholder.
+        ssnBack: bid.ssnBack,
         address: data.matchedPost?.address ?? "",
         phone: bid.phone,
       },
