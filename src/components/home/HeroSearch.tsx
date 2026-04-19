@@ -240,52 +240,50 @@ export function HeroSearch() {
                     className="h-12 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-base text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]"
                   />
 
-                  {/* Typeahead 드롭다운 */}
-                  {showDropdown && (
-                    <div
-                      ref={dropdownRef}
-                      className="absolute left-0 right-0 top-full z-50 mt-1 max-h-80 overflow-y-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white shadow-[var(--shadow-lift)]"
-                    >
-                      {suggestions.length > 0 ? (
-                        suggestions.map((item, idx) => (
-                          <button
-                            key={item.docid}
-                            type="button"
-                            onClick={() => selectSuggestion(item)}
-                            className={cn(
-                              "flex w-full flex-col gap-0.5 border-b border-[var(--color-border)] px-4 py-3 text-left transition last:border-b-0",
-                              idx === activeIdx
-                                ? "bg-brand-50"
-                                : "hover:bg-[var(--color-surface-muted)]"
+                  {/* Typeahead 드롭다운 — 결과 있거나 검색 중일 때만 노출.
+                      빈 결과(데이터 결핍 자인) 메시지 미노출 — Lessons Learned [B] UX 무언화 원칙 (2026-04-19). */}
+                  {showDropdown &&
+                    (suggestions.length > 0 || searching) && (
+                      <div
+                        ref={dropdownRef}
+                        className="absolute left-0 right-0 top-full z-50 mt-1 max-h-80 overflow-y-auto rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white shadow-[var(--shadow-lift)]"
+                      >
+                        {suggestions.length > 0
+                          ? suggestions.map((item, idx) => (
+                              <button
+                                key={item.docid}
+                                type="button"
+                                onClick={() => selectSuggestion(item)}
+                                className={cn(
+                                  "flex w-full flex-col gap-0.5 border-b border-[var(--color-border)] px-4 py-3 text-left transition last:border-b-0",
+                                  idx === activeIdx
+                                    ? "bg-brand-50"
+                                    : "hover:bg-[var(--color-surface-muted)]",
+                                )}
+                              >
+                                <span className="text-sm font-bold text-[var(--color-ink-900)]">
+                                  {item.case_number}
+                                  <span className="ml-2 text-xs font-medium text-[var(--color-ink-500)]">
+                                    {item.court_name}
+                                  </span>
+                                </span>
+                                <span className="text-xs text-[var(--color-ink-500)]">
+                                  {item.address_display}
+                                </span>
+                                <span className="text-xs text-[var(--color-ink-500)]">
+                                  {item.bid_date}
+                                  {item.min_bid_amount != null &&
+                                    ` · 최저가 ${formatKoreanWon(item.min_bid_amount)}`}
+                                </span>
+                              </button>
+                            ))
+                          : (
+                              <p className="px-4 py-3 text-xs text-[var(--color-ink-500)]">
+                                검색 중...
+                              </p>
                             )}
-                          >
-                            <span className="text-sm font-bold text-[var(--color-ink-900)]">
-                              {item.case_number}
-                              <span className="ml-2 text-xs font-medium text-[var(--color-ink-500)]">
-                                {item.court_name}
-                              </span>
-                            </span>
-                            <span className="text-xs text-[var(--color-ink-500)]">
-                              {item.address_display}
-                            </span>
-                            <span className="text-xs text-[var(--color-ink-500)]">
-                              {item.bid_date}
-                              {item.min_bid_amount != null &&
-                                ` · 최저가 ${formatKoreanWon(item.min_bid_amount)}`}
-                            </span>
-                          </button>
-                        ))
-                      ) : searching ? (
-                        <p className="px-4 py-3 text-xs text-[var(--color-ink-500)]">
-                          검색 중...
-                        </p>
-                      ) : (
-                        <p className="px-4 py-3 text-xs text-[var(--color-ink-500)]">
-                          해당 사건을 찾을 수 없습니다
-                        </p>
-                      )}
-                    </div>
-                  )}
+                      </div>
+                    )}
                 </div>
               </>
             ) : (
