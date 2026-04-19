@@ -14,6 +14,7 @@ import { BRAND_NAME, COURTS_ALL, groupCourtsByRegion } from "@/lib/constants";
 import { formatKoreanWon } from "@/lib/utils";
 import { PhotoGallery } from "../PhotoGallery";
 import { CaseConfirmCard } from "../CaseConfirmCard";
+import { CaseConfirmModal } from "../CaseConfirmModal";
 
 /**
  * Step 1 — 법원 + 사건번호 입력 + 사건 정보 확인.
@@ -524,12 +525,17 @@ export function Step1Property({
         </div>
       )}
 
-      {/* Phase 4-CONFIRM: 사건 정보 확인 카드 (두 경로 동일 UX) */}
+      {/* Phase 4-CONFIRM: 사건 정보 확인 카드 + 강제 모달.
+          - matched: 인라인 카드 + 인라인 체크박스
+          - manual: 강제 모달(미확인 상태) → "확인" 클릭 후 인라인 읽기 전용 카드 + "정보 수정" 버튼 */}
       {showMatchedConfirm && (
         <CaseConfirmCard data={data} onChange={onChange} mode="matched" />
       )}
       {showManualConfirm && (
         <CaseConfirmCard data={data} onChange={onChange} mode="manual" />
+      )}
+      {showManualConfirm && !data.caseConfirmedByUser && (
+        <CaseConfirmModal data={data} onChange={onChange} />
       )}
 
       <div className="flex items-center justify-end gap-3 pt-2">

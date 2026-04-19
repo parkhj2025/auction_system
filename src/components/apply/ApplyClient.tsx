@@ -89,8 +89,24 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
     const i = STEP_ORDER.indexOf(currentStep);
     if (i < 0 || i >= STEP_ORDER.length - 1) return;
     const nextStep = STEP_ORDER[i + 1];
-    // Phase 4-CONFIRM: Step4 진입 시 bidDate + caseConfirmedByUser 둘 다 보장.
-    // manualEntry 경로도 Step1 CaseConfirmCard에서 채운 값으로 통과 가능.
+    // Phase 4-CONFIRM 회귀 수정: property → 이후 모든 step 전환 시 bidDate + caseConfirmedByUser 게이트 적용.
+    // 기존(Phase 4-CONFIRM 1차)는 nextStep === "confirm"에서만 발동했으나,
+    // Step1 → Step2 race condition으로 manualEntry 경로가 무방비 진입 가능 → 이중 방어.
+    // Step1Property 강제 모달이 1차 방어선, 본 가드가 2차 방어선.
+    if (
+      currentStep === "property" &&
+      (!data.bidDate || !data.caseConfirmedByUser)
+    ) {
+      setSubmitError(
+        "Step1에서 매각기일 확인 + 사건 정보 동의를 완료해주세요.",
+      );
+      // 이미 property 단계이므로 setCurrentStep 호출 불필요 — 진입 차단만.
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      return;
+    }
+    // Step4(confirm) 진입 직전 재확인 (3차 방어 — 이전 단계에서 reset된 경우 차단)
     if (nextStep === "confirm" && (!data.bidDate || !data.caseConfirmedByUser)) {
       setSubmitError(
         "Step1에서 매각기일 확인 + 사건 정보 동의 체크박스를 모두 완료해주세요.",

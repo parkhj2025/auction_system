@@ -214,8 +214,9 @@ export async function generateDelegationPdf(
         });
 
       // 서명 블록 (병렬 배치 — 위임인 좌, 수임인 우)
+      // Phase 4-CONFIRM 회귀: 라벨↔박스 gap 12 → 18로 +6pt 확보 (라벨 폰트 10.5pt와 박스 상단 겹침 방지)
       const labelY = dateY + 18;
-      const boxY = labelY + 12;
+      const boxY = labelY + 18;
 
       const totalSigW = SIG_BOX_W * 2 + SIG_GAP;
       const sigStartX = x + (innerW - totalSigW) / 2;

@@ -1,30 +1,11 @@
 "use client";
 
-import { CheckCircle2 } from "lucide-react";
+import { CheckCircle2, Edit3 } from "lucide-react";
 import type { ApplyFormData } from "@/types/apply";
-import type { PropertyType } from "@/types/content";
 import {
   CASE_CONFIRM_CHECKBOX_LABEL,
-  USER_INPUT_LIABILITY_NOTICE,
 } from "@/lib/legal";
 import { getKSTDateTimeIso } from "@/lib/datetime";
-
-const PROPERTY_TYPE_OPTIONS: PropertyType[] = [
-  "아파트",
-  "다세대주택",
-  "빌라",
-  "오피스텔",
-  "단독주택",
-  "토지",
-  "상가",
-  "공장",
-  "기타",
-];
-
-const OTHER_PREFIX = "기타 - ";
-
-const inputClass =
-  "h-12 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-sm text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]";
 
 interface Props {
   data: ApplyFormData;
@@ -32,21 +13,21 @@ interface Props {
   mode: "matched" | "manual";
 }
 
-function getSelectValue(v: string): string {
-  if (!v) return "";
-  if (v === "기타" || v.startsWith(OTHER_PREFIX)) return "기타";
-  return v;
-}
-
-function getOtherText(v: string): string {
-  if (v.startsWith(OTHER_PREFIX)) return v.slice(OTHER_PREFIX.length);
-  return "";
-}
-
+/**
+ * 사건 정보 확인 카드 (Phase 4-CONFIRM 회귀 수정 — P0-2).
+ *
+ * mode="matched": 매칭 성공 시 자동 채움된 정보 읽기 전용 + 인라인 체크박스
+ *   → 체크 ON 시 즉시 caseConfirmedByUser=true + caseConfirmedAt set
+ *
+ * mode="manual": 강제 모달이 입력 + 체크 + "확인" 처리.
+ *   - caseConfirmedByUser=true 시: 읽기 전용 요약 + "정보 수정" 버튼
+ *     (수정 버튼 클릭 시 caseConfirmedByUser=false reset → 모달 재오픈)
+ *   - caseConfirmedByUser=false 시: null 반환 (모달이 처리 중이므로 인라인 표시 안 함)
+ */
 export function CaseConfirmCard({ data, onChange, mode }: Props) {
-  const isManual = mode === "manual";
-  const selectValue = getSelectValue(data.propertyType);
-  const otherText = getOtherText(data.propertyType);
+  if (mode === "manual" && !data.caseConfirmedByUser) {
+    return null;
+  }
 
   function handleCheck(checked: boolean) {
     onChange({
@@ -55,156 +36,88 @@ export function CaseConfirmCard({ data, onChange, mode }: Props) {
     });
   }
 
-  function handleSelectPropertyType(value: string) {
-    onChange({ propertyType: value });
-  }
-
-  function handleOtherTextChange(text: string) {
+  function handleEditManual() {
+    // caseConfirmedByUser=false reset → Step1Property에서 모달 재오픈
     onChange({
-      propertyType: text.trim() ? `${OTHER_PREFIX}${text}` : "기타",
+      caseConfirmedByUser: false,
+      caseConfirmedAt: null,
     });
   }
 
+  const isManual = mode === "manual";
+
   return (
     <section className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">
-      <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
-        {isManual ? "사건 정보 직접 입력" : "사건 정보 확인"}
-      </h3>
+      <div className="flex items-start justify-between gap-3">
+        <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
+          {isManual ? "사건 정보 (직접 입력 완료)" : "사건 정보 확인"}
+        </h3>
+        {isManual && (
+          <button
+            type="button"
+            onClick={handleEditManual}
+            className="inline-flex items-center gap-1 text-xs font-bold text-brand-600 underline-offset-2 hover:underline"
+          >
+            <Edit3 size={12} aria-hidden="true" />
+            정보 수정
+          </button>
+        )}
+      </div>
 
-      {isManual ? (
-        <>
-          <p className="mt-2 text-xs leading-5 text-[var(--color-ink-500)]">
-            대법원 경매정보 매칭이 되지 않아 직접 입력이 필요합니다. 매각기일은
-            법원 공고를 직접 확인해주세요.
-          </p>
-
-          <div className="mt-5 grid gap-4 sm:grid-cols-2">
-            <div>
-              <label
-                htmlFor="confirm-bid-date"
-                className="mb-1 block text-xs font-bold text-[var(--color-ink-700)]"
-              >
-                매각기일
-              </label>
-              <input
-                id="confirm-bid-date"
-                type="date"
-                value={data.bidDate}
-                onChange={(e) => onChange({ bidDate: e.target.value })}
-                className={inputClass}
-              />
-            </div>
-            <div>
-              <label
-                htmlFor="confirm-property-type"
-                className="mb-1 block text-xs font-bold text-[var(--color-ink-700)]"
-              >
-                물건 종류
-              </label>
-              <select
-                id="confirm-property-type"
-                value={selectValue}
-                onChange={(e) => handleSelectPropertyType(e.target.value)}
-                className={inputClass}
-              >
-                <option value="">선택해주세요</option>
-                {PROPERTY_TYPE_OPTIONS.map((t) => (
-                  <option key={t} value={t}>
-                    {t}
-                  </option>
-                ))}
-              </select>
-            </div>
-            {selectValue === "기타" && (
-              <div className="sm:col-span-2">
-                <label
-                  htmlFor="confirm-property-type-other"
-                  className="mb-1 block text-xs font-bold text-[var(--color-ink-700)]"
-                >
-                  물건 종류 (직접 입력)
-                </label>
-                <input
-                  id="confirm-property-type-other"
-                  type="text"
-                  placeholder="예: 임야, 근린생활시설 등"
-                  value={otherText}
-                  onChange={(e) => handleOtherTextChange(e.target.value)}
-                  className={inputClass}
-                />
-              </div>
-            )}
-            <div className="sm:col-span-2">
-              <label
-                htmlFor="confirm-property-address"
-                className="mb-1 block text-xs font-bold text-[var(--color-ink-700)]"
-              >
-                물건 주소
-              </label>
-              <input
-                id="confirm-property-address"
-                type="text"
-                placeholder="예: 인천광역시 미추홀구 ..."
-                value={data.propertyAddress}
-                onChange={(e) => onChange({ propertyAddress: e.target.value })}
-                className={inputClass}
-              />
-            </div>
-          </div>
-
-          <div className="mt-5 rounded-[var(--radius-md)] border border-[var(--color-accent-red)] bg-[var(--color-accent-red-soft)] p-4">
-            <p className="text-xs font-bold text-[var(--color-accent-red)]">
-              위임인 책임
-            </p>
-            <p className="mt-1 text-xs leading-5 text-[var(--color-ink-700)]">
-              {USER_INPUT_LIABILITY_NOTICE}
-            </p>
-          </div>
-        </>
-      ) : (
-        <>
-          <p className="mt-2 text-xs leading-5 text-[var(--color-ink-500)]">
-            위 사건 정보가 본인이 의뢰하려는 사건과 일치하는지 확인해주세요.
-          </p>
-          <dl className="mt-4 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
-            <div>
-              <dt className="text-xs text-[var(--color-ink-500)]">매각기일</dt>
-              <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
-                {data.bidDate || "-"}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs text-[var(--color-ink-500)]">물건 종류</dt>
-              <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
-                {data.propertyType || "-"}
-              </dd>
-            </div>
-            <div className="sm:col-span-2">
-              <dt className="text-xs text-[var(--color-ink-500)]">주소</dt>
-              <dd className="mt-1 text-sm text-[var(--color-ink-700)]">
-                {data.propertyAddress || "-"}
-              </dd>
-            </div>
-          </dl>
-        </>
+      {!isManual && (
+        <p className="mt-2 text-xs leading-5 text-[var(--color-ink-500)]">
+          위 사건 정보가 본인이 의뢰하려는 사건과 일치하는지 확인해주세요.
+        </p>
       )}
 
-      <label className="mt-5 flex cursor-pointer items-start gap-3">
-        <input
-          type="checkbox"
-          checked={data.caseConfirmedByUser}
-          onChange={(e) => handleCheck(e.target.checked)}
-          className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-brand-600"
-        />
-        <span className="flex-1 text-sm leading-6 text-[var(--color-ink-900)]">
-          {CASE_CONFIRM_CHECKBOX_LABEL}
-          {data.caseConfirmedByUser && data.caseConfirmedAt && (
-            <span className="ml-2 inline-flex items-center gap-1 text-xs text-[var(--color-ink-500)]">
-              <CheckCircle2 size={12} aria-hidden="true" />
-              확인 시각 기록됨
-            </span>
-          )}
-        </span>
-      </label>
+      <dl className="mt-4 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+        <div>
+          <dt className="text-xs text-[var(--color-ink-500)]">매각기일</dt>
+          <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
+            {data.bidDate || "-"}
+          </dd>
+        </div>
+        <div>
+          <dt className="text-xs text-[var(--color-ink-500)]">물건 종류</dt>
+          <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
+            {data.propertyType || "-"}
+          </dd>
+        </div>
+        <div className="sm:col-span-2">
+          <dt className="text-xs text-[var(--color-ink-500)]">주소</dt>
+          <dd className="mt-1 text-sm text-[var(--color-ink-700)]">
+            {data.propertyAddress || "-"}
+          </dd>
+        </div>
+      </dl>
+
+      {!isManual && (
+        // matched 경로: 인라인 체크박스. manual 경로는 모달의 "확인"이 이미 set한 상태이므로 체크박스 불필요.
+        <label className="mt-5 flex cursor-pointer items-start gap-3">
+          <input
+            type="checkbox"
+            checked={data.caseConfirmedByUser}
+            onChange={(e) => handleCheck(e.target.checked)}
+            className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-brand-600"
+          />
+          <span className="flex-1 text-sm leading-6 text-[var(--color-ink-900)]">
+            {CASE_CONFIRM_CHECKBOX_LABEL}
+            {data.caseConfirmedByUser && data.caseConfirmedAt && (
+              <span className="ml-2 inline-flex items-center gap-1 text-xs text-[var(--color-ink-500)]">
+                <CheckCircle2 size={12} aria-hidden="true" />
+                확인 시각 기록됨
+              </span>
+            )}
+          </span>
+        </label>
+      )}
+
+      {isManual && data.caseConfirmedAt && (
+        <p className="mt-4 inline-flex items-center gap-1 text-xs text-[var(--color-ink-500)]">
+          <CheckCircle2 size={12} aria-hidden="true" />
+          확인 시각 기록됨 · 위임인 책임 조항 동의 완료
+        </p>
+      )}
     </section>
   );
 }
