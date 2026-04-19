@@ -57,175 +57,135 @@ export function Step1Property({
   const selectedCourt = COURTS_ALL.find((c) => c.label === data.court);
   const courtCode = selectedCourt?.courtCode ?? "";
 
+  // Phase 6 회귀 수정 (P0): 사용자 caseNumber 변경 시 매칭 state reset만 처리.
+  // 매칭 조회는 명시적 액션(Enter/Blur/"사건번호 확인" 버튼)에서만 발동 — onChange 실시간 조회 완전 제거.
+  // 정규식 \d+가 1자리 이상 허용하여 타이핑 중 모든 중간값이 트리거되던 문제 본질적 해결.
   useEffect(() => {
+    setCaseTaken(false);
+    setListings([]);
+    if (
+      data.matchedPost ||
+      data.matchedListing ||
+      data.manualEntry ||
+      data.bidDate ||
+      data.propertyType ||
+      data.propertyAddress ||
+      data.caseConfirmedByUser
+    ) {
+      latestPatchRef.current({
+        matchedPost: null,
+        matchedListing: null,
+        manualEntry: false,
+        bidDate: "",
+        propertyType: "",
+        propertyAddress: "",
+        caseConfirmedByUser: false,
+        caseConfirmedAt: null,
+      });
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [data.caseNumber, courtCode]);
+
+  /**
+   * 사건번호 매칭 조회 — 명시적 액션 트리거 (Phase 6 회귀 수정 P0).
+   * 트리거 3곳: input onKeyDown(Enter), input onBlur, "사건번호 확인" 버튼.
+   * 빈 입력 / 정규식 미통과 / 이미 조회 중 → 즉시 return.
+   */
+  async function triggerLookup() {
     const q = data.caseNumber.trim();
+    if (!q) return;
+    if (!CASE_NUMBER_PATTERN.test(q)) return;
+    if (checking) return;
 
-    if (!q) {
-      setCaseTaken(false);
-      setChecking(false);
-      setListings([]);
-      if (
-        data.matchedPost ||
-        data.matchedListing ||
-        data.manualEntry ||
-        data.bidDate ||
-        data.propertyType ||
-        data.propertyAddress ||
-        data.caseConfirmedByUser
-      ) {
+    setChecking(true);
+    try {
+      const res = await fetch("/api/orders/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ caseNumber: q, courtCode, courtName: data.court }),
+      });
+
+      if (res.status === 401) {
+        setCaseTaken(false);
+        setListings([]);
+        return;
+      }
+
+      const json = (await res.json()) as {
+        available?: boolean | null;
+        reason?: string;
+        listings?: CourtListingSummary[];
+      };
+
+      setCaseTaken(json.available === false);
+
+      const resultListings = json.listings ?? [];
+      setListings(resultListings);
+
+      if (resultListings.length === 1) {
+        const l = resultListings[0];
         latestPatchRef.current({
+          matchedListing: l,
           matchedPost: null,
-          matchedListing: null,
           manualEntry: false,
-          bidDate: "",
-          propertyType: "",
-          propertyAddress: "",
+          bidDate: l.bid_date ?? "",
+          propertyType: l.usage_name ?? "",
+          propertyAddress: l.address_display ?? "",
           caseConfirmedByUser: false,
           caseConfirmedAt: null,
         });
-      }
-      return;
-    }
-
-    // Phase 6.3 회귀 수정: 정규식 미통과 부분 입력 시 매칭/모달 차단.
-    // 사용자가 사건번호를 끝까지 타이핑할 때까지 manualEntry 자동 진입 차단.
-    if (!CASE_NUMBER_PATTERN.test(q)) {
-      setCaseTaken(false);
-      setChecking(false);
-      setListings([]);
-      if (
-        data.matchedPost ||
-        data.matchedListing ||
-        data.manualEntry ||
-        data.bidDate ||
-        data.propertyType ||
-        data.propertyAddress ||
-        data.caseConfirmedByUser
-      ) {
-        latestPatchRef.current({
-          matchedPost: null,
-          matchedListing: null,
-          manualEntry: false,
-          bidDate: "",
-          propertyType: "",
-          propertyAddress: "",
-          caseConfirmedByUser: false,
-          caseConfirmedAt: null,
-        });
-      }
-      return;
-    }
-
-    const handle = setTimeout(async () => {
-      setChecking(true);
-      try {
-        const res = await fetch("/api/orders/check", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ caseNumber: q, courtCode, courtName: data.court }),
-        });
-
-        if (res.status === 401) {
-          setCaseTaken(false);
-          setListings([]);
-          return;
-        }
-
-        const json = (await res.json()) as {
-          available?: boolean | null;
-          reason?: string;
-          listings?: CourtListingSummary[];
-        };
-
-        setCaseTaken(json.available === false);
-
-        const resultListings = json.listings ?? [];
-        setListings(resultListings);
-
-        if (resultListings.length === 1) {
-          const l = resultListings[0];
+      } else if (resultListings.length === 0) {
+        const fmMatch =
+          posts.find((p) => p.caseNumber === q) ??
+          posts.find(
+            (p) =>
+              p.caseNumber.replace(/\s/g, "") === q.replace(/\s/g, "")
+          );
+        if (fmMatch) {
           latestPatchRef.current({
-            matchedListing: l,
-            matchedPost: null,
+            matchedPost: fmMatch,
+            matchedListing: null,
+            caseNumber: fmMatch.caseNumber,
             manualEntry: false,
-            bidDate: l.bid_date ?? "",
-            propertyType: l.usage_name ?? "",
-            propertyAddress: l.address_display ?? "",
+            bidDate: fmMatch.bidDate,
+            propertyType: fmMatch.propertyType,
+            propertyAddress: fmMatch.address,
             caseConfirmedByUser: false,
             caseConfirmedAt: null,
           });
-        } else if (resultListings.length === 0) {
-          const fmMatch =
-            posts.find((p) => p.caseNumber === q) ??
-            posts.find(
-              (p) =>
-                p.caseNumber.replace(/\s/g, "") === q.replace(/\s/g, "")
-            );
-
-          if (fmMatch) {
-            if (data.matchedPost?.slug !== fmMatch.slug) {
-              latestPatchRef.current({
-                matchedPost: fmMatch,
-                matchedListing: null,
-                caseNumber: fmMatch.caseNumber,
-                manualEntry: false,
-                bidDate: fmMatch.bidDate,
-                propertyType: fmMatch.propertyType,
-                propertyAddress: fmMatch.address,
-                caseConfirmedByUser: false,
-                caseConfirmedAt: null,
-              });
-            }
-          } else {
-            // 매칭 0건 → manualEntry 모드 자동 진입
-            if (
-              data.matchedPost ||
-              data.matchedListing ||
-              !data.manualEntry
-            ) {
-              latestPatchRef.current({
-                matchedPost: null,
-                matchedListing: null,
-                manualEntry: true,
-                bidDate: "",
-                propertyType: "",
-                propertyAddress: "",
-                caseConfirmedByUser: false,
-                caseConfirmedAt: null,
-              });
-            }
-          }
         } else {
-          // 복수 매칭 → 선택 대기
-          if (
-            data.matchedListing ||
-            data.matchedPost ||
-            data.manualEntry ||
-            data.caseConfirmedByUser
-          ) {
-            latestPatchRef.current({
-              matchedPost: null,
-              matchedListing: null,
-              manualEntry: false,
-              bidDate: "",
-              propertyType: "",
-              propertyAddress: "",
-              caseConfirmedByUser: false,
-              caseConfirmedAt: null,
-            });
-          }
+          // 매칭 0건 → manualEntry 자동 진입 → CaseConfirmModal 노출 트리거
+          latestPatchRef.current({
+            matchedPost: null,
+            matchedListing: null,
+            manualEntry: true,
+            bidDate: "",
+            propertyType: "",
+            propertyAddress: "",
+            caseConfirmedByUser: false,
+            caseConfirmedAt: null,
+          });
         }
-      } catch {
-        setCaseTaken(false);
-        setListings([]);
-      } finally {
-        setChecking(false);
+      } else {
+        // 복수 매칭 → 사용자가 selectListing으로 선택 대기
+        latestPatchRef.current({
+          matchedPost: null,
+          matchedListing: null,
+          manualEntry: false,
+          bidDate: "",
+          propertyType: "",
+          propertyAddress: "",
+          caseConfirmedByUser: false,
+          caseConfirmedAt: null,
+        });
       }
-    }, 600);
-
-    return () => clearTimeout(handle);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [data.caseNumber, courtCode, posts]);
+    } catch {
+      setCaseTaken(false);
+      setListings([]);
+    } finally {
+      setChecking(false);
+    }
+  }
 
   const isNonServicedCourt = selectedCourt && !selectedCourt.isServiced;
 
@@ -316,19 +276,39 @@ export function Step1Property({
             >
               사건번호
             </label>
-            <input
-              id="step1-case"
-              type="text"
-              placeholder="예: 2024타경12345"
-              value={data.caseNumber}
-              onChange={(e) => onChange({ caseNumber: e.target.value })}
-              className="h-12 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-base tabular-nums text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]"
-            />
+            <div className="flex gap-2">
+              <input
+                id="step1-case"
+                type="text"
+                placeholder="예: 2024타경12345"
+                value={data.caseNumber}
+                onChange={(e) => onChange({ caseNumber: e.target.value })}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    e.preventDefault();
+                    void triggerLookup();
+                  }
+                }}
+                onBlur={() => void triggerLookup()}
+                className="h-12 flex-1 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-base tabular-nums text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]"
+              />
+              <button
+                type="button"
+                onClick={() => void triggerLookup()}
+                disabled={
+                  checking || !CASE_NUMBER_PATTERN.test(data.caseNumber.trim())
+                }
+                className="inline-flex h-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-brand-600 bg-white px-4 text-sm font-bold text-brand-700 hover:bg-brand-50 disabled:cursor-not-allowed disabled:border-[var(--color-border)] disabled:bg-[var(--color-ink-100)] disabled:text-[var(--color-ink-500)]"
+              >
+                {checking ? "확인 중..." : "사건번호 확인"}
+              </button>
+            </div>
           </div>
         </div>
         <p className="mt-3 text-xs text-[var(--color-ink-500)]">
           법원은 전국 어느 법원이든 선택할 수 있습니다. 사건번호는 법원 고유 포맷
-          (예: 2024타경12345)으로 입력해주세요.
+          (예: 2024타경12345)으로 입력 후 <strong>Enter 키 또는 &ldquo;사건번호 확인&rdquo;
+          버튼</strong>으로 매칭을 확인해주세요.
         </p>
       </div>
 

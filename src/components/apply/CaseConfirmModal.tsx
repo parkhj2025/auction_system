@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ShieldCheck } from "lucide-react";
+import { ShieldCheck, Info } from "lucide-react";
 import type { ApplyFormData } from "@/types/apply";
 import type { PropertyType } from "@/types/content";
 import {
@@ -221,10 +221,19 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
             />
           </div>
 
-          <div className="rounded-[var(--radius-md)] border border-[var(--color-accent-red)] bg-[var(--color-accent-red-soft)] p-4">
-            <p className="text-xs font-bold text-[var(--color-accent-red)]">
-              위임인 책임
-            </p>
+          {/* Phase 6 UX 수정: 빨간 경고 톤 → 슬레이트 뉴트럴 안내 톤.
+              강제 모달 진입 시점이라 추가 주의 환기 불필요. legal.ts 단일 출처(USER_INPUT_LIABILITY_NOTICE) 유지. */}
+          <div className="rounded-[var(--radius-md)] border border-slate-200 bg-slate-50 p-4">
+            <div className="flex items-center gap-1.5">
+              <Info
+                size={14}
+                aria-hidden="true"
+                className="shrink-0 text-slate-500"
+              />
+              <p className="text-xs font-bold text-slate-700">
+                위임인 책임
+              </p>
+            </div>
             <p className="mt-1 text-xs leading-5 text-[var(--color-ink-700)]">
               {USER_INPUT_LIABILITY_NOTICE}
             </p>
