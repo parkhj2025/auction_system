@@ -72,8 +72,22 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
   function goNext() {
     const i = STEP_ORDER.indexOf(currentStep);
     if (i < 0 || i >= STEP_ORDER.length - 1) return;
+    const nextStep = STEP_ORDER[i + 1];
+    // 보강 1 (Phase 4-DATETIME): Step4 진입 시 bidDate(법원 공고 매각기일) 보장.
+    // manualEntry 경로는 matchedPost가 null이라 위임장 PDF에 박을 매각기일이 없음 → Step1로 되돌리고 안내.
+    if (nextStep === "confirm" && !data.matchedPost?.bidDate) {
+      setSubmitError(
+        "Step1에서 매각기일이 확인된 사건만 위임장을 작성할 수 있습니다. 사건번호를 다시 입력해 매칭을 완료해주세요.",
+      );
+      setCurrentStep("property");
+      if (typeof window !== "undefined") {
+        window.scrollTo({ top: 0, behavior: "smooth" });
+      }
+      return;
+    }
+    setSubmitError(null);
     setCompleted((prev) => new Set(prev).add(currentStep));
-    setCurrentStep(STEP_ORDER[i + 1]);
+    setCurrentStep(nextStep);
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }

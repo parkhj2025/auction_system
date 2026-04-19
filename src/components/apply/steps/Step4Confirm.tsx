@@ -7,6 +7,7 @@ import { FeeCalculator } from "../FeeCalculator";
 import { SignatureCanvas } from "../SignatureCanvas";
 import { DelegationPreviewModal } from "../DelegationPreviewModal";
 import { formatKoreanWon } from "@/lib/utils";
+import { getKSTDateTimeIso } from "@/lib/datetime";
 import type { DelegationData } from "@/lib/pdf/delegationTemplate";
 
 type AgreementKey = "agreedDelegation" | "agreedPrivacy" | "agreedTerms";
@@ -45,7 +46,15 @@ export function Step4Confirm({
   }
 
   // 미리보기 모달용 DelegationData 구성. ssnBack과 signatureDataUrl은 placeholder.
+  // 보강 2 (Phase 4-DATETIME): bidDate 누락 시 throw로 차단.
+  // 보강 1(Step4 진입 가드)이 정상 작동하면 이 throw는 발생하지 않는 안전장치.
   const previewData: DelegationData = useMemo(() => {
+    const bidDate = data.matchedPost?.bidDate;
+    if (!bidDate) {
+      throw new Error(
+        "Step1 매칭 미완료 상태에서 Step4 도달 — 위임장 PDF 생성 불가",
+      );
+    }
     const appraisal = data.matchedPost?.appraisal ?? 0;
     const depositRate = bid.rebid ? REBID_DEPOSIT_RATE : NORMAL_DEPOSIT_RATE;
     const deposit = Math.floor(appraisal * depositRate);
@@ -59,11 +68,11 @@ export function Step4Confirm({
       },
       caseNumber: data.caseNumber,
       courtLabel: data.court,
-      bidDate: data.matchedPost?.bidDate ?? new Date().toISOString().slice(0, 10),
+      bidDate,
       bidAmount,
       deposit,
       signatureDataUrl: null,
-      createdAt: new Date().toISOString(),
+      createdAt: getKSTDateTimeIso(),
     };
   }, [data, bid, bidAmount]);
 

@@ -9,6 +9,7 @@
 import fs from "node:fs";
 import { generateDelegationPdf } from "../src/lib/pdf/delegation";
 import type { DelegationData } from "../src/lib/pdf/delegationTemplate";
+import { getKSTDateTimeIso } from "../src/lib/datetime";
 
 const baseSample: DelegationData = {
   delegator: {
@@ -20,11 +21,13 @@ const baseSample: DelegationData = {
   },
   caseNumber: "2021타경521675",
   courtLabel: "인천지방법원",
+  // bidDate는 샘플 시뮬레이션 — 특정 사건 매각기일 고정 표현 (실제 입찰일 의미).
   bidDate: "2026-04-18",
   bidAmount: 99_470_000,
   deposit: 9_947_000,
   signatureDataUrl: null,
-  createdAt: "2026-04-18",
+  // createdAt은 실행 시점(오늘 KST)으로 동적 생성.
+  createdAt: getKSTDateTimeIso(),
 };
 
 const longAddressSample: DelegationData = {
@@ -48,8 +51,8 @@ async function generate(label: string, data: DelegationData, outPath: string) {
 async function main() {
   // PDF 뷰어 lock 회피용. 검증 후 형준님이 닫고 본 파일명으로 rename 또는
   // 다음 빌드에서 자연 덮어쓰기.
-  await generate("default", baseSample, "scripts/sample-delegation-v4.pdf");
-  await generate("long-address", longAddressSample, "scripts/sample-delegation-long-v3.pdf");
+  await generate("default", baseSample, "scripts/sample-delegation-v5.pdf");
+  await generate("long-address", longAddressSample, "scripts/sample-delegation-long-v4.pdf");
 }
 
 main().catch((err) => {

@@ -1,4 +1,5 @@
 import { AGENT_INFO, COMPANY, PRIVACY_CONTACT } from "@/lib/constants";
+import { formatKSTDate } from "@/lib/datetime";
 
 export interface DelegationData {
   delegator: {
@@ -97,14 +98,8 @@ function formatKrwAmount(value: number): string {
   return value.toLocaleString("ko-KR") + "원";
 }
 
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return iso;
-  const y = d.getFullYear();
-  const m = String(d.getMonth() + 1).padStart(2, "0");
-  const day = String(d.getDate()).padStart(2, "0");
-  return `${y}년 ${m}월 ${day}일`;
-}
+// 입력 ISO 무관 항상 Asia/Seoul 기준 출력 (UTC 서버 환경 대응).
+const formatDate = formatKSTDate;
 
 function formatSsn(front: string, back: string): string {
   const f = (front || "").padEnd(6, " ");

@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { getKSTDateTimeIso } from "@/lib/datetime";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -31,9 +32,11 @@ export async function GET(request: Request) {
   }
 
   const supabase = createAdminClient();
-  const cutoff = new Date();
-  cutoff.setFullYear(cutoff.getFullYear() - RETENTION_YEARS);
-  const cutoffIso = cutoff.toISOString();
+  // KST 기준 N년 전 cutoff. 연 단위라 UTC 결과와 사실상 동일하나 일관성 위해 통일.
+  const nowKstIso = getKSTDateTimeIso();
+  const nowKst = new Date(nowKstIso);
+  nowKst.setFullYear(nowKst.getFullYear() - RETENTION_YEARS);
+  const cutoffIso = nowKst.toISOString();
 
   let scanned = 0;
   let deletedFiles = 0;

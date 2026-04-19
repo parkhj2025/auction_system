@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { generateDelegationPdf } from "@/lib/pdf/delegation";
 import type { DelegationData } from "@/lib/pdf/delegationTemplate";
+import { getKSTDateTimeIso } from "@/lib/datetime";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
@@ -98,11 +99,15 @@ export async function POST(
       },
       caseNumber: order.case_number,
       courtLabel: order.court,
-      bidDate: snapshot.bidDate ?? new Date().toISOString().slice(0, 10),
+      // 보강 2 (Phase 4-DATETIME): bidDate 누락은 Step1 매칭 미완료 비정상 경로.
+      // 클라이언트의 보강 1(Step4 진입 가드)이 정상 작동하면 도달 불가능한 안전장치.
+      bidDate: snapshot.bidDate ?? (() => {
+        throw new Error("Step1 매칭 미완료 상태에서 위임장 PDF 생성 요청");
+      })(),
       bidAmount: Number(order.bid_amount),
       deposit: Number(order.deposit_amount ?? 0),
       signatureDataUrl,
-      createdAt: new Date().toISOString(),
+      createdAt: getKSTDateTimeIso(),
     };
 
     const { pdfBytes } = await generateDelegationPdf(data);

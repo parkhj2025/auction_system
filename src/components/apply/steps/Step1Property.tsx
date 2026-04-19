@@ -154,6 +154,21 @@ export function Step1Property({
 
   function handleNext() {
     if (!canProceed) return;
+    // TODO(Phase 4-CONFIRM, 2026-04-19):
+    // 현재 manualEntry 경로는 검증 없이 통과. Phase 4-CONFIRM에서
+    // 아래 흐름으로 재설계 예정:
+    // - 크롤러 매칭 성공/실패 무관하게 고객에게 사건 정보 재확인
+    //   UX 통일 ("다음 사건이 맞습니까?" 체크박스)
+    // - manualEntry 경로에서 매각기일·물건종류 수기 입력 필드 추가
+    // - 고객 확인 체크 + KST 타임스탬프를 ApplyFormData에 저장
+    // - bidDate를 ApplyFormData 레벨 non-null string으로 승격 →
+    //   Phase 4-DATETIME의 (B) throw를 (A) 타입 강제로 자연 전환
+    // - 위임장 PDF에 "위임인이 직접 확인·입력" 책임 조항 추가
+    // - 착수 시점: Phase 5(본인인증 mock) 완료 후
+    // - 추정 공수: 5~6시간 (Step1 UI + 타입 + PDF + privacy/terms)
+    //
+    // 현재 (Phase 4-DATETIME) 단계에서는 위임장 PDF 생성 시점
+    // throw로 차단 (보강 2).
     if (!data.matchedPost && !data.matchedListing && !data.manualEntry) {
       onChange({ manualEntry: true });
     }
