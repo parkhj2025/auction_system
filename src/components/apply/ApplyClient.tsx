@@ -294,6 +294,8 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
             listing={data.matchedListing}
             caseNumber={data.caseNumber}
             manualEntry={data.manualEntry}
+            court={data.court}
+            bidDate={data.bidDate}
           />
         )}
         {stepView}
