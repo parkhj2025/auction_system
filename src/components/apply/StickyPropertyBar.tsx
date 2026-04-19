@@ -1,6 +1,6 @@
 "use client";
 
-import { CheckCircle2, MapPin } from "lucide-react";
+import { CheckCircle2 } from "lucide-react";
 import type { CourtListingSummary } from "@/types/apply";
 import { formatKoreanWon } from "@/lib/utils";
 

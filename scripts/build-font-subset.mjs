@@ -51,7 +51,6 @@ chars += "₩￦元";
 
 console.log(`Glyphs requested: ${chars.length}`);
 let totalOut = 0;
-let totalIn = 0;
 
 for (const t of TARGETS) {
   const input = fs.readFileSync(t.source);
@@ -69,7 +68,6 @@ for (const t of TARGETS) {
   console.log(`  ratio: ${((output.length / input.length) * 100).toFixed(1)}% of source`);
 
   totalOut += output.length;
-  totalIn += input.length;
 }
 
 console.log("");

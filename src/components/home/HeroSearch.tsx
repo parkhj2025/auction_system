@@ -61,7 +61,6 @@ export function HeroSearch() {
     }, 300);
 
     return () => clearTimeout(handle);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [caseNumber, court, mode]);
 
   // 외부 클릭 시 드롭다운 닫기
