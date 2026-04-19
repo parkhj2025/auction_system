@@ -30,6 +30,12 @@ const inputClass =
 interface Props {
   data: ApplyFormData;
   onChange: (patch: Partial<ApplyFormData>) => void;
+  /**
+   * "사건번호 다시 입력" 버튼 콜백 (Phase 6.3 회귀 수정 — 2026-04-19).
+   * X 버튼/배경/Esc dismiss 차단 원칙은 유지하되, 사용자가 manualEntry 진입을
+   * 의도하지 않은 경우 (잘못 입력한 사건번호 등) 모달에서 명시적으로 빠져나갈 경로 제공.
+   */
+  onReturn: () => void;
 }
 
 function getSelectValue(v: string): string {
@@ -56,7 +62,7 @@ function getOtherText(v: string): string {
  *
  * caseConfirmedAt 기록 시점: "확인" 버튼 클릭 시 (체크박스 ON 단독으로는 set 안 함).
  */
-export function CaseConfirmModal({ data, onChange }: Props) {
+export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
   const submitRef = useRef<HTMLButtonElement>(null);
   const [agreed, setAgreed] = useState(false);
 
@@ -237,18 +243,29 @@ export function CaseConfirmModal({ data, onChange }: Props) {
           </label>
         </div>
 
-        <div className="border-t border-[var(--color-border)] bg-[var(--color-surface-muted)] px-6 py-4">
-          <button
-            ref={submitRef}
-            type="button"
-            onClick={handleConfirm}
-            disabled={!canConfirm}
-            className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-4 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
-          >
-            확인
-          </button>
-          <p className="mt-2 text-center text-[10px] leading-4 text-[var(--color-ink-500)]">
-            * 모든 항목을 입력하고 책임 조항에 동의해야 진행할 수 있습니다.
+        <div className="flex flex-col gap-3 border-t border-[var(--color-border)] bg-[var(--color-surface-muted)] px-6 py-4">
+          <div className="flex gap-3">
+            <button
+              type="button"
+              onClick={onReturn}
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-sm font-bold text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)]"
+            >
+              사건번호 다시 입력
+            </button>
+            <button
+              ref={submitRef}
+              type="button"
+              onClick={handleConfirm}
+              disabled={!canConfirm}
+              className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-4 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
+            >
+              확인
+            </button>
+          </div>
+          <p className="text-center text-[10px] leading-4 text-[var(--color-ink-500)]">
+            * 모든 항목을 입력하고 책임 조항에 동의해야 &ldquo;확인&rdquo;으로 진행할 수
+            있습니다. 사건번호 자체를 잘못 입력한 경우 좌측 &ldquo;사건번호 다시 입력&rdquo;
+            버튼으로 Step 1 입력 화면으로 돌아갈 수 있습니다.
           </p>
         </div>
       </div>

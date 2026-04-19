@@ -29,6 +29,27 @@ export function Step2BidInfo({
   const [verifyModalOpen, setVerifyModalOpen] = useState(!data.verified);
   const bid = data.bidInfo;
   const inputsDisabled = !data.verified;
+  const hasErrors = Object.keys(errors).length > 0;
+
+  // Phase 6.4 회귀 수정: 입력 필드 → 에러 메시지 ID 매핑 (handleNext scrollIntoView 대상).
+  const ERROR_FIELD_TO_ID: Record<string, string> = {
+    bidAmount: "bid-amount",
+    applicantName: "applicant-name",
+    phone: "applicant-phone",
+    ssnFront: "applicant-ssn-front",
+    ssnBack: "applicant-ssn-back",
+    jointApplicantName: "joint-name",
+    jointApplicantPhone: "joint-phone",
+  };
+
+  function clearError(key: string) {
+    setErrors((prev) => {
+      if (!prev[key]) return prev;
+      const next = { ...prev };
+      delete next[key];
+      return next;
+    });
+  }
 
   function handleVerified(result: PhoneVerifyResult, verifiedName: string) {
     onVerified(result, verifiedName);
@@ -43,7 +64,7 @@ export function Step2BidInfo({
   const belowMin =
     data.matchedPost !== null && bidAmountNum > 0 && bidAmountNum < minPrice;
 
-  function validate(): boolean {
+  function validate(): { ok: boolean; errors: Record<string, string> } {
     const next: Record<string, string> = {};
     if (!bid.bidAmount.trim() || bidAmountNum <= 0)
       next.bidAmount = "입찰 희망 금액을 입력해주세요.";
@@ -61,11 +82,24 @@ export function Step2BidInfo({
         next.jointApplicantPhone = "공동입찰인 연락처를 입력해주세요.";
     }
     setErrors(next);
-    return Object.keys(next).length === 0;
+    return { ok: Object.keys(next).length === 0, errors: next };
   }
 
   function handleNext() {
-    if (validate()) onNext();
+    const result = validate();
+    if (result.ok) {
+      onNext();
+      return;
+    }
+    // Phase 6.4 회귀 수정: 첫 에러 필드로 scrollIntoView + focus.
+    // hasErrors disabled 게이트가 1차 방어, 본 scrollTo는 사용자가 어디 막혔는지 즉시 안내.
+    const firstKey = Object.keys(result.errors)[0];
+    const elementId = ERROR_FIELD_TO_ID[firstKey];
+    if (elementId && typeof document !== "undefined") {
+      const el = document.getElementById(elementId);
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      el?.focus();
+    }
   }
 
   function inputClass(key: string) {
@@ -134,6 +168,7 @@ export function Step2BidInfo({
                   onBidInfoChange({
                     bidAmount: cleaned ? Number(cleaned).toLocaleString("ko-KR") : "",
                   });
+                  clearError("bidAmount");
                 }}
                 className={`${inputClass("bidAmount")} pr-12 tabular-nums`}
               />
@@ -173,7 +208,10 @@ export function Step2BidInfo({
                 type="text"
                 placeholder="홍길동"
                 value={bid.applicantName}
-                onChange={(e) => onBidInfoChange({ applicantName: e.target.value })}
+                onChange={(e) => {
+                  onBidInfoChange({ applicantName: e.target.value });
+                  clearError("applicantName");
+                }}
                 className={inputClass("applicantName")}
               />
               {errors.applicantName && (
@@ -195,9 +233,10 @@ export function Step2BidInfo({
                 inputMode="tel"
                 placeholder="010-0000-0000"
                 value={bid.phone}
-                onChange={(e) =>
-                  onBidInfoChange({ phone: formatPhone(e.target.value) })
-                }
+                onChange={(e) => {
+                  onBidInfoChange({ phone: formatPhone(e.target.value) });
+                  clearError("phone");
+                }}
                 className={inputClass("phone")}
               />
               {errors.phone && (
@@ -222,11 +261,12 @@ export function Step2BidInfo({
                 maxLength={6}
                 placeholder="000000"
                 value={bid.ssnFront}
-                onChange={(e) =>
+                onChange={(e) => {
                   onBidInfoChange({
                     ssnFront: e.target.value.replace(/\D/g, "").slice(0, 6),
-                  })
-                }
+                  });
+                  clearError("ssnFront");
+                }}
                 className={`${inputClass("ssnFront")} tabular-nums`}
               />
               <span aria-hidden="true" className="text-[var(--color-ink-500)]">
@@ -240,11 +280,12 @@ export function Step2BidInfo({
                 maxLength={7}
                 placeholder="0000000"
                 value={bid.ssnBack}
-                onChange={(e) =>
+                onChange={(e) => {
                   onBidInfoChange({
                     ssnBack: e.target.value.replace(/\D/g, "").slice(0, 7),
-                  })
-                }
+                  });
+                  clearError("ssnBack");
+                }}
                 className={`${inputClass("ssnBack")} tabular-nums`}
                 autoComplete="off"
               />
@@ -312,9 +353,10 @@ export function Step2BidInfo({
                     id="joint-name"
                     type="text"
                     value={bid.jointApplicantName}
-                    onChange={(e) =>
-                      onBidInfoChange({ jointApplicantName: e.target.value })
-                    }
+                    onChange={(e) => {
+                      onBidInfoChange({ jointApplicantName: e.target.value });
+                      clearError("jointApplicantName");
+                    }}
                     className={`${inputClass("jointApplicantName")} h-11 text-sm`}
                   />
                   {errors.jointApplicantName && (
@@ -334,11 +376,12 @@ export function Step2BidInfo({
                     id="joint-phone"
                     type="tel"
                     value={bid.jointApplicantPhone}
-                    onChange={(e) =>
+                    onChange={(e) => {
                       onBidInfoChange({
                         jointApplicantPhone: formatPhone(e.target.value),
-                      })
-                    }
+                      });
+                      clearError("jointApplicantPhone");
+                    }}
                     className={`${inputClass("jointApplicantPhone")} h-11 text-sm`}
                   />
                   {errors.jointApplicantPhone && (
@@ -369,7 +412,7 @@ export function Step2BidInfo({
         <button
           type="button"
           onClick={handleNext}
-          disabled={inputsDisabled}
+          disabled={inputsDisabled || hasErrors}
           className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
         >
           다음: 서류 업로드

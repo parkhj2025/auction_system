@@ -17,6 +17,14 @@ import { CaseConfirmCard } from "../CaseConfirmCard";
 import { CaseConfirmModal } from "../CaseConfirmModal";
 
 /**
+ * 사건번호 정규식 — `2024타경12345` 형식 (Phase 6.3 회귀 수정 — 2026-04-19).
+ * 매칭 조회 + manualEntry 자동 진입은 정규식 통과 시점에만 발동.
+ * 부분 입력(예: "2099타경") 상태에서는 fetch/manualEntry/모달 모두 차단되어
+ * 사용자가 끝까지 타이핑할 수 있다.
+ */
+const CASE_NUMBER_PATTERN = /^\d{4}타경\d+$/;
+
+/**
  * Step 1 — 법원 + 사건번호 입력 + 사건 정보 확인.
  *
  * 설계 원칙 (2026-04-19 Phase 4-CONFIRM 확정):
@@ -53,6 +61,35 @@ export function Step1Property({
     const q = data.caseNumber.trim();
 
     if (!q) {
+      setCaseTaken(false);
+      setChecking(false);
+      setListings([]);
+      if (
+        data.matchedPost ||
+        data.matchedListing ||
+        data.manualEntry ||
+        data.bidDate ||
+        data.propertyType ||
+        data.propertyAddress ||
+        data.caseConfirmedByUser
+      ) {
+        latestPatchRef.current({
+          matchedPost: null,
+          matchedListing: null,
+          manualEntry: false,
+          bidDate: "",
+          propertyType: "",
+          propertyAddress: "",
+          caseConfirmedByUser: false,
+          caseConfirmedAt: null,
+        });
+      }
+      return;
+    }
+
+    // Phase 6.3 회귀 수정: 정규식 미통과 부분 입력 시 매칭/모달 차단.
+    // 사용자가 사건번호를 끝까지 타이핑할 때까지 manualEntry 자동 진입 차단.
+    if (!CASE_NUMBER_PATTERN.test(q)) {
       setCaseTaken(false);
       setChecking(false);
       setListings([]);
@@ -535,7 +572,28 @@ export function Step1Property({
         <CaseConfirmCard data={data} onChange={onChange} mode="manual" />
       )}
       {showManualConfirm && !data.caseConfirmedByUser && (
-        <CaseConfirmModal data={data} onChange={onChange} />
+        <CaseConfirmModal
+          data={data}
+          onChange={onChange}
+          onReturn={() => {
+            // Phase 6.3 회귀 수정: 모달에서 명시적 dismiss 경로.
+            // 단일 onChange 호출로 9개 필드 일괄 reset (race condition 차단 + 가독성).
+            // useEffect 빈 처리 분기에 의존하지 않고 onReturn 자신이 제어하는 모든 상태 명시.
+            // 본인인증 정보(verified/verifiedName/verifiedAt)는 의도적 미포함 — 재입력 시 유지.
+            // 강제 모달의 X/배경/Esc 차단 원칙은 유지.
+            onChange({
+              caseNumber: "",
+              matchedPost: null,
+              matchedListing: null,
+              manualEntry: false,
+              bidDate: "",
+              propertyType: "",
+              propertyAddress: "",
+              caseConfirmedByUser: false,
+              caseConfirmedAt: null,
+            });
+          }}
+        />
       )}
 
       <div className="flex items-center justify-end gap-3 pt-2">
