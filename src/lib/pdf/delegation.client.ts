@@ -1,6 +1,7 @@
 "use client";
 
 import { PDFDocument, rgb, type PDFFont } from "pdf-lib";
+import fontkit from "@pdf-lib/fontkit";
 import { AGENT_SEAL_PENDING_NOTICE } from "@/lib/legal";
 import {
   formatDelegation,
@@ -89,6 +90,9 @@ export async function generateDelegationPdfClient(
   const { regular, bold } = await loadFonts();
 
   const pdfDoc = await PDFDocument.create();
+  // Phase 6.5-POST 회귀 fix (2026-04-19): pdf-lib는 표준 14개 폰트만 자체 지원.
+  // NotoSansKR 같은 커스텀 TTF/OTF 임베드는 @pdf-lib/fontkit 별도 등록 필수.
+  pdfDoc.registerFontkit(fontkit);
   pdfDoc.setTitle(formatted.title);
   pdfDoc.setAuthor(formatted.delegate.rows[0]?.value ?? "");
   pdfDoc.setCreationDate(new Date());

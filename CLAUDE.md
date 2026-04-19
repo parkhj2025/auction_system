@@ -507,6 +507,7 @@ Phase 2 (목표)
 ### 코드 컨벤션
 
 - **날짜·시간**: 서버 사이드 날짜/시간 생성 시 반드시 `src/lib/datetime.ts` 유틸 사용. `new Date().toISOString()` 직접 호출 금지. 모든 날짜 처리는 Asia/Seoul 기준. (Vercel 서버는 UTC라 한국 새벽 0~9시 KST 시각이 전날로 기록되는 버그 발생)
+- **PDF 생성 검증 (서버/클라이언트 양쪽 스모크 필수)**: 위임장 PDF 생성 코드(`src/lib/pdf/delegation.ts` 서버 PDFKit 또는 `src/lib/pdf/delegation.client.ts` 클라이언트 pdf-lib) 수정 시 **반드시 양쪽 스모크 테스트 PASS 후 커밋**. 서버: `pnpm dlx tsx scripts/gen-sample-delegation.ts` + `node scripts/verify-pdf-text.mjs`. 클라이언트: `node scripts/smoke-delegation-client.mjs` (pdf-lib + @pdf-lib/fontkit + NotoSansKR 통합 검증). tsc/lint/build PASS만으로는 클라이언트 런타임 회귀(예: registerFontkit 누락) catch 불가 — Phase 6.5-POST 회귀(2026-04-19)로 학습.
 
 ### 내부 자료 보호
 
