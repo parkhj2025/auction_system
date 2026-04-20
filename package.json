@@ -39,6 +39,7 @@
     "pdf-parse": "^2.4.5",
     "subset-font": "^2.5.0",
     "tailwindcss": "^4",
-    "typescript": "^5"
+    "typescript": "^5",
+    "vconsole": "^3.15.1"
   }
 }
