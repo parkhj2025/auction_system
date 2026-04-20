@@ -1,21 +1,28 @@
 "use client";
 
-import { useEffect, useMemo, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
+import type { PDFDocumentLoadingTask } from "pdfjs-dist";
 import { Check, X, Info } from "lucide-react";
 import { AGENT_SEAL_PENDING_NOTICE } from "@/lib/legal";
 
 /**
- * 위임장 PDF 미리보기 모달 (Phase 6.5-POST-FIX, 2026-04-19).
+ * 위임장 PDF 미리보기 모달 (Phase 6.7.5, 2026-04-20).
  *
  * 흐름: Step4Confirm 동의 체크박스 클릭 → /api/preview-delegation POST → 본 모달 →
  *       "확인" → 동의 체크박스 ON / "취소" → 체크박스 OFF
  *
- * - iframe + blob URL로 서버 생성 PDF 시각 노출 (브라우저 내장 PDF 뷰어)
- * - "취소"(좌) = 동의 보류 (체크박스 미체크 유지) / "확인"(우) = 위임장 내용 동의 확정
- * - 하단 배너: AGENT_SEAL_PENDING_NOTICE (legal.ts 단일 소스)
+ * Phase 6.7.5 변경: iframe + blob URL 방식 폐기 → pdfjs-dist canvas 렌더.
+ * Android Chrome이 iframe PDF 인라인 렌더 미지원(Chromium issue 40668174 외)이라
+ * 폰에서 "열기" 버튼만 보이고 무반응하던 증상 해소. 데스크톱/Android/iOS 동일 UX.
  *
- * 보안: PDF는 서버 PDFKit 단일 소스 생성. 본 모달은 시각 확인 + 동의 확정 게이트.
- * Storage 저장은 별도 /api/orders/[id]/generate-delegation에서 수행 (제출 시점).
+ * - pdfjs-dist 5.x dynamic import로 worker 번들 분리 (Step4 진입 시 lazy load)
+ * - Worker URL: Next.js static import (new URL(..., import.meta.url))
+ * - 1페이지 고정 렌더 (위임장 1페이지 전제, 확장 시 Phase 6.7.6 별도 작업)
+ * - devicePixelRatio 대응으로 모바일 고해상도 렌더
+ * - touch-action: pan-y (수직 스크롤만 허용, pinch-zoom 미지원)
+ *
+ * 보안: PDF는 서버 PDFKit 단일 소스 생성. pdfjs는 렌더 전용 → Lessons Learned [A]
+ * 이중 엔진 원칙 위반 아님. Storage 저장은 /api/orders/[id]/generate-delegation.
  */
 interface Props {
   pdfBytes: Uint8Array | null;
@@ -24,6 +31,8 @@ interface Props {
   submitting: boolean;
 }
 
+type RenderState = "loading" | "rendered" | "error";
+
 export function PDFPreviewModal({
   pdfBytes,
   onConfirm,
@@ -31,28 +40,74 @@ export function PDFPreviewModal({
   submitting,
 }: Props) {
   const cancelRef = useRef<HTMLButtonElement>(null);
-
-  // pdfBytes로부터 blob URL을 useMemo로 계산하고, cleanup만 useEffect에서 처리.
-  // React 19 react-hooks/set-state-in-effect 회피.
-  const blobUrl = useMemo(() => {
-    if (!pdfBytes) return null;
-    const blob = new Blob([new Uint8Array(pdfBytes)], { type: "application/pdf" });
-    return URL.createObjectURL(blob);
-  }, [pdfBytes]);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const [renderState, setRenderState] = useState<RenderState>("loading");
 
   useEffect(() => {
-    if (!blobUrl) return;
+    if (!pdfBytes) {
+      setRenderState("loading");
+      return;
+    }
+
+    let cancelled = false;
+    let loadingTask: PDFDocumentLoadingTask | null = null;
+
+    (async () => {
+      try {
+        setRenderState("loading");
+        const pdfjs = await import("pdfjs-dist");
+        pdfjs.GlobalWorkerOptions.workerSrc = new URL(
+          "pdfjs-dist/build/pdf.worker.min.mjs",
+          import.meta.url,
+        ).toString();
+
+        const data = new Uint8Array(pdfBytes);
+        loadingTask = pdfjs.getDocument({ data });
+        const pdfDoc = await loadingTask.promise;
+        if (cancelled) return;
+
+        const page = await pdfDoc.getPage(1);
+        if (cancelled) return;
+
+        const canvas = canvasRef.current;
+        if (!canvas) return;
+
+        const dpr = window.devicePixelRatio || 1;
+        const scale = 1.5;
+        const viewport = page.getViewport({ scale });
+
+        canvas.width = Math.floor(viewport.width * dpr);
+        canvas.height = Math.floor(viewport.height * dpr);
+        canvas.style.width = `${viewport.width}px`;
+        canvas.style.height = `${viewport.height}px`;
+
+        const ctx = canvas.getContext("2d");
+        if (!ctx) throw new Error("canvas 2d context unavailable");
+        ctx.scale(dpr, dpr);
+
+        await page.render({ canvas, canvasContext: ctx, viewport }).promise;
+        if (cancelled) return;
+
+        setRenderState("rendered");
+      } catch (err) {
+        console.error("[PDFPreviewModal] render failed", err);
+        if (!cancelled) setRenderState("error");
+      }
+    })();
+
     return () => {
-      URL.revokeObjectURL(blobUrl);
+      cancelled = true;
+      if (loadingTask) {
+        loadingTask.destroy().catch(() => {});
+      }
     };
-  }, [blobUrl]);
+  }, [pdfBytes]);
 
   useEffect(() => {
     const prev = document.body.style.overflow;
     document.body.style.overflow = "hidden";
     cancelRef.current?.focus();
     function onKey(e: KeyboardEvent) {
-      // 제출 중이 아닐 때만 Esc로 닫기 허용 (수정 경로)
       if (e.key === "Escape" && !submitting) {
         onCancel();
       } else if (e.key === "Escape") {
@@ -73,7 +128,6 @@ export function PDFPreviewModal({
       aria-labelledby="pdf-preview-title"
       className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-4"
       onClick={() => {
-        // 제출 중 배경 dismiss 차단 + 정상 시에는 배경 클릭으로 수정 경로
         if (!submitting) onCancel();
       }}
     >
@@ -90,19 +144,26 @@ export function PDFPreviewModal({
           </h2>
         </div>
 
-        <div className="flex-1 overflow-hidden bg-[var(--color-surface-muted)]">
-          {blobUrl ? (
-            <iframe
-              src={blobUrl}
-              title="위임장 PDF 최종 확인"
-              className="h-full w-full border-0"
-              style={{ minHeight: "60vh" }}
-            />
-          ) : (
+        <div
+          className="flex-1 overflow-auto bg-[var(--color-surface-muted)]"
+          style={{ touchAction: "pan-y", minHeight: "60vh" }}
+        >
+          {renderState === "loading" && (
             <div className="flex h-full items-center justify-center p-8 text-sm text-[var(--color-ink-500)]">
               PDF 생성 중...
             </div>
           )}
+          {renderState === "error" && (
+            <div className="flex h-full items-center justify-center p-8 text-sm text-[var(--color-accent-red)]">
+              미리보기를 불러오지 못했습니다. 취소 후 다시 시도해주세요.
+            </div>
+          )}
+          <div
+            className="justify-center p-4"
+            style={{ display: renderState === "rendered" ? "flex" : "none" }}
+          >
+            <canvas ref={canvasRef} className="max-w-full" />
+          </div>
         </div>
 
         <div className="flex items-start gap-2 border-t border-[var(--color-border)] bg-slate-50 px-6 py-3">

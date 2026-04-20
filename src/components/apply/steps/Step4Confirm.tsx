@@ -1,12 +1,17 @@
 "use client";
 
 import { useMemo, useState } from "react";
+import dynamic from "next/dynamic";
 import { ArrowLeft, AlertCircle, FileText, Send } from "lucide-react";
 import type { ApplyFormData } from "@/types/apply";
 import { FeeCalculator } from "../FeeCalculator";
 import { SignatureCanvas } from "../SignatureCanvas";
 import { DelegationPreviewModal } from "../DelegationPreviewModal";
-import { PDFPreviewModal } from "../PDFPreviewModal";
+// pdfjs-dist 번들을 Step4 진입 시점으로 lazy load (Phase 6.7.5)
+const PDFPreviewModal = dynamic(
+  () => import("../PDFPreviewModal").then((m) => m.PDFPreviewModal),
+  { ssr: false },
+);
 import { PrivacyPreviewModal } from "../PrivacyPreviewModal";
 import { TermsPreviewModal } from "../TermsPreviewModal";
 import { formatKoreanWon } from "@/lib/utils";
