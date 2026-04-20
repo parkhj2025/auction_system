@@ -19,6 +19,8 @@ export function Step2BidInfo({
 }: {
   data: ApplyFormData;
   onBidInfoChange: (patch: Partial<ApplyBidInfo>) => void;
+  // 상위 ApplyClient.handleVerified는 기존 2인자 (result, name) 시그니처 유지.
+  // phone prefill은 handleVerified 내부에서 bid state 직접 업데이트.
   onVerified: (result: PhoneVerifyResult, verifiedName: string) => void;
   onNext: () => void;
   onBack: () => void;
@@ -51,13 +53,20 @@ export function Step2BidInfo({
     });
   }
 
-  function handleVerified(result: PhoneVerifyResult, verifiedName: string) {
+  function handleVerified(
+    result: PhoneVerifyResult,
+    verifiedName: string,
+    verifiedPhone: string,
+  ) {
     onVerified(result, verifiedName);
     setVerifyModalOpen(false);
-    // 인증 시 입력한 이름을 신청인 이름에도 자동 채움 (수정 가능)
-    if (!bid.applicantName.trim()) {
-      onBidInfoChange({ applicantName: verifiedName });
-    }
+    // Phase 6.7.6: 이름 + 전화번호 모두 prefill (빈 상태일 때만 — 사용자가 본인인증 전
+    // 이미 수동 입력한 값은 덮어쓰지 않음). formatPhone 재적용 불필요 — modal state는
+    // 이미 "010-1234-5678" 포맷.
+    const patch: Partial<ApplyBidInfo> = {};
+    if (!bid.applicantName.trim()) patch.applicantName = verifiedName;
+    if (!bid.phone.trim()) patch.phone = verifiedPhone;
+    if (Object.keys(patch).length > 0) onBidInfoChange(patch);
   }
   const bidAmountNum = Number(bid.bidAmount.replace(/[^\d]/g, "")) || 0;
   const minPrice = data.matchedPost?.minPrice ?? 0;
@@ -214,6 +223,11 @@ export function Step2BidInfo({
                 }}
                 className={inputClass("applicantName")}
               />
+              {data.verified && bid.applicantName.trim() && (
+                <p className="mt-1 text-xs text-[var(--color-ink-500)]">
+                  본인인증 완료 정보로 자동 입력됨
+                </p>
+              )}
               {errors.applicantName && (
                 <p className="mt-1 text-xs text-[var(--color-accent-red)]">
                   {errors.applicantName}
@@ -239,6 +253,11 @@ export function Step2BidInfo({
                 }}
                 className={inputClass("phone")}
               />
+              {data.verified && bid.phone.trim() && (
+                <p className="mt-1 text-xs text-[var(--color-ink-500)]">
+                  본인인증 완료 정보로 자동 입력됨
+                </p>
+              )}
               {errors.phone && (
                 <p className="mt-1 text-xs text-[var(--color-accent-red)]">
                   {errors.phone}

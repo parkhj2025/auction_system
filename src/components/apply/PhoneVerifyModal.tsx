@@ -18,7 +18,17 @@ interface Props {
   /** 인증 후보 사용자 정보. mock은 사용 안 함, 실 SDK는 본인 확인 매칭에 사용. */
   initialName?: string;
   initialSsnFront?: string;
-  onVerified: (result: PhoneVerifyResult, verifiedName: string) => void;
+  /**
+   * 본인인증 완료 콜백.
+   * Phase 6.7.6 시그니처 확장: verifiedPhone 3번째 인자 추가 →
+   * Step2BidInfo가 bid.phone state에 prefill하여 "이미 본인인증 시 입력한 값을
+   * 다시 입력해야 한다" 모순 UX 제거.
+   */
+  onVerified: (
+    result: PhoneVerifyResult,
+    verifiedName: string,
+    verifiedPhone: string,
+  ) => void;
   onClose: () => void;
 }
 
@@ -84,7 +94,10 @@ export function PhoneVerifyModal({
         setVerifying(false);
         return;
       }
-      onVerified(result, name.trim());
+      // Phase 6.7.6: phone state는 handlePhoneChange에서 이미 formatPhone과
+      // 동일 포맷("010-1234-5678")으로 저장되어 있음 (PHONE_PATTERN 검증 통과).
+      // Step2BidInfo.bid.phone에 그대로 전달 가능.
+      onVerified(result, name.trim(), phone);
     } catch (err) {
       console.error("[PhoneVerifyModal] verify failed", err);
       setError("본인인증 중 오류가 발생했습니다. 다시 시도해주세요.");

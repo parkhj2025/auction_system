@@ -88,13 +88,18 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
   const handleVerified = (
     result: import("@/lib/auth/phoneVerify").PhoneVerifyResult,
     verifiedName: string,
-  ) =>
+    // Phase 6.7.6: optional phone 파라미터 수용. 본 Phase에서는 사용 안 하지만
+    // 향후 ApplyClient 상위 로직에서 phone 활용 필요 시 시그니처 재수정 회피 목적.
+    verifiedPhone?: string,
+  ) => {
+    void verifiedPhone;
     setData((d) => ({
       ...d,
       verified: result.ok,
       verifiedName: result.ok ? verifiedName : null,
       verifiedAt: result.ok ? (result.mockedAt ?? null) : null,
     }));
+  };
 
   function goNext() {
     const i = STEP_ORDER.indexOf(currentStep);
