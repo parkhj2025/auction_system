@@ -9,14 +9,16 @@ import { useEffect } from "react";
  * 탭하면 Log/Network/Element 탭이 열려 모바일에서 직접 로그 확인 가능.
  *
  * IS_DIAG 가드:
- * - Preview 환경 (NEXT_PUBLIC_VERCEL_ENV === "preview")에서만 dynamic import 실행
- * - Production 배포: IS_DIAG=false → import("vconsole") 호출 안 됨 → vconsole chunk
- *   요청 발생 안 함 (chunk 자체는 번들에 있지만 네트워크 로드 안 됨)
- * - 로컬 dev (pnpm dev): env 미설정 → IS_DIAG=false → 미활성
+ * - NEXT_PUBLIC_DIAG_ENABLED=1 환경변수 설정 시에만 dynamic import 실행
+ * - main → Production 워크플로우에서는 Preview 배포가 자동 생성되지 않으므로
+ *   이전 `VERCEL_ENV === "preview"` 가드가 always false였음 → 별도 env var로 전환.
+ * - 환경변수 미설정 시 undefined !== "1" → IS_DIAG=false → import("vconsole") 호출 안 됨
+ *   → vconsole chunk 자체는 번들에 있지만 네트워크 로드 안 됨
+ * - 로컬 dev (pnpm dev): .env.local에 해당 변수 설정 없으면 미활성
  *
- * 원인 확정 후 본 컴포넌트 + PDFPreviewModal의 [pdf-diag] 코드를 동시에 제거.
+ * 원인 확정 후 본 컴포넌트 + PDFPreviewModal의 [pdf-diag] 코드 + env var 제거.
  */
-const IS_DIAG = process.env.NEXT_PUBLIC_VERCEL_ENV === "preview";
+const IS_DIAG = process.env.NEXT_PUBLIC_DIAG_ENABLED === "1";
 
 export function DiagConsole() {
   useEffect(() => {

@@ -5,10 +5,12 @@ import type { PDFDocumentLoadingTask } from "pdfjs-dist";
 import { Check, X, Info } from "lucide-react";
 import { AGENT_SEAL_PENDING_NOTICE } from "@/lib/legal";
 
-// Phase 6.7.5 모바일 에러 진단 — Vercel Preview 환경에서만 활성.
-// Production 빌드에서는 상수가 `"production" === "preview"` → false로 인라인되어
-// if 블록이 dead code elimination 대상. 원인 확정 후 제거 커밋 예정.
-const IS_DIAG = process.env.NEXT_PUBLIC_VERCEL_ENV === "preview";
+// Phase 6.7.5 모바일 에러 진단 — NEXT_PUBLIC_DIAG_ENABLED=1 환경변수 설정 시 활성.
+// main → Production 워크플로우에서는 Preview 배포가 자동 생성되지 않으므로
+// 이전 `VERCEL_ENV === "preview"` 가드가 always false였음 → 별도 env var로 전환.
+// 환경변수 미설정 시 undefined !== "1" → false → 진단 코드 실행 안 됨.
+// 원인 확정 후 본 코드 + env var 둘 다 제거 커밋 예정.
+const IS_DIAG = process.env.NEXT_PUBLIC_DIAG_ENABLED === "1";
 
 /**
  * 위임장 PDF 미리보기 모달 (Phase 6.7.5, 2026-04-20).
