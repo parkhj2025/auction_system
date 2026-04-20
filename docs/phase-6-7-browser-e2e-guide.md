@@ -1,7 +1,7 @@
 # Phase 6.7 Browser E2E Guide
 
 > 경매퀵 /apply 플로우 데스크톱 + 모바일 브라우저 E2E 검증 실행 가이드. Phase 6.6 Supabase 검증 전면 PASS 이후 진입.
-> **v1.0** | 2026-04-20
+> **v1.1** | 2026-04-20 — Vercel Preview 기반으로 전환 (PC LAN IP 방식 폐기)
 
 ---
 
@@ -24,42 +24,43 @@
 
 ---
 
-## 2. 모바일 접속 셋업 (로컬 IP + HTTP)
+## 2. Vercel Preview 접속
 
-현재 /apply 플로우는 `getUserMedia` 카메라 API 등 **HTTPS 필수 브라우저 API를 사용하지 않으므로 ngrok 터널링 불필요**. 로컬 IP에 HTTP 평문으로 직접 접속.
+모바일 검증은 Vercel Preview URL을 사용한다. 장소·네트워크 독립적(HTTPS + 이동성), 프로덕션 환경과 동등한 조건에서 검증 가능.
 
-### 사전 조건
-- 휴대폰과 PC가 **같은 Wi-Fi**에 연결
-- PC 방화벽 포트 3000 인바운드 허용 (Windows Defender Firewall: Node.js 허용)
+### 3단계 흐름
+1. 로컬에서 코드 변경 → `git push origin <branch>` (main도 가능, 별도 검증 branch 권장)
+2. Vercel Dashboard → Deployments → 최신 deployment `Ready` 상태 확인 → **Preview URL 복사**
+   - 예: `https://auctionsystem-a783ew4hm-auctionq.vercel.app`
+   - main 브랜치는 `auctionsystem-green.vercel.app`(Production) 자동 갱신
+3. 폰 **Chrome** 주소창에 Preview URL 붙여넣기 → HTTPS 접속
 
-### PC 로컬 IP 확인
-- **Windows**: PowerShell 또는 cmd에서 `ipconfig` → 무선 LAN 어댑터 섹션 `IPv4 주소`
-- **macOS**: 터미널에서 `ipconfig getifaddr en0` (Wi-Fi 어댑터)
+### Chrome 사용 필수 (인앱 브라우저 금지)
+카카오톡 / 라인 / 페이스북 등 인앱 WebView에서 Google OAuth 시도 시 **`403 disallowed_useragent`** 발생 (Google 정책). 공유 링크를 받더라도 **Chrome에서 열기** 선택 필수.
+- 인앱 브라우저 사용자 안내 UI(Chrome 전환 유도 모달)는 기술부채 #11로 등록됨.
 
-### dev 서버 기동 (2가지 명령 병기)
-- 권장: `pnpm dev -H 0.0.0.0` (pnpm이 추가 인자를 `next dev`로 pass-through)
-- 대체: `pnpm exec next dev -H 0.0.0.0` (script 우회, 가장 확실)
+### Preview URL 관찰 포인트
+- URL은 commit 단위로 갱신됨 (`<project>-<hash>-<team>.vercel.app`)
+- Supabase Additional Redirect URLs에 **wildcard 등록 완료** → hash 변경되어도 작동 (섹션 3.1 참조)
+- Vercel 프로젝트 Settings → Deployment Protection → **Authentication OFF** 확인 (ON이면 Preview 접속 시 Vercel SSO 요구)
 
-### 폰 접속
-- 주소창에 `http://<PC-IP>:3000` 입력 (예: `http://192.168.0.12:3000`)
-- PWA 아님: 홈 화면 추가 시 일반 웹 북마크로 동작
-
-### 참고
-- ngrok 불필요 (카메라/HTTPS API 없음)
-- IP가 변경되면 Supabase Auth Additional Redirect URLs도 갱신 필요 (섹션 3.1)
+### 로컬 dev (데스크톱 전용)
+- `pnpm dev` → `http://localhost:3000`
+- 모바일 LAN IP 접속 방식은 **폐기됨** (Phase 6.7 전환 — `allowedDevOrigins`, PC IP, ngrok 전부 제거)
 
 ---
 
 ## 3. 사전 준비
 
-### 3.1 Supabase Auth URL 설정
+### 3.1 Supabase Auth URL 설정 (확정값)
 - Supabase Dashboard → **Authentication → URL Configuration**
-- **Site URL**: `http://localhost:3000` (기존)
-- **Additional Redirect URLs**에 다음 3개 등록:
-  - `http://localhost:3000/auth/callback`
-  - `http://<PC-IP>:3000/auth/callback` ← 모바일 IP 접속용 (동적 IP이므로 세션마다 갱신 주의)
-  - `https://<your-domain>/auth/callback` (프로덕션)
+- **Site URL**: `https://auctionsystem-green.vercel.app` (Production 기본값, 변경 금지)
+- **Additional Redirect URLs** 3개:
+  - `http://localhost:3000/**` (로컬 dev)
+  - `https://auctionsystem-green.vercel.app/**` (Production)
+  - `https://auctionsystem-*-auctionq.vercel.app/**` (Preview wildcard, team slug = `auctionq`)
 - Save 후 반영 5초 대기
+- Site URL을 localhost로 바꾸면 Production OAuth 즉시 실패 → 변경 금지
 
 ### 3.2 Google Cloud Console OAuth 설정 확인
 - Google Cloud Console → **APIs & Services → Credentials → OAuth 2.0 Client IDs**
@@ -90,9 +91,10 @@
 - [ ] redirect 파라미터 정상 동작 (`startsWith("/")` 검증 — [src/app/login/page.tsx:31](../src/app/login/page.tsx#L31))
 
 **진단 실패 시**:
-- Supabase Additional Redirect URLs에 현재 PC-IP 등록되어 있는지 (3.1)
+- Preview URL이 Supabase Additional Redirect URLs wildcard 패턴에 매칭되는지 확인 (3.1 — `auctionsystem-*-auctionq.vercel.app`)
 - Google Cloud Console에 Supabase 고정 콜백 URL 등록되어 있는지 (3.2)
 - 네트워크 탭에서 `/auth/v1/callback` 응답 상태 확인
+- 인앱 브라우저(카카오톡/라인/페북)에서 열고 있지 않은지 — `disallowed_useragent` 에러 시 Chrome 전환 (섹션 2)
 
 ---
 
@@ -252,10 +254,10 @@ CLAUDE.md Lessons Learned [C] 3번 자가 검증 의무 사항.
 - BrowserStack Live 기본 idle timeout 있음 (30초-1분 이상 무활동 시 세션 종료 가능)
 - 입력 중 주의, 세션 설정에서 타임아웃 조정 가능
 
-### BrowserStack Local 터널 (로컬 접속용)
-- Windows: `BrowserStackLocal.exe --key <ACCESS_KEY>`
-- macOS: `./BrowserStackLocal --key <ACCESS_KEY>`
-- 터널 연결 후 BrowserStack Live 브라우저에서 `http://<PC-IP>:3000` 진입
+### Preview URL 직접 입력 (Local 터널 불필요)
+- BrowserStack Live 브라우저 주소창에 Preview URL 붙여넣기 (예: `https://auctionsystem-<hash>-auctionq.vercel.app`)
+- HTTPS라 BrowserStack Local 터널 불필요 — Preview는 공개 인터넷에서 직접 접근 가능
+- Vercel Deployment Protection(Authentication) OFF 상태 재확인 필수
 
 ### Round 분할 (예비 전략)
 30분 이내 완주 권장. 예상 외 디버깅으로 시간 초과 시 분할:
@@ -271,7 +273,7 @@ CLAUDE.md Lessons Learned [C] 3번 자가 검증 의무 사항.
 
 | # | 항목 | 통과 조건 |
 |---|------|----------|
-| [1] | dev 서버 기동 | `pnpm dev -H 0.0.0.0` 또는 `pnpm exec next dev -H 0.0.0.0` 터미널 에러 0 |
+| [1] | 접속 환경 | 데스크톱: `pnpm dev` → `localhost:3000` 터미널 에러 0 / 모바일: Vercel Preview URL HTTPS 정상 접속 |
 | [2] | 핵심 UI 경로 렌더 | 7단계 체크리스트 전 통과 |
 | [3] | DevTools Console 에러 0건 | 데스크톱 + 모바일 Android + 모바일 iOS 3개 환경 |
 | [4] | 시각적 산출물 확인 | PDFPreviewModal iframe + 제출 후 orders 레코드 Dashboard |
