@@ -5,13 +5,6 @@ import type { PDFDocumentLoadingTask } from "pdfjs-dist";
 import { Check, X, Info } from "lucide-react";
 import { AGENT_SEAL_PENDING_NOTICE } from "@/lib/legal";
 
-// Phase 6.7.5 모바일 에러 진단 — NEXT_PUBLIC_DIAG_ENABLED=1 환경변수 설정 시 활성.
-// main → Production 워크플로우에서는 Preview 배포가 자동 생성되지 않으므로
-// 이전 `VERCEL_ENV === "preview"` 가드가 always false였음 → 별도 env var로 전환.
-// 환경변수 미설정 시 undefined !== "1" → false → 진단 코드 실행 안 됨.
-// 원인 확정 후 본 코드 + env var 둘 다 제거 커밋 예정.
-const IS_DIAG = process.env.NEXT_PUBLIC_DIAG_ENABLED === "1";
-
 /**
  * 위임장 PDF 미리보기 모달 (Phase 6.7.5, 2026-04-20).
  *
@@ -49,11 +42,6 @@ export function PDFPreviewModal({
   const cancelRef = useRef<HTMLButtonElement>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [renderState, setRenderState] = useState<RenderState>("loading");
-  // Phase 6.7.5 진단용. IS_DIAG 활성 시에만 UI 노출.
-  const [errorInfo, setErrorInfo] = useState<{
-    name: string;
-    message: string;
-  } | null>(null);
 
   useEffect(() => {
     if (!pdfBytes) {
@@ -77,18 +65,14 @@ export function PDFPreviewModal({
           import.meta.url,
         );
         pdfjs.GlobalWorkerOptions.workerSrc = workerUrl.toString();
-        if (IS_DIAG) console.log("[pdf-diag] worker url", workerUrl.href);
 
         const data = new Uint8Array(pdfBytes);
-        if (IS_DIAG) console.log("[pdf-diag] getDocument start");
         loadingTask = pdfjs.getDocument({ data });
         const pdfDoc = await loadingTask.promise;
         if (cancelled) return;
-        if (IS_DIAG) console.log("[pdf-diag] pdf loaded", pdfDoc.numPages);
 
         const page = await pdfDoc.getPage(1);
         if (cancelled) return;
-        if (IS_DIAG) console.log("[pdf-diag] page loaded");
 
         const canvas = canvasRef.current;
         if (!canvas) return;
@@ -108,18 +92,11 @@ export function PDFPreviewModal({
 
         await page.render({ canvas, canvasContext: ctx, viewport }).promise;
         if (cancelled) return;
-        if (IS_DIAG) console.log("[pdf-diag] render complete");
 
         setRenderState("rendered");
       } catch (err) {
-        const name = err instanceof Error ? err.name : "UnknownError";
-        const message = err instanceof Error ? err.message : String(err);
-        if (IS_DIAG) console.error("[pdf-diag] error", name, message);
-        else console.error("[PDFPreviewModal] render failed", err);
-        if (!cancelled) {
-          setErrorInfo({ name, message });
-          setRenderState("error");
-        }
+        console.error("[PDFPreviewModal] render failed", err);
+        if (!cancelled) setRenderState("error");
       }
     })();
 
@@ -182,13 +159,8 @@ export function PDFPreviewModal({
             </div>
           )}
           {renderState === "error" && (
-            <div className="flex h-full flex-col items-center justify-center gap-2 p-8 text-center text-sm text-[var(--color-accent-red)]">
-              <p>미리보기를 불러오지 못했습니다. 취소 후 다시 시도해주세요.</p>
-              {IS_DIAG && errorInfo && (
-                <p className="break-all text-xs text-[var(--color-ink-500)]">
-                  [diag] {errorInfo.name}: {errorInfo.message}
-                </p>
-              )}
+            <div className="flex h-full items-center justify-center p-8 text-center text-sm text-[var(--color-accent-red)]">
+              미리보기를 불러오지 못했습니다. 취소 후 다시 시도해주세요.
             </div>
           )}
           <div

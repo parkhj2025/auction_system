@@ -4,7 +4,6 @@ import "./globals.css";
 import { TopNav } from "@/components/layout/TopNav";
 import { Footer } from "@/components/layout/Footer";
 import { MobileSticky } from "@/components/layout/MobileSticky";
-import { DiagConsole } from "@/components/diag/DiagConsole";
 import { createClient } from "@/lib/supabase/server";
 import type { UserMenuProps } from "@/components/auth/UserMenu";
 import { BRAND_NAME } from "@/lib/constants";
@@ -65,7 +64,6 @@ export default async function RootLayout({
         <div className="flex flex-1 flex-col">{children}</div>
         <Footer />
         <MobileSticky />
-        <DiagConsole />
       </body>
     </html>
   );
