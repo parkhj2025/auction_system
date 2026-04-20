@@ -20,12 +20,8 @@ export interface CourtListingSummary {
   photos_fetched_at: string | null;
   /** 같은 item 내 구성 부동산 수 (토지+건물 등). 1이면 단독, 2+이면 일괄 */
   component_count: number;
-  /**
-   * 매각회차 — failed_count + 1 (API 응답에서 서버가 주입). 신건은 1.
-   * Phase 6.7.6: 커밋 1에서는 optional(서버 미주입 상태),
-   * 커밋 2에서 /api/orders/check 주입 + required 승격 예정.
-   */
-  auction_round?: number;
+  /** 매각회차 — failed_count + 1 (서버 주입). 신건은 1. Phase 6.7.6. */
+  auction_round: number;
 }
 
 export type FeeTier = "earlybird" | "standard" | "rush";

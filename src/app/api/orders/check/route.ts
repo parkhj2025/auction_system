@@ -46,6 +46,7 @@ function groupByItem(rows: RawListing[]): CourtListingSummary[] {
     result.push({
       ...representative,
       component_count: group.length,
+      auction_round: representative.failed_count + 1,
     });
   }
 
@@ -81,11 +82,16 @@ export async function POST(req: Request) {
     }
 
     const body = (await req.json().catch(() => null)) as
-      | { caseNumber?: string; courtCode?: string; courtName?: string }
+      | { caseNumber?: string; courtCode?: string; courtName?: string; round?: number }
       | null;
     const caseNumber = body?.caseNumber?.trim() ?? "";
     const courtCode = body?.courtCode?.trim() ?? "";
     const courtName = body?.courtName?.trim() ?? "";
+    // Phase 6.7.6: 중복 체크는 round가 명시될 때만 수행.
+    // round 미제공(Step1 최초 lookup) → 체크 스킵 + listings만 리턴. 사용자가
+    // listing 선택 또는 CaseConfirmModal에서 round 확정한 후에 클라이언트가 재호출.
+    const round =
+      typeof body?.round === "number" && body.round >= 1 ? body.round : null;
 
     if (!caseNumber) {
       return NextResponse.json(
@@ -94,27 +100,29 @@ export async function POST(req: Request) {
       );
     }
 
-    // 1. 중복 접수 확인 (기존 RPC)
-    const { data: isActive, error: rpcError } = await supabase.rpc(
-      "is_case_active",
-      { case_no: caseNumber }
-    );
-
-    if (rpcError) {
-      console.error("[orders/check] rpc failed", rpcError);
-      return NextResponse.json(
-        { available: null, error: "server_error", listings: [] },
-        { status: 500 }
+    // 1. 중복 접수 확인 (round 명시된 경우만)
+    if (round !== null) {
+      const { data: isActive, error: rpcError } = await supabase.rpc(
+        "is_case_active",
+        { case_no: caseNumber, round_no: round },
       );
-    }
 
-    if (isActive === true) {
-      return NextResponse.json({
-        available: false,
-        reason:
-          "이미 다른 고객의 접수가 진행 중입니다. 같은 물건은 중복 접수할 수 없습니다.",
-        listings: [],
-      });
+      if (rpcError) {
+        console.error("[orders/check] rpc failed", rpcError);
+        return NextResponse.json(
+          { available: null, error: "server_error", listings: [] },
+          { status: 500 },
+        );
+      }
+
+      if (isActive === true) {
+        return NextResponse.json({
+          available: false,
+          reason:
+            "이미 다른 고객의 접수가 진행 중입니다. 같은 회차는 중복 접수할 수 없습니다.",
+          listings: [],
+        });
+      }
     }
 
     // 2. court_listings 매칭 (D2: court_code 필터, D3: 배열 반환)

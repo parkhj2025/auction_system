@@ -68,6 +68,9 @@ export async function POST(req: Request) {
     const propertyType = ((form.get("propertyType") as string | null) ?? "").trim();
     const propertyAddress = ((form.get("propertyAddress") as string | null) ?? "").trim();
     const caseConfirmedAt = ((form.get("caseConfirmedAt") as string | null) ?? "").trim();
+    // Phase 6.7.6: auction_round (default 1). 같은 사건번호 다른 회차는 별도 접수로 허용.
+    const auctionRoundRaw = (form.get("auctionRound") as string | null) ?? "1";
+    const auctionRound = Math.max(1, parseInt(auctionRoundRaw, 10) || 1);
 
     // ---- 서버 측 검증 ----
     const bidAmount = Number(bidAmountRaw.replace(/[^\d]/g, ""));
@@ -122,10 +125,10 @@ export async function POST(req: Request) {
       }
     }
 
-    // ---- 1물건 1고객 사전 확인 (DB 함수) ----
+    // ---- 1물건 1고객 사전 확인 (DB 함수, Phase 6.7.6 case_number + auction_round 복합키) ----
     const { data: caseActive, error: rpcError } = await supabase.rpc(
       "is_case_active",
-      { case_no: caseNumber }
+      { case_no: caseNumber, round_no: auctionRound }
     );
 
     if (rpcError) {
@@ -208,6 +211,7 @@ export async function POST(req: Request) {
         court,
         matched_slug: matchedSlug,
         manual_entry: manualEntry,
+        auction_round: auctionRound,
         property_snapshot: propertySnapshot,
         bid_amount: bidAmount,
         applicant_name: applicantName,

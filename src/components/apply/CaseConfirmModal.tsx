@@ -23,6 +23,9 @@ const PROPERTY_TYPE_OPTIONS: PropertyType[] = [
 ];
 
 const OTHER_PREFIX = "기타 - ";
+// Phase 6.7.6 manualEntry 매각회차 드롭다운 옵션
+const ROUND_OPTIONS: number[] = [1, 2, 3, 4, 5];
+const ROUND_CUSTOM = "custom";
 
 const inputClass =
   "h-12 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-sm text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]";
@@ -65,6 +68,13 @@ function getOtherText(v: string): string {
 export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
   const submitRef = useRef<HTMLButtonElement>(null);
   const [agreed, setAgreed] = useState(false);
+  // Phase 6.7.6 매각회차. ROUND_OPTIONS(1~5) 외 값은 "직접 입력" 모드.
+  const [roundMode, setRoundMode] = useState<string>(() =>
+    ROUND_OPTIONS.includes(data.auctionRound) ? String(data.auctionRound) : ROUND_CUSTOM,
+  );
+  const [customRound, setCustomRound] = useState<string>(() =>
+    ROUND_OPTIONS.includes(data.auctionRound) ? "" : String(data.auctionRound),
+  );
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -97,12 +107,19 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
   }
 
   const otherTextOk = selectValue !== "기타" || !!otherText.trim();
+  // 회차 유효성: 드롭다운 1~5면 바로 OK, custom은 숫자 >= 1 필요
+  const resolvedRound =
+    roundMode === ROUND_CUSTOM
+      ? parseInt(customRound, 10)
+      : parseInt(roundMode, 10);
+  const roundOk = Number.isFinite(resolvedRound) && resolvedRound >= 1;
   const canConfirm =
     !!data.bidDate &&
     !!data.propertyType &&
     selectValue !== "" &&
     otherTextOk &&
     !!data.propertyAddress.trim() &&
+    roundOk &&
     agreed;
 
   function handleConfirm() {
@@ -110,6 +127,7 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
     onChange({
       caseConfirmedByUser: true,
       caseConfirmedAt: getKSTDateTimeIso(),
+      auctionRound: resolvedRound,
     });
   }
 
@@ -219,6 +237,44 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
               onChange={(e) => onChange({ propertyAddress: e.target.value })}
               className={inputClass}
             />
+          </div>
+
+          <div>
+            <label
+              htmlFor="modal-auction-round"
+              className="mb-1 block text-xs font-bold text-[var(--color-ink-700)]"
+            >
+              매각회차
+            </label>
+            <div className="flex items-center gap-2">
+              <select
+                id="modal-auction-round"
+                value={roundMode}
+                onChange={(e) => setRoundMode(e.target.value)}
+                className={inputClass}
+              >
+                {ROUND_OPTIONS.map((r) => (
+                  <option key={r} value={String(r)}>
+                    {r === 1 ? "1차 (신건)" : `${r}차 매각`}
+                  </option>
+                ))}
+                <option value={ROUND_CUSTOM}>직접 입력</option>
+              </select>
+              {roundMode === ROUND_CUSTOM && (
+                <input
+                  type="number"
+                  min={1}
+                  inputMode="numeric"
+                  placeholder="회차 숫자"
+                  value={customRound}
+                  onChange={(e) => setCustomRound(e.target.value.replace(/\D/g, ""))}
+                  className={`${inputClass} w-32 tabular-nums`}
+                />
+              )}
+            </div>
+            <p className="mt-1 text-[11px] text-[var(--color-ink-500)]">
+              같은 사건번호라도 회차가 다르면 별도 접수로 처리됩니다.
+            </p>
           </div>
 
           {/* Phase 6 UX 수정: 빨간 경고 톤 → 슬레이트 뉴트럴 안내 톤.

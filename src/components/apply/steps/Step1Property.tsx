@@ -133,6 +133,7 @@ export function Step1Property({
           propertyAddress: l.address_display ?? "",
           caseConfirmedByUser: false,
           caseConfirmedAt: null,
+          auctionRound: l.auction_round,
         });
       } else if (resultListings.length === 0) {
         const fmMatch =
@@ -152,6 +153,7 @@ export function Step1Property({
             propertyAddress: fmMatch.address,
             caseConfirmedByUser: false,
             caseConfirmedAt: null,
+            auctionRound: 1,
           });
         } else {
           // 매칭 0건 → manualEntry 자동 진입 → CaseConfirmModal 노출 트리거
@@ -164,6 +166,7 @@ export function Step1Property({
             propertyAddress: "",
             caseConfirmedByUser: false,
             caseConfirmedAt: null,
+            auctionRound: 1,
           });
         }
       } else {
@@ -177,6 +180,7 @@ export function Step1Property({
           propertyAddress: "",
           caseConfirmedByUser: false,
           caseConfirmedAt: null,
+          auctionRound: 1,
         });
       }
     } catch {
@@ -214,6 +218,8 @@ export function Step1Property({
       propertyAddress: listing.address_display ?? "",
       caseConfirmedByUser: false,
       caseConfirmedAt: null,
+      // Phase 6.7.6: 매칭 경로는 listing.auction_round 자동 결정 (사용자 변경 불가).
+      auctionRound: listing.auction_round,
     });
   }
 
@@ -423,14 +429,25 @@ export function Step1Property({
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-[var(--color-ink-500)]">
-                최저가 (유찰 {listing.failed_count}회)
-              </dt>
+              <dt className="text-xs text-[var(--color-ink-500)]">최저가</dt>
               <dd className="mt-1 font-black tabular-nums text-[var(--color-accent-red)]">
                 {listing.min_bid_amount != null
                   ? formatKoreanWon(listing.min_bid_amount)
                   : "-"}
               </dd>
+            </div>
+            <div>
+              <dt className="text-xs text-[var(--color-ink-500)]">매각회차</dt>
+              <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
+                {listing.failed_count === 0
+                  ? "신건"
+                  : `${listing.failed_count + 1}차 매각`}
+              </dd>
+              {listing.failed_count >= 1 && (
+                <p className="mt-0.5 text-[11px] text-[var(--color-ink-500)]">
+                  유찰 {listing.failed_count}회
+                </p>
+              )}
             </div>
             <div>
               <dt className="text-xs text-[var(--color-ink-500)]">용도</dt>
@@ -477,6 +494,7 @@ export function Step1Property({
                   propertyAddress: "",
                   caseConfirmedByUser: false,
                   caseConfirmedAt: null,
+                  auctionRound: 1,
                 })
               }
               className="mt-2 ml-3 text-xs font-medium text-[var(--color-ink-500)] underline underline-offset-2 hover:text-[var(--color-ink-700)]"

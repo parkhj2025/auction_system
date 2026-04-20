@@ -166,6 +166,8 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
         form.set("bidDate", data.bidDate);
         form.set("propertyType", data.propertyType);
         form.set("propertyAddress", data.propertyAddress);
+        // Phase 6.7.6 — 매각회차 (default 1, listing 매칭 시 failed_count+1 자동, manualEntry 시 사용자 선택)
+        form.set("auctionRound", String(data.auctionRound));
         if (data.caseConfirmedAt) {
           form.set("caseConfirmedAt", data.caseConfirmedAt);
         }
