@@ -245,7 +245,7 @@ export function Step2BidInfo({
                 id="applicant-phone"
                 type="tel"
                 inputMode="tel"
-                placeholder="010-0000-0000"
+                placeholder="휴대폰번호를 입력해주세요"
                 value={bid.phone}
                 onChange={(e) => {
                   onBidInfoChange({ phone: formatPhone(e.target.value) });
@@ -278,7 +278,7 @@ export function Step2BidInfo({
                 type="text"
                 inputMode="numeric"
                 maxLength={6}
-                placeholder="000000"
+                placeholder="앞 6자리"
                 value={bid.ssnFront}
                 onChange={(e) => {
                   onBidInfoChange({
@@ -297,7 +297,7 @@ export function Step2BidInfo({
                 type="password"
                 inputMode="numeric"
                 maxLength={7}
-                placeholder="0000000"
+                placeholder="뒷 7자리"
                 value={bid.ssnBack}
                 onChange={(e) => {
                   onBidInfoChange({
