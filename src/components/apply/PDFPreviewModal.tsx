@@ -67,9 +67,13 @@ export function PDFPreviewModal({
     (async () => {
       try {
         setRenderState("loading");
-        const pdfjs = await import("pdfjs-dist");
+        // Phase 6.7.5: legacy build for Samsung Internet compatibility.
+        // standard build (pdfjs-dist/build/*) uses Uint8Array.prototype.toHex()
+        // which is ES 2025 proposal, not shipped in Samsung Internet (Chromium v138).
+        // Legacy build transpiles to ES5 target and avoids new APIs.
+        const pdfjs = await import("pdfjs-dist/legacy/build/pdf.mjs");
         const workerUrl = new URL(
-          "pdfjs-dist/build/pdf.worker.min.mjs",
+          "pdfjs-dist/legacy/build/pdf.worker.min.mjs",
           import.meta.url,
         );
         pdfjs.GlobalWorkerOptions.workerSrc = workerUrl.toString();
