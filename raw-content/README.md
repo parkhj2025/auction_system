@@ -6,7 +6,7 @@ Cowork가 전달한 **원천 자료** 보관 디렉터리.
 
 각 콘텐츠 1건은 하나의 폴더 단위로 산출된다. 폴더명은 사건번호(`{caseNumber}/`).
 
-구조·frontmatter 스키마·본문 규칙은 [`docs/content-source-v1.md`](../docs/content-source-v1.md)에 단일 정의. 이 디렉터리의 산출물은 규격 v1을 준수해야 한다.
+구조·frontmatter 스키마·본문 규칙은 [`docs/content-source-v2.md`](../docs/content-source-v2.md)에 단일 정의. 이 디렉터리의 산출물은 규격 v1을 준수해야 한다.
 
 ```
 raw-content/
@@ -61,4 +61,4 @@ pnpm content:publish raw-content/{caseNumber} --execute
 
 ## 규격 개정
 
-`docs/content-source-v1.md`의 frontmatter 스키마·불변식이 변경되면 본 README와 CLI 동기화 필요. 개정은 형준님 승인 + Opus 검토 절차로만.
+`docs/content-source-v2.md`의 frontmatter 스키마·불변식이 변경되면 본 README와 CLI 동기화 필요. 개정은 형준님 승인 + Opus 검토 절차로만.
