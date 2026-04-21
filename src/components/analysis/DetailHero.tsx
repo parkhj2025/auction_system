@@ -1,40 +1,10 @@
 import Link from "next/link";
-import { ChevronRight, AlertTriangle, ShieldCheck, BookOpen } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import type { AnalysisFrontmatter } from "@/types/content";
 import { AnalysisMdxImage } from "./AnalysisMdxImage";
 import { formatKoreanWon } from "@/lib/utils";
 
-const CATEGORY_META: Record<
-  AnalysisFrontmatter["category"],
-  { label: string; className: string; Icon: typeof AlertTriangle }
-> = {
-  danger: {
-    label: "주의 물건",
-    className: "bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
-    Icon: AlertTriangle,
-  },
-  safe: {
-    label: "안정 물건",
-    className: "bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
-    Icon: ShieldCheck,
-  },
-  edu: {
-    label: "교육 물건",
-    className: "bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
-    Icon: BookOpen,
-  },
-};
-
-const RISK_LABEL = {
-  high: "고위험",
-  mid: "중간",
-  low: "저위험",
-} as const;
-
 export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
-  const cat = CATEGORY_META[fm.category];
-  const Icon = cat.Icon;
-
   return (
     <section
       aria-labelledby="detail-title"
@@ -59,17 +29,8 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
           </span>
         </nav>
 
-        {/* Badges */}
+        {/* Badges — 사실 정보만 (v2 원칙 5: 내부 분류 라벨 비노출) */}
         <div className="mt-6 flex flex-wrap items-center gap-2">
-          <span
-            className={`inline-flex h-7 items-center gap-1.5 rounded-full px-3 text-xs font-black uppercase tracking-wider ${cat.className}`}
-          >
-            <Icon size={13} aria-hidden="true" />
-            {cat.label}
-          </span>
-          <span className="inline-flex h-7 items-center rounded-full border border-[var(--color-border)] bg-white px-3 text-xs font-bold text-[var(--color-ink-700)]">
-            위험도 · {RISK_LABEL[fm.riskLevel]}
-          </span>
           <span className="inline-flex h-7 items-center rounded-full border border-[var(--color-border)] bg-white px-3 text-xs font-bold text-[var(--color-ink-700)]">
             {fm.round}회차 · 감정가의 {fm.percent}%
           </span>
@@ -112,7 +73,6 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
           <AnalysisMdxImage
             src={fm.coverImage}
             alt={`${fm.buildingName ?? fm.title} 커버 이미지`}
-            category={fm.category}
           />
 
           <div className="flex flex-col gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">

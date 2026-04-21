@@ -59,7 +59,7 @@ export default async function AnalysisDetailPage({
 
   const fm = post.frontmatter;
   const related = getRelatedAnalysis(slug, 3);
-  const components = buildAnalysisMdxComponents(fm.category);
+  const components = buildAnalysisMdxComponents();
 
   const jsonLd = {
     "@context": "https://schema.org",

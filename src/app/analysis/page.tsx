@@ -3,10 +3,7 @@ import Link from "next/link";
 import { Search } from "lucide-react";
 import { getAllAnalysisPosts } from "@/lib/content";
 import { PropertyCard } from "@/components/common/PropertyCard";
-import type {
-  AnalysisCategory,
-  AnalysisPost,
-} from "@/types/content";
+import type { AnalysisPost } from "@/types/content";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
@@ -15,21 +12,11 @@ export const metadata: Metadata = {
     "인천지방법원 경매 물건을 7섹션 구조로 무료 분석합니다. 권리분석 · 시세비교 · 수익 시뮬레이션까지 숫자로 판단.",
 };
 
+// v2: 카테고리 필터 폐기 (원칙 5 — 내부 분류 라벨 비노출). 검색·정렬만 유지.
 type Search = {
-  category?: string;
   q?: string;
   sort?: string;
 };
-
-const CATEGORY_CHIPS: {
-  value: "all" | AnalysisCategory;
-  label: string;
-}[] = [
-  { value: "all", label: "전체" },
-  { value: "danger", label: "주의" },
-  { value: "safe", label: "안정" },
-  { value: "edu", label: "교육" },
-];
 
 const SORT_OPTIONS: { value: "latest" | "bid"; label: string }[] = [
   { value: "latest", label: "최신순" },
@@ -46,14 +33,10 @@ function buildHref(params: Record<string, string | undefined>): string {
 }
 
 function filterAndSort(posts: AnalysisPost[], params: Search): AnalysisPost[] {
-  const category = (params.category ?? "all").toLowerCase();
   const q = (params.q ?? "").trim().toLowerCase();
   const sort = (params.sort ?? "latest").toLowerCase();
 
   let out = posts;
-  if (category !== "all") {
-    out = out.filter((p) => p.frontmatter.category === category);
-  }
   if (q) {
     out = out.filter((p) => {
       const fm = p.frontmatter;
@@ -91,7 +74,6 @@ export default async function AnalysisListPage({
   const posts = getAllAnalysisPosts();
   const filtered = filterAndSort(posts, params);
 
-  const activeCategory = params.category ?? "all";
   const activeSort = params.sort ?? "latest";
   const activeQ = params.q ?? "";
 
@@ -113,38 +95,12 @@ export default async function AnalysisListPage({
         </div>
       </section>
 
-      {/* 필터 바 */}
+      {/* 필터 바 — v2: 검색·정렬만 (카테고리 칩 폐기, 원칙 5) */}
       <section
         aria-label="물건분석 필터"
         className="sticky top-16 z-20 border-b border-[var(--color-border)] bg-white/95 backdrop-blur"
       >
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-4 sm:px-6 md:flex-row md:items-center md:justify-between">
-          {/* 카테고리 칩 */}
-          <nav aria-label="카테고리" className="flex flex-wrap gap-2">
-            {CATEGORY_CHIPS.map((chip) => {
-              const isActive = activeCategory === chip.value;
-              return (
-                <Link
-                  key={chip.value}
-                  href={buildHref({
-                    category: chip.value,
-                    q: activeQ || undefined,
-                    sort: activeSort !== "latest" ? activeSort : undefined,
-                  })}
-                  aria-current={isActive ? "page" : undefined}
-                  className={cn(
-                    "inline-flex h-10 min-w-[56px] items-center justify-center rounded-full border px-4 text-sm font-bold transition",
-                    isActive
-                      ? "border-brand-600 bg-brand-600 text-white"
-                      : "border-[var(--color-border)] bg-white text-[var(--color-ink-700)] hover:border-brand-300 hover:text-brand-700"
-                  )}
-                >
-                  {chip.label}
-                </Link>
-              );
-            })}
-          </nav>
-
+        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-4 sm:px-6 md:flex-row md:items-center md:justify-end">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
             {/* 검색 */}
             <form
@@ -153,9 +109,6 @@ export default async function AnalysisListPage({
               method="get"
               className="flex h-10 items-center gap-0 overflow-hidden rounded-full border border-[var(--color-border)] bg-white pl-3 pr-1"
             >
-              {activeCategory !== "all" && (
-                <input type="hidden" name="category" value={activeCategory} />
-              )}
               {activeSort !== "latest" && (
                 <input type="hidden" name="sort" value={activeSort} />
               )}
@@ -194,8 +147,6 @@ export default async function AnalysisListPage({
                   <Link
                     key={opt.value}
                     href={buildHref({
-                      category:
-                        activeCategory !== "all" ? activeCategory : undefined,
                       q: activeQ || undefined,
                       sort: opt.value,
                     })}
@@ -226,7 +177,7 @@ export default async function AnalysisListPage({
             </strong>
             건
           </p>
-          {(activeQ || activeCategory !== "all" || activeSort !== "latest") && (
+          {(activeQ || activeSort !== "latest") && (
             <Link
               href="/analysis"
               className="text-xs font-bold text-brand-600 hover:text-brand-700"

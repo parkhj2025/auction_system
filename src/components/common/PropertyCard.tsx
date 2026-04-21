@@ -1,32 +1,13 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import type { AnalysisFrontmatter, TagItem } from "@/types/content";
+import type { AnalysisFrontmatter } from "@/types/content";
 import { formatKoreanWon } from "@/lib/utils";
 
-/* 카테고리 배지 — 중립화 (B안: 텍스트 라벨만, 회색 통일) */
-const CAT_STYLE: Record<AnalysisFrontmatter["category"], string> = {
-  danger: "bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
-  safe: "bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
-  edu: "bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
-};
-
-const CAT_LABEL: Record<AnalysisFrontmatter["category"], string> = {
-  danger: "주의",
-  safe: "안정",
-  edu: "교육",
-};
-
-/* 태그 — 중립화 (전부 neutral 스타일로 통일) */
-const TAG_STYLE: Record<TagItem["type"], string> = {
-  danger:
-    "border-[var(--color-border)] bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
-  warn:
-    "border-[var(--color-border)] bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
-  safe:
-    "border-[var(--color-border)] bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
-  neutral:
-    "border-[var(--color-border)] bg-[var(--color-ink-100)] text-[var(--color-ink-700)]",
-};
+/**
+ * 물건분석 목록 카드.
+ * v2: category·riskLevel·TagItem 배지 폐기 (원칙 5 — 내부 분류 라벨 비노출).
+ * round·감정가%·사실 tags만 노출.
+ */
 
 export function PropertyCard({
   frontmatter: fm,
@@ -39,12 +20,7 @@ export function PropertyCard({
     <article
       className={`group relative flex h-full flex-col rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)] ${className}`}
     >
-      <div className="flex items-center justify-between">
-        <span
-          className={`inline-flex h-6 items-center rounded-full px-2.5 text-[11px] font-bold uppercase tracking-wide ${CAT_STYLE[fm.category]}`}
-        >
-          {CAT_LABEL[fm.category]}
-        </span>
+      <div className="flex items-center justify-end">
         <span className="text-[11px] font-medium text-[var(--color-ink-500)]">
           {fm.round}회차 · 감정가의 {fm.percent}%
         </span>
@@ -96,10 +72,10 @@ export function PropertyCard({
         <ul className="mt-4 flex flex-wrap gap-1.5">
           {fm.tags.slice(0, 3).map((t) => (
             <li
-              key={t.text}
-              className={`inline-flex h-6 items-center rounded-full border px-2 text-[11px] font-medium ${TAG_STYLE[t.type]}`}
+              key={t}
+              className="inline-flex h-6 items-center rounded-full border border-[var(--color-border)] bg-[var(--color-ink-100)] px-2 text-[11px] font-medium text-[var(--color-ink-700)]"
             >
-              {t.text}
+              {t}
             </li>
           ))}
         </ul>

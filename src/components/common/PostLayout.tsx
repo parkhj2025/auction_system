@@ -32,7 +32,7 @@ export async function PostLayout({
   badges?: string[];
   body: string;
 }) {
-  const components = buildAnalysisMdxComponents("edu");
+  const components = buildAnalysisMdxComponents();
   void collection; // reserved for future per-collection tweaks
 
   return (

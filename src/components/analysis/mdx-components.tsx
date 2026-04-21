@@ -1,6 +1,5 @@
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import Image from "next/image";
-import type { AnalysisCategory } from "@/types/content";
 import { AnalysisMdxImage } from "./AnalysisMdxImage";
 
 /**
@@ -242,15 +241,14 @@ export function AnalysisCoverImage({
 }
 
 /**
- * 카테고리별로 img 컴포넌트가 다른 플레이스홀더를 쓰도록 MDX components를 생성.
- * 사용처: `<MDXRemote components={buildAnalysisMdxComponents(category)} />`
+ * MDX components 오버라이드를 생성.
+ * v2: category 인자 폐기 (원칙 5 — 내부 분류 라벨 비노출).
+ * 사용처: `<MDXRemote components={buildAnalysisMdxComponents()} />`
  */
-export function buildAnalysisMdxComponents(category: AnalysisCategory) {
+export function buildAnalysisMdxComponents() {
   function Img({ src, alt }: ComponentPropsWithoutRef<"img">) {
     const safeSrc = typeof src === "string" ? src : undefined;
-    return (
-      <AnalysisMdxImage src={safeSrc} alt={alt ?? ""} category={category} />
-    );
+    return <AnalysisMdxImage src={safeSrc} alt={alt ?? ""} />;
   }
 
   return {
