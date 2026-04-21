@@ -531,7 +531,7 @@ CREATE POLICY "court_listings_public_read" ON public.court_listings
 
 
 -- ============================================================================
--- 10. STORAGE POLICIES (bucket: court-photos)
+-- 10. STORAGE POLICIES (buckets: court-photos, content-photos)
 -- ============================================================================
 -- 사전 준비: Supabase Dashboard → Storage → New bucket
 --   name: court-photos
@@ -548,12 +548,29 @@ CREATE POLICY "court_photos_public_read"
 -- (크롤러·사진 페처가 SUPABASE_SERVICE_ROLE_KEY로 직접 업로드)
 
 
+-- Phase 7 콘텐츠 이미지 버킷 (content-photos)
+-- 마이그레이션: supabase/migrations/20260421_content_photos_bucket.sql
+-- 사용처: scripts/content-publish/index.mjs (CLI) — Cowork 원천 이미지 업로드.
+--   name: content-photos
+--   public: true               (콘텐츠 페이지에서 익명 렌더)
+--   file size limit: 10 MB     (원본 대비 여유 마진, 실제 WebP 200~400KB)
+--   allowed mime types: image/jpeg, image/png, image/webp
+
+DROP POLICY IF EXISTS "content_photos_public_read" ON storage.objects;
+CREATE POLICY "content_photos_public_read"
+  ON storage.objects FOR SELECT
+  USING (bucket_id = 'content-photos');
+
+-- INSERT/UPDATE는 정책 없음 → service_role key로만 업로드 가능
+
+
 -- ============================================================================
 -- 11. 운영 메모 (실행자용)
 -- ============================================================================
--- 1. 이 파일 실행 후 Storage 버킷 2개를 Dashboard에서 생성할 것:
+-- 1. 이 파일 실행 후 Storage 버킷 3개를 Dashboard에서 생성(또는 migration 파일 실행):
 --    - order-documents (private, 10MB, PDF/JPG/PNG/WebP) — P2-2에서 사용
 --    - court-photos (public, 500KB, WebP/JPG) — P2-7에서 사용
+--    - content-photos (public, 10MB, JPEG/PNG/WebP) — Phase 7에서 사용
 -- 2. 형준님 계정 최초 로그인 후 다음 쿼리로 admin 권한 부여:
 --      UPDATE public.profiles SET role = 'admin' WHERE email = '형준님이메일';
 -- 3. 애플리케이션 레벨 상태 전이 규칙은 /api/orders/[id]/status 핸들러가 관리.
