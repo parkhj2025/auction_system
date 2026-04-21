@@ -1,5 +1,3 @@
-export type AnalysisCategory = "danger" | "safe" | "edu";
-export type RiskLevel = "high" | "mid" | "low";
 export type PropertyType =
   | "아파트"
   | "다세대주택"
@@ -12,11 +10,6 @@ export type PropertyType =
   | "기타";
 export type AuctionType = "강제경매" | "임의경매";
 export type PostStatus = "draft" | "published" | "archived";
-
-export interface TagItem {
-  text: string;
-  type: "danger" | "neutral" | "safe" | "warn";
-}
 
 export interface MarketData {
   avgSalePrice?: number;
@@ -36,7 +29,6 @@ export interface AnalysisFrontmatter {
   title: string;
   subtitle?: string;
   summary?: string;
-  category: AnalysisCategory;
   region: string;
   court: string;
   /** 예: "경매9계" */
@@ -64,10 +56,10 @@ export interface AnalysisFrontmatter {
   appraisalDisplay?: string;
   minPriceDisplay?: string;
   auctionType: AuctionType;
-  tags: TagItem[];
+  /** v2: 단순 문자열 배열. 분류 의미 부여 금지 (category·riskLevel 폐기와 동일 원칙). */
+  tags: string[];
   seoTags?: string[];
   coverImage?: string;
-  riskLevel: RiskLevel;
   publishedAt: string;
   updatedAt: string;
   status: PostStatus;
