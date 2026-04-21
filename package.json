@@ -8,7 +8,8 @@
     "start": "next start",
     "lint": "eslint",
     "font:subset": "node scripts/build-font-subset.mjs",
-    "lighthouse": "node scripts/lighthouse-audit.mjs"
+    "lighthouse": "node scripts/lighthouse-audit.mjs",
+    "content:publish": "node --env-file=.env.local scripts/content-publish/index.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",

@@ -23,6 +23,9 @@ export interface MarketData {
   avgLeasePrice?: number;
   saleCount?: number;
   leaseCount?: number;
+  avgRentDeposit?: number;
+  avgRentMonthly?: number;
+  rentCount?: number;
   dataDate?: string;
   source?: string;
 }
