@@ -36,6 +36,10 @@ yarn-error.log*
 # vercel
 .vercel
 
+# lighthouse audit output (Phase 6.8)
+.lighthouse/
+.build-report.txt
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts

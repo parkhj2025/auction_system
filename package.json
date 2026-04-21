@@ -7,7 +7,8 @@
     "build": "next build",
     "start": "next start",
     "lint": "eslint",
-    "font:subset": "node scripts/build-font-subset.mjs"
+    "font:subset": "node scripts/build-font-subset.mjs",
+    "lighthouse": "node scripts/lighthouse-audit.mjs"
   },
   "dependencies": {
     "@supabase/ssr": "^0.10.2",
@@ -34,8 +35,10 @@
     "@types/react": "^19",
     "@types/react-dom": "^19",
     "@types/react-signature-canvas": "^1.0.7",
+    "chrome-launcher": "^1.2.1",
     "eslint": "^9",
     "eslint-config-next": "16.2.3",
+    "lighthouse": "^13.1.0",
     "pdf-parse": "^2.4.5",
     "subset-font": "^2.5.0",
     "tailwindcss": "^4",
