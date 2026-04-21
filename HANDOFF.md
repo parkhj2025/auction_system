@@ -1,13 +1,156 @@
 # 경매퀵 웹사이트 핸드오프 문서
 
 > **용도**: 다음 Claude Code 세션이 이 문서 하나만 읽고도 작업을 이어갈 수 있도록 현재 상태를 정리한다.
-> **최종 업데이트**: 2026-04-17
-> **현재 빌드 상태**: **P2-7 Stage 2A 완료 + 디자인 최소 정리 완료**, 프로덕션 배포 중
-> **함께 읽을 문서**: `CLAUDE.md` (원칙·컴플라이언스), `BUILD_GUIDE.md` (구조·토큰), `C:\Users\User\.claude\plans\staged-jumping-star.md` (Stage 2A/2B/2B-post/2C 빌드 플랜)
+> **최종 업데이트**: 2026-04-21
+> **현재 빌드 상태**: **Phase 6.7.6 완료 + 6.8 1단계(Lighthouse 측정 환경) 완료**, 프로덕션 배포 중
+> **함께 읽을 문서**: `CLAUDE.md` (원칙·컴플라이언스 + Lessons [A]~[D]), `BUILD_GUIDE.md` (구조·토큰), `C:\Users\User\.claude\plans\phase-6-6-magical-liskov.md` (6.7.6 인스펙션/계획 이력)
 
 ---
 
-## ⚡ 2026-04-17 핫 스냅샷 — 다음 세션 시작 시 여기부터 읽기
+## ⚡ 2026-04-21 핫 스냅샷 — 다음 세션 시작 시 여기부터 읽기
+
+### 지금 어디인가
+
+**Phase 6.7.6 완료 → Phase 6.8 1단계(측정 환경 준비) 완료 → 6.8 2단계(본질 내재화 진단) 대기**. 의미:
+
+- **Phase 6.7.6 (2026-04-20~21)**: `auction_round` 스키마 확장 + 본인인증 prefill + placeholder 경량화 + 진단 코드 cleanup. 5커밋 본체 + 1커밋 후속 backfill.
+- **Production 500 사고·복구 (2026-04-21 오전)**: 6.7.6 마이그레이션 SQL이 plan 안에만 있고 repo에 미커밋 + Supabase Dashboard 수동 실행 누락 → /api/apply POST PGRST202/204 발생. 형준님 Dashboard에서 migration 수동 실행 완료 후 복구. 사후 repo backfill 커밋(`3ff01e4`)으로 migration 파일 + schema.sql 동기화 + Lessons Learned [D] 신설.
+- **Phase 6.8 1단계 (2026-04-21)**: Lighthouse 측정 스크립트 `scripts/lighthouse-audit.mjs` + `pnpm lighthouse` + `.lighthouse/` gitignore 설정. 기본 대상: Production URL(`auctionsystem-green.vercel.app/`). Desktop+Mobile 2회, 4 카테고리 × 6 Core Web Vitals JSON+HTML 저장.
+
+**현재 최신 커밋**: `0cdcf86 chore(audit): setup lighthouse script + bundle analysis`
+
+### 2026-04-21 완료 작업 요약
+
+| 영역 | 결과 |
+|------|------|
+| Phase 6.7.6 B 커밋 (`3ff01e4`) | `supabase/migrations/20260420_orders_auction_round.sql` 신설 + `supabase/schema.sql` 3구간 동기화(function 2-arg / orders.auction_round 컬럼 / `orders_unique_active_case_round` 인덱스) + CLAUDE.md Lessons [D] 신설 |
+| Phase 6.8 1단계 커밋 (`0cdcf86`) | `lighthouse 13.1.0` + `chrome-launcher 1.2.1` devDep / `scripts/lighthouse-audit.mjs` 112줄 / `pnpm lighthouse` script / `.lighthouse/` + `.build-report.txt` gitignore |
+| 랜딩(/) Lighthouse 초기 측정 | Desktop: perf=79 a11y=97 bp=100 seo=91 · Mobile: perf=97 a11y=97 bp=100 seo=91 · LCP Desktop 2.7s / Mobile 2.4s · CLS Desktop 0.044 / Mobile 0.002 · TBT Desktop 90ms / Mobile 100ms |
+| 번들 산출물 | `.next/static/chunks/` 총 2.0MB, 최대 JS 청크 454KB, 최대 CSS 301KB, 1MB 초과 청크 0건 |
+| Lessons Learned 누적 | [A] 이중 엔진 금지 / [B] UX 무언화 / [C] 기획-구현 괴리 방지 / [D] DB 변경은 repo migration 파일 커밋+Dashboard 실행 쌍으로 추적 |
+
+### Phase 6.8 2단계 예고 (다음 세션에서 진행)
+
+형준님 정책 판정:
+1. **본질 내재화 진단** (Q1~Q5, 아래 트리거 참조) — CLAUDE.md/BUILD_GUIDE.md 등 근간 문서에 "자사 웹 = 전환 중심, 플랫폼 중립" 프레임 기록 여부 점검
+2. **빌드 게이트 임계값 확정** — Lighthouse 초기값(perf 79/97, a11y 97, bp 100, seo 91) 검토 후 CI/프리커밋 차단 기준선 설정
+3. **개선 필요 항목 판정** — Desktop perf 79(<90)의 개선 여부 / LCP 2.7s 개선 여부 / CSS 301KB 적정성 / SEO 91→95+ 여부
+
+**작업 순서**: Q1~Q5 진단이 먼저 (근간 문서 하네스 확립). 그 다음 Lighthouse 게이트 판정.
+
+### 이월 / 대기 항목
+
+1. **형준님 E2E 재검증 (Phase 6.7.6)** — 마이그레이션 복구 후 8케이스 재진행 필요. 매칭 경로 / manualEntry 드롭다운 / 교차경로 round 갱신 / 다른 회차 동시접수 허용 / 동일 회차 중복차단 / placeholder 3건 / 본인인증 prefill 라벨 / PDFPreviewModal 진단 UI 0건.
+2. **Vercel env var 정리** — `NEXT_PUBLIC_DIAG_ENABLED` Production scope에서 수동 삭제 (형준님 Dashboard).
+3. **Lighthouse 게이트 임계값 확정** — 6.8 2단계.
+4. **런칭 블로커 누적** — `memory/project_launch_blockers.md` 참조 (Google OAuth 동의 화면 도메인 등).
+5. **기술부채 #11** — 인앱 브라우저(카카오/라인/페이스북) Chrome 전환 UX.
+
+### 다음 세션 즉시 실행 트리거 (형준님이 복사해서 입력)
+
+**Phase 6.8 본질 내재화 진단 시**:
+
+```
+[Phase 6.8 본질 정의 내재화 확인 + 방향성 일치 검증]
+
+=== 목적 ===
+
+Phase 6.8 진입 지시문에 포함한 사업 본질 프레임을
+Claude Code가 "이번 Phase 한정 지시"로 처리했는지,
+아니면 프로젝트 근간 문서에 내재화했는지 확인.
+
+Phase 6.7.6에서 마이그레이션 SQL이 plan 안에만 있고
+repo에 없어 추적 누락 → Lessons Learned [D]로 승격.
+같은 실수 방지 위해 "본질 정의"도 근간 문서 레벨로
+내재화되어야 함.
+
+=== 질의 ===
+
+아래 5개 질문에 대해 객관 사실 기준으로 보고.
+수정 작업 착수 금지 — 현 상태 진단만.
+
+Q1. CLAUDE.md 내 사업 본질 프레임 기록 여부
+
+"자사 웹페이지의 본질 = 전환", "랜딩 Hero = CTA",
+"플랫폼 중립 (네이버·카톡·유튜브 등 특화 금지)",
+"콘텐츠 제공 아님" 등의 원칙이 CLAUDE.md 또는
+BUILD_GUIDE.md 등 근간 문서에 섹션으로 기록되어
+있는가?
+
+- 기록되어 있으면: 파일명 + 라인 + 스니펫 인용
+- 기록되어 있지 않으면: 명시 "기록 없음"
+
+Q2. Lessons Learned 섹션 누적 현황
+
+현재 CLAUDE.md Lessons Learned [A]~[D] 4건 기록
+확인. 각 항목 제목 + 1줄 요약 보고. 형준님과 저
+(Opus)가 인지하는 6건(A~F)과 일치하는지 검증.
+
+Q3. Phase 6.8 지시문의 "본질 정의" 섹션 처리 이력
+
+Phase 6.8 진입 지시문의 "사업 본질 정의" 섹션을
+받았을 때 어떻게 처리했는가?
+
+(a) 이번 Phase 한정 컨텍스트로 처리
+(b) CLAUDE.md에 반영
+(c) 별도 BUILD_GUIDE.md 등에 반영
+(d) 기타
+
+처리 결과 파일 변경 이력 있으면 커밋 해시 명시.
+
+Q4. 향후 Phase에서 이 프레임 참조 장치
+
+Phase 6.8 종료 후 Phase 6.9 이상, 더 나아가 Phase
+7 등 향후 작업 진입 시 Claude Code가 "자사 웹 =
+전환 중심, 콘텐츠 제공 아님" 원칙을 자동 참조할
+장치가 현재 어느 파일에 있는가?
+
+없으면 "참조 장치 없음 — 매 Phase 지시문에서
+반복 명시 필요" 판정.
+
+Q5. 저(Opus)와의 방향성 일치 여부 자체 점검
+
+Claude Code 자신 관점에서:
+- 형준님 본질 정의를 어떻게 이해하고 있는지
+  2~3줄로 자체 표현
+- 이번 Phase 6.8 1단계 작업에서 본질 정의에
+  어긋날 수 있었던 유혹 지점이 있었다면 명시
+- 없었다면 "없음" 명시
+
+=== 작업 금지 ===
+
+Q1~Q5 진단만. 파일 수정, 커밋, push 전면 금지.
+내재화 작업 필요성이 드러나도 본 단계에서 진행
+금지. 형준님과 저의 판정 후 별도 지시로 진행.
+
+=== 보고 형식 ===
+
+Q1~Q5 각각 별도 섹션. 각 질문에 객관 사실 + 판정.
+추측이나 장식 금지.
+```
+
+**Lighthouse 게이트 확정 시 (본질 진단 이후)**:
+
+```
+Phase 6.8 2단계 — 빌드 게이트 임계값 확정.
+HANDOFF "2026-04-21 핫 스냅샷" Lighthouse 초기값
+(Desktop perf=79 / Mobile perf=97 / a11y=97 / bp=100 / seo=91)
+검토 후 CI 게이트 임계값 + 개선 필요 항목 판정.
+pnpm lighthouse 재측정 → 판정 → 개선 커밋 순서.
+```
+
+### 다음 세션 시작 시 환경 체크리스트
+
+1. `node --version` (v22), `pnpm -v` (10.33)
+2. `.env.local` 4개 키 존재
+3. Supabase Dashboard에서 `orders.auction_round` 컬럼 + `is_case_active(case_no TEXT, round_no INT)` 2-arg 함수 + `orders_unique_active_case_round` 인덱스 존재 확인
+4. `pnpm build` 0 에러
+5. 프로덕션 배포 확인: https://auctionsystem-green.vercel.app
+6. (선택) `pnpm lighthouse` 재실행 → `.lighthouse/summary.json` 최신값 확인
+
+---
+
+## ⚡ 2026-04-17 핫 스냅샷 — 참고용 (상위 스냅샷으로 대체됨)
 
 ### 지금 어디인가
 
