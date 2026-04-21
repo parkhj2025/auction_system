@@ -537,6 +537,18 @@ Phase 경계마다 다음 자가 검증 필수:
 4. 핵심 컴포넌트의 시각적 산출물 (PDF, 모달, 페이지) 스크린샷 또는 텍스트 기반 확인
 위 4종 미수행 시 "기능 완료" 보고 금지.
 
+### [D] DB 변경 워크플로우: migration 파일 repo 커밋 → Dashboard 붙여넣기 실행 (Phase 6.7.6, 2026-04-21)
+Plan 안에 SQL 원본만 두고 "형준님 수동 실행"으로 넘기면 실행 누락 시 추적 불가. 실제 Phase 6.7.6에서 마이그레이션 실행 누락으로 Production 500 발생 (PGRST202 `is_case_active(case_no, round_no)` + PGRST204 `orders.auction_round` 컬럼 없음).
+
+원칙:
+1. DB 변경 SQL은 반드시 repo의 `supabase/migrations/YYYYMMDD_*.sql` 파일로 **먼저 커밋**
+2. 형준님은 repo 파일 내용을 Supabase Dashboard SQL Editor에 붙여넣기 실행
+3. `supabase/schema.sql`도 동일 커밋에서 최신 상태로 동기화 (함수 시그니처, 테이블 컬럼, 인덱스 정의)
+4. 실행 이력은 git commit + Supabase DB 상태 양쪽에서 추적 가능
+5. 기존 Lessons [A] 이중 엔진 금지의 변형 — 스키마 정의가 repo와 DB 양쪽에 이중 관리 금지. 단일 소스(repo) → 단방향 반영(DB).
+
+**적용 트리거**: plan에 `ALTER TABLE` / `CREATE FUNCTION` / `CREATE INDEX` 등 DDL이 포함될 때마다.
+
 ### 내부 자료 보호
 
 아래 자료는 내부 작업용이며, 원본 구조·표현 방식·데이터 형식이 외부에 노출되어서는 안 된다:

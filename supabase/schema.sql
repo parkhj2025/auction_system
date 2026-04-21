@@ -71,14 +71,16 @@ RETURNS BOOLEAN AS $$
 $$ LANGUAGE sql SECURITY DEFINER STABLE;
 
 
--- 사건번호가 현재 활성 접수 상태인지 확인 (1물건 1고객 사전 검증용)
+-- 사건번호 + 매각회차가 현재 활성 접수 상태인지 확인 (1물건 1고객 사전 검증용)
 -- SECURITY DEFINER로 orders RLS 우회하여 본인 접수뿐 아니라 타인 접수도 체크 가능.
 -- 반환은 boolean만이므로 타인 접수의 상세 내용은 노출되지 않음.
-CREATE OR REPLACE FUNCTION public.is_case_active(case_no TEXT)
+-- Phase 6.7.6: case_number 단일 키 → (case_number, auction_round) 복합 키로 확장.
+CREATE OR REPLACE FUNCTION public.is_case_active(case_no TEXT, round_no INT)
 RETURNS BOOLEAN AS $$
   SELECT EXISTS (
     SELECT 1 FROM public.orders
     WHERE case_number = case_no
+      AND auction_round = round_no
       AND status NOT IN ('cancelled', 'settled', 'deposit_returned')
       AND deleted_at IS NULL
   );
@@ -197,6 +199,7 @@ CREATE TABLE IF NOT EXISTS public.orders (
 
   -- 물건 식별
   case_number TEXT NOT NULL,
+  auction_round INT NOT NULL DEFAULT 1 CHECK (auction_round >= 1),  -- Phase 6.7.6
   court TEXT NOT NULL DEFAULT '인천지방법원',
   court_division TEXT,
   matched_slug TEXT,
@@ -244,9 +247,10 @@ CREATE TABLE IF NOT EXISTS public.orders (
   deleted_at TIMESTAMPTZ
 );
 
--- 1물건 1고객 원칙: 동일 사건번호에 대해 활성 접수는 1건만
-CREATE UNIQUE INDEX IF NOT EXISTS orders_unique_active_case
-  ON public.orders (case_number)
+-- 1물건 1고객 원칙 (Phase 6.7.6): 동일 사건번호 + 동일 매각회차에 대해 활성 접수는 1건만.
+-- 다른 회차는 별도 접수로 허용 (유찰 후 재매각 케이스 대응).
+CREATE UNIQUE INDEX IF NOT EXISTS orders_unique_active_case_round
+  ON public.orders (case_number, auction_round)
   WHERE status NOT IN ('cancelled', 'settled', 'deposit_returned')
     AND deleted_at IS NULL;
 
