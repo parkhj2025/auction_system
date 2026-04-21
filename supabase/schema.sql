@@ -550,18 +550,25 @@ CREATE POLICY "court_photos_public_read"
 
 -- Phase 7 콘텐츠 이미지 버킷 (content-photos)
 -- 마이그레이션: supabase/migrations/20260421_content_photos_bucket.sql
--- 사용처: scripts/content-publish/index.mjs (CLI) — Cowork 원천 이미지 업로드.
+-- 사전 준비: Supabase Dashboard → Storage → New bucket (UI로 생성)
 --   name: content-photos
 --   public: true               (콘텐츠 페이지에서 익명 렌더)
 --   file size limit: 10 MB     (원본 대비 여유 마진, 실제 WebP 200~400KB)
 --   allowed mime types: image/jpeg, image/png, image/webp
+-- 사용처: scripts/content-publish/index.mjs (CLI) — Cowork 원천 이미지 업로드.
 
 DROP POLICY IF EXISTS "content_photos_public_read" ON storage.objects;
 CREATE POLICY "content_photos_public_read"
   ON storage.objects FOR SELECT
   USING (bucket_id = 'content-photos');
 
--- INSERT/UPDATE는 정책 없음 → service_role key로만 업로드 가능
+DROP POLICY IF EXISTS "content_photos_service_write" ON storage.objects;
+CREATE POLICY "content_photos_service_write"
+  ON storage.objects FOR INSERT
+  TO service_role
+  WITH CHECK (bucket_id = 'content-photos');
+
+-- UPDATE/DELETE는 정책 없음 → service_role key로만 작업 가능
 
 
 -- ============================================================================
