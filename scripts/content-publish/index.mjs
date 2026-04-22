@@ -59,16 +59,27 @@ function parseArgs(argv) {
 // 규격 v1 필수 frontmatter 필드
 // ---------------------------------------------------------------------------
 
+// v2: category / riskLevel 삭제 (원칙 5 — 내부 분류 라벨 비노출)
 const REQUIRED_FIELDS = [
   "caseNumber", "court", "courtDivision", "bidDate", "bidTime",
   "address", "sido", "sigungu", "dong", "propertyType", "auctionType",
   "areaM2", "areaPyeong", "appraisal", "minPrice", "percent", "round",
-  "appraisalDisplay", "minPriceDisplay", "category", "riskLevel",
+  "appraisalDisplay", "minPriceDisplay",
   "tags", "seoTags", "title", "summary", "coverImage", "publishedAt",
   "marketData",
 ];
 
+// v2: 삭제된 필드 목록. 존재 시 abort (마이그레이션 실수 차단).
+const DEPRECATED_FIELDS = ["category", "riskLevel"];
+
 const REQUIRED_MARKET_FIELDS = ["avgSalePrice", "saleCount", "avgLeasePrice", "leaseCount", "source"];
+
+// v2 §3-5 summary 분류어 abort 목록 (Plan v2.1 확정)
+const SUMMARY_CLASSIFIER_RE =
+  /학습용|교육\s*사례|안전\s*사례|투자\s*매력|적합한|실습용|추천|주의\s*물건|위험\s*물건/;
+
+// v2 §3-5 title 금지 접두어
+const TITLE_FORBIDDEN_PREFIX_RE = /^\s*\[오늘의/;
 
 // ---------------------------------------------------------------------------
 // Step (a) — 입력 검증 + 불변식 + source 마스킹
@@ -111,6 +122,57 @@ function validateFrontmatter(fm, folderName) {
     if (fm[key] === undefined || fm[key] === null || fm[key] === "") {
       errors.push(`frontmatter 필수 필드 누락: ${key}`);
     }
+  }
+
+  // v2: 폐기 필드 존재 감지 (§6-4 불변식)
+  for (const key of DEPRECATED_FIELDS) {
+    if (fm[key] !== undefined) {
+      errors.push(
+        `frontmatter v2 폐기 필드 감지: ${key}. ` +
+        `Cowork 측에서 해당 필드를 산출물에서 제거 후 재발행 필요 ` +
+        `(규격 v2 §3-2, 원칙 5 내부 분류 라벨 비노출).`
+      );
+    }
+  }
+
+  // v2: tags는 string[] (§6-10)
+  if (Array.isArray(fm.tags)) {
+    const nonString = fm.tags.find((t) => typeof t !== "string");
+    if (nonString !== undefined) {
+      errors.push(
+        `tags에 문자열이 아닌 원소 감지: ${JSON.stringify(nonString)}. ` +
+        `v2는 array<string> (§3-2, §6-10). 객체 구조 {text,type}은 v1 레거시.`
+      );
+    }
+  }
+
+  // v2: title 고정 접두어 감지 (§6-11)
+  if (typeof fm.title === "string" && TITLE_FORBIDDEN_PREFIX_RE.test(fm.title)) {
+    errors.push(
+      `title에 금지 접두어 "[오늘의" 감지. ` +
+      `v2 §3-5 title 규칙: 고정 접두어 금지. 물건 특성 한 줄 블로그 제목으로 재작성 필요.`
+    );
+  }
+
+  // v2: title 접미 "· {caseNumber}" 감지 (§6-11)
+  if (typeof fm.title === "string" && typeof fm.caseNumber === "string") {
+    const suffixRe = new RegExp(`·\\s*${fm.caseNumber.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`);
+    if (suffixRe.test(fm.title)) {
+      errors.push(
+        `title 말미에 "· ${fm.caseNumber}" 접미 감지. ` +
+        `v2 §3-5 title 규칙: 사건번호 접미 금지 (하단 메타에 이미 표시).`
+      );
+    }
+  }
+
+  // v2: summary 분류어 감지 abort (§6-12, Plan v2.1 확정)
+  if (typeof fm.summary === "string" && SUMMARY_CLASSIFIER_RE.test(fm.summary)) {
+    const matched = fm.summary.match(SUMMARY_CLASSIFIER_RE);
+    errors.push(
+      `summary에 분류어 "${matched ? matched[0] : "?"}" 감지. ` +
+      `v2 §3-5 summary 규칙: 판정·용도 분류 표현 금지 (학습용/교육 사례/안전 사례/투자 매력/적합한/실습용/추천/주의 물건/위험 물건). ` +
+      `사실 요약으로 재작성 필요. 자동 치환 금지 (원천 자료 무결성 보호).`
+    );
   }
 
   // marketData 하위 필드
@@ -191,22 +253,8 @@ function deriveSlug(caseNumber) {
 }
 
 // ---------------------------------------------------------------------------
-// Step (d) — frontmatter 매핑
+// Step (d) — frontmatter 매핑 (v2: category/riskLevel 매핑 삭제)
 // ---------------------------------------------------------------------------
-
-const CATEGORY_MAP = {
-  danger: "danger",
-  safe: "safe",
-  edu: "edu",
-  caution: "danger",  // 규격 v1 "caution" → 기존 타입 "danger"
-};
-
-const RISK_MAP = {
-  low: "low",
-  mid: "mid",
-  high: "high",
-  medium: "mid",  // 규격 v1 "medium" → 기존 타입 "mid"
-};
 
 const REGION_MAP = [
   { match: (sido, sigungu) => /인천/.test(sido) || /인천/.test(sigungu), region: "incheon" },
@@ -222,23 +270,15 @@ function deriveRegion(sido, sigungu) {
 }
 
 function mapFrontmatter(sourceFm, slug) {
-  const category = CATEGORY_MAP[sourceFm.category];
-  const riskLevel = RISK_MAP[sourceFm.riskLevel];
-  if (!category) throw new Error(`category "${sourceFm.category}" 매핑 불가. 허용: ${Object.keys(CATEGORY_MAP).join(", ")}`);
-  if (!riskLevel) throw new Error(`riskLevel "${sourceFm.riskLevel}" 매핑 불가. 허용: ${Object.keys(RISK_MAP).join(", ")}`);
-
-  const mapped = {
+  // v2: category/riskLevel 매핑 제거. 주입 필드는 type/slug/status/region/updatedAt만.
+  return {
     ...sourceFm,
     type: "analysis",
     slug,
     status: "published",
-    category,
-    riskLevel,
     region: deriveRegion(sourceFm.sido, sourceFm.sigungu),
-    updatedAt: sourceFm.publishedAt,  // 규격 v1엔 updatedAt 없음 → publishedAt 복사
+    updatedAt: sourceFm.publishedAt,  // 규격 v2엔 updatedAt 없음 → publishedAt 복사
   };
-
-  return mapped;
 }
 
 // ---------------------------------------------------------------------------
