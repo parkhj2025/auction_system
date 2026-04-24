@@ -45,6 +45,33 @@ const DEFAULT_MAX_PHOTOS = 4;
 const ALL_MAX_PHOTOS = 20;
 
 /**
+ * 캐시에 저장된 PhotoMeta 배열에서 전경 2 + 내부 2 + 보충 규칙으로 기본 상한만큼 재선별.
+ * all=true로 큰 캐시를 만든 이후 기본 호출에서 품질 있는 4장을 내려주기 위한 함수.
+ */
+function reselectFromCache(cached: PhotoMeta[], max: number): PhotoMeta[] {
+  if (cached.length <= max) return cached;
+  const byCategory = new Map<string, PhotoMeta[]>();
+  for (const p of cached) {
+    const code = p.categoryCode;
+    if (!byCategory.has(code)) byCategory.set(code, []);
+    byCategory.get(code)!.push(p);
+  }
+  const result: PhotoMeta[] = [];
+  result.push(...(byCategory.get("000241") ?? []).slice(0, 2));
+  result.push(...(byCategory.get("000245") ?? []).slice(0, 2));
+  if (result.length < max) {
+    const used = new Set(result);
+    for (const p of cached) {
+      if (result.length >= max) break;
+      if (used.has(p)) continue;
+      result.push(p);
+      used.add(p);
+    }
+  }
+  return result.slice(0, max);
+}
+
+/**
  * 사진 선별.
  * - 기본(all=false): 전경 2 + 내부 2 + 부족 시 다른 카테고리 보충, 최대 `max`장.
  * - all=true: 응답 순서 그대로, `max` 상한까지.
@@ -123,10 +150,14 @@ export async function fetchAndCachePhotos(
     Array.isArray(listing?.photos) ? (listing!.photos as PhotoMeta[]) : [];
 
   if (listing?.photos_fetched_at && cached.length > 0) {
-    if (!all || cached.length > DEFAULT_MAX_PHOTOS) {
-      return cached;
+    if (all) {
+      if (cached.length > DEFAULT_MAX_PHOTOS) {
+        return cached;
+      }
+      // all 요청 + 캐시가 기본 상한 이하 → 전체 재fetch 시도 (아래 로직 계속)
+    } else {
+      return reselectFromCache(cached, DEFAULT_MAX_PHOTOS);
     }
-    // all 요청 + 캐시가 기본 상한 이하 → 전체 재fetch 시도 (아래 로직 계속)
   }
 
   // 2. 세션 획득
