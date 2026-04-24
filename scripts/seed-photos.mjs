@@ -129,9 +129,12 @@ docid는 ASCII-only여야 함 (Supabase Storage key 제약).
 }
 
 function makeDocid(courtCode, caseNumber, itemSeq) {
-  const digits = caseNumber.replace(/[^0-9]/g, "");
-  const last = digits.slice(-6) || digits || "0";
-  return `${courtCode}-${last}-${itemSeq}`;
+  // 연도(\d+) + 구분자(타경 등 non-digit) + 사건번호 순번(\d+) 을 분리해 순번만 사용.
+  // 과거 버그: slice(-6)으로 잘라 5자리 사건(예: 2024타경49993)이
+  // "449993"으로 잘못 추출되던 문제를 정규식 분리로 해결.
+  const match = caseNumber.match(/(\d+)[^\d]+(\d+)/);
+  if (!match) throw new Error(`invalid caseNumber: ${caseNumber}`);
+  return `${courtCode}-${match[2]}-${itemSeq}`;
 }
 
 function cookieHeader(jar) {
