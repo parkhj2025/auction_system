@@ -41,32 +41,43 @@ const PIC_CATEGORY: Record<string, string> = {
   "000247": "기타사진",
 };
 
-/** 카테고리별 최대 N장 선별. 전경 2 + 내부 2 우선, 부족 시 다른 카테고리로 보충. */
-function selectPhotos(pics: RawPicItem[], max: number): RawPicItem[] {
+const DEFAULT_MAX_PHOTOS = 4;
+const ALL_MAX_PHOTOS = 20;
+
+/**
+ * 사진 선별.
+ * - 기본(all=false): 전경 2 + 내부 2 + 부족 시 다른 카테고리 보충, 최대 `max`장.
+ * - all=true: 응답 순서 그대로, `max` 상한까지.
+ */
+function selectPhotos(
+  pics: RawPicItem[],
+  max: number,
+  all: boolean
+): RawPicItem[] {
+  const withBody = pics.filter((p) => p.picFile);
+
+  if (all) {
+    return withBody.slice(0, max);
+  }
+
   const byCategory = new Map<string, RawPicItem[]>();
-  for (const p of pics) {
-    if (!p.picFile) continue;
+  for (const p of withBody) {
     const code = p.cortAuctnPicDvsCd;
     if (!byCategory.has(code)) byCategory.set(code, []);
     byCategory.get(code)!.push(p);
   }
 
   const result: RawPicItem[] = [];
-
-  // 전경(000241) 최대 2장
   const exterior = byCategory.get("000241") ?? [];
   result.push(...exterior.slice(0, 2));
-
-  // 내부(000245) 최대 2장
   const interior = byCategory.get("000245") ?? [];
   result.push(...interior.slice(0, 2));
 
-  // 부족 시 다른 카테고리에서 보충
   if (result.length < max) {
     const used = new Set(result);
-    for (const p of pics) {
+    for (const p of withBody) {
       if (result.length >= max) break;
-      if (used.has(p) || !p.picFile) continue;
+      if (used.has(p)) continue;
       result.push(p);
       used.add(p);
     }
@@ -82,25 +93,40 @@ interface FetchPhotosParams {
   itemSequence: number;
 }
 
+interface FetchPhotosOpts {
+  /** true면 MAX_PHOTOS=20까지 순서대로, false(기본)면 4장(전경 2+내부 2+보충). */
+  all?: boolean;
+}
+
 /**
  * 사진을 조회하고 캐싱한다.
  * 캐시 hit 시 즉시 URL 반환, miss 시 대법원 API → sharp 압축 → Storage 업로드.
+ *
+ * `opts.all=true`일 때는 캐시가 기본 상한(4)을 넘지 못하면 재fetch를 시도한다.
+ * 재fetch 결과가 기존 캐시보다 적거나(Vercel WAF로 빈 응답) 동일하면 기존 캐시를 유지한다(파괴 방지).
  */
 export async function fetchAndCachePhotos(
-  params: FetchPhotosParams
+  params: FetchPhotosParams,
+  opts: FetchPhotosOpts = {}
 ): Promise<PhotoMeta[]> {
   const { docid, caseNumber, courtCode, itemSequence } = params;
+  const { all = false } = opts;
   const admin = createAdminClient();
 
-  // 1. 캐시 체크
   const { data: listing } = await admin
     .from("court_listings")
     .select("photos, photos_fetched_at")
     .eq("docid", docid)
     .single();
 
-  if (listing?.photos_fetched_at && Array.isArray(listing.photos) && listing.photos.length > 0) {
-    return listing.photos as PhotoMeta[];
+  const cached: PhotoMeta[] =
+    Array.isArray(listing?.photos) ? (listing!.photos as PhotoMeta[]) : [];
+
+  if (listing?.photos_fetched_at && cached.length > 0) {
+    if (!all || cached.length > DEFAULT_MAX_PHOTOS) {
+      return cached;
+    }
+    // all 요청 + 캐시가 기본 상한 이하 → 전체 재fetch 시도 (아래 로직 계속)
   }
 
   // 2. 세션 획득
@@ -157,6 +183,10 @@ export async function fetchAndCachePhotos(
     json?.data?.dma_result?.csPicLst;
 
   if (!csPicLst || csPicLst.length === 0) {
+    // 방어: 기존 캐시가 있으면 유지 (Vercel WAF로 csPicLst가 비어 올 수 있음)
+    if (cached.length > 0) {
+      return cached;
+    }
     // 사진 없는 사건 — 빈 배열 캐싱 (재호출 방지)
     await admin
       .from("court_listings")
@@ -169,9 +199,9 @@ export async function fetchAndCachePhotos(
     return [];
   }
 
-  // 4. 카테고리별 4장 선별 → 압축 + 업로드
-  const MAX_PHOTOS = 4;
-  const selected = selectPhotos(csPicLst, MAX_PHOTOS);
+  // 4. 선별 → 압축 + 업로드
+  const maxPhotos = all ? ALL_MAX_PHOTOS : DEFAULT_MAX_PHOTOS;
+  const selected = selectPhotos(csPicLst, maxPhotos, all);
 
   const photos: PhotoMeta[] = [];
   const storagePath = `${courtCode}/${docid}`;
@@ -219,6 +249,11 @@ export async function fetchAndCachePhotos(
     } catch (err) {
       console.error(`[photos] Process failed for pic ${i}:`, err);
     }
+  }
+
+  // 방어: 재fetch 결과가 기존 캐시보다 적으면 기존 캐시 유지 (부분 실패 보호)
+  if (cached.length > photos.length) {
+    return cached;
   }
 
   // 5. JSONB 캐싱
