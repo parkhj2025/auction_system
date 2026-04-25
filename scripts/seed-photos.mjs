@@ -385,7 +385,7 @@ async function main() {
       photos_unavailable: true,
       photos_unavailable_marked_at: new Date().toISOString(),
       photos_unavailable_reason:
-        "csPicLst empty (case not registered with photos)",
+        "csPicLst empty in selectAuctnCsSrchRslt.on at fetch time. Other channels not investigated.",
     };
     const { error: markErr } = await admin
       .from("court_listings")
