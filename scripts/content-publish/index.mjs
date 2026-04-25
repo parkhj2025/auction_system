@@ -80,6 +80,19 @@ const FORBIDDEN_WORDS = [
   "실습용", "추천", "주의 물건", "초보 추천", "교훈", "배울 수 있는",
 ];
 
+/**
+ * v3.4 §10-7 — published_at / updatedAt ISO timestamp 정규화.
+ *  - "YYYY-MM-DD" → 그대로
+ *  - "YYYY-MM-DD..." (ISO timestamp 등) → slice(0, 10)
+ *  - 그 외(예외) → 그대로 통과 (위반은 내용 검증으로 후속 처리)
+ */
+function normalizeDate(v) {
+  if (typeof v !== "string") return v;
+  if (/^\d{4}-\d{2}-\d{2}$/.test(v)) return v;
+  if (/^\d{4}-\d{2}-\d{2}.+$/.test(v)) return v.slice(0, 10);
+  return v;
+}
+
 /* ─── argv ─── */
 function parseArgs(argv) {
   const a = { caseNumber: null, force: false, dryRun: false, verbose: false };
@@ -180,11 +193,22 @@ function buildFrontmatter(meta, slug, opts) {
     if (marketData[k] === undefined) delete marketData[k];
   }
 
+  // v3.4 §10-7: title 우선순위 — hero.headline ?? card.title ?? ""
+  // (hero.headline이 v2.5 카피 표준 위치. card.title은 archive 패턴일 수 있음)
+  const title = hero.headline ?? card.title ?? "";
+
+  // v3.4 §10-7: archive_* 필드 명시 폐기 — hero.archive_headline,
+  // hero.archive_sub_headline, frontmatter archive_title은 매핑에 포함하지 않음.
+  // (post.md frontmatter는 §4-3로 이미 무시. 여기서는 hero.archive_* 명시 제외.)
+
+  // v3.4 §10-7: published_at ISO normalize
+  const publishedAt = normalizeDate(meta.published_at ?? "");
+
   // undefined 필드는 직렬화 시 제외되도록 명시적으로 빼기
   const fm = {
     type: "analysis",
     slug,
-    title: card.title ?? hero.headline ?? "",
+    title,
     summary: card.summary ?? "",
     region,
     court: meta.court ?? "",
@@ -213,8 +237,8 @@ function buildFrontmatter(meta, slug, opts) {
     tags,
     seoTags,
     coverImage,
-    publishedAt: meta.published_at ?? "",
-    updatedAt: opts.updatedAt,
+    publishedAt,
+    updatedAt: normalizeDate(opts.updatedAt),
     status: "published",
     marketData,
   };
@@ -371,19 +395,21 @@ async function main() {
   console.log(`[4] 본문 처리 + 이미지 매핑 (url_map / used) — post.md frontmatter 무시`);
   const body = transformBody(postRaw, photosMeta, title);
 
-  // updatedAt 결정
+  // updatedAt 결정 (v3.4 §10-7: ISO normalize 적용)
   const outPath = path.join(OUT_DIR, `${slug}.mdx`);
   const outExists = fs.existsSync(outPath);
   const today = new Date().toISOString().slice(0, 10);
   let updatedAt;
   if (!outExists) {
-    updatedAt = meta.published_at ?? today;
+    updatedAt = normalizeDate(meta.published_at ?? today);
   } else if (args.force) {
     updatedAt = today;
   } else {
     // 멱등 비교용 — 기존 mdx의 updatedAt을 그대로 유지하면 byte-identical 가능
     const existingFm = matter(fs.readFileSync(outPath, "utf8")).data;
-    updatedAt = existingFm.updatedAt ?? meta.published_at ?? today;
+    updatedAt = normalizeDate(
+      existingFm.updatedAt ?? meta.published_at ?? today
+    );
   }
 
   console.log(`[5] frontmatter 매핑 (updatedAt=${updatedAt})`);
