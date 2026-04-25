@@ -297,6 +297,19 @@ function transformBody(postRaw, photosMeta, title) {
   if (missingCount > 0) {
     console.warn(`  ⚠ 총 ${missingCount}건의 photos 매핑 누락 (원본 유지)`);
   }
+
+  // v3.5 §7-3: "네이버" 리터럴 자동 마스킹.
+  // abort 정책 폐기. /네이버/g → "네○○" 전역 치환.
+  // 이미 마스킹된 "네○○"·"네ㅇㅇ"는 영향 없음.
+  let maskedCount = 0;
+  body = body.replace(/네이버/g, () => {
+    maskedCount++;
+    return "네○○";
+  });
+  if (maskedCount > 0) {
+    console.log(`  · "네이버" 리터럴 ${maskedCount}건 자동 마스킹 → "네○○"`);
+  }
+
   return body;
 }
 
@@ -317,9 +330,7 @@ function runContentChecks(meta, body) {
     for (const w of FORBIDDEN_WORDS) {
       if (s.includes(w)) errors.push(`forbidden word "${w}"`);
     }
-    if (s.includes("네이버")) {
-      errors.push(`raw "네이버" literal (use "네○○" or "네ㅇㅇ")`);
-    }
+    // v3.5 §7-3: "네이버" 리터럴 abort 폐기. transformBody에서 자동 마스킹.
   }
 
   if ("category" in meta) errors.push("forbidden field: meta.category");
