@@ -1,426 +1,410 @@
 #!/usr/bin/env node
 /**
- * Phase 7 — Cowork 원천 자료 → 웹 콘텐츠 변환 CLI.
+ * Phase 7 — Cowork raw-content/{caseNumber}/ → content/analysis/{slug}.mdx 변환 CLI.
  * ----------------------------------------------------------------------------
- * 사용법:
- *   pnpm content:publish raw-content/{caseNumber}              # dry-run
- *   pnpm content:publish raw-content/{caseNumber} --execute    # 실행
- *   pnpm content:publish raw-content/{caseNumber} --execute --force
- *                                             # 기존 mdx 덮어쓰기
+ * 규격: docs/content-source-v3.md (v3.2)
+ * 1차 원소스: meta.json
+ * 2차 원소스: post.md (본문)
  *
- * 원천 자료 규격: docs/content-source-v1.md
- * 변환 결과:
- *   - content/analysis/{slug}.mdx  (slug = caseNumber.replace("타경","-"))
- *   - Supabase Storage content-photos/{slug}/{sha256(webp).slice(0,8)}.webp
+ * 사용:
+ *   pnpm publish 2024타경505827           # default (멱등 no-op or 신규)
+ *   pnpm publish 2024타경505827 --force   # 기존 mdx 덮어쓰기 + updatedAt 갱신(today)
+ *   pnpm publish 2024타경505827 --dry-run # 출력만, 파일 안 씀
+ *   pnpm publish 2024타경505827 --verbose
  *
- * 처리 흐름:
- *   (a) 입력 검증 + 불변식 grep + source 마스킹 검증
- *   (b) post.md 파싱 (gray-matter)
- *   (c) slug 파생
- *   (d) frontmatter 매핑 (규격 v1 → AnalysisFrontmatter)
- *   (e) 이미지 수집
- *   (f) sharp 변환 + SHA-256 hash
- *   (g) Storage upload (멱등)
- *   (h) MDX 본문 이미지 경로 치환
- *   (i) frontmatter 후처리
- *   (j) content/analysis/{slug}.mdx 생성
- *   (k) 리포트
- *
- * 환경: node --env-file=.env.local 전제.
- * 필수 env: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY
+ * 종료 코드:
+ *   0  성공 / dry-run / 멱등 no-op
+ *   1  입력 검증 실패 (필수 파일 누락, slug 비-ASCII 등)
+ *   2  콘텐츠 규칙 위반 (분류어, 내부분류필드, 네이버 리터럴, title 패턴 등)
+ *   3  기존 mdx와 차이 발생, --force 없음
+ *   4  파일 쓰기 실패
  */
 
-import { readFile, readdir, writeFile, stat } from "node:fs/promises";
-import { existsSync } from "node:fs";
+import fs from "node:fs";
 import path from "node:path";
-import crypto from "node:crypto";
+import url from "node:url";
 import matter from "gray-matter";
-import sharp from "sharp";
-import { createClient } from "@supabase/supabase-js";
 
-const BUCKET = "content-photos";
-const CONTENT_DIR = "content/analysis";
+const __filename = url.fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
+const REPO_ROOT = path.resolve(__dirname, "..", "..");
+const RAW_ROOT = path.join(REPO_ROOT, "raw-content");
+const OUT_DIR = path.join(REPO_ROOT, "content/analysis");
 
-// ---------------------------------------------------------------------------
-// CLI 인자 파싱
-// ---------------------------------------------------------------------------
+/* ─── α: 시·도 → region 매핑 (CLI 내부 const) ─── */
+const SIDO_TO_REGION = {
+  "인천광역시": "incheon",
+  "서울특별시": "seoul",
+  "경기도": "gyeonggi",
+  "부산광역시": "busan",
+  "대구광역시": "daegu",
+  "대전광역시": "daejeon",
+  "광주광역시": "gwangju",
+  "울산광역시": "ulsan",
+  "세종특별자치시": "sejong",
+  "강원특별자치도": "gangwon",
+  "강원도": "gangwon",
+  "충청북도": "chungbuk",
+  "충청남도": "chungnam",
+  "전북특별자치도": "jeonbuk",
+  "전라북도": "jeonbuk",
+  "전라남도": "jeonnam",
+  "경상북도": "gyeongbuk",
+  "경상남도": "gyeongnam",
+  "제주특별자치도": "jeju",
+};
 
-function parseArgs(argv) {
-  const args = { dir: null, execute: false, force: false };
-  for (const a of argv.slice(2)) {
-    if (a === "--execute") args.execute = true;
-    else if (a === "--force") args.force = true;
-    else if (!a.startsWith("--") && !args.dir) args.dir = a;
-  }
-  return args;
-}
+/* ─── PropertyType / AuctionType 정규화 (AnalysisFrontmatter enum 호환) ─── */
+const PROPERTY_TYPE_NORMALIZE = {
+  "오피스텔(주거)": "오피스텔",
+  "오피스텔(업무)": "오피스텔",
+  "도시형생활주택": "오피스텔",
+  "주상복합": "아파트",
+};
+const PROPERTY_TYPE_VALID = new Set([
+  "아파트", "다세대주택", "빌라", "오피스텔",
+  "단독주택", "토지", "상가", "공장", "기타",
+]);
 
-// ---------------------------------------------------------------------------
-// 규격 v1 필수 frontmatter 필드
-// ---------------------------------------------------------------------------
+const AUCTION_TYPE_NORMALIZE = {
+  "임의경매": "임의경매",
+  "강제경매": "강제경매",
+  "청산을위한형식적경매": "임의경매",
+  "공유물분할을위한경매": "임의경매",
+  "유치권에의한경매": "임의경매",
+};
 
-// v2: category / riskLevel 삭제 (원칙 5 — 내부 분류 라벨 비노출)
-const REQUIRED_FIELDS = [
-  "caseNumber", "court", "courtDivision", "bidDate", "bidTime",
-  "address", "sido", "sigungu", "dong", "propertyType", "auctionType",
-  "areaM2", "areaPyeong", "appraisal", "minPrice", "percent", "round",
-  "appraisalDisplay", "minPriceDisplay",
-  "tags", "seoTags", "title", "summary", "coverImage", "publishedAt",
-  "marketData",
+/* ─── 콘텐츠 검증 룰 (v3 §7 / §10-2) ─── */
+const FORBIDDEN_WORDS = [
+  "학습용", "교육 사례", "안전 사례", "위험 물건", "투자 매력", "적합한",
+  "실습용", "추천", "주의 물건", "초보 추천", "교훈", "배울 수 있는",
 ];
 
-// v2: 삭제된 필드 목록. 존재 시 abort (마이그레이션 실수 차단).
-const DEPRECATED_FIELDS = ["category", "riskLevel"];
+/* ─── argv ─── */
+function parseArgs(argv) {
+  const a = { caseNumber: null, force: false, dryRun: false, verbose: false };
+  for (let i = 2; i < argv.length; i++) {
+    const v = argv[i];
+    if (v === "--force") a.force = true;
+    else if (v === "--dry-run") a.dryRun = true;
+    else if (v === "--verbose" || v === "-v") a.verbose = true;
+    else if (v === "--help" || v === "-h") { printHelp(); process.exit(0); }
+    else if (!v.startsWith("--") && !a.caseNumber) a.caseNumber = v;
+  }
+  return a;
+}
+function printHelp() {
+  console.log(`pnpm publish <caseNumber> [--force] [--dry-run] [--verbose]
 
-const REQUIRED_MARKET_FIELDS = ["avgSalePrice", "saleCount", "avgLeasePrice", "leaseCount", "source"];
+규격: docs/content-source-v3.md (v3.2)
+입력: raw-content/{caseNumber}/  (meta.json·post.md·data/·images/)
+출력: content/analysis/{slug}.mdx  (slug = caseNumber.replace("타경","-"))
 
-// v2 §3-5 summary 분류어 abort 목록 (Plan v2.1 확정)
-const SUMMARY_CLASSIFIER_RE =
-  /학습용|교육\s*사례|안전\s*사례|투자\s*매력|적합한|실습용|추천|주의\s*물건|위험\s*물건/;
+옵션:
+  --force     기존 mdx 덮어쓰기 + updatedAt을 today로 갱신
+  --dry-run   파일 쓰지 않음 (검증·매핑만)
+  --verbose   상세 로그`);
+}
 
-// v2 §3-5 title 금지 접두어
-const TITLE_FORBIDDEN_PREFIX_RE = /^\s*\[오늘의/;
-
-// ---------------------------------------------------------------------------
-// Step (a) — 입력 검증 + 불변식 + source 마스킹
-// ---------------------------------------------------------------------------
-
-async function validateInput(dir) {
-  const errors = [];
-
-  // 폴더 존재
-  if (!existsSync(dir)) errors.push(`폴더 없음: ${dir}`);
-  const stats = existsSync(dir) ? await stat(dir) : null;
-  if (stats && !stats.isDirectory()) errors.push(`폴더 아님: ${dir}`);
-
-  // 필수 파일
+/* ─── §1: 입력 검증 ─── */
+function validateInput(rawDir) {
   const required = [
+    "meta.json",
     "post.md",
     "data/pdf_text.txt",
-    "data/crawler.json",
+    "data/crawler_summary.json",
     "data/photos_meta.json",
   ];
-  for (const rel of required) {
-    const full = path.join(dir, rel);
-    if (!existsSync(full)) errors.push(`필수 파일 없음: ${rel}`);
-  }
-
-  // images/photos/ 디렉터리
-  const imgDir = path.join(dir, "images/photos");
-  if (!existsSync(imgDir)) errors.push(`이미지 디렉터리 없음: images/photos/`);
-
-  if (errors.length) {
-    throw new Error(`입력 검증 실패:\n  - ${errors.join("\n  - ")}`);
-  }
+  const missing = required.filter((p) => !fs.existsSync(path.join(rawDir, p)));
+  if (!fs.existsSync(path.join(rawDir, "images/photos"))) missing.push("images/photos/");
+  return { ok: missing.length === 0, missing };
 }
 
-function validateFrontmatter(fm, folderName) {
-  const errors = [];
-
-  // 필수 필드
-  for (const key of REQUIRED_FIELDS) {
-    if (fm[key] === undefined || fm[key] === null || fm[key] === "") {
-      errors.push(`frontmatter 필수 필드 누락: ${key}`);
-    }
-  }
-
-  // v2: 폐기 필드 존재 감지 (§6-4 불변식)
-  for (const key of DEPRECATED_FIELDS) {
-    if (fm[key] !== undefined) {
-      errors.push(
-        `frontmatter v2 폐기 필드 감지: ${key}. ` +
-        `Cowork 측에서 해당 필드를 산출물에서 제거 후 재발행 필요 ` +
-        `(규격 v2 §3-2, 원칙 5 내부 분류 라벨 비노출).`
-      );
-    }
-  }
-
-  // v2: tags는 string[] (§6-10)
-  if (Array.isArray(fm.tags)) {
-    const nonString = fm.tags.find((t) => typeof t !== "string");
-    if (nonString !== undefined) {
-      errors.push(
-        `tags에 문자열이 아닌 원소 감지: ${JSON.stringify(nonString)}. ` +
-        `v2는 array<string> (§3-2, §6-10). 객체 구조 {text,type}은 v1 레거시.`
-      );
-    }
-  }
-
-  // v2: title 고정 접두어 감지 (§6-11)
-  if (typeof fm.title === "string" && TITLE_FORBIDDEN_PREFIX_RE.test(fm.title)) {
-    errors.push(
-      `title에 금지 접두어 "[오늘의" 감지. ` +
-      `v2 §3-5 title 규칙: 고정 접두어 금지. 물건 특성 한 줄 블로그 제목으로 재작성 필요.`
-    );
-  }
-
-  // v2: title 접미 "· {caseNumber}" 감지 (§6-11)
-  if (typeof fm.title === "string" && typeof fm.caseNumber === "string") {
-    const suffixRe = new RegExp(`·\\s*${fm.caseNumber.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}\\s*$`);
-    if (suffixRe.test(fm.title)) {
-      errors.push(
-        `title 말미에 "· ${fm.caseNumber}" 접미 감지. ` +
-        `v2 §3-5 title 규칙: 사건번호 접미 금지 (하단 메타에 이미 표시).`
-      );
-    }
-  }
-
-  // v2: summary 분류어 감지 abort (§6-12, Plan v2.1 확정)
-  if (typeof fm.summary === "string" && SUMMARY_CLASSIFIER_RE.test(fm.summary)) {
-    const matched = fm.summary.match(SUMMARY_CLASSIFIER_RE);
-    errors.push(
-      `summary에 분류어 "${matched ? matched[0] : "?"}" 감지. ` +
-      `v2 §3-5 summary 규칙: 판정·용도 분류 표현 금지 (학습용/교육 사례/안전 사례/투자 매력/적합한/실습용/추천/주의 물건/위험 물건). ` +
-      `사실 요약으로 재작성 필요. 자동 치환 금지 (원천 자료 무결성 보호).`
-    );
-  }
-
-  // marketData 하위 필드
-  if (fm.marketData && typeof fm.marketData === "object") {
-    for (const key of REQUIRED_MARKET_FIELDS) {
-      if (fm.marketData[key] === undefined || fm.marketData[key] === null || fm.marketData[key] === "") {
-        errors.push(`marketData.${key} 누락`);
-      }
-    }
-  }
-
-  // 불변식 1: 폴더명 === caseNumber
-  if (fm.caseNumber && folderName !== fm.caseNumber) {
-    errors.push(`불변식 §6-1: 폴더명 "${folderName}" ≠ caseNumber "${fm.caseNumber}"`);
-  }
-
-  // source 마스킹 검증 (Plan v1.1 Step 6 (a))
-  const source = fm.marketData?.source;
-  if (typeof source === "string" && /네이버/.test(source)) {
-    errors.push(
-      `marketData.source 네이버 상표 미마스킹 감지: "${source}". ` +
-      `원천 자료 post.md의 source 필드를 "네○○ 부동산"으로 수정 후 재발행 필요. ` +
-      `자동 치환 금지 (원천 자료 무결성 보호).`
-    );
-  }
-
-  if (errors.length) {
-    throw new Error(`frontmatter 검증 실패:\n  - ${errors.join("\n  - ")}`);
-  }
-}
-
-function validateBody(body, imageFiles) {
-  const warnings = [];
-
-  // 불변식 5: H1 1개 + H2 "## 01" ~ "## 07" + "## 면책 고지"
-  const h1Count = (body.match(/^# /gm) || []).length;
-  if (h1Count !== 1) warnings.push(`본문 H1 개수 ${h1Count} (기대 1)`);
-
-  for (let n = 1; n <= 7; n++) {
-    const pad = String(n).padStart(2, "0");
-    const re = new RegExp(`^## ${pad} `, "m");
-    if (!re.test(body)) warnings.push(`본문에 "## ${pad}" 섹션 없음`);
-  }
-  if (!/^## 면책 고지/m.test(body)) warnings.push(`본문에 "## 면책 고지" 섹션 없음`);
-
-  // 불변식 6: 본문 참조 이미지 실존
-  const imgRe = /!\[[^\]]*\]\(images\/photos\/([^)]+)\)/g;
-  let match;
-  while ((match = imgRe.exec(body)) !== null) {
-    const file = match[1];
-    if (!imageFiles.includes(file)) {
-      warnings.push(`본문 참조 이미지 파일 없음: images/photos/${file}`);
-    }
-  }
-
-  // 불변식 7: 네이버 마스킹 (본문에 "네이버" 리터럴 감지 시 경고)
-  if (/네이버/.test(body)) {
-    warnings.push(`본문에 "네이버" 리터럴 감지. "네○○ 부동산"으로 마스킹 필요.`);
-  }
-
-  return warnings;
-}
-
-// ---------------------------------------------------------------------------
-// Step (c) — slug 파생
-// ---------------------------------------------------------------------------
-
+/* ─── §2: slug ─── */
 function deriveSlug(caseNumber) {
-  // "2024타경46918" → "2024-46918"
   const slug = caseNumber.replace("타경", "-");
-  if (!/^\d{4}-\d+$/.test(slug)) {
-    throw new Error(
-      `slug 파생 실패: "${caseNumber}" → "${slug}". ` +
-      `기대 형식: "YYYY타경NNNNN" (숫자만).`
-    );
+  if (!/^[\x20-\x7e]+$/.test(slug)) {
+    throw new Error(`slug must be ASCII-only, got "${slug}"`);
   }
   return slug;
 }
 
-// ---------------------------------------------------------------------------
-// Step (d) — frontmatter 매핑 (v2: category/riskLevel 매핑 삭제)
-// ---------------------------------------------------------------------------
+/* ─── §3: frontmatter (meta.json → AnalysisFrontmatter) ─── */
+function buildFrontmatter(meta, slug, opts) {
+  const property = meta.property ?? {};
+  const price = meta.price ?? {};
+  const md = meta.market_data ?? {};
+  const seo = meta.seo ?? {};
+  const card = meta.card ?? {};
+  const hero = meta.hero ?? {};
 
-const REGION_MAP = [
-  { match: (sido, sigungu) => /인천/.test(sido) || /인천/.test(sigungu), region: "incheon" },
-  { match: (sido) => /경기/.test(sido), region: "gyeonggi" },
-  { match: (sido) => /서울/.test(sido), region: "seoul" },
-];
-
-function deriveRegion(sido, sigungu) {
-  for (const rule of REGION_MAP) {
-    if (rule.match(sido, sigungu)) return rule.region;
+  const rawType = property.type ?? "";
+  const propertyType = PROPERTY_TYPE_NORMALIZE[rawType] ?? rawType;
+  if (!PROPERTY_TYPE_VALID.has(propertyType)) {
+    throw new Error(`Unsupported propertyType: "${rawType}" → "${propertyType}"`);
   }
-  return "etc";
-}
+  const rawAuction = property.auction_type ?? "";
+  const auctionType = AUCTION_TYPE_NORMALIZE[rawAuction];
+  if (!auctionType) {
+    throw new Error(`Unsupported auctionType: "${rawAuction}"`);
+  }
+  const sido = property.sido ?? "";
+  const region = SIDO_TO_REGION[sido];
+  if (!region) {
+    throw new Error(`Unknown sido for region mapping: "${sido}"`);
+  }
 
-function mapFrontmatter(sourceFm, slug) {
-  // v2: category/riskLevel 매핑 제거. 주입 필드는 type/slug/status/region/updatedAt만.
-  return {
-    ...sourceFm,
+  const buildingName = property.building
+    ? `${property.name ?? ""} ${property.building}`.trim()
+    : property.name ?? undefined;
+
+  const tags = (card.tags ?? seo.tags ?? []).filter(Boolean);
+  const seoTags = (seo.seo_tags ?? card.seo_tags ?? []).filter(Boolean);
+  const coverImage = hero.image_url ?? card.cover_image ?? "";
+
+  const marketData = {
+    avgSalePrice: md.avg_sale_price,
+    saleCount: md.sale_count,
+    avgLeasePrice: md.avg_lease_deposit,
+    leaseCount: md.lease_count,
+    avgRentDeposit: md.avg_rent_deposit,
+    avgRentMonthly: md.avg_rent_monthly,
+    rentCount: md.rent_count,
+    source: "네○○ 부동산",
+  };
+
+  // undefined 필드는 직렬화 시 제외되도록 명시적으로 빼기
+  const fm = {
     type: "analysis",
     slug,
+    title: card.title ?? hero.headline ?? "",
+    summary: card.summary ?? "",
+    region,
+    court: meta.court ?? "",
+    ...(meta.court_division ? { courtDivision: meta.court_division } : {}),
+    caseNumber: meta.case_number ?? "",
+    appraisal: price.appraisal ?? 0,
+    minPrice: price.min_price ?? 0,
+    round: price.bid_round ?? 0,
+    percent: price.min_rate ?? 0,
+    bidDate: meta.bid_date ?? "",
+    ...(meta.bid_time ? { bidTime: meta.bid_time } : {}),
+    address: property.address ?? "",
+    ...(property.sido ? { sido: property.sido } : {}),
+    ...(property.sigungu ? { sigungu: property.sigungu } : {}),
+    ...(property.dong ? { dong: property.dong } : {}),
+    ...(buildingName ? { buildingName } : {}),
+    ...(property.ho ? { ho: property.ho } : {}),
+    propertyType,
+    auctionType,
+    areaM2: property.building_area_m2 ?? 0,
+    areaPyeong: property.building_area_pyeong ?? 0,
+    ...(property.land_area_m2 != null ? { landAreaM2: property.land_area_m2 } : {}),
+    ...(property.land_area_pyeong != null ? { landAreaPyeong: property.land_area_pyeong } : {}),
+    ...(price.appraisal_display ? { appraisalDisplay: price.appraisal_display } : {}),
+    ...(price.min_price_display ? { minPriceDisplay: price.min_price_display } : {}),
+    tags,
+    seoTags,
+    coverImage,
+    publishedAt: meta.published_at ?? "",
+    updatedAt: opts.updatedAt,
     status: "published",
-    region: deriveRegion(sourceFm.sido, sourceFm.sigungu),
-    updatedAt: sourceFm.publishedAt,  // 규격 v2엔 updatedAt 없음 → publishedAt 복사
+    marketData,
   };
+  return fm;
 }
 
-// ---------------------------------------------------------------------------
-// Step (f), (g) — 이미지 변환 + Storage 업로드
-// ---------------------------------------------------------------------------
-
-async function processImage(supabase, rawPath, slug, dryRun) {
-  const input = await readFile(rawPath);
-
-  const webp = await sharp(input)
-    .rotate()                                           // EXIF Auto-Orient + 메타 strip
-    .resize({ width: 1600, withoutEnlargement: true })
-    .webp({ quality: 82 })
-    .toBuffer();
-
-  const hash = crypto.createHash("sha256").update(webp).digest("hex").slice(0, 8);
-  const key = `${slug}/${hash}.webp`;
-
-  if (!dryRun) {
-    const { error } = await supabase.storage
-      .from(BUCKET)
-      .upload(key, webp, { contentType: "image/webp", upsert: true });
-    if (error) throw new Error(`Storage upload 실패 (${key}): ${error.message}`);
-  }
-
-  return { key, size: webp.length };
-}
-
-function publicUrl(supabaseUrl, slug, hash) {
-  return `${supabaseUrl}/storage/v1/object/public/${BUCKET}/${slug}/${hash}.webp`;
-}
-
-// ---------------------------------------------------------------------------
-// 메인
-// ---------------------------------------------------------------------------
-
-async function main() {
-  const args = parseArgs(process.argv);
-  if (!args.dir) {
-    console.error("사용법: pnpm content:publish raw-content/{caseNumber} [--execute] [--force]");
-    process.exit(1);
-  }
-
-  const dir = path.resolve(args.dir);
-  const folderName = path.basename(dir);
-  const dryRun = !args.execute;
-
-  console.log(`[content-publish] ${dryRun ? "DRY-RUN" : "EXECUTE"} ${dir}`);
-
-  // (a) 입력 검증
-  await validateInput(dir);
-
-  // (b) post.md 파싱
-  const postRaw = await readFile(path.join(dir, "post.md"), "utf8");
+/* ─── §4: 본문 처리 ─── */
+function transformBody(postRaw, urlMap, title) {
   const parsed = matter(postRaw);
-  const sourceFm = parsed.data;
-  const body = parsed.content;
+  let body = parsed.content;
 
-  // (a-2) frontmatter 검증
-  validateFrontmatter(sourceFm, folderName);
+  // H1 자동 주입 (없을 때만)
+  const head = body.trimStart();
+  const hasH1 = /^#\s+/.test(head);
+  if (!hasH1 && title) {
+    body = `# ${title}\n\n${head}`;
+  }
 
-  // 이미지 파일 수집
-  const imgDir = path.join(dir, "images/photos");
-  const imageFiles = (await readdir(imgDir)).filter((f) =>
-    /\.(jpe?g|png|webp)$/i.test(f)
+  // 이미지 경로 치환: ![alt](images/photos/{filename}) → ![alt]({Supabase URL})
+  let missingCount = 0;
+  body = body.replace(
+    /!\[([^\]]*)\]\(images\/photos\/([^)]+)\)/g,
+    (m, alt, filename) => {
+      const u = urlMap[filename];
+      if (!u) {
+        missingCount++;
+        console.warn(`  ⚠ url_map 누락: images/photos/${filename} → 원본 경로 유지`);
+        return m;
+      }
+      return `![${alt}](${u})`;
+    }
   );
-
-  // 본문 검증 (경고 수준)
-  const bodyWarnings = validateBody(body, imageFiles);
-  if (bodyWarnings.length) {
-    console.warn(`[content-publish] 본문 경고 ${bodyWarnings.length}건:`);
-    for (const w of bodyWarnings) console.warn(`  - ${w}`);
+  if (missingCount > 0) {
+    console.warn(`  ⚠ 총 ${missingCount}건의 url_map 누락 (원본 유지)`);
   }
+  return body;
+}
 
-  // (c) slug 파생
-  const slug = deriveSlug(sourceFm.caseNumber);
+/* ─── §6: 콘텐츠 룰 검증 ─── */
+function runContentChecks(meta, body) {
+  const errors = [];
 
-  // (d) frontmatter 매핑
-  const targetFm = mapFrontmatter(sourceFm, slug);
+  const stringsToCheck = [
+    meta.card?.title,
+    meta.card?.summary,
+    meta.hero?.headline,
+    meta.hero?.sub_headline,
+    ...Object.values(meta.sections ?? {}).flatMap((s) => [s?.title, s?.summary]),
+    body,
+  ].filter((s) => typeof s === "string");
 
-  // 기존 mdx 중복 체크
-  const mdxOut = path.join(CONTENT_DIR, `${slug}.mdx`);
-  if (existsSync(mdxOut) && !args.force && !dryRun) {
-    throw new Error(`기존 파일 존재: ${mdxOut}. --force 지정 시 덮어쓰기.`);
-  }
-
-  // Supabase 클라이언트 (execute 시에만 필요하지만 dry-run에서도 env 확인)
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-  if (!supabaseUrl || !serviceKey) {
-    throw new Error("NEXT_PUBLIC_SUPABASE_URL 또는 SUPABASE_SERVICE_ROLE_KEY 없음. node --env-file=.env.local 으로 실행.");
-  }
-  const supabase = createClient(supabaseUrl, serviceKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  });
-
-  // (e), (f), (g) — 이미지 처리
-  const imageMap = {};  // { "000241_전경_01.jpg": "abc12345" }
-  for (const file of imageFiles) {
-    const rawPath = path.join(imgDir, file);
-    const { key, size } = await processImage(supabase, rawPath, slug, dryRun);
-    const hash = key.split("/").pop().replace(".webp", "");
-    imageMap[file] = hash;
-    console.log(`  [${dryRun ? "DRY" : "UP"}] ${file} → ${key} (${Math.round(size / 1024)}KB)`);
-  }
-
-  // (h) MDX 본문 이미지 경로 치환
-  let transformedBody = body;
-  for (const [origFile, hash] of Object.entries(imageMap)) {
-    const url = publicUrl(supabaseUrl, slug, hash);
-    const escapedOrig = origFile.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
-    const pathRe = new RegExp(`images/photos/${escapedOrig}`, "g");
-    transformedBody = transformedBody.replace(pathRe, url);
-  }
-
-  // (i) frontmatter coverImage 치환
-  if (typeof targetFm.coverImage === "string") {
-    const coverFile = path.basename(targetFm.coverImage);
-    const coverHash = imageMap[coverFile];
-    if (coverHash) {
-      targetFm.coverImage = publicUrl(supabaseUrl, slug, coverHash);
+  for (const s of stringsToCheck) {
+    for (const w of FORBIDDEN_WORDS) {
+      if (s.includes(w)) errors.push(`forbidden word "${w}"`);
+    }
+    if (s.includes("네이버")) {
+      errors.push(`raw "네이버" literal (use "네○○" or "네ㅇㅇ")`);
     }
   }
 
-  // (j) content/analysis/{slug}.mdx 생성
-  const output = matter.stringify(transformedBody, targetFm);
-  if (!dryRun) {
-    await writeFile(mdxOut, output, "utf8");
+  if ("category" in meta) errors.push("forbidden field: meta.category");
+  if ("riskLevel" in meta) errors.push("forbidden field: meta.riskLevel");
+
+  for (const t of (meta.card?.tags ?? [])) {
+    if (typeof t !== "string") errors.push(`card.tags must be string[], got ${typeof t}`);
+  }
+  for (const t of (meta.seo?.tags ?? [])) {
+    if (typeof t !== "string") errors.push(`seo.tags must be string[], got ${typeof t}`);
   }
 
-  // (k) 리포트
-  console.log(`\n[content-publish] ${dryRun ? "DRY-RUN" : "COMPLETED"}`);
-  console.log(`  slug: ${slug}`);
-  console.log(`  mdx:  ${mdxOut}${dryRun ? " (미생성)" : ""}`);
-  console.log(`  이미지: ${imageFiles.length}장 (${dryRun ? "미업로드" : "업로드 완료"})`);
-  console.log(`  region: ${targetFm.region}, category: ${targetFm.category}, riskLevel: ${targetFm.riskLevel}`);
-  if (dryRun) {
-    console.log(`\n실행하려면 --execute 플래그 추가.`);
+  const title = meta.card?.title ?? meta.hero?.headline ?? "";
+  if (title.startsWith("[오늘의 무료 물건분석]")) {
+    errors.push("forbidden title prefix");
   }
+  if (meta.case_number && title.endsWith(`· ${meta.case_number}`)) {
+    errors.push(`forbidden title suffix "· ${meta.case_number}"`);
+  }
+
+  return [...new Set(errors)];
 }
 
-main().catch((err) => {
-  console.error(`[content-publish] 실패: ${err.message}`);
+/* ─── 직렬화 ─── */
+function serializeMdx(frontmatter, body) {
+  return matter.stringify(body, frontmatter);
+}
+
+/* ─── main ─── */
+async function main() {
+  const args = parseArgs(process.argv);
+  if (!args.caseNumber) {
+    printHelp();
+    process.exit(1);
+  }
+
+  const rawDir = path.join(RAW_ROOT, args.caseNumber);
+  if (!fs.existsSync(rawDir)) {
+    console.error(`raw-content/${args.caseNumber}/ 폴더 없음`);
+    process.exit(1);
+  }
+  console.log(`[1] 입력 검증: ${path.relative(REPO_ROOT, rawDir)}`);
+  const v = validateInput(rawDir);
+  if (!v.ok) {
+    console.error(`  ✗ 누락: ${v.missing.join(", ")}`);
+    process.exit(1);
+  }
+  if (args.verbose) console.log(`  ✓ 6개 필수 항목 존재`);
+
+  const meta = JSON.parse(fs.readFileSync(path.join(rawDir, "meta.json"), "utf8"));
+  const postRaw = fs.readFileSync(path.join(rawDir, "post.md"), "utf8");
+  const urlMap = meta.photos?.url_map ?? {};
+
+  const slug = deriveSlug(args.caseNumber);
+  console.log(`[2] slug: ${slug}`);
+
+  console.log(`[3] 콘텐츠 룰 검증`);
+  const matterParsed = matter(postRaw);
+  const checkErrors = runContentChecks(meta, matterParsed.content);
+  if (checkErrors.length > 0) {
+    console.error(`  ✗ ${checkErrors.length}개 위반:`);
+    for (const e of checkErrors) console.error(`    - ${e}`);
+    process.exit(2);
+  }
+  if (args.verbose) console.log(`  ✓ §7 + §10-2 통과`);
+
+  const title = meta.card?.title ?? meta.hero?.headline ?? "";
+  console.log(`[4] 본문 처리 + 이미지 url_map 치환`);
+  const body = transformBody(postRaw, urlMap, title);
+
+  // updatedAt 결정
+  const outPath = path.join(OUT_DIR, `${slug}.mdx`);
+  const outExists = fs.existsSync(outPath);
+  const today = new Date().toISOString().slice(0, 10);
+  let updatedAt;
+  if (!outExists) {
+    updatedAt = meta.published_at ?? today;
+  } else if (args.force) {
+    updatedAt = today;
+  } else {
+    // 멱등 비교용 — 기존 mdx의 updatedAt을 그대로 유지하면 byte-identical 가능
+    const existingFm = matter(fs.readFileSync(outPath, "utf8")).data;
+    updatedAt = existingFm.updatedAt ?? meta.published_at ?? today;
+  }
+
+  console.log(`[5] frontmatter 매핑 (updatedAt=${updatedAt})`);
+  const frontmatter = buildFrontmatter(meta, slug, { updatedAt });
+  const mdxContent = serializeMdx(frontmatter, body);
+
+  // dry-run: 멱등 검사보다 우선. 차이가 있어도 미리보기 후 정상 종료.
+  if (args.dryRun) {
+    if (outExists) {
+      const existing = fs.readFileSync(outPath, "utf8");
+      if (existing === mdxContent) {
+        console.log(`[6] dry-run — 기존 파일과 byte-identical (no-op 예상)`);
+      } else {
+        console.log(
+          `[6] dry-run — 기존과 차이: 기존 ${existing.length}B / 신규 ${mdxContent.length}B`
+        );
+      }
+    } else {
+      console.log(`[6] dry-run — 신규 파일 (${mdxContent.length}B)`);
+    }
+    if (args.verbose) {
+      console.log("\n--- frontmatter preview ---");
+      console.log(matter.stringify("", frontmatter));
+    }
+    process.exit(0);
+  }
+
+  // §7 멱등성
+  if (outExists) {
+    const existing = fs.readFileSync(outPath, "utf8");
+    if (existing === mdxContent) {
+      console.log(`[6] 기존 파일과 byte-identical → no-op`);
+      process.exit(0);
+    }
+    if (!args.force) {
+      console.error(
+        `[6] 기존 ${path.relative(REPO_ROOT, outPath)}과 차이 발생.\n   --force로 덮어쓰기 또는 --dry-run으로 검토.`
+      );
+      console.error(`   기존 ${existing.length}B / 신규 ${mdxContent.length}B`);
+      process.exit(3);
+    }
+  }
+
+  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  try {
+    fs.writeFileSync(outPath, mdxContent, "utf8");
+  } catch (e) {
+    console.error(`[8] 쓰기 실패: ${e.message}`);
+    process.exit(4);
+  }
+  console.log(
+    `[8] 쓰기 완료: ${path.relative(REPO_ROOT, outPath)}  ${mdxContent.length}B  updatedAt=${updatedAt}`
+  );
+}
+
+main().catch((e) => {
+  console.error("치명적 오류:", e);
   process.exit(1);
 });
