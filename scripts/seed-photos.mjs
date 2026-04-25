@@ -26,10 +26,10 @@
  *   SUPABASE_SERVICE_ROLE_KEY
  *
  * 종료 코드:
- *   0  성공 (혹은 이미 캐시됨)
+ *   0  성공 (혹은 이미 캐시됨, 또는 csPicLst 0장 → photos_unavailable 마킹 후 정상 종료)
  *   1  인자 오류 / DB 연결 실패
  *   2  대법원 세션 초기화 실패
- *   3  상세 API 빈 응답 (사진 없음 또는 WAF)
+ *   3  상세 API 호출 자체 실패 (HTTP 에러 등)
  *   4  Storage 업로드 실패
  */
 
@@ -371,10 +371,40 @@ async function main() {
   pics = pics.filter((p) => p.picFile);
   console.log(`    csPicLst: ${pics.length}장 (picFile 보유)`);
   if (pics.length === 0) {
-    console.error(
-      "빈 응답입니다. WAF 차단이거나 실제로 사진이 없는 사건입니다."
+    // 사진 미수신 케이스: 사건이 사이트에 등록돼 있으나 사진이 첨부되지 않았거나,
+    // 사건 자체가 해당 (court, csNo, item) 조합으로 조회되지 않는 상황.
+    // 진단을 위해 raw_snapshot에 photos_unavailable=true 플래그를 마킹하고
+    // photos_fetched_at을 세팅해 향후 호출 시 재시도가 무한 반복되지 않도록 한다.
+    const { data: existing } = await admin
+      .from("court_listings")
+      .select("raw_snapshot")
+      .eq("docid", docid)
+      .maybeSingle();
+    const mergedSnapshot = {
+      ...(existing?.raw_snapshot ?? {}),
+      photos_unavailable: true,
+      photos_unavailable_marked_at: new Date().toISOString(),
+      photos_unavailable_reason:
+        "csPicLst empty (case not registered with photos)",
+    };
+    const { error: markErr } = await admin
+      .from("court_listings")
+      .update({
+        photos: [],
+        photos_fetched_at: new Date().toISOString(),
+        photos_count: 0,
+        raw_snapshot: mergedSnapshot,
+      })
+      .eq("docid", docid);
+    if (markErr) {
+      console.error("photos_unavailable 마킹 실패:", markErr.message);
+      process.exit(3);
+    }
+    console.log(
+      `사진 미수신 (csPicLst 0장). photos_unavailable=true 마킹 후 정상 종료.`
     );
-    process.exit(3);
+    console.log(`  docid: ${docid}`);
+    process.exit(0);
   }
 
   const max = args.all ? (args.max ?? ALL_MAX) : DEFAULT_MAX;
