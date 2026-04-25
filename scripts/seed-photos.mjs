@@ -193,8 +193,22 @@ async function initSession(verbose) {
   return jar;
 }
 
-async function fetchPicList(jar, { caseNumber, courtCode, itemSequence }) {
-  const res = await fetch(`${BASE}/pgj/pgj15B/selectAuctnCsSrchRslt.on`, {
+/**
+ * caseNumber("YYYY타경NNN") → csNo("YYYY0130NNNNNN") 14자리 zero-padded.
+ * - 1~4: 연도, 5~6: "01"(타경), 7~8: "30"(상수), 9~14: 사건번호 6자리.
+ *
+ * 형준님 캡쳐(2026-04-25) 기준 selectPicInf.on 페이로드 규격.
+ */
+function encodeCsNo(caseNumber) {
+  const m = caseNumber.match(/(\d+)[^\d]+(\d+)/);
+  if (!m) throw new Error(`invalid caseNumber: ${caseNumber}`);
+  const year = m[1];
+  const num = m[2].padStart(6, "0");
+  return `${year}0130${num}`;
+}
+
+async function callPicInfPage(jar, courtCode, csNo, pageNo, totalCnt, totalYn) {
+  const res = await fetch(`${BASE}/pgj/pgj15B/selectPicInf.on`, {
     method: "POST",
     headers: {
       "User-Agent": UA,
@@ -204,8 +218,9 @@ async function fetchPicList(jar, { caseNumber, courtCode, itemSequence }) {
       Origin: BASE,
       Referer: `${BASE}/pgj/index.on?w2xPath=/pgj/ui/pgj100/PGJ151F00.xml`,
       "SC-Userid": "NONUSER",
-      "SC-Pgmid": "PGJ15BM01",
-      submissionid: "mf_wfm_mainFrame_sbm_selectGdsDtlSrchDtlInfo",
+      "SC-Pgmid": "PGJ15BP06",
+      submissionid:
+        "mf_wfm_mainFrame_dspslGdsReltPicPopUp_wframe_sbm_selectPicInfoLst",
       "sec-ch-ua":
         '"Google Chrome";v="147", "Not.A/Brand";v="8", "Chromium";v="147"',
       "sec-ch-ua-mobile": "?0",
@@ -213,20 +228,82 @@ async function fetchPicList(jar, { caseNumber, courtCode, itemSequence }) {
       Cookie: cookieHeader(jar),
     },
     body: JSON.stringify({
-      dma_srchGdsDtlSrch: {
-        csNo: caseNumber,
+      dma_pageInfo: {
+        pageNo,
+        pageSize: 1,
+        bfPageNo: "",
+        startRowNo: "",
+        totalCnt: totalYn === "Y" ? "" : String(totalCnt),
+        totalYn,
+      },
+      dma_srchPicInf: {
         cortOfcCd: courtCode,
-        dspslGdsSeq: String(itemSequence),
-        pgmId: "PGJ15BM01",
-        srchInfo: {},
+        csNo,
+        ordTsCnt: "",
+        auctnInfOriginDvsCd: "",
+        pgmId: "PGJ15BP06",
+        cortAuctnPicDvsCd: "",
+        flag: totalYn === "Y" ? "" : "1",
       },
     }),
   });
   if (!res.ok) {
-    throw new Error(`detail API HTTP ${res.status}`);
+    throw new Error(`selectPicInf.on HTTP ${res.status}`);
   }
-  const json = await res.json();
-  return json?.data?.dma_result?.csPicLst ?? [];
+  return await res.json();
+}
+
+/**
+ * 새 endpoint(selectPicInf.on) 기반 사진 수집.
+ *
+ * 흐름:
+ *   1) totalYn="Y" 호출 → dma_pageInfo.totalCnt 획득
+ *   2) totalCnt 만큼 pageNo 1..N 반복 호출 (totalYn="N", flag="1")
+ *      - 응답: picLst[0] = base64 / dlt_csPicLst[0] = 메타
+ *
+ * 출력 객체 형식은 기존(selectAuctnCsSrchRslt.on의 csPicLst 항목)과 호환되도록
+ * picFile / cortAuctnPicDvsCd / cortAuctnPicSeq / pageSeq / picTitlNm / picDscrCtt 채움.
+ * → selectPhotos / sharp / Storage 업로드 흐름 그대로 재사용 가능.
+ *
+ * itemSequence 파라미터는 docid 생성에서만 사용되고 selectPicInf.on에는 전달되지 않음.
+ * 기존 호출부 호환을 위해 시그니처는 유지.
+ */
+async function fetchPicList(jar, { caseNumber, courtCode /* , itemSequence */ }) {
+  const csNo = encodeCsNo(caseNumber);
+
+  // 1) totalCnt 획득
+  const r1 = await callPicInfPage(jar, courtCode, csNo, 1, "", "Y");
+  const totalCnt = parseInt(r1?.data?.dma_pageInfo?.totalCnt ?? "0", 10);
+  if (!Number.isFinite(totalCnt) || totalCnt <= 0) return [];
+
+  // 2) totalCnt 만큼 페이지 호출
+  const pics = [];
+  for (let p = 1; p <= totalCnt; p++) {
+    let r;
+    try {
+      r = await callPicInfPage(jar, courtCode, csNo, p, totalCnt, "N");
+    } catch (e) {
+      console.warn(`    page ${p} 실패:`, e.message);
+      continue;
+    }
+    const meta = r?.data?.dlt_csPicLst?.[0];
+    const b64 = r?.data?.picLst?.[0];
+    if (!meta || !b64) {
+      console.warn(`    page ${p}: meta(${!!meta}) or base64(${!!b64}) 누락`);
+      continue;
+    }
+    pics.push({
+      picFile: b64,
+      cortAuctnPicDvsCd: meta.cortAuctnPicDvsCd,
+      cortAuctnPicSeq: meta.cortAuctnPicSeq,
+      pageSeq: meta.pageSeq,
+      picTitlNm: meta.picTitlNm,
+      picDscrCtt: meta.picDscrCtt,
+    });
+    // rate limit 친화: 페이지마다 250ms
+    await new Promise((r) => setTimeout(r, 250));
+  }
+  return pics;
 }
 
 function selectPhotos(pics, max, all) {
@@ -461,12 +538,34 @@ async function main() {
     process.exit(4);
   }
 
+  // 사진 수신에 성공했으므로, 이전에 마킹된 photos_unavailable 플래그를
+  // 자동 해제한다 (raw_snapshot에서 관련 키 3개 제거).
+  const { data: existingRow } = await admin
+    .from("court_listings")
+    .select("raw_snapshot")
+    .eq("docid", docid)
+    .maybeSingle();
+  const cleanedSnapshot = { ...(existingRow?.raw_snapshot ?? {}) };
+  let unavailableCleared = false;
+  if (
+    "photos_unavailable" in cleanedSnapshot ||
+    "photos_unavailable_marked_at" in cleanedSnapshot ||
+    "photos_unavailable_reason" in cleanedSnapshot
+  ) {
+    delete cleanedSnapshot.photos_unavailable;
+    delete cleanedSnapshot.photos_unavailable_marked_at;
+    delete cleanedSnapshot.photos_unavailable_reason;
+    cleanedSnapshot.photos_unavailable_cleared_at = new Date().toISOString();
+    unavailableCleared = true;
+  }
+
   const { error: updErr } = await admin
     .from("court_listings")
     .update({
       photos,
       photos_fetched_at: new Date().toISOString(),
       photos_count: photos.length,
+      raw_snapshot: cleanedSnapshot,
     })
     .eq("docid", docid);
   if (updErr) {
@@ -475,7 +574,8 @@ async function main() {
   }
 
   console.log(
-    `[4] court_listings.photos UPDATE 완료. photos_count=${photos.length}`
+    `[4] court_listings.photos UPDATE 완료. photos_count=${photos.length}` +
+      (unavailableCleared ? " (photos_unavailable 자동 해제)" : "")
   );
   console.log(
     `\n결과 호출: GET /api/court-listings/${docid}/photos${args.all ? "?all=true" : ""}`
