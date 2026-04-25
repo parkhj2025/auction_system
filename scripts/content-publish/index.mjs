@@ -106,18 +106,20 @@ function printHelp() {
   --verbose   상세 로그`);
 }
 
-/* ─── §1: 입력 검증 ─── */
+/* ─── §1: 입력 검증 (v3.3 — pdf_text·images/photos 선택) ─── */
 function validateInput(rawDir) {
   const required = [
     "meta.json",
     "post.md",
-    "data/pdf_text.txt",
     "data/crawler_summary.json",
     "data/photos_meta.json",
   ];
+  const optional = ["data/pdf_text.txt", "images/photos"];
   const missing = required.filter((p) => !fs.existsSync(path.join(rawDir, p)));
-  if (!fs.existsSync(path.join(rawDir, "images/photos"))) missing.push("images/photos/");
-  return { ok: missing.length === 0, missing };
+  const optionalMissing = optional.filter(
+    (p) => !fs.existsSync(path.join(rawDir, p))
+  );
+  return { ok: missing.length === 0, missing, optionalMissing };
 }
 
 /* ─── §2: slug ─── */
@@ -162,16 +164,21 @@ function buildFrontmatter(meta, slug, opts) {
   const seoTags = (seo.seo_tags ?? card.seo_tags ?? []).filter(Boolean);
   const coverImage = hero.image_url ?? card.cover_image ?? "";
 
+  // v3.3 표준 우선, 베타 1호 패턴(avg_*) fallback
   const marketData = {
-    avgSalePrice: md.avg_sale_price,
+    avgSalePrice: md.sale_avg ?? md.avg_sale_price,
     saleCount: md.sale_count,
-    avgLeasePrice: md.avg_lease_deposit,
+    avgLeasePrice: md.lease_avg ?? md.avg_lease_deposit,
     leaseCount: md.lease_count,
-    avgRentDeposit: md.avg_rent_deposit,
-    avgRentMonthly: md.avg_rent_monthly,
+    avgRentDeposit: md.rent_deposit_avg ?? md.avg_rent_deposit,
+    avgRentMonthly: md.rent_avg ?? md.avg_rent_monthly,
     rentCount: md.rent_count,
     source: "네○○ 부동산",
   };
+  // undefined 값 제거 (matter.stringify가 null로 직렬화하는 것을 회피)
+  for (const k of Object.keys(marketData)) {
+    if (marketData[k] === undefined) delete marketData[k];
+  }
 
   // undefined 필드는 직렬화 시 제외되도록 명시적으로 빼기
   const fm = {
@@ -214,8 +221,9 @@ function buildFrontmatter(meta, slug, opts) {
   return fm;
 }
 
-/* ─── §4: 본문 처리 ─── */
-function transformBody(postRaw, urlMap, title) {
+/* ─── §4: 본문 처리 (v3.3 — post.md frontmatter 무시, 절대 URL 통과, used fallback) ─── */
+function transformBody(postRaw, photosMeta, title) {
+  // v3.3 §4-3: post.md frontmatter는 무시, 본문만 사용
   const parsed = matter(postRaw);
   let body = parsed.content;
 
@@ -226,22 +234,44 @@ function transformBody(postRaw, urlMap, title) {
     body = `# ${title}\n\n${head}`;
   }
 
-  // 이미지 경로 치환: ![alt](images/photos/{filename}) → ![alt]({Supabase URL})
+  const urlMap = photosMeta?.url_map ?? {};
+  const used = Array.isArray(photosMeta?.used) ? photosMeta.used : [];
+
+  // used 배열에서 파일명 → URL 매핑을 보조 룩업으로 구성 (베타 2호 호환)
+  // used 항목이 객체({filename, url}) 또는 URL 문자열, 파일명 문자열 등 다양할 수 있음.
+  const usedLookup = {};
+  for (const u of used) {
+    if (typeof u === "string") {
+      // URL 문자열이면 파일명 추출 (마지막 segment)
+      const slash = u.lastIndexOf("/");
+      const fname = slash >= 0 ? u.slice(slash + 1) : u;
+      usedLookup[fname] = u;
+    } else if (u && typeof u === "object") {
+      const fname = u.filename ?? u.name ?? u.file;
+      const url = u.url ?? u.public_url ?? u.src;
+      if (fname && url) usedLookup[fname] = url;
+    }
+  }
+
+  // 상대경로 치환: ![alt](images/photos/{filename}) → 절대 URL
+  // v3.3: 본문이 이미 절대 URL이면 정규식 매칭 0건이라 no-op (의도된 통과)
   let missingCount = 0;
   body = body.replace(
     /!\[([^\]]*)\]\(images\/photos\/([^)]+)\)/g,
     (m, alt, filename) => {
-      const u = urlMap[filename];
+      const u = urlMap[filename] ?? usedLookup[filename];
       if (!u) {
         missingCount++;
-        console.warn(`  ⚠ url_map 누락: images/photos/${filename} → 원본 경로 유지`);
+        console.warn(
+          `  ⚠ photos 매핑 누락: images/photos/${filename} → 원본 경로 유지`
+        );
         return m;
       }
       return `![${alt}](${u})`;
     }
   );
   if (missingCount > 0) {
-    console.warn(`  ⚠ 총 ${missingCount}건의 url_map 누락 (원본 유지)`);
+    console.warn(`  ⚠ 총 ${missingCount}건의 photos 매핑 누락 (원본 유지)`);
   }
   return body;
 }
@@ -310,14 +340,19 @@ async function main() {
   console.log(`[1] 입력 검증: ${path.relative(REPO_ROOT, rawDir)}`);
   const v = validateInput(rawDir);
   if (!v.ok) {
-    console.error(`  ✗ 누락: ${v.missing.join(", ")}`);
+    console.error(`  ✗ 누락 (필수): ${v.missing.join(", ")}`);
     process.exit(1);
   }
-  if (args.verbose) console.log(`  ✓ 6개 필수 항목 존재`);
+  if (v.optionalMissing?.length > 0 && args.verbose) {
+    console.log(
+      `  · 선택 항목 누락 (v3.3 허용): ${v.optionalMissing.join(", ")}`
+    );
+  }
+  if (args.verbose) console.log(`  ✓ 4개 필수 항목 존재`);
 
   const meta = JSON.parse(fs.readFileSync(path.join(rawDir, "meta.json"), "utf8"));
   const postRaw = fs.readFileSync(path.join(rawDir, "post.md"), "utf8");
-  const urlMap = meta.photos?.url_map ?? {};
+  const photosMeta = meta.photos ?? {};
 
   const slug = deriveSlug(args.caseNumber);
   console.log(`[2] slug: ${slug}`);
@@ -333,8 +368,8 @@ async function main() {
   if (args.verbose) console.log(`  ✓ §7 + §10-2 통과`);
 
   const title = meta.card?.title ?? meta.hero?.headline ?? "";
-  console.log(`[4] 본문 처리 + 이미지 url_map 치환`);
-  const body = transformBody(postRaw, urlMap, title);
+  console.log(`[4] 본문 처리 + 이미지 매핑 (url_map / used) — post.md frontmatter 무시`);
+  const body = transformBody(postRaw, photosMeta, title);
 
   // updatedAt 결정
   const outPath = path.join(OUT_DIR, `${slug}.mdx`);
