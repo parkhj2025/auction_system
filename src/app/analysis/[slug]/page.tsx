@@ -20,10 +20,24 @@ import { GatingWrapper } from "@/components/analysis/GatingWrapper";
 import { remarkAnalysisBlocks } from "@/lib/remark/analysis-blocks";
 import { BRAND_NAME } from "@/lib/constants";
 
-export const dynamicParams = false;
+// 단계 3-5-fix: 한글 slug 호환 — dynamicParams=true 로 변경.
+// generateStaticParams 가 만든 paths 는 SSG, 그 외는 SSR + getAnalysisBySlug
+// 매칭 실패 시 notFound() 로 404. 한글 인코딩 dev 환경 호환.
+export const dynamicParams = true;
+
+function safeDecode(s: string): string {
+  try {
+    return decodeURIComponent(s);
+  } catch {
+    return s;
+  }
+}
 
 export async function generateStaticParams() {
-  return getAllAnalysisPosts().map((p) => ({ slug: p.frontmatter.slug }));
+  // 단계 3-5-fix: NFC 정규화 — URL 디코딩 결과(NFC)와 매칭되도록 SSG path 등록.
+  return getAllAnalysisPosts().map((p) => ({
+    slug: p.frontmatter.slug.normalize("NFC"),
+  }));
 }
 
 export async function generateMetadata({
@@ -31,7 +45,8 @@ export async function generateMetadata({
 }: {
   params: Promise<{ slug: string }>;
 }): Promise<Metadata> {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  const slug = safeDecode(rawSlug);
   const post = getAnalysisBySlug(slug);
   if (!post || post.frontmatter.status !== "published") {
     return { title: "물건분석을 찾을 수 없습니다" };
@@ -58,7 +73,10 @@ export default async function AnalysisDetailPage({
 }: {
   params: Promise<{ slug: string }>;
 }) {
-  const { slug } = await params;
+  const { slug: rawSlug } = await params;
+  // 단계 3-5-fix: Next.js 16 dynamic route 가 percent-encoded slug 를 그대로 전달.
+  // 한글 slug 호환 위해 명시적으로 decodeURIComponent.
+  const slug = safeDecode(rawSlug);
   const post = getAnalysisBySlug(slug);
   if (!post || post.frontmatter.status !== "published") notFound();
 

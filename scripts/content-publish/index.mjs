@@ -95,10 +95,17 @@ function normalizeDate(v) {
 
 /* ─── argv ─── */
 function parseArgs(argv) {
-  const a = { caseNumber: null, force: false, dryRun: false, verbose: false };
+  const a = {
+    caseNumber: null,
+    all: false,
+    force: false,
+    dryRun: false,
+    verbose: false,
+  };
   for (let i = 2; i < argv.length; i++) {
     const v = argv[i];
     if (v === "--force") a.force = true;
+    else if (v === "--all") a.all = true;
     else if (v === "--dry-run") a.dryRun = true;
     else if (v === "--verbose" || v === "-v") a.verbose = true;
     else if (v === "--help" || v === "-h") { printHelp(); process.exit(0); }
@@ -107,16 +114,29 @@ function parseArgs(argv) {
   return a;
 }
 function printHelp() {
-  console.log(`pnpm publish <caseNumber> [--force] [--dry-run] [--verbose]
+  console.log(`pnpm run publish <caseNumber> [--force] [--dry-run] [--verbose]
+pnpm run publish --all      # raw-content/ 하위 사건 디렉토리 전체 일괄
 
-규격: docs/content-source-v3.md (v3.2)
-입력: raw-content/{caseNumber}/  (meta.json·post.md·data/·images/)
-출력: content/analysis/{slug}.mdx  (slug = caseNumber.replace("타경","-"))
+slug = raw-content 디렉토리명 그대로 (단계 3-5-fix). 분류 부호 가정 0.
+입력: raw-content/{caseNumber}/  (meta.json · post.md · data/)
+출력: content/analysis/{slug}.mdx + {slug}.meta.json
 
 옵션:
-  --force     기존 mdx 덮어쓰기 + updatedAt을 today로 갱신
+  --all       raw-content 하위 사건 디렉토리 전부 일괄 publish
+              (1건 정합성 FAIL 시 해당 건만 차단, 나머지 진행)
+  --force     기존 mdx 덮어쓰기 + updatedAt today / 정합성 FAIL 강행
   --dry-run   파일 쓰지 않음 (검증·매핑만)
   --verbose   상세 로그`);
+}
+
+/* ─── §2-2: raw-content 하위 사건 디렉토리 스캔 (단계 3-5-fix) ─── */
+function scanCaseDirs() {
+  if (!fs.existsSync(RAW_ROOT)) return [];
+  return fs
+    .readdirSync(RAW_ROOT, { withFileTypes: true })
+    .filter((e) => e.isDirectory() && !e.name.startsWith("."))
+    .map((e) => e.name)
+    .sort();
 }
 
 /* ─── §1: 입력 검증 (v3.3 — pdf_text·images/photos 선택) ─── */
@@ -135,13 +155,11 @@ function validateInput(rawDir) {
   return { ok: missing.length === 0, missing, optionalMissing };
 }
 
-/* ─── §2: slug ─── */
+/* ─── §2: slug — raw-content 디렉토리명 그대로 (단계 3-5-fix)
+ *  사건 분류 부호("타경"/"타기" 등) 가정 0. 정규식 매칭 0.
+ *  Next.js dynamic route 가 한글·숫자·특수문자 자동 처리 (URL 인코딩은 브라우저가 담당). */
 function deriveSlug(caseNumber) {
-  const slug = caseNumber.replace("타경", "-");
-  if (!/^[\x20-\x7e]+$/.test(slug)) {
-    throw new Error(`slug must be ASCII-only, got "${slug}"`);
-  }
-  return slug;
+  return caseNumber;
 }
 
 /* ─── §3: frontmatter (meta.json → AnalysisFrontmatter) ─── */
@@ -752,24 +770,25 @@ function buildPublishedMeta(meta, photosMeta, slug) {
   return out;
 }
 
-/* ─── main ─── */
-async function main() {
-  const args = parseArgs(process.argv);
-  if (!args.caseNumber) {
-    printHelp();
-    process.exit(1);
-  }
-
-  const rawDir = path.join(RAW_ROOT, args.caseNumber);
+/**
+ * 단건 publish — args.caseNumber 1건 처리.
+ * 반환: { status, code, slug, message? }
+ *   status: success | skipped | fail-input | fail-rules | fail-consistency | fail-conflict | fail-write
+ *   code: 0 = success, >0 = exit code
+ *
+ * 일괄 모드(--all)에서는 process.exit 호출 0 — main dispatcher 가 결과 종합 후 종료.
+ */
+async function publishOne(caseNumber, args) {
+  const rawDir = path.join(RAW_ROOT, caseNumber);
   if (!fs.existsSync(rawDir)) {
-    console.error(`raw-content/${args.caseNumber}/ 폴더 없음`);
-    process.exit(1);
+    console.error(`  ✗ raw-content/${caseNumber}/ 폴더 없음`);
+    return { status: "fail-input", code: 1, slug: caseNumber };
   }
   console.log(`[1] 입력 검증: ${path.relative(REPO_ROOT, rawDir)}`);
   const v = validateInput(rawDir);
   if (!v.ok) {
     console.error(`  ✗ 누락 (필수): ${v.missing.join(", ")}`);
-    process.exit(1);
+    return { status: "fail-input", code: 1, slug: caseNumber };
   }
   if (v.optionalMissing?.length > 0 && args.verbose) {
     console.log(
@@ -782,7 +801,7 @@ async function main() {
   const postRaw = fs.readFileSync(path.join(rawDir, "post.md"), "utf8");
   const photosMeta = meta.photos ?? {};
 
-  const slug = deriveSlug(args.caseNumber);
+  const slug = deriveSlug(caseNumber);
   console.log(`[2] slug: ${slug}`);
 
   console.log(`[3] 콘텐츠 룰 검증`);
@@ -791,18 +810,18 @@ async function main() {
   if (checkErrors.length > 0) {
     console.error(`  ✗ ${checkErrors.length}개 위반:`);
     for (const e of checkErrors) console.error(`    - ${e}`);
-    process.exit(2);
+    return { status: "fail-rules", code: 2, slug };
   }
   if (args.verbose) console.log(`  ✓ §7 + §10-2 통과`);
 
-  // [3.5] 시나리오 정합성 검증 (v3.7 신규, 단계 3-5)
+  // [3.5] 시나리오 정합성 검증 (v3.7, 단계 3-5)
   console.log(`[3.5] 시나리오 정합성 검증 (한 줄 요약 ↔ 표 숫자, 5% 임계)`);
   const consistency = validateScenarioConsistency(postRaw);
   reportConsistency(consistency);
-  if (!consistency.ok) {
-    if (!args.force) {
-      process.exit(1);
-    }
+  if (!consistency.ok && !args.force) {
+    return { status: "fail-consistency", code: 1, slug };
+  }
+  if (!consistency.ok && args.force) {
     console.warn(
       `  ⚠ --force 플래그로 정합성 위반을 무시하고 진행합니다.`
     );
@@ -822,7 +841,6 @@ async function main() {
   } else if (args.force) {
     updatedAt = today;
   } else {
-    // 멱등 비교용 — 기존 mdx의 updatedAt을 그대로 유지하면 byte-identical 가능
     const existingFm = matter(fs.readFileSync(outPath, "utf8")).data;
     updatedAt = normalizeDate(
       existingFm.updatedAt ?? meta.published_at ?? today
@@ -833,7 +851,6 @@ async function main() {
   const frontmatter = buildFrontmatter(meta, slug, { updatedAt });
   const mdxContent = serializeMdx(frontmatter, body);
 
-  // dry-run: 멱등 검사보다 우선. 차이가 있어도 미리보기 후 정상 종료.
   if (args.dryRun) {
     if (outExists) {
       const existing = fs.readFileSync(outPath, "utf8");
@@ -851,10 +868,9 @@ async function main() {
       console.log("\n--- frontmatter preview ---");
       console.log(matter.stringify("", frontmatter));
     }
-    process.exit(0);
+    return { status: "success", code: 0, slug, dryRun: true };
   }
 
-  // §7 멱등성 — mdx 부분만. meta.json 은 §9 에서 별도 처리.
   let mdxNoop = false;
   if (outExists) {
     const existing = fs.readFileSync(outPath, "utf8");
@@ -866,7 +882,7 @@ async function main() {
         `[6] 기존 ${path.relative(REPO_ROOT, outPath)}과 차이 발생.\n   --force로 덮어쓰기 또는 --dry-run으로 검토.`
       );
       console.error(`   기존 ${existing.length}B / 신규 ${mdxContent.length}B`);
-      process.exit(3);
+      return { status: "fail-conflict", code: 3, slug };
     }
   }
 
@@ -876,14 +892,14 @@ async function main() {
       fs.writeFileSync(outPath, mdxContent, "utf8");
     } catch (e) {
       console.error(`[8] mdx 쓰기 실패: ${e.message}`);
-      process.exit(4);
+      return { status: "fail-write", code: 4, slug };
     }
     console.log(
       `[8] mdx 쓰기 완료: ${path.relative(REPO_ROOT, outPath)}  ${mdxContent.length}B  updatedAt=${updatedAt}`
     );
   }
 
-  // [9] meta.json 동행 출력 (v3.6 신규) — 컴포넌트 어댑터용 평탄화 데이터
+  // [9] meta.json 동행 출력
   const photosMetaRaw = (() => {
     const p = path.join(rawDir, "data/photos_meta.json");
     if (!fs.existsSync(p)) return {};
@@ -910,12 +926,53 @@ async function main() {
       fs.writeFileSync(metaOutPath, metaJson, "utf8");
     } catch (e) {
       console.error(`[9] meta.json 쓰기 실패: ${e.message}`);
-      process.exit(4);
+      return { status: "fail-write", code: 4, slug };
     }
     console.log(
       `[9] meta.json 동행: ${path.relative(REPO_ROOT, metaOutPath)}  ${metaJson.length}B`
     );
   }
+
+  return { status: "success", code: 0, slug };
+}
+
+/* ─── main dispatcher ─── */
+async function main() {
+  const args = parseArgs(process.argv);
+
+  // --all 모드 — raw-content/ 하위 사건 디렉토리 전체 일괄 publish
+  if (args.all) {
+    const cases = scanCaseDirs();
+    if (cases.length === 0) {
+      console.error("raw-content/ 하위에 사건 디렉토리가 없습니다.");
+      process.exit(1);
+    }
+    console.log(
+      `=== --all 모드: ${cases.length}건 발견 — ${cases.join(", ")} ===\n`
+    );
+    const results = [];
+    for (const c of cases) {
+      console.log(`\n──────────── [${c}] 시작 ────────────`);
+      const r = await publishOne(c, args);
+      results.push({ caseNumber: c, ...r });
+    }
+    const ok = results.filter((r) => r.status === "success").length;
+    const fail = results.length - ok;
+    console.log(`\n=== --all 결과 요약: PASS ${ok}건 / FAIL ${fail}건 ===`);
+    for (const r of results) {
+      const tag = r.status === "success" ? "✓" : "✗";
+      console.log(`  ${tag} ${r.caseNumber} — ${r.status}`);
+    }
+    process.exit(fail > 0 ? 1 : 0);
+  }
+
+  // 단건 모드
+  if (!args.caseNumber) {
+    printHelp();
+    process.exit(1);
+  }
+  const r = await publishOne(args.caseNumber, args);
+  process.exit(r.code);
 }
 
 main().catch((e) => {

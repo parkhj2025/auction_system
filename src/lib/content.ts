@@ -68,9 +68,12 @@ export function getAllAnalysisPosts(): AnalysisPost[] {
 }
 
 export function getAnalysisBySlug(slug: string): AnalysisPost | null {
+  // 단계 3-5-fix: 한글 slug 호환 — NFC 정규화 후 비교.
+  // URL 디코딩 결과와 mdx frontmatter 의 한글 인코딩이 NFC/NFD 로 다를 수 있음.
+  const normalized = slug.normalize("NFC");
   return (
     readCollection<AnalysisFrontmatter>("analysis").find(
-      (p) => p.frontmatter.slug === slug
+      (p) => p.frontmatter.slug.normalize("NFC") === normalized
     ) ?? null
   );
 }
