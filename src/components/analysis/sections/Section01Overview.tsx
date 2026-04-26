@@ -7,11 +7,6 @@ import { SectionHeader } from "./SectionHeader";
  */
 export function Section01Overview({ title }: { title: string }) {
   return (
-    <SectionHeader
-      num="01"
-      title={title}
-      badge="물건 정보"
-      badgeTone="info"
-    />
+    <SectionHeader num="01" title={title} badge="물건 정보" />
   );
 }

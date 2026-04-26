@@ -6,11 +6,6 @@ import { SectionHeader } from "./SectionHeader";
  */
 export function Section02BidHistory({ title }: { title: string }) {
   return (
-    <SectionHeader
-      num="02"
-      title={title}
-      badge="회차 이력"
-      badgeTone="neutral"
-    />
+    <SectionHeader num="02" title={title} badge="회차 이력" />
   );
 }
