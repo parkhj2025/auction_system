@@ -2,13 +2,9 @@ import { Landmark, FileText, ShieldCheck, Signature } from "lucide-react";
 import type { ReactNode } from "react";
 
 /**
- * Trust 4-grid — 본문 끝 ApplyCTA 직전.
- *  - 대법원 경매정보 (Landmark) — 공공데이터 기초
- *  - 공인중개사 자격 (FileText) — 대표 박형준 보유
- *  - 서울보증보험 (ShieldCheck) — 대리업무 가입
- *  - 전자서명 접수 (Signature) — 비대면 100%
- *
- * 면책 고지를 하단에 1줄 inline 으로 함께 노출 (preview prototype 패턴).
+ * Trust 4-grid (G1 보강).
+ *  - 4 grid (대법원 / 자격 / 보증보험 / 전자서명) — 보존
+ *  - 컴플라이언스 산문 단락 → footnote 1줄 압축 (자세한 고지는 ComplianceNotice 가 단독 노출)
  */
 export function TrustBlock() {
   return (
@@ -44,12 +40,8 @@ export function TrustBlock() {
           body="비대면 100%"
         />
       </div>
-      <p className="mt-6 border-t border-[var(--color-border)] pt-5 text-[11px] leading-5 text-[var(--color-ink-500)]">
-        본 콘텐츠는 대법원 경매정보 및 공공데이터를 기초로 작성된 참고 자료이며,
-        투자 권유가 아닙니다. 경매퀵은 공인중개사법에 따른 매수신청 대리(입찰
-        대리) 업무만을 수행하며, 권리분석·투자자문·명도 등은 포함되지
-        않습니다. 주변 시세는 네○○ 부동산, 국토부 실거래가 공개시스템 등 외부
-        데이터를 참조했으며 실시간 시세와 차이가 있을 수 있습니다.
+      <p className="mt-5 text-[11px] leading-5 text-[var(--color-ink-500)]">
+        본 콘텐츠는 참고 자료입니다. 자세한 고지는 페이지 하단 안내 참조.
       </p>
     </section>
   );

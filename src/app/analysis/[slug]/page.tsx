@@ -12,8 +12,10 @@ import { DetailSidebar } from "@/components/analysis/DetailSidebar";
 import { TrustBlock } from "@/components/analysis/TrustBlock";
 import { ApplyCTA } from "@/components/analysis/ApplyCTA";
 import { RelatedCards } from "@/components/analysis/RelatedCards";
+import { ComplianceNotice } from "@/components/analysis/ComplianceNotice";
 import { buildAnalysisMdxComponents } from "@/components/analysis/mdx-components";
 import { GatingWrapper } from "@/components/analysis/GatingWrapper";
+import { remarkAnalysisBlocks } from "@/lib/remark/analysis-blocks";
 import { BRAND_NAME } from "@/lib/constants";
 
 export const dynamicParams = false;
@@ -90,18 +92,26 @@ export default async function AnalysisDetailPage({
       <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
           <article className="min-w-0">
-            {/* MDX 본문만 게이팅 대상. Trust/CTA/RelatedCards 는 전환 경로 보호로 게이팅 영역 밖. */}
+            {/* MDX 본문만 게이팅 대상. Trust/CTA/Related/Compliance 는 게이팅 영역 밖 (전환·법적 노출 보호) */}
             <GatingWrapper slug={slug}>
               <MDXRemote
                 source={post.content}
                 components={components}
-                options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
+                options={{
+                  mdxOptions: {
+                    remarkPlugins: [
+                      [remarkGfm, { singleTilde: false }],
+                      remarkAnalysisBlocks,
+                    ],
+                  },
+                }}
               />
             </GatingWrapper>
 
             <TrustBlock />
             <ApplyCTA fm={fm} />
             <RelatedCards posts={related} />
+            <ComplianceNotice />
           </article>
 
           <DetailSidebar fm={fm} />
