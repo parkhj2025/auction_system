@@ -1,45 +1,39 @@
 @import "tailwindcss";
 
 /*
-  경매퀵 디자인 토큰
-  - 블루 메인, 노랑·빨강 키컬러. 오렌지 금지, 3색 동시 강조 금지.
+  경매퀵 디자인 토큰 (Phase 7 prototype 단계 2 — v1)
+  ──────────────────────────────────────────────────
+  - Tailwind v4 CSS-first 패턴 (tailwind.config.ts 미사용)
+  - 블루 메인. 오렌지 금지. 3색 동시 강조 금지.
   - 4px 기반 스페이싱은 Tailwind 기본 스케일 사용
 
-  ═══════════════════════════════════════════════════════════
-  컬러 사용 규칙 (Stage 2B-post 디자인 정지 작업 전까지 유효)
-  ═══════════════════════════════════════════════════════════
+  카테고리:
+    1. 컬러
+       - brand 11단계 (브랜드 블루)
+       - ink 5단계 (중립 텍스트)
+       - 시맨틱 4종 (success / warning / danger / info) — 기능 전용, AA 통과
+       - accent 3종 (yellow / red / green) — 표현용, deprecated 검토 (단계 3 마이그레이션)
+       - 시맨틱 alias (background / foreground / border / muted)
+    2. 보더 반경 6단계 (xs / sm / md / lg / xl / 2xl)
+    3. 그림자 4단계 (subtle / card / elevated / lift)
+    4. 폰트 (Noto Sans KR)
+    5. 타이포 스케일 (display / h1 / h2 / h3 / h4 / body / body-sm / caption / numeric)
+    6. 모션 토큰 (duration 3단계 + ease 3종)
+    7. z-index 5단계 (base / dropdown / sticky / modal / toast)
 
-  --color-brand-{50..950}
-    용도: CTA 버튼 배경(600), 활성 탭(600), 링크(600/700),
-          focus ring(600), 히어로 배경(700), 매칭 카드 보더(600)
-    금지: 일반 텍스트 강조, 배지 배경, 메타 정보 숫자
-    추후: 브랜드 컬러 확정 시 전체 팔레트 교체
+  세부 사용 가이드: docs/design-tokens.md
 
-  --color-accent-red (#dc2626)
-    용도: 폼 에러, 필수(*) 표시, 접수 중복 경고 배너
-    제한: 최저가 숫자에 사용 중 — 디자인 정지 시 ink-900으로 교체 검토
-    추후: 에러/경고 전용으로 축소
-
-  --color-accent-yellow (#ffd600)
-    용도: 히어로 가격 강조(1곳), 오픈예정 뱃지(RegionStrip)
-    금지: 배지 범용, 텍스트, 보더
-    추후: 브랜드 서브 컬러로 교체 또는 제거
-
-  --color-accent-green (#16a34a)
-    용도: 카테고리 배지 (중립화 완료 — 텍스트 라벨로 전환됨)
-    추후: Stage 2B-post에서 완전 제거
-
-  --color-cat-{danger|edu|safe}
-    상태: 중립화 완료 (텍스트 라벨, ink-700 + ink-100)
-    추후: Stage 2B-post에서 최종 방식 확정
-
-  --color-ink-{100..900}
-    용도: 모든 텍스트/배경/보더 기본 팔레트. 변경 없이 유지.
-    900=제목, 700=본문, 500=보조, 300=비활성, 100=배경
+  단계 3 마이그레이션 후보:
+    - --color-cat-* (제거됨, 사용처 0)
+    - --color-accent-red → --color-danger
+    - --color-accent-green → --color-success
+    - --color-accent-yellow → 유지 또는 brand 톤 흡수
 */
 
 @theme {
-  /* 블루 메인 */
+  /* ─── 1. 컬러 ──────────────────────────────────────────────────── */
+
+  /* 1-1. 브랜드 블루 11단계 */
   --color-brand-50:  #eff6ff;
   --color-brand-100: #dbeafe;
   --color-brand-200: #bfdbfe;
@@ -52,43 +46,44 @@
   --color-brand-900: #1e3a8a;
   --color-brand-950: #172554;
 
-  /* 노랑 — 오픈예정, 강조 포인트 */
-  --color-accent-yellow: #ffd600;
-  --color-accent-yellow-soft: #fff4b0;
-
-  /* 빨강 — 위험, 낙찰가 강조 */
-  --color-accent-red: #dc2626;
-  --color-accent-red-soft: #fee2e2;
-
-  /* 그린 — 안전, 수익 긍정 */
-  --color-accent-green: #16a34a;
-  --color-accent-green-soft: #dcfce7;
-
-  /* 3 카테고리 톤 별칭 */
-  --color-cat-danger: var(--color-accent-red);
-  --color-cat-danger-soft: var(--color-accent-red-soft);
-  --color-cat-edu: var(--color-brand-600);
-  --color-cat-edu-soft: var(--color-brand-50);
-  --color-cat-safe: var(--color-accent-green);
-  --color-cat-safe-soft: var(--color-accent-green-soft);
-
-  /* 중립 */
-  --color-ink-900: #0f172a;
-  --color-ink-700: #334155;
-  --color-ink-500: #64748b;
-  --color-ink-300: #cbd5e1;
-  --color-ink-100: #f1f5f9;
+  /* 1-2. 중립 ink 5단계 + 표면 */
+  --color-ink-900: #0f172a; /* 제목 */
+  --color-ink-700: #334155; /* 본문 */
+  --color-ink-500: #64748b; /* 보조 */
+  --color-ink-300: #cbd5e1; /* 비활성 (텍스트 사용 금지 — AA 미달) */
+  --color-ink-100: #f1f5f9; /* 배경 */
   --color-surface: #ffffff;
   --color-surface-muted: #f8fafc;
 
-  /* 시맨틱 */
+  /* 1-3. 시맨틱 컬러 4종 (단계 2 신규)
+     모두 흰 배경 위에서 4.5:1 이상 (AA 통과)
+     기능 전용: success(완료/긍정), warning(주의), danger(에러/위험), info(안내) */
+  --color-success: #15803d;       /* green-700, on white ≈ 5.8:1 */
+  --color-success-soft: #dcfce7;  /* 배경용 soft */
+  --color-warning: #854d0e;       /* yellow-800, on white ≈ 7.2:1 */
+  --color-warning-soft: #fef3c7;  /* 배경용 soft */
+  --color-danger: #b91c1c;        /* red-700, on white ≈ 6.0:1 */
+  --color-danger-soft: #fee2e2;   /* 배경용 soft */
+  --color-info: #1d4ed8;          /* brand-700, on white ≈ 8.4:1 */
+  --color-info-soft: #eff6ff;     /* brand-50, 배경용 soft */
+
+  /* 1-4. accent 3종 — 표현 강조용 (단계 3에서 시맨틱 마이그레이션 검토)
+     컴포넌트 다수 의존 중이라 본 단계에서는 색상 그대로 유지 */
+  --color-accent-yellow: #ffd600;
+  --color-accent-yellow-soft: #fff4b0;
+  --color-accent-red: #dc2626;
+  --color-accent-red-soft: #fee2e2;
+  --color-accent-green: #16a34a;
+  --color-accent-green-soft: #dcfce7;
+
+  /* 1-5. 시맨틱 alias (기존 유지) */
   --color-background: var(--color-surface);
   --color-foreground: var(--color-ink-900);
   --color-border: #e2e8f0;
   --color-muted: var(--color-surface-muted);
   --color-muted-foreground: var(--color-ink-500);
 
-  /* 보더 반경 */
+  /* ─── 2. 보더 반경 ────────────────────────────────────────────── */
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -96,12 +91,46 @@
   --radius-xl: 20px;
   --radius-2xl: 28px;
 
-  /* 그림자 — 과하지 않게 */
+  /* ─── 3. 그림자 (4단계로 확장, --shadow-lift는 deprecated) ─────── */
+  --shadow-subtle: 0 1px 2px rgba(15, 23, 42, 0.04);
   --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04);
+  --shadow-elevated: 0 8px 24px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04);
   --shadow-lift: 0 4px 14px rgba(15, 23, 42, 0.08);
 
-  /* 폰트 */
+  /* ─── 4. 폰트 ────────────────────────────────────────────────── */
   --font-sans: var(--font-noto-kr), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+
+  /* ─── 5. 타이포 스케일 (단계 2 신규)
+     Tailwind v4 --text-* namespace는 utility class로 직접 매핑됨
+     예: text-display / text-h1 / text-body / text-caption
+     line-height·font-weight는 컴포넌트 측에서 leading-* / font-* utility로 조합 */
+  --text-display: 3rem;       /* 48px — 페이지 대형 헤더 */
+  --text-h1: 2.25rem;         /* 36px — 페이지 H1 */
+  --text-h2: 1.875rem;        /* 30px — 섹션 H2 */
+  --text-h3: 1.5rem;          /* 24px — 서브 헤딩 */
+  --text-h4: 1.25rem;         /* 20px — 카드 제목 */
+  --text-body: 1rem;          /* 16px — 본문 (모바일 최소 16px 권장) */
+  --text-body-sm: 0.875rem;   /* 14px — 보조 본문 */
+  --text-caption: 0.75rem;    /* 12px — 캡션·메타 */
+  --text-numeric: 1.5rem;     /* 24px — 숫자 강조(가격) */
+
+  /* ─── 6. 모션 토큰 (단계 2 신규)
+     Tailwind v4 --ease-* namespace는 ease-* utility에 매핑됨
+     duration은 namespace 외라 직접 사용: duration-[var(--duration-base)] */
+  --duration-fast: 150ms;     /* 마이크로 인터랙션 */
+  --duration-base: 250ms;     /* 일반 트랜지션 */
+  --duration-slow: 400ms;     /* 복잡 트랜지션 */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-in: cubic-bezier(0.7, 0, 0.84, 0);
+  --ease-in-out: cubic-bezier(0.65, 0, 0.35, 1);
+
+  /* ─── 7. z-index 5단계 (단계 2 신규)
+     namespace 외라 직접 사용: z-[var(--z-modal)] */
+  --z-base: 0;
+  --z-dropdown: 10;
+  --z-sticky: 20;
+  --z-modal: 40;
+  --z-toast: 50;
 }
 
 :root {
@@ -121,6 +150,15 @@ body {
   outline: 2px solid var(--color-brand-600);
   outline-offset: 2px;
   border-radius: var(--radius-xs);
+}
+
+/* prefers-reduced-motion 대응: 모션 토큰을 0에 가깝게 */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --duration-fast: 0.01ms;
+    --duration-base: 0.01ms;
+    --duration-slow: 0.01ms;
+  }
 }
 
 /* 숫자 tabular 정렬 — 가격·수치 테이블 가독성 */
