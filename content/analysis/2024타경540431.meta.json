@@ -1,0 +1,52 @@
+{
+  "slug": "2024타경540431",
+  "highlights": [
+    {
+      "label": "최저가",
+      "value": "3억 380만 원 (감정가 70%)"
+    },
+    {
+      "label": "회차 / 매각기일",
+      "value": "2차 · 2026-05-27 (수) 10:00"
+    },
+    {
+      "label": "매각 형태",
+      "value": "토지 및 건물 지분 매각 (황은정 지분 1/2)"
+    },
+    {
+      "label": "단지 / 평형",
+      "value": "송도더샵마스터뷰 22BL · 전용 84.92㎡ (전체) / 42.46㎡ (지분)"
+    },
+    {
+      "label": "임차인 / 인수 부담",
+      "value": "임차인 없음 · 등기 전부 소멸"
+    }
+  ],
+  "rights": {
+    "basis_date": "2015-09-30",
+    "basis_type": "근저당권",
+    "basis_holder": "한국산업은행",
+    "total_claims": 395000000,
+    "tenants": []
+  },
+  "market": {
+    "sale_avg": 739595238,
+    "sale_median": 740000000,
+    "sale_count": 294,
+    "lease_avg": 481833333,
+    "lease_count": 18,
+    "rent_count": 19
+  },
+  "photos": [
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/0.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/1.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/2.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/3.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/4.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/5.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/6.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/7.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/8.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/9.webp"
+  ]
+}

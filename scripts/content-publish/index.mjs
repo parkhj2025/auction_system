@@ -121,9 +121,10 @@ slug = raw-content 디렉토리명 그대로 (단계 3-5-fix). 분류 부호 가
 입력: raw-content/{caseNumber}/  (meta.json · post.md · data/)
 출력: content/analysis/{slug}.mdx + {slug}.meta.json
 
-정합성 검증 (단계 3-5-fix-3):
-  Claude Opus 자체 판단으로 "한 줄 요약 ↔ 표 ↔ 산문" 통일.
-  ANTHROPIC_API_KEY 환경변수 필수.
+정합성 검증 (단계 3-5-fix-4):
+  Gemini 3.1 Pro 자체 판단으로 "한 줄 요약 ↔ 표 ↔ 산문" 통일.
+  GEMINI_API_KEY 환경변수 필수 (.env.local).
+  thinking_level=high + responseSchema 로 JSON 강제 출력.
   LLM 호출 실패 시 종료 코드 1 (재시도 0).
 
 옵션:
@@ -389,16 +390,17 @@ function serializeMdx(frontmatter, body) {
   return matter.stringify(body, frontmatter);
 }
 
-/* ─── §10-X: 시나리오 정합성 — Claude Opus 자체 판단 (v3.8, 단계 3-5-fix-3)
+/* ─── §10-X: 시나리오 정합성 — Gemini 3.1 Pro 자체 판단 (v3.9, 단계 3-5-fix-4)
  *
- *  배경: 정규식·임계 룰 (단계 3-5/fix-2) 폐기. Claude Code Opus max effort 의 판단 품질을
- *       신뢰하여 한 줄 요약 ↔ 표 ↔ 산문 3요소를 LLM 자체 추론으로 통일.
+ *  배경: Anthropic API 의존(fix-3) 폐기. 형준님 환경 GEMINI_API_KEY 보유 + 형준님 결정으로
+ *       Gemini 3.1 Pro Preview + thinking_level "high" 자체 판단으로 백엔드 교체.
+ *  시스템 프롬프트·반환 JSON 형식·치환 흐름은 그대로 유지 (단순 백엔드 교체).
  *  방식: 시나리오 섹션별 LLM 호출. adjusted=true 시 한 줄 요약 라인 치환 (mdx 생성 시점).
  *  raw-content/post.md 무수정 — 치환은 publishOne 의 transformBody 직전 in-memory 만.
  */
 
-const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
-const ANTHROPIC_MODEL = "claude-opus-4-7";
+const GEMINI_MODEL = "gemini-3.1-pro-preview";
+const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
 const SCENARIO_SYSTEM_PROMPT = `당신은 부동산 경매 분석 콘텐츠의 정합성 검증자입니다.
 
 입력으로 시나리오 섹션 1개 (한 줄 요약 + 표 + 산문) 가 주어집니다.
@@ -461,11 +463,10 @@ function extractScenarioSections(postBody) {
 }
 
 async function adjustScenarioWithLLM(section) {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
+  const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error(
-      "ANTHROPIC_API_KEY 환경변수가 설정되지 않았습니다. " +
-        "shell 에서 export 하거나 .env.local 에 추가하세요."
+      "GEMINI_API_KEY 환경변수가 설정되지 않았습니다. .env.local 에 추가하세요."
     );
   }
 
@@ -473,20 +474,38 @@ async function adjustScenarioWithLLM(section) {
     `시나리오 ${section.key} 섹션 원본:\n\n` +
     section.bodyLines.join("\n");
 
+  // Gemini 3.1 Pro Preview + thinking_level "high" + responseSchema 강제 출력
   const reqBody = {
-    model: ANTHROPIC_MODEL,
-    max_tokens: 1024,
-    system: SCENARIO_SYSTEM_PROMPT,
-    messages: [{ role: "user", content: userMessage }],
+    systemInstruction: {
+      parts: [{ text: SCENARIO_SYSTEM_PROMPT }],
+    },
+    contents: [
+      {
+        role: "user",
+        parts: [{ text: userMessage }],
+      },
+    ],
+    generationConfig: {
+      thinkingConfig: { thinkingLevel: "high" },
+      responseMimeType: "application/json",
+      responseSchema: {
+        type: "object",
+        properties: {
+          adjusted: { type: "boolean" },
+          adjustedSummaryLine: { type: "string" },
+          reason: { type: "string" },
+        },
+        required: ["adjusted", "adjustedSummaryLine", "reason"],
+      },
+    },
   };
 
   let res;
   try {
-    res = await fetch(ANTHROPIC_API_URL, {
+    res = await fetch(GEMINI_API_URL, {
       method: "POST",
       headers: {
-        "x-api-key": apiKey,
-        "anthropic-version": "2023-06-01",
+        "x-goog-api-key": apiKey,
         "content-type": "application/json",
       },
       body: JSON.stringify(reqBody),
@@ -505,13 +524,14 @@ async function adjustScenarioWithLLM(section) {
   }
 
   const json = await res.json();
-  const text = json?.content?.[0]?.text;
+  const text = json?.candidates?.[0]?.content?.parts?.[0]?.text;
   if (typeof text !== "string") {
     throw new Error(
-      `시나리오 ${section.key} LLM 응답 형식 비정상: content[0].text 누락`
+      `시나리오 ${section.key} LLM 응답 형식 비정상: candidates[0].content.parts[0].text 누락`
     );
   }
 
+  // responseMimeType=application/json + responseSchema 로 강제 JSON 이지만 안전망 매칭
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
     throw new Error(
@@ -601,7 +621,7 @@ async function applyConsistencyAdjustments(postBody) {
 function buildPublishedMeta(meta, photosMeta, slug, adjustments) {
   const out = { slug };
 
-  // 단계 3-5-fix-3: Claude Opus 자체 판단 정합성 조정 기록
+  // 단계 3-5-fix-4: Gemini 3.1 Pro 자체 판단 정합성 조정 기록 (count>0 일 때만 노출)
   if (Array.isArray(adjustments) && adjustments.length > 0) {
     const items = adjustments
       .filter((a) => a.adjusted)
@@ -611,10 +631,12 @@ function buildPublishedMeta(meta, photosMeta, slug, adjustments) {
         after: a.adjustedSummaryLine.trim(),
         reason: a.reason,
       }));
-    out.consistencyAdjustments = {
-      count: items.length,
-      items,
-    };
+    if (items.length > 0) {
+      out.consistencyAdjustments = {
+        count: items.length,
+        items,
+      };
+    }
   }
 
   // highlights — top-level 그대로
@@ -764,8 +786,8 @@ async function publishOne(caseNumber, args) {
   }
   if (args.verbose) console.log(`  ✓ §7 + §10-2 통과`);
 
-  // [3.5] 시나리오 정합성 — Claude Opus 자체 판단 (v3.8, 단계 3-5-fix-3)
-  console.log(`[3.5] 시나리오 정합성 검증 (Claude Opus 자체 판단)`);
+  // [3.5] 시나리오 정합성 — Gemini 3.1 Pro 자체 판단 (v3.9, 단계 3-5-fix-4)
+  console.log(`[3.5] 시나리오 정합성 검증 (Gemini 3.1 Pro 자체 판단)`);
   const matterContent = matterParsed.content;
   let adjustments = [];
   let postContentForBody = matterContent;
