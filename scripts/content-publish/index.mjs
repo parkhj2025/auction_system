@@ -158,10 +158,16 @@ function buildFrontmatter(meta, slug, opts) {
   if (!PROPERTY_TYPE_VALID.has(propertyType)) {
     throw new Error(`Unsupported propertyType: "${rawType}" → "${propertyType}"`);
   }
+  // v2.6.2 schema 호환: auction_type 누락 시 "임의경매" 기본값 (Cowork 영역 영향 0)
   const rawAuction = property.auction_type ?? "";
-  const auctionType = AUCTION_TYPE_NORMALIZE[rawAuction];
+  let auctionType = AUCTION_TYPE_NORMALIZE[rawAuction];
   if (!auctionType) {
-    throw new Error(`Unsupported auctionType: "${rawAuction}"`);
+    if (!rawAuction) {
+      console.warn(`  · property.auction_type 누락 — "임의경매" 기본값 적용`);
+      auctionType = "임의경매";
+    } else {
+      throw new Error(`Unsupported auctionType: "${rawAuction}"`);
+    }
   }
   const sido = property.sido ?? "";
   const region = SIDO_TO_REGION[sido];
@@ -216,8 +222,9 @@ function buildFrontmatter(meta, slug, opts) {
     caseNumber: meta.case_number ?? "",
     appraisal: price.appraisal ?? 0,
     minPrice: price.min_price ?? 0,
-    round: price.bid_round ?? 0,
-    percent: price.min_rate ?? 0,
+    // v2.6.2 schema 호환: round/rate (567436) || bid_round/min_rate (legacy)
+    round: price.round ?? price.bid_round ?? 0,
+    percent: price.rate ?? price.min_rate ?? 0,
     bidDate: meta.bid_date ?? "",
     ...(meta.bid_time ? { bidTime: meta.bid_time } : {}),
     address: property.address ?? "",
@@ -228,8 +235,9 @@ function buildFrontmatter(meta, slug, opts) {
     ...(property.ho ? { ho: property.ho } : {}),
     propertyType,
     auctionType,
-    areaM2: property.building_area_m2 ?? 0,
-    areaPyeong: property.building_area_pyeong ?? 0,
+    // v2.6.2 schema 호환: area_m2/pyeong (567436) || building_area_m2/pyeong (legacy)
+    areaM2: property.area_m2 ?? property.building_area_m2 ?? 0,
+    areaPyeong: property.area_pyeong ?? property.building_area_pyeong ?? 0,
     ...(property.land_area_m2 != null ? { landAreaM2: property.land_area_m2 } : {}),
     ...(property.land_area_pyeong != null ? { landAreaPyeong: property.land_area_pyeong } : {}),
     ...(price.appraisal_display ? { appraisalDisplay: price.appraisal_display } : {}),
@@ -359,6 +367,128 @@ function serializeMdx(frontmatter, body) {
   return matter.stringify(body, frontmatter);
 }
 
+/**
+ * §3-3-7: content/analysis/{slug}.meta.json 동행 출력 (v3.6 신규).
+ *
+ * 컴포넌트(Timeline / RightsCallout / MarketCompare / ScenarioCards / PhotoGalleryStrip)가
+ * 빌드 시 사용하는 구조화 데이터. raw-content/{caseNumber}/meta.json 에서 평탄화.
+ *
+ * Cowork schema 정합:
+ *  - sections.bidding.history (v2.6.2+) — TimelineSection
+ *  - sections.rights | registry (legacy) — RightsCallout
+ *  - sections.market | market_data (legacy) — MarketCompareCard
+ *  - sections.investment — ScenarioCards
+ *  - photos.used[] | photos[] (photos_meta.json) — PhotoGalleryStrip
+ *  - highlights[] — DetailSidebar 보강 (선택)
+ *
+ * 모든 섹션 optional. 누락 시 페이지 컴포넌트는 mdx body fallback (단계 3-1 baseline).
+ */
+function buildPublishedMeta(meta, photosMeta, slug) {
+  const out = { slug };
+
+  // highlights — top-level 그대로
+  if (Array.isArray(meta.highlights) && meta.highlights.length > 0) {
+    out.highlights = meta.highlights.map((h) => ({
+      label: String(h.label ?? ""),
+      value: String(h.value ?? ""),
+    }));
+  }
+
+  const sections = meta.sections ?? {};
+
+  // bidding (v2.6.2+ — sections.bidding.history)
+  const bh = sections.bidding?.history;
+  if (Array.isArray(bh) && bh.length > 0) {
+    out.bidding = {
+      history: bh.map((e) => ({
+        round: e.round ?? null,
+        date: e.date ?? "",
+        minimum: e.minimum ?? null,
+        rate: e.rate ?? null,
+        result: e.result ?? "",
+      })),
+    };
+  }
+
+  // rights (v2.6.2+ — sections.rights || legacy registry)
+  const rights = sections.rights ?? meta.registry;
+  if (rights && typeof rights === "object") {
+    out.rights = {
+      basis_date: rights.basis_date ?? "",
+      basis_type: rights.basis_type ?? "",
+      basis_holder: rights.basis_holder ?? "",
+      total_claims: rights.total_claims ?? rights.claim_amount ?? null,
+      tenants: Array.isArray(rights.tenants) ? rights.tenants.map((t) => ({
+        name: t.name ?? "",
+        move_in_date: t.move_in_date ?? "",
+        deposit: t.deposit ?? null,
+        opposing_power: t.opposing_power ?? null,
+        analysis: t.analysis ?? "",
+      })) : [],
+    };
+  }
+
+  // market (v2.6.2+ — sections.market || legacy market_data)
+  const market = sections.market ?? meta.market_data;
+  if (market && typeof market === "object") {
+    out.market = {
+      sale_avg: market["매매_평균"] ?? market.sale_avg ?? market.avg_sale_price ?? null,
+      sale_median: market["매매_중위"] ?? market.sale_median ?? null,
+      sale_count: market["매매_건수"] ?? market.sale_count ?? null,
+      lease_avg: market["전세_평균"] ?? market.lease_avg ?? market.avg_lease_price ?? null,
+      lease_count: market["전세_건수"] ?? market.lease_count ?? null,
+      rent_count: market["월세_건수"] ?? market.rent_count ?? null,
+    };
+    // null 만으로 가득 찬 객체는 제외
+    const hasAnyValue = Object.values(out.market).some((v) => v != null);
+    if (!hasAnyValue) delete out.market;
+  }
+
+  // investment scenarios
+  const inv = sections.investment;
+  if (inv && typeof inv === "object") {
+    out.investment = {
+      real_acquisition_cost: inv.real_acquisition_cost ?? null,
+      scenario_a: inv.scenario_a ?? null,
+      scenario_b: inv.scenario_b ?? null,
+      scenario_c1: inv.scenario_c1 ?? null,
+      scenario_c2: inv.scenario_c2 ?? null,
+    };
+  }
+
+  // photos — meta.photos.used[] 우선 / photos_meta.json 의 photos[].url fallback
+  // 상대 경로 (예: "B000240-535385-1/0.webp") → Supabase 공개 URL 으로 정규화
+  const SUPABASE_PHOTO_BASE =
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos";
+  function normalizePhotoUrl(s) {
+    if (typeof s !== "string" || !s) return "";
+    if (/^https?:\/\//.test(s)) return s;
+    // "B000240-NNNNNN-1/N.webp" 형태 → "{base}/B000240/B000240-NNNNNN-1/N.webp"
+    const m = s.match(/^(B\d{6})-(\d+-\d+)\//);
+    if (m) {
+      const courtCode = m[1]; // B000240
+      return `${SUPABASE_PHOTO_BASE}/${courtCode}/${s}`;
+    }
+    return s;
+  }
+  let photoUrls = [];
+  const usedFromMeta = meta.photos?.used;
+  if (Array.isArray(usedFromMeta) && usedFromMeta.length > 0) {
+    photoUrls = usedFromMeta
+      .map((u) => (typeof u === "string" ? u : u?.url ?? ""))
+      .map(normalizePhotoUrl)
+      .filter(Boolean);
+  } else if (Array.isArray(photosMeta?.photos)) {
+    photoUrls = photosMeta.photos
+      .map((p) => p?.url ?? "")
+      .map(normalizePhotoUrl)
+      .filter(Boolean);
+  }
+  if (photoUrls.length > 0) out.photos = photoUrls;
+
+  return out;
+}
+
 /* ─── main ─── */
 async function main() {
   const args = parseArgs(process.argv);
@@ -448,14 +578,14 @@ async function main() {
     process.exit(0);
   }
 
-  // §7 멱등성
+  // §7 멱등성 — mdx 부분만. meta.json 은 §9 에서 별도 처리.
+  let mdxNoop = false;
   if (outExists) {
     const existing = fs.readFileSync(outPath, "utf8");
     if (existing === mdxContent) {
-      console.log(`[6] 기존 파일과 byte-identical → no-op`);
-      process.exit(0);
-    }
-    if (!args.force) {
+      console.log(`[6] mdx — 기존 파일과 byte-identical → no-op`);
+      mdxNoop = true;
+    } else if (!args.force) {
       console.error(
         `[6] 기존 ${path.relative(REPO_ROOT, outPath)}과 차이 발생.\n   --force로 덮어쓰기 또는 --dry-run으로 검토.`
       );
@@ -464,16 +594,52 @@ async function main() {
     }
   }
 
-  fs.mkdirSync(path.dirname(outPath), { recursive: true });
-  try {
-    fs.writeFileSync(outPath, mdxContent, "utf8");
-  } catch (e) {
-    console.error(`[8] 쓰기 실패: ${e.message}`);
-    process.exit(4);
+  if (!mdxNoop) {
+    fs.mkdirSync(path.dirname(outPath), { recursive: true });
+    try {
+      fs.writeFileSync(outPath, mdxContent, "utf8");
+    } catch (e) {
+      console.error(`[8] mdx 쓰기 실패: ${e.message}`);
+      process.exit(4);
+    }
+    console.log(
+      `[8] mdx 쓰기 완료: ${path.relative(REPO_ROOT, outPath)}  ${mdxContent.length}B  updatedAt=${updatedAt}`
+    );
   }
-  console.log(
-    `[8] 쓰기 완료: ${path.relative(REPO_ROOT, outPath)}  ${mdxContent.length}B  updatedAt=${updatedAt}`
-  );
+
+  // [9] meta.json 동행 출력 (v3.6 신규) — 컴포넌트 어댑터용 평탄화 데이터
+  const photosMetaRaw = (() => {
+    const p = path.join(rawDir, "data/photos_meta.json");
+    if (!fs.existsSync(p)) return {};
+    try {
+      return JSON.parse(fs.readFileSync(p, "utf8"));
+    } catch {
+      return {};
+    }
+  })();
+  const publishedMeta = buildPublishedMeta(meta, photosMetaRaw, slug);
+  const metaOutPath = path.join(OUT_DIR, `${slug}.meta.json`);
+  const metaJson = JSON.stringify(publishedMeta, null, 2) + "\n";
+  let metaNoop = false;
+  if (fs.existsSync(metaOutPath)) {
+    const existing = fs.readFileSync(metaOutPath, "utf8");
+    if (existing === metaJson) {
+      console.log(`[9] meta.json — 기존 파일과 byte-identical → no-op`);
+      metaNoop = true;
+    }
+  }
+  if (!metaNoop) {
+    fs.mkdirSync(path.dirname(metaOutPath), { recursive: true });
+    try {
+      fs.writeFileSync(metaOutPath, metaJson, "utf8");
+    } catch (e) {
+      console.error(`[9] meta.json 쓰기 실패: ${e.message}`);
+      process.exit(4);
+    }
+    console.log(
+      `[9] meta.json 동행: ${path.relative(REPO_ROOT, metaOutPath)}  ${metaJson.length}B`
+    );
+  }
 }
 
 main().catch((e) => {

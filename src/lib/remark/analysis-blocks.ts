@@ -4,7 +4,7 @@
  *  1. "### 시나리오 X — ..." H3 + 다음 H3/H2 까지의 자식 → <ScenarioCard title="...">
  *  2. "## 07 종합 ..." 진입 후 첫 paragraph → <ConclusionCallout>
  *  3. "### 체크포인트" 직후 ol → <CheckpointList>
- *  4. "## 면책 고지" h2 + 그 아래 모든 자식 → 폐기 (ComplianceNotice 컴포넌트로 페이지 끝에 단일 노출)
+ *  4. "## 면책 고지" h2 + 그 아래 모든 자식 → 폐기 (ComplianceFooter 컴포넌트로 페이지 끝에 단일 노출)
  *
  * 단계 3-1 baseline. 데이터 어댑터(meta.json) 결합은 단계 3-2 이월.
  */

@@ -3,6 +3,7 @@ import path from "node:path";
 import matter from "gray-matter";
 import type {
   AnalysisFrontmatter,
+  AnalysisMeta,
   AnalysisPost,
   GuideFrontmatter,
   GuidePost,
@@ -72,6 +73,21 @@ export function getAnalysisBySlug(slug: string): AnalysisPost | null {
       (p) => p.frontmatter.slug === slug
     ) ?? null
   );
+}
+
+/**
+ * 단계 3-3 — content/analysis/{slug}.meta.json 평탄화 데이터 로더.
+ * publish CLI v3.6+ 가 mdx 와 함께 산출. 누락 시 null (컴포넌트 fallback).
+ */
+export function getAnalysisMeta(slug: string): AnalysisMeta | null {
+  const p = path.join(CONTENT_ROOT, "analysis", `${slug}.meta.json`);
+  if (!fs.existsSync(p)) return null;
+  try {
+    const raw = fs.readFileSync(p, "utf8");
+    return JSON.parse(raw) as AnalysisMeta;
+  } catch {
+    return null;
+  }
 }
 
 /**

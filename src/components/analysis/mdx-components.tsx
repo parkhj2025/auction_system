@@ -1,5 +1,6 @@
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import Image from "next/image";
+import type { AnalysisFrontmatter, AnalysisMeta } from "@/types/content";
 import { Section01Overview } from "./sections/Section01Overview";
 import { Section02BidHistory } from "./sections/Section02BidHistory";
 import { Section03Rights } from "./sections/Section03Rights";
@@ -7,17 +8,29 @@ import { Section04Market } from "./sections/Section04Market";
 import { Section05Investment } from "./sections/Section05Investment";
 import { Section06SaleHistory } from "./sections/Section06SaleHistory";
 import { Section07Opinion } from "./sections/Section07Opinion";
+import { TimelineSection } from "./TimelineSection";
+import { RightsCallout } from "./RightsCallout";
+import { MarketCompareCard } from "./MarketCompareCard";
+import { ScenarioCardsBoard } from "./ScenarioCardsBoard";
 
 /**
- * next-mdx-remote components 오버라이드 (G1 보강).
+ * next-mdx-remote components 오버라이드.
  *
- *  - Img → null (본문 사진 차단, Hero 갤러리 일원화)
+ * 단계 3-1 G1 보강 (불변):
+ *  - Img → null (본문 사진 차단, Hero/PhotoGalleryStrip 일원화)
  *  - del/s → passthrough (취소선 차단; remark-gfm singleTilde:false 와 함께)
- *  - Td 콘텐츠 기반 정렬: 금액·% → text-right tabular-nums nowrap, 회차·날짜·짧은 단어 → nowrap
+ *  - Td 콘텐츠 기반 정렬: 금액·% → text-right tabular-nums nowrap
  *  - Tr 행 색 분기: 말소기준·인수·미납·매각 강조
- *  - H2 dispatcher: "## NN 제목" → SectionXX
- *  - H3: "체크포인트" 강조 + "시나리오 X — ..." 패턴은 remark plugin 이 ScenarioCard 로 wrap
- *  - 신규 컴포넌트: ScenarioCard / ConclusionCallout / CheckpointList (remark plugin 이 emit)
+ *  - SectionHeader badge 폐기 (sub-label chip 0)
+ *  - H3 "체크포인트" 강조 / "시나리오 X" → ScenarioCard wrap (remark plugin)
+ *
+ * 단계 3-3 신규:
+ *  - H2 dispatcher 가 meta · fm 인자 수신 후 SectionXX 직후 신규 컴포넌트 자연스러운 흐름 삽입
+ *      02 → TimelineSection (meta.bidding)
+ *      03 → RightsCallout (meta.rights)
+ *      04 → MarketCompareCard (meta.market)
+ *      05 → ScenarioCardsBoard (meta.investment)
+ *  - meta 누락 시 신규 컴포넌트 0건 렌더 (mdx body fallback — 단계 3-1 baseline)
  */
 
 function extractText(children: ReactNode): string {
@@ -40,50 +53,87 @@ function H1() {
   return null;
 }
 
-function H2({ children, ...rest }: ComponentPropsWithoutRef<"h2">) {
-  const text = extractText(children);
-  const match = /^(\d{2})\s+(.+)$/.exec(text.trim());
-  if (match) {
-    const [, num, title] = match;
-    switch (num) {
-      case "01":
-        return <Section01Overview title={title} />;
-      case "02":
-        return <Section02BidHistory title={title} />;
-      case "03":
-        return <Section03Rights title={title} />;
-      case "04":
-        return <Section04Market title={title} />;
-      case "05":
-        return <Section05Investment title={title} />;
-      case "06":
-        return <Section06SaleHistory title={title} />;
-      case "07":
-        return <Section07Opinion title={title} />;
-      default:
-        return (
-          <h2
-            id={`section-${num}`}
-            className="mt-20 flex scroll-mt-24 items-baseline gap-4 border-t border-[var(--color-border)] pt-10 first:mt-0 first:border-t-0 first:pt-0"
-          >
-            <span className="text-xs font-black uppercase tracking-[0.24em] text-brand-600 tabular-nums">
-              {num}
-            </span>
-            <span className="text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
-              {title}
-            </span>
-          </h2>
-        );
+function buildH2(
+  meta: AnalysisMeta | null | undefined,
+  fm: AnalysisFrontmatter
+) {
+  return function H2({ children, ...rest }: ComponentPropsWithoutRef<"h2">) {
+    const text = extractText(children);
+    const match = /^(\d{2})\s+(.+)$/.exec(text.trim());
+    if (match) {
+      const [, num, title] = match;
+      switch (num) {
+        case "01":
+          return <Section01Overview title={title} />;
+        case "02":
+          return (
+            <>
+              <Section02BidHistory title={title} />
+              {meta?.bidding ? (
+                <TimelineSection history={meta.bidding.history} />
+              ) : null}
+            </>
+          );
+        case "03":
+          return (
+            <>
+              <Section03Rights title={title} />
+              {meta?.rights ? <RightsCallout rights={meta.rights} /> : null}
+            </>
+          );
+        case "04":
+          return (
+            <>
+              <Section04Market title={title} />
+              {meta?.market ? (
+                <MarketCompareCard
+                  market={meta.market}
+                  appraisal={fm.appraisal}
+                  minPrice={fm.minPrice}
+                  round={fm.round}
+                  percent={fm.percent}
+                />
+              ) : null}
+            </>
+          );
+        case "05":
+          return (
+            <>
+              <Section05Investment title={title} />
+              {meta?.investment ? (
+                <ScenarioCardsBoard inv={meta.investment} />
+              ) : null}
+            </>
+          );
+        case "06":
+          return <Section06SaleHistory title={title} />;
+        case "07":
+          return <Section07Opinion title={title} />;
+        default:
+          return (
+            <h2
+              id={`section-${num}`}
+              className="mt-20 flex scroll-mt-24 items-baseline gap-4 border-t border-[var(--color-border)] pt-10 first:mt-0 first:border-t-0 first:pt-0"
+            >
+              <span className="text-xs font-black uppercase tracking-[0.24em] text-brand-600 tabular-nums">
+                {num}
+              </span>
+              <span className="text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+                {title}
+              </span>
+            </h2>
+          );
+      }
     }
-  }
-  return (
-    <h2
-      className="mt-16 scroll-mt-24 text-2xl font-black tracking-tight text-[var(--color-ink-900)] first:mt-0 sm:text-3xl"
-      {...rest}
-    >
-      {children}
-    </h2>
-  );
+    return (
+      <h2
+        className="mt-16 scroll-mt-24 text-2xl font-black tracking-tight text-[var(--color-ink-900)] first:mt-0 sm:text-3xl"
+        {...rest}
+      >
+        {children}
+      </h2>
+    );
+  };
 }
 
 function H3({ children, ...rest }: ComponentPropsWithoutRef<"h3">) {
@@ -223,7 +273,6 @@ function Tr({ children, ...rest }: ComponentPropsWithoutRef<"tr">) {
   );
 }
 
-/** Th — 헤더 텍스트로 nowrap·right-align 분기 */
 function Th({ children, ...rest }: ComponentPropsWithoutRef<"th">) {
   const text = extractText(children).trim();
   const cls = thHeaderClass(text);
@@ -247,7 +296,6 @@ function thHeaderClass(text: string): string {
   return "text-left";
 }
 
-/** Td — 콘텐츠 기반 정렬·nowrap 자동 감지 */
 function Td({ children, ...rest }: ComponentPropsWithoutRef<"td">) {
   const text = extractText(children).trim();
   const cls = tdContentClass(text);
@@ -263,33 +311,28 @@ function Td({ children, ...rest }: ComponentPropsWithoutRef<"td">) {
 
 function tdContentClass(text: string): string {
   if (!text) return "";
-
-  // 회차 — 1차 / 2차 ...
   if (/^\d+차$/.test(text)) {
     return "text-center whitespace-nowrap font-medium";
   }
-
-  // 날짜 yyyy-mm-dd / yyyy-mm
   if (/^\d{4}-\d{2}(-\d{2})?$/.test(text)) {
     return "whitespace-nowrap";
   }
-
-  // 비율 % (단순 숫자%)
   if (/^[\d.,]+\s*%$/.test(text)) {
     return "text-right tabular-nums whitespace-nowrap";
   }
-
-  // 금액 (원/만/억 단위, 한글 단위 또는 콤마 정수)
-  if (/^[\d,.\s]+(원|만원?|억(?:\s*[\d,]+만(?:원)?)?)$/.test(text) ||
-      /^\d+억(\s*[\d,]+만(?:원)?)?$/.test(text)) {
+  if (
+    /^[\d,.\s]+(원|만원?|억(?:\s*[\d,]+만(?:원)?)?)$/.test(text) ||
+    /^\d+억(\s*[\d,]+만(?:원)?)?$/.test(text)
+  ) {
     return "text-right tabular-nums whitespace-nowrap";
   }
-
-  // 짧은 단일 단어 한글 — 결과 / 대항력 / 결정 등
-  if (/^(있음|없음|유찰|매각|소멸|인수|미상|진행|예정|변경|신청|미신청|—)$/.test(text)) {
+  if (
+    /^(있음|없음|유찰|매각|소멸|인수|미상|진행|예정|변경|신청|미신청|—)$/.test(
+      text
+    )
+  ) {
     return "text-center whitespace-nowrap";
   }
-
   return "";
 }
 
@@ -309,7 +352,10 @@ function Blockquote({
 
 function Hr(props: ComponentPropsWithoutRef<"hr">) {
   return (
-    <hr className="my-12 border-0 border-t border-[var(--color-border)]" {...props} />
+    <hr
+      className="my-12 border-0 border-t border-[var(--color-border)]"
+      {...props}
+    />
   );
 }
 
@@ -325,13 +371,7 @@ function A({ children, href = "#", ...rest }: ComponentPropsWithoutRef<"a">) {
   );
 }
 
-export function AnalysisCoverImage({
-  src,
-  alt,
-}: {
-  src: string;
-  alt: string;
-}) {
+export function AnalysisCoverImage({ src, alt }: { src: string; alt: string }) {
   return (
     <div className="relative aspect-[16/9] w-full overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-surface-muted)]">
       <Image
@@ -352,12 +392,6 @@ function Img() {
 
 /* ─── remark-analysis-blocks 가 emit 하는 신규 컴포넌트 ─── */
 
-/**
- * ScenarioCard — H3 "시나리오 X — ..." + 다음 H3/H2 까지의 콘텐츠를 카드로 wrap.
- *  - title = H3 텍스트 ("시나리오 A — 실거주 매입" 등)
- *  - 헤더에서 시나리오명 / 요약 분리 ("—" 또는 "-" 구분자)
- *  - 시맨틱 색 baseline = 모두 brand-600 (단계 3-2 어댑터에서 loss/neutral/gain 분류)
- */
 function ScenarioCard({
   title,
   children,
@@ -389,9 +423,6 @@ function splitScenarioTitle(title: string): [string, string] {
   return [title.trim(), ""];
 }
 
-/**
- * ConclusionCallout — 07 종합 의견 첫 단락을 결론 callout 으로 wrap.
- */
 function ConclusionCallout({ children }: { children?: ReactNode }) {
   return (
     <div className="mt-6 rounded-r-[var(--radius-md)] border-l-4 border-brand-600 bg-[var(--color-brand-50)] px-5 py-4 sm:px-6 sm:py-5">
@@ -405,18 +436,46 @@ function ConclusionCallout({ children }: { children?: ReactNode }) {
   );
 }
 
-/**
- * CheckpointList — 07 체크포인트 ol 을 num-circle 스타일로 wrap.
- *  실제 num-circle CSS 는 globals.css 의 .checkpoint-list 클래스가 처리.
- */
 function CheckpointList({ children }: { children?: ReactNode }) {
   return <div className="checkpoint-list mt-5">{children}</div>;
 }
 
-export function buildAnalysisMdxComponents() {
+/**
+ * mdx components 빌더.
+ * 단계 3-3: meta + fm 을 받아 H2 dispatcher 가 신규 컴포넌트 자연스러운 흐름 삽입.
+ * 인자 누락 시 단계 3-1 baseline 동작 (meta=null → 신규 컴포넌트 0 렌더).
+ */
+export function buildAnalysisMdxComponents(
+  meta?: AnalysisMeta | null,
+  fm?: AnalysisFrontmatter
+) {
+  // fm 누락 시 fallback 더미 (component 호출 시 0 effect — meta 가 null 이므로 신규 컴포넌트 분기 미진입)
+  const fmSafe: AnalysisFrontmatter = fm ?? ({
+    type: "analysis",
+    slug: "",
+    title: "",
+    region: "incheon",
+    court: "",
+    caseNumber: "",
+    appraisal: 0,
+    minPrice: 0,
+    round: 0,
+    percent: 0,
+    bidDate: "",
+    address: "",
+    propertyType: "기타",
+    auctionType: "임의경매",
+    areaM2: 0,
+    areaPyeong: 0,
+    tags: [],
+    publishedAt: "",
+    updatedAt: "",
+    status: "published",
+  } as AnalysisFrontmatter);
+
   return {
     h1: H1,
-    h2: H2,
+    h2: buildH2(meta ?? null, fmSafe),
     h3: H3,
     p: P,
     strong: Strong,
@@ -435,7 +494,6 @@ export function buildAnalysisMdxComponents() {
     hr: Hr,
     a: A,
     img: Img,
-    // remark-analysis-blocks emit
     ScenarioCard,
     ConclusionCallout,
     CheckpointList,

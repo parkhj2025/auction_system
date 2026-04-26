@@ -4,7 +4,7 @@ import type { ReactNode } from "react";
 /**
  * Trust 4-grid (G1 보강).
  *  - 4 grid (대법원 / 자격 / 보증보험 / 전자서명) — 보존
- *  - 컴플라이언스 산문 단락 → footnote 1줄 압축 (자세한 고지는 ComplianceNotice 가 단독 노출)
+ *  - 컴플라이언스 산문 단락 → footnote 1줄 압축 (자세한 고지는 ComplianceFooter 가 단독 노출)
  */
 export function TrustBlock() {
   return (

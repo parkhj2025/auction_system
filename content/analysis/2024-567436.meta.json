@@ -1,0 +1,108 @@
+{
+  "slug": "2024-567436",
+  "highlights": [
+    {
+      "label": "최저가",
+      "value": "4억 4,982만원 (감정가 49%)"
+    },
+    {
+      "label": "회차",
+      "value": "3차 · 2026-05-28"
+    },
+    {
+      "label": "임차인",
+      "value": "있음 · 대항력 없음 (채무자 동거인 추정)"
+    },
+    {
+      "label": "본 단지 호가",
+      "value": "동일 평형 8.5억~10.5억"
+    },
+    {
+      "label": "실질 취득비",
+      "value": "약 4억 8,527만원 (1주택자)"
+    }
+  ],
+  "bidding": {
+    "history": [
+      {
+        "round": 1,
+        "date": "2026-03-24",
+        "minimum": 918000000,
+        "rate": 100,
+        "result": "유찰"
+      },
+      {
+        "round": 2,
+        "date": "2026-04-23",
+        "minimum": 642600000,
+        "rate": 70,
+        "result": "유찰"
+      },
+      {
+        "round": 3,
+        "date": "2026-05-28",
+        "minimum": 449820000,
+        "rate": 49,
+        "result": "진행"
+      }
+    ]
+  },
+  "rights": {
+    "basis_date": "2022-02-25",
+    "basis_type": "근저당권",
+    "basis_holder": "에스비아이저축은행",
+    "total_claims": 959343290,
+    "tenants": [
+      {
+        "name": "박영민",
+        "move_in_date": "2022-03-03",
+        "deposit": null,
+        "opposing_power": false,
+        "analysis": "채무자 이상헌의 동거인으로 추정"
+      }
+    ]
+  },
+  "market": {
+    "sale_avg": 958461538,
+    "sale_median": 1020000000,
+    "sale_count": 13,
+    "lease_avg": null,
+    "lease_count": 0,
+    "rent_count": 0
+  },
+  "investment": {
+    "real_acquisition_cost": 485268000,
+    "scenario_a": {
+      "label": "실거주 매입",
+      "discount_from_appraisal": 468180000,
+      "self_capital_with_loan": 215376000
+    },
+    "scenario_b": {
+      "label": "1년 미만 매도",
+      "expected_sale_price": 900000000,
+      "after_tax_profit": 94560000
+    },
+    "scenario_c1": {
+      "label": "전세 갭투자",
+      "expected_lease_deposit": 450000000,
+      "gap": 35268000
+    },
+    "scenario_c2": {
+      "label": "월세 운용",
+      "monthly_rent": 1830000,
+      "annual_yield": 4.6,
+      "payback_years": 21
+    }
+  },
+  "photos": [
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-567436-1/0.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-567436-1/1.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-567436-1/2.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-567436-1/3.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-567436-1/4.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-567436-1/5.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-567436-1/6.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-567436-1/7.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-567436-1/8.webp"
+  ]
+}

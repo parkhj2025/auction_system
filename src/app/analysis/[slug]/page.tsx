@@ -5,6 +5,7 @@ import remarkGfm from "remark-gfm";
 import {
   getAllAnalysisPosts,
   getAnalysisBySlug,
+  getAnalysisMeta,
   getRelatedAnalysis,
 } from "@/lib/content";
 import { DetailHero } from "@/components/analysis/DetailHero";
@@ -12,7 +13,8 @@ import { DetailSidebar } from "@/components/analysis/DetailSidebar";
 import { TrustBlock } from "@/components/analysis/TrustBlock";
 import { ApplyCTA } from "@/components/analysis/ApplyCTA";
 import { RelatedCards } from "@/components/analysis/RelatedCards";
-import { ComplianceNotice } from "@/components/analysis/ComplianceNotice";
+import { ComplianceFooter } from "@/components/analysis/ComplianceFooter";
+import { PhotoGalleryStrip } from "@/components/analysis/PhotoGalleryStrip";
 import { buildAnalysisMdxComponents } from "@/components/analysis/mdx-components";
 import { GatingWrapper } from "@/components/analysis/GatingWrapper";
 import { remarkAnalysisBlocks } from "@/lib/remark/analysis-blocks";
@@ -61,8 +63,9 @@ export default async function AnalysisDetailPage({
   if (!post || post.frontmatter.status !== "published") notFound();
 
   const fm = post.frontmatter;
+  const meta = getAnalysisMeta(slug); // null → 단계 3-1 baseline fallback
   const related = getRelatedAnalysis(slug, 3);
-  const components = buildAnalysisMdxComponents();
+  const components = buildAnalysisMdxComponents(meta, fm);
 
   const jsonLd = {
     "@context": "https://schema.org",
@@ -92,7 +95,6 @@ export default async function AnalysisDetailPage({
       <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
         <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
           <article className="min-w-0">
-            {/* MDX 본문만 게이팅 대상. Trust/CTA/Related/Compliance 는 게이팅 영역 밖 (전환·법적 노출 보호) */}
             <GatingWrapper slug={slug}>
               <MDXRemote
                 source={post.content}
@@ -108,10 +110,17 @@ export default async function AnalysisDetailPage({
               />
             </GatingWrapper>
 
+            {/* dedicated 갤러리 — 본문 끝 / Trust 위 (단계 3-1 mdx Img null 보존, Hero strip 보강) */}
+            <PhotoGalleryStrip
+              photos={meta?.photos}
+              coverImage={fm.coverImage}
+              alt={`${fm.buildingName ?? fm.title} 현장 사진`}
+            />
+
             <TrustBlock />
             <ApplyCTA fm={fm} />
             <RelatedCards posts={related} />
-            <ComplianceNotice />
+            <ComplianceFooter />
           </article>
 
           <DetailSidebar fm={fm} />

@@ -105,3 +105,73 @@ export type AnalysisPost = LoadedPost<AnalysisFrontmatter>;
 export type GuidePost = LoadedPost<GuideFrontmatter>;
 export type NewsPost = LoadedPost<NewsFrontmatter>;
 export type NoticePost = LoadedPost<NoticeFrontmatter>;
+
+/**
+ * 단계 3-3 — content/analysis/{slug}.meta.json 어댑터 출력 스키마.
+ *
+ * publish CLI 가 raw-content/{caseNumber}/meta.json 을 평탄화하여 산출.
+ * Cowork v2.6.2 schema (sections.bidding/rights/market/investment) +
+ * legacy v2.5 schema (registry / market_data) 양쪽 모두 흡수.
+ *
+ * 모든 섹션 optional. 누락 시 컴포넌트는 mdx body fallback (단계 3-1 baseline).
+ */
+export interface AnalysisMetaHighlight {
+  label: string;
+  value: string;
+}
+
+export interface BiddingHistoryEntry {
+  round: number | null;
+  date: string;
+  minimum: number | null;
+  rate: number | null;
+  result: string;
+}
+
+export interface RightsTenant {
+  name: string;
+  move_in_date: string;
+  deposit: number | null;
+  opposing_power: boolean | null;
+  analysis: string;
+}
+
+export interface RightsMeta {
+  basis_date: string;
+  basis_type: string;
+  basis_holder: string;
+  total_claims: number | null;
+  tenants: RightsTenant[];
+}
+
+export interface MarketMeta {
+  sale_avg: number | null;
+  sale_median: number | null;
+  sale_count: number | null;
+  lease_avg: number | null;
+  lease_count: number | null;
+  rent_count: number | null;
+}
+
+export interface ScenarioFields {
+  label?: string;
+  [key: string]: unknown;
+}
+
+export interface InvestmentMeta {
+  real_acquisition_cost: number | null;
+  scenario_a: ScenarioFields | null;
+  scenario_b: ScenarioFields | null;
+  scenario_c1: ScenarioFields | null;
+  scenario_c2: ScenarioFields | null;
+}
+
+export interface AnalysisMeta {
+  slug: string;
+  highlights?: AnalysisMetaHighlight[];
+  bidding?: { history: BiddingHistoryEntry[] };
+  rights?: RightsMeta;
+  market?: MarketMeta;
+  investment?: InvestmentMeta;
+  photos?: string[];
+}
