@@ -6,17 +6,15 @@ import { formatKoreanWon } from "@/lib/utils";
 import { HeroGallery } from "./HeroGallery";
 
 /**
- * 분석 상세 Hero.
- *  - Breadcrumb / tags / title / summary / meta line
- *  - 4-cell stat grid (감정가 / N차 최저가 [accent] / 입찰보증금 / 입찰기일)
- *  - HeroGallery (1 main + 4 thumbs strip)
- *
- * 보증금: meta.json wiring 미적용 단계 — 최저가 × 10% 기본 가정.
- *   재경매·고압 보증금율은 단계 3-2 어댑터 후 정밀화.
+ * 분석 상세 Hero (G1 보강).
+ *  - h1 위계 강화: text-4xl→text-6xl, font-extrabold, lead 의 1.5배 이상
+ *  - 메타 라인: h1 직하 단일 행 inline (법원·사건·주소)
+ *  - lead: text-base lg:text-lg ink-700, line-clamp-3 fallback
+ *  - 단일 컬럼 (우측 photos column 폐기)
+ *  - stat-grid 후 갤러리 strip 가로 4열 (Hero 본문 하부)
  */
 export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
   const depositAmount = computeDeposit(fm.minPrice);
-  const depositSub = "최저가의 10% (기본 가정)";
 
   return (
     <section
@@ -42,7 +40,7 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
           </span>
         </nav>
 
-        {/* Tags chips — 사실 어휘만 (분류 의미 부여 0) */}
+        {/* Tags chips */}
         {fm.tags && fm.tags.length > 0 ? (
           <div className="mt-6 flex flex-wrap items-center gap-1.5">
             {fm.tags.slice(0, 7).map((t) => (
@@ -56,30 +54,32 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
           </div>
         ) : null}
 
-        {/* Title */}
+        {/* H1 — 강한 위계 */}
         <h1
           id="detail-title"
-          className="mt-5 max-w-4xl text-3xl font-black leading-[1.2] tracking-tight text-[var(--color-ink-900)] sm:text-[40px] sm:leading-[1.15]"
+          className="mt-5 max-w-4xl text-4xl font-extrabold leading-[1.15] tracking-tight text-[var(--color-ink-900)] sm:text-5xl lg:text-6xl"
         >
           {fm.title}
         </h1>
 
-        {/* Summary */}
-        {fm.summary ? (
-          <p className="mt-4 max-w-3xl text-base leading-7 text-[var(--color-ink-500)] sm:text-lg sm:leading-8">
-            {fm.summary}
-          </p>
-        ) : null}
-
-        {/* Meta line */}
-        <div className="mt-5 flex flex-wrap items-center gap-x-5 gap-y-1.5 text-sm text-[var(--color-ink-500)]">
+        {/* Meta line — h1 직하 단일 행 */}
+        <p className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[var(--color-ink-500)]">
           <span className="font-semibold text-[var(--color-ink-700)]">
             {fm.court}
             {fm.courtDivision ? ` ${fm.courtDivision}` : ""}
           </span>
+          <span aria-hidden="true">·</span>
           <span className="tabular-nums">사건 {fm.caseNumber}</span>
+          <span aria-hidden="true">·</span>
           <span>{fm.address}</span>
-        </div>
+        </p>
+
+        {/* Lead (summary) */}
+        {fm.summary ? (
+          <p className="mt-3 max-w-3xl text-base leading-relaxed text-[var(--color-ink-700)] line-clamp-3 lg:text-lg lg:leading-[1.7]">
+            {fm.summary}
+          </p>
+        ) : null}
 
         {/* Key numbers — 4-cell stat grid */}
         <div className="mt-9 grid grid-cols-2 gap-px overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-border)] lg:grid-cols-4">
@@ -97,7 +97,7 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
           <Stat
             label="입찰보증금"
             value={formatKoreanWon(depositAmount)}
-            sub={depositSub}
+            sub="최저가의 10% (기본 가정)"
           />
           <Stat
             label="입찰기일"
@@ -107,13 +107,11 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
           />
         </div>
 
-        {/* Gallery */}
-        <div className="mt-6">
-          <HeroGallery
-            coverImage={fm.coverImage}
-            alt={`${fm.buildingName ?? fm.title} 외관 대표 사진`}
-          />
-        </div>
+        {/* 갤러리 strip — Hero 본문 하부 가로 4열 */}
+        <HeroGallery
+          coverImage={fm.coverImage}
+          alt={`${fm.buildingName ?? fm.title} 외관 대표 사진`}
+        />
       </div>
     </section>
   );
@@ -173,4 +171,3 @@ function formatDay(yyyyMmDd: string): string {
   const days = ["일", "월", "화", "수", "목", "금", "토"];
   return `${days[d.getDay()]}요일`;
 }
-
