@@ -9,8 +9,7 @@
     "lint": "eslint",
     "font:subset": "node scripts/build-font-subset.mjs",
     "lighthouse": "node scripts/lighthouse-audit.mjs",
-    "content:publish": "node --env-file=.env.local scripts/content-publish/index.mjs",
-    "content:import": "node scripts/content-import/index.mjs"
+    "content:publish": "node --env-file=.env.local scripts/content-publish/index.mjs"
   },
   "dependencies": {
     "@base-ui/react": "^1.4.1",
