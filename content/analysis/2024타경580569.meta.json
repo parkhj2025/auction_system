@@ -1,13 +1,19 @@
 {
   "slug": "2024타경580569",
-  "consistencyAdjustments": {
-    "count": 1,
+  "supervisorAdjustments": {
+    "count": 2,
     "items": [
       {
-        "scenario": "C-2",
-        "before": "연 수익률 약 7.6% / 자본 회수 약 13년.",
-        "after": "연 수익률 약 7.6% / 자본 회수 약 13.1년.",
-        "reason": "표에 기재된 자본 회수기간(약 13.1년)과 한 줄 요약의 수치(약 13년)가 일치하지 않아 표의 진실값에 맞게 수정함."
+        "category": "consistency",
+        "before": "보증금 약 5,800만원",
+        "after": "보증금 약 5,888만원",
+        "reason": "시뮬레이션 C-2 표의 월세 보증금 수치(5,888만원)와 일치화"
+      },
+      {
+        "category": "vocabulary",
+        "before": "월 61만원 (양 스프레드)",
+        "after": "월 61만원 (월 순현금흐름)",
+        "reason": "일반 투자자가 잘 사용하지 않는 비표준 전문용어(양 스프레드)를 직관적인 표현(월 순현금흐름)으로 순화"
       }
     ]
   },

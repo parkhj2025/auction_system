@@ -121,10 +121,15 @@ slug = raw-content 디렉토리명 그대로 (단계 3-5-fix). 분류 부호 가
 입력: raw-content/{caseNumber}/  (meta.json · post.md · data/)
 출력: content/analysis/{slug}.mdx + {slug}.meta.json
 
-정합성 검증 (단계 3-5-fix-4):
-  Gemini 3.1 Pro 자체 판단으로 "한 줄 요약 ↔ 표 ↔ 산문" 통일.
+콘텐츠 2차 감시 (단계 4-2):
+  Gemini 3.1 Pro 자체 판단으로 5 책임 통합 (1회 호출):
+    1) 정합성 (한 줄 요약 ↔ 표 ↔ 산문)
+    2) 데이터 누락 보강 (frontmatter 빈 필드 본문에서 추출)
+    3) 어휘 순화 (비표준 전문용어 → 일반어)
+    4) 표·산문·frontmatter 일관성
+    5) 금지 어휘 검증 (분류·판정 어휘 + 데이터 처리 어휘)
   GEMINI_API_KEY 환경변수 필수 (.env.local).
-  thinking_level=high + responseSchema 로 JSON 강제 출력.
+  thinking_level=high + responseSchema 강제 JSON.
   LLM 호출 실패 시 종료 코드 1 (재시도 0).
 
 옵션:
@@ -398,79 +403,110 @@ function serializeMdx(frontmatter, body) {
   return matter.stringify(body, frontmatter);
 }
 
-/* ─── §10-X: 시나리오 정합성 — Gemini 3.1 Pro 자체 판단 (v3.9, 단계 3-5-fix-4)
+/* ─── §10-X: 콘텐츠 2차 감시자 — Gemini 3.1 Pro (v4.0, 단계 4-2)
  *
- *  배경: Anthropic API 의존(fix-3) 폐기. 형준님 환경 GEMINI_API_KEY 보유 + 형준님 결정으로
- *       Gemini 3.1 Pro Preview + thinking_level "high" 자체 판단으로 백엔드 교체.
- *  시스템 프롬프트·반환 JSON 형식·치환 흐름은 그대로 유지 (단순 백엔드 교체).
- *  방식: 시나리오 섹션별 LLM 호출. adjusted=true 시 한 줄 요약 라인 치환 (mdx 생성 시점).
- *  raw-content/post.md 무수정 — 치환은 publishOne 의 transformBody 직전 in-memory 만.
+ *  배경: 단계 3-5-fix-4 의 시나리오별 4회 호출 폐기. Gemini 책임을 "콘텐츠 2차 감시자"
+ *       로 확장 — 본문 전체 1회 호출로 5 책임 통합.
+ *  책임 5건: 정합성 / 데이터 누락 보강 / 어휘 순화 / 표·산문·frontmatter 일관성 / 금지 어휘 검증
+ *  raw-content/post.md 무수정 — 치환은 publishOne 의 mdx 생성 시점 in-memory 만.
  */
 
 const GEMINI_MODEL = "gemini-3.1-pro-preview";
 const GEMINI_API_URL = `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent`;
-const SCENARIO_SYSTEM_PROMPT = `당신은 부동산 경매 분석 콘텐츠의 정합성 검증자입니다.
 
-입력으로 시나리오 섹션 1개 (한 줄 요약 + 표 + 산문) 가 주어집니다.
+const CONTENT_SUPERVISOR_SYSTEM_PROMPT = `당신은 부동산 경매 분석 콘텐츠의 2차 감시자입니다.
 
-판단 절차:
-1. 표에서 핵심 지표 셀 식별 (예: 세후 순수익, 연 수익률, 자본 회수 기간, 갭, 매도가 등)
-2. 산문에서 동일 지표 언급 확인
-3. 표 ↔ 산문이 일치하면 그 값을 "진실값" 으로 확정
-4. 한 줄 요약이 진실값과 일치하면 그대로 반환 (adjusted=false)
-5. 한 줄 요약이 진실값과 다르면 진실값 기반으로 한 줄 요약을 다시 작성 (adjusted=true)
-6. 표 ↔ 산문 자체가 어긋나는 경우, 표를 우선하되 산문 맥락을 고려해 진실값 추론
+입력으로 콘텐츠 본문 전체 + frontmatter (YAML→JSON) + 라우트 컨텍스트가 주어집니다.
 
-조정한 한 줄 요약은 원본의 톤·길이·문체를 유지하되 숫자만 진실값으로 교체. 새로운 정보 추가 0.
+판단 책임 5건 (모두 통합 수행):
 
-반환은 반드시 단일 JSON 객체. 다른 텍스트·코드블록 0.
-{"adjusted": bool, "adjustedSummaryLine": "...", "reason": "..."}
+[책임 1 — 정합성]
+- 시나리오 섹션 (### 시나리오 X) 의 한 줄 요약 ↔ 표 ↔ 산문 숫자 일관성 점검
+- 표가 우선 진실값. 한 줄 요약·산문이 어긋나면 표 값으로 통일
+- 표 ↔ 산문 자체 어긋남이 발견되면 표 우선 + 산문 맥락 고려해 추론
 
-adjusted=false 면 adjustedSummaryLine 은 원본 한 줄 요약 그대로.`;
+[책임 2 — 데이터 누락 보강]
+- frontmatter 의 빈 필드 (값 없음·null·빈 문자열) 를 본문에서 추출 가능한지 확인
+- 본문에 명시된 정보로 빈 필드 채움 (예: 02 입찰 경과 표에서 "2차 2026-05-28" → frontmatter biddingDate 채움)
+- 본문에 정보 부재 시 보강 금지 (허위 채움 절대 금지)
+- 채움 가능 필드: 입찰일·전용면적·감정가·최저가·법원 정보·사건번호·소재지·물건종류·매각회차
 
-/**
- * post.md 본문에서 "### 시나리오 X — ..." 섹션 추출.
- *  반환: [{ key, headerLine, summaryLine, summaryLineIdx, bodyLines }]
- */
-function extractScenarioSections(postBody) {
-  const lines = postBody.split(/\r?\n/);
-  const sections = [];
-  let current = null;
-  for (let i = 0; i < lines.length; i++) {
-    const l = lines[i];
-    const headerMatch = /^###\s+시나리오\s+([A-Z](?:-\d+)?)\s*[—\-–]/.exec(l);
-    if (headerMatch) {
-      if (current) sections.push(current);
-      current = {
-        key: headerMatch[1],
-        headerLine: l,
-        headerLineIdx: i,
-        summaryLine: "",
-        summaryLineIdx: -1,
-        bodyLines: [l],
-      };
-      continue;
+[책임 3 — 어휘 순화]
+- 부동산 일반 투자자가 잘 사용하지 않는 비표준 전문용어 식별
+- 일반어로 치환 또는 자연스럽게 삭제
+- 차단 예시: "양 스프레드" → "월 순현금흐름" 또는 표현 삭제 / "역마진" → "월세보다 이자가 큰 구조" / "역레버리지" → "수익률 마이너스 구조"
+- 허용 어휘 (변경 금지): LTV, DSR, 갭투자, 매각가율, 근저당권, 말소기준등기, 임의경매, 강제경매, 공유자 우선매수권, 가처분, 임차인 대항력, 권리분석
+
+[책임 4 — 표·산문·frontmatter 일관성]
+- 동일 지표가 표·산문·frontmatter 에서 동일 값을 가져야 함
+- 불일치 발견 시 표 우선 → 산문·frontmatter 에 정합화
+
+[책임 5 — 금지 어휘 검증]
+- 분류·판정 어휘 (위험·매력·함정·교훈·안전·적합한·교보재·투자매력) 본문 잔존 시 자연스럽게 삭제 또는 사실 기반 표현으로 교체
+- 데이터 처리 어휘 (PDF 첨부·두인옥션·추출한·파싱한·원천 자료·data 폴더·백엔드·파이프라인) 잔존 시 삭제
+- 위 어휘 신규 도입 절대 금지
+
+산문 톤·문장 구조 유지. 단어·숫자·필드 값만 교체.
+
+반환 형식 (JSON 단일 객체. 다른 텍스트·코드블록 0):
+{
+  "status": "pass" | "adjusted",
+  "adjustedBody": "전체 본문 (수정 반영, status=adjusted 일 때만. status=pass 시 빈 문자열)",
+  "adjustedFrontmatter": { ... } | null,
+  "adjustments": [
+    {
+      "category": "consistency" | "missing_data" | "vocabulary" | "alignment" | "forbidden_term",
+      "before": "...",
+      "after": "...",
+      "reason": "..."
     }
-    if (current && /^(?:##|###)\s+/.test(l)) {
-      sections.push(current);
-      current = null;
-    }
-    if (current) {
-      if (current.summaryLineIdx === -1) {
-        const t = l.trim();
-        if (t && !/^[|*\->!]/.test(t)) {
-          current.summaryLine = l;
-          current.summaryLineIdx = i;
-        }
-      }
-      current.bodyLines.push(l);
-    }
-  }
-  if (current) sections.push(current);
-  return sections;
+  ]
 }
 
-async function adjustScenarioWithLLM(section) {
+조정 0 건이면 status=pass, adjustedBody="", adjustedFrontmatter=null, adjustments=[].`;
+
+const SUPERVISOR_RESPONSE_SCHEMA = {
+  type: "object",
+  properties: {
+    status: { type: "string", enum: ["pass", "adjusted"] },
+    adjustedBody: { type: "string" },
+    adjustedFrontmatter: {
+      type: "object",
+      properties: {},
+      nullable: true,
+    },
+    adjustments: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          category: {
+            type: "string",
+            enum: [
+              "consistency",
+              "missing_data",
+              "vocabulary",
+              "alignment",
+              "forbidden_term",
+            ],
+          },
+          before: { type: "string" },
+          after: { type: "string" },
+          reason: { type: "string" },
+        },
+        required: ["category", "before", "after", "reason"],
+      },
+    },
+  },
+  required: ["status", "adjustedBody", "adjustments"],
+};
+
+/**
+ * Gemini 호출 1회 — 본문 전체 + frontmatter 통합 감시.
+ *  실패 시 throw — publishOne 이 fail-supervisor 로 종료.
+ *  반환: { status, adjustedBody, adjustedFrontmatter, adjustments }
+ */
+async function supervisorContent({ body, frontmatter, slug, caseNumber }) {
   const apiKey = process.env.GEMINI_API_KEY;
   if (!apiKey) {
     throw new Error(
@@ -479,32 +515,23 @@ async function adjustScenarioWithLLM(section) {
   }
 
   const userMessage =
-    `시나리오 ${section.key} 섹션 원본:\n\n` +
-    section.bodyLines.join("\n");
+    `라우트 컨텍스트:\n` +
+    `  caseNumber: ${caseNumber}\n` +
+    `  slug: ${slug}\n\n` +
+    `frontmatter (JSON):\n` +
+    `${JSON.stringify(frontmatter, null, 2)}\n\n` +
+    `본문 (post.md body):\n` +
+    `${body}`;
 
-  // Gemini 3.1 Pro Preview + thinking_level "high" + responseSchema 강제 출력
   const reqBody = {
     systemInstruction: {
-      parts: [{ text: SCENARIO_SYSTEM_PROMPT }],
+      parts: [{ text: CONTENT_SUPERVISOR_SYSTEM_PROMPT }],
     },
-    contents: [
-      {
-        role: "user",
-        parts: [{ text: userMessage }],
-      },
-    ],
+    contents: [{ role: "user", parts: [{ text: userMessage }] }],
     generationConfig: {
       thinkingConfig: { thinkingLevel: "high" },
       responseMimeType: "application/json",
-      responseSchema: {
-        type: "object",
-        properties: {
-          adjusted: { type: "boolean" },
-          adjustedSummaryLine: { type: "string" },
-          reason: { type: "string" },
-        },
-        required: ["adjusted", "adjustedSummaryLine", "reason"],
-      },
+      responseSchema: SUPERVISOR_RESPONSE_SCHEMA,
     },
   };
 
@@ -519,15 +546,13 @@ async function adjustScenarioWithLLM(section) {
       body: JSON.stringify(reqBody),
     });
   } catch (e) {
-    throw new Error(
-      `시나리오 ${section.key} LLM 호출 네트워크 오류: ${e.message}`
-    );
+    throw new Error(`Gemini supervisor 네트워크 오류: ${e.message}`);
   }
 
   if (!res.ok) {
     const text = await res.text().catch(() => "");
     throw new Error(
-      `시나리오 ${section.key} LLM 호출 실패 (HTTP ${res.status}): ${text.slice(0, 500)}`
+      `Gemini supervisor 호출 실패 (HTTP ${res.status}): ${text.slice(0, 500)}`
     );
   }
 
@@ -535,15 +560,14 @@ async function adjustScenarioWithLLM(section) {
   const text = json?.candidates?.[0]?.content?.parts?.[0]?.text;
   if (typeof text !== "string") {
     throw new Error(
-      `시나리오 ${section.key} LLM 응답 형식 비정상: candidates[0].content.parts[0].text 누락`
+      `Gemini supervisor 응답 형식 비정상: candidates[0].content.parts[0].text 누락`
     );
   }
 
-  // responseMimeType=application/json + responseSchema 로 강제 JSON 이지만 안전망 매칭
   const jsonMatch = text.match(/\{[\s\S]*\}/);
   if (!jsonMatch) {
     throw new Error(
-      `시나리오 ${section.key} LLM 응답에서 JSON 블록 0건: ${text.slice(0, 300)}`
+      `Gemini supervisor 응답에서 JSON 블록 0건: ${text.slice(0, 300)}`
     );
   }
   let parsed;
@@ -551,63 +575,29 @@ async function adjustScenarioWithLLM(section) {
     parsed = JSON.parse(jsonMatch[0]);
   } catch (e) {
     throw new Error(
-      `시나리오 ${section.key} LLM JSON 파싱 실패 (${e.message}): ${jsonMatch[0].slice(0, 300)}`
+      `Gemini supervisor JSON 파싱 실패 (${e.message}): ${jsonMatch[0].slice(0, 300)}`
     );
   }
 
-  const adjusted = !!parsed.adjusted;
-  const adjustedLine =
-    typeof parsed.adjustedSummaryLine === "string"
-      ? parsed.adjustedSummaryLine
-      : section.summaryLine;
-  const reason = typeof parsed.reason === "string" ? parsed.reason : "";
+  const status = parsed.status === "adjusted" ? "adjusted" : "pass";
+  const adjustedBody =
+    typeof parsed.adjustedBody === "string" ? parsed.adjustedBody : "";
+  const adjustedFrontmatter =
+    parsed.adjustedFrontmatter && typeof parsed.adjustedFrontmatter === "object"
+      ? parsed.adjustedFrontmatter
+      : null;
+  const adjustments = Array.isArray(parsed.adjustments)
+    ? parsed.adjustments
+        .filter((a) => a && typeof a === "object")
+        .map((a) => ({
+          category: String(a.category ?? ""),
+          before: String(a.before ?? ""),
+          after: String(a.after ?? ""),
+          reason: String(a.reason ?? ""),
+        }))
+    : [];
 
-  return {
-    scenario: section.key,
-    adjusted,
-    originalSummaryLine: section.summaryLine,
-    adjustedSummaryLine: adjustedLine,
-    reason,
-  };
-}
-
-/**
- * post.md 전체 본문에 시나리오별 LLM 판단 적용.
- *  - adjusted=true 인 항목은 summaryLineIdx 위치 라인 치환
- *  - 반환: { adjustedBody, adjustments }
- *  - 실패 시 throw — publishOne 이 종료 처리
- */
-async function applyConsistencyAdjustments(postBody) {
-  const sections = extractScenarioSections(postBody);
-  if (sections.length === 0) {
-    return { adjustedBody: postBody, adjustments: [] };
-  }
-
-  const adjustments = [];
-  for (const sec of sections) {
-    if (!sec.summaryLine || sec.summaryLineIdx < 0) {
-      adjustments.push({
-        scenario: sec.key,
-        adjusted: false,
-        originalSummaryLine: "",
-        adjustedSummaryLine: "",
-        reason: "한 줄 요약 없음 (스킵)",
-      });
-      continue;
-    }
-    const adj = await adjustScenarioWithLLM(sec);
-    adjustments.push(adj);
-  }
-
-  const lines = postBody.split(/\r?\n/);
-  for (let i = 0; i < sections.length; i++) {
-    const sec = sections[i];
-    const adj = adjustments[i];
-    if (!adj.adjusted || sec.summaryLineIdx < 0) continue;
-    lines[sec.summaryLineIdx] = adj.adjustedSummaryLine;
-  }
-
-  return { adjustedBody: lines.join("\n"), adjustments };
+  return { status, adjustedBody, adjustedFrontmatter, adjustments };
 }
 
 /**
@@ -629,22 +619,18 @@ async function applyConsistencyAdjustments(postBody) {
 function buildPublishedMeta(meta, photosMeta, slug, adjustments) {
   const out = { slug };
 
-  // 단계 3-5-fix-4: Gemini 3.1 Pro 자체 판단 정합성 조정 기록 (count>0 일 때만 노출)
+  // 단계 4-2: Gemini 콘텐츠 2차 감시자 통합 결과 기록 (count>0 일 때만 노출)
+  // adjustments 항목 = { category, before, after, reason }
   if (Array.isArray(adjustments) && adjustments.length > 0) {
-    const items = adjustments
-      .filter((a) => a.adjusted)
-      .map((a) => ({
-        scenario: a.scenario,
-        before: a.originalSummaryLine.trim(),
-        after: a.adjustedSummaryLine.trim(),
+    out.supervisorAdjustments = {
+      count: adjustments.length,
+      items: adjustments.map((a) => ({
+        category: a.category,
+        before: a.before,
+        after: a.after,
         reason: a.reason,
-      }));
-    if (items.length > 0) {
-      out.consistencyAdjustments = {
-        count: items.length,
-        items,
-      };
-    }
+      })),
+    };
   }
 
   // highlights — top-level 그대로
@@ -794,36 +780,66 @@ async function publishOne(caseNumber, args) {
   }
   if (args.verbose) console.log(`  ✓ §7 + §10-2 통과`);
 
-  // [3.5] 시나리오 정합성 — Gemini 3.1 Pro 자체 판단 (v3.9, 단계 3-5-fix-4)
-  console.log(`[3.5] 시나리오 정합성 검증 (Gemini 3.1 Pro 자체 판단)`);
-  const matterContent = matterParsed.content;
+  // [3.5] 콘텐츠 2차 감시 — Gemini 3.1 Pro (v4.0, 단계 4-2)
+  // 정합성 + 데이터 누락 + 어휘 순화 + 일관성 + 금지 어휘 통합 1회 호출
+  console.log(`[3.5] 콘텐츠 2차 감시 (Gemini 3.1 Pro)`);
+  const originalBody = matterParsed.content;
+  const originalFm = matterParsed.data ?? {};
   let adjustments = [];
-  let postContentForBody = matterContent;
+  let postContentForBody = originalBody;
+  let postFrontmatterForBody = originalFm;
   try {
-    const r = await applyConsistencyAdjustments(matterContent);
-    postContentForBody = r.adjustedBody;
+    const r = await supervisorContent({
+      body: originalBody,
+      frontmatter: originalFm,
+      slug,
+      caseNumber: args.caseNumber ?? caseNumber,
+    });
+    if (r.status === "adjusted") {
+      if (r.adjustedBody && r.adjustedBody.length > 0) {
+        postContentForBody = r.adjustedBody;
+      }
+      if (r.adjustedFrontmatter) {
+        // 부분 병합 — Gemini 가 변경한 키만 덮어쓰기 (안전)
+        postFrontmatterForBody = { ...originalFm, ...r.adjustedFrontmatter };
+      }
+    }
     adjustments = r.adjustments;
   } catch (e) {
     console.error(`  ✗ ${e.message}`);
-    return { status: "fail-consistency", code: 1, slug };
+    return { status: "fail-supervisor", code: 1, slug };
   }
+  // 카테고리별 카운트 + 상세 출력
+  const byCat = {
+    consistency: 0,
+    missing_data: 0,
+    vocabulary: 0,
+    alignment: 0,
+    forbidden_term: 0,
+  };
   for (const a of adjustments) {
-    if (a.adjusted) {
+    if (a.category in byCat) byCat[a.category]++;
+  }
+  if (adjustments.length === 0) {
+    console.log(`  · PASS (조정 없음)`);
+  } else {
+    console.log(
+      `  · 정합성 ${byCat.consistency}건 / 데이터 누락 ${byCat.missing_data}건 / 어휘 순화 ${byCat.vocabulary}건 / 일관성 ${byCat.alignment}건 / 금지 어휘 ${byCat.forbidden_term}건`
+    );
+    for (const a of adjustments) {
+      const before = a.before.length > 60 ? a.before.slice(0, 57) + "..." : a.before;
+      const after = a.after.length > 60 ? a.after.slice(0, 57) + "..." : a.after;
       console.log(
-        `  · 시나리오 ${a.scenario} — ADJUSTED: "${a.originalSummaryLine.trim()}" → "${a.adjustedSummaryLine.trim()}" (${a.reason})`
+        `    - [${a.category}] "${before}" → "${after}" (${a.reason})`
       );
-    } else if (a.reason && a.reason.includes("스킵")) {
-      console.log(`  · 시나리오 ${a.scenario} — SKIP: ${a.reason}`);
-    } else {
-      console.log(`  · 시나리오 ${a.scenario} — PASS (조정 없음)`);
     }
   }
-  const adjustedCount = adjustments.filter((a) => a.adjusted).length;
+  const adjustedCount = adjustments.length;
 
   const title = meta.card?.title ?? meta.hero?.headline ?? "";
   console.log(`[4] 본문 처리 + 이미지 매핑 (url_map / used) — post.md frontmatter 무시`);
-  // matterContent → adjustment 적용된 본문 → frontmatter 더한 raw 형태 재구성
-  const matterFmText = matter.stringify(postContentForBody, matterParsed.data);
+  // postContentForBody (supervisor 적용된 본문) + postFrontmatterForBody 재구성
+  const matterFmText = matter.stringify(postContentForBody, postFrontmatterForBody);
   const body = transformBody(matterFmText, photosMeta, title);
 
   // updatedAt 결정 (v3.4 §10-7: ISO normalize 적용)
