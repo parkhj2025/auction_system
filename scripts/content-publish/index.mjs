@@ -121,10 +121,14 @@ slug = raw-content 디렉토리명 그대로 (단계 3-5-fix). 분류 부호 가
 입력: raw-content/{caseNumber}/  (meta.json · post.md · data/)
 출력: content/analysis/{slug}.mdx + {slug}.meta.json
 
+정합성 검증 (단계 3-5-fix-3):
+  Claude Opus 자체 판단으로 "한 줄 요약 ↔ 표 ↔ 산문" 통일.
+  ANTHROPIC_API_KEY 환경변수 필수.
+  LLM 호출 실패 시 종료 코드 1 (재시도 0).
+
 옵션:
   --all       raw-content 하위 사건 디렉토리 전부 일괄 publish
-              (1건 정합성 FAIL 시 해당 건만 차단, 나머지 진행)
-  --force     기존 mdx 덮어쓰기 + updatedAt today / 정합성 FAIL 강행
+  --force     기존 mdx 덮어쓰기 + updatedAt today (정합성과 무관)
   --dry-run   파일 쓰지 않음 (검증·매핑만)
   --verbose   상세 로그`);
 }
@@ -385,267 +389,197 @@ function serializeMdx(frontmatter, body) {
   return matter.stringify(body, frontmatter);
 }
 
-/**
- * §10-X: 시나리오 정합성 검증 (v3.7 신규, 단계 3-5).
+/* ─── §10-X: 시나리오 정합성 — Claude Opus 자체 판단 (v3.8, 단계 3-5-fix-3)
  *
- * 사유: v2.7.1 Cowork 동결 + 책임 분리 — Cowork(LLM·주관) vs Code(검증·객관).
- *      LLM 비결정성은 patch 로 차단 0, post-processing 검증이 본질 해결책.
- *
- * 알고리즘:
- *   1) "### 시나리오 " 헤더로 본문 분할 (4개: A·B·C-1·C-2 등)
- *   2) 각 섹션에서 한 줄 요약 추출 — 헤더 다음 첫 비공백 줄.
- *      `|` `-` `*` 시작이면 한 줄 요약 없음 (스킵, WARN)
- *   3) 한 줄 요약에서 숫자+단위 추출 (만원/억/%/년)
- *   4) 동일 섹션의 마크다운 표(헤더 행 다음) 안 모든 셀에서 동일 정규식
- *   5) 한 줄 요약 각 숫자에 대해, 같은 단위 그룹에서 가장 가까운 표 숫자 매칭.
- *      차이비율 = abs(요약값 - 표값) / max(요약값, 표값). 5% 초과 시 FAIL.
- *
- * 단위 정규화: 만원/억은 만원 단위 통일 (1억=10000만). %·년은 그대로.
- *
- * 반환: { ok: boolean, results: Array<{ scenario, status, summaries: [{value, unit, nearest, diff, pass}] }> }
+ *  배경: 정규식·임계 룰 (단계 3-5/fix-2) 폐기. Claude Code Opus max effort 의 판단 품질을
+ *       신뢰하여 한 줄 요약 ↔ 표 ↔ 산문 3요소를 LLM 자체 추론으로 통일.
+ *  방식: 시나리오 섹션별 LLM 호출. adjusted=true 시 한 줄 요약 라인 치환 (mdx 생성 시점).
+ *  raw-content/post.md 무수정 — 치환은 publishOne 의 transformBody 직전 in-memory 만.
  */
 
-const NUMBER_UNIT_RE = /(\d{1,3}(?:,\d{3})*(?:\.\d+)?)\s*(만원|억|%|년)/g;
+const ANTHROPIC_API_URL = "https://api.anthropic.com/v1/messages";
+const ANTHROPIC_MODEL = "claude-opus-4-7";
+const SCENARIO_SYSTEM_PROMPT = `당신은 부동산 경매 분석 콘텐츠의 정합성 검증자입니다.
 
-function parseNumber(rawDigits) {
-  return parseFloat(String(rawDigits).replace(/,/g, ""));
-}
+입력으로 시나리오 섹션 1개 (한 줄 요약 + 표 + 산문) 가 주어집니다.
 
-/** 단위별 정규화: 만원/억은 "만" 단위 정수, %·년은 원본 값. 단위 그룹 키는 "money" 또는 unit 자체 */
-function normalizeNumberUnit(value, unit) {
-  if (unit === "억") return { group: "money", value: value * 10000 };
-  if (unit === "만원") return { group: "money", value };
-  if (unit === "%") return { group: "%", value };
-  if (unit === "년") return { group: "년", value };
-  return { group: unit, value };
-}
+판단 절차:
+1. 표에서 핵심 지표 셀 식별 (예: 세후 순수익, 연 수익률, 자본 회수 기간, 갭, 매도가 등)
+2. 산문에서 동일 지표 언급 확인
+3. 표 ↔ 산문이 일치하면 그 값을 "진실값" 으로 확정
+4. 한 줄 요약이 진실값과 일치하면 그대로 반환 (adjusted=false)
+5. 한 줄 요약이 진실값과 다르면 진실값 기반으로 한 줄 요약을 다시 작성 (adjusted=true)
+6. 표 ↔ 산문 자체가 어긋나는 경우, 표를 우선하되 산문 맥락을 고려해 진실값 추론
 
-function extractNumbersFromText(text) {
-  const out = [];
-  if (!text) return out;
-  let m;
-  NUMBER_UNIT_RE.lastIndex = 0;
-  while ((m = NUMBER_UNIT_RE.exec(text)) !== null) {
-    const raw = m[1];
-    const unit = m[2];
-    const value = parseNumber(raw);
-    if (Number.isFinite(value)) {
-      const norm = normalizeNumberUnit(value, unit);
-      out.push({ raw, unit, value, group: norm.group, normValue: norm.value });
-    }
-  }
-  return out;
-}
+조정한 한 줄 요약은 원본의 톤·길이·문체를 유지하되 숫자만 진실값으로 교체. 새로운 정보 추가 0.
 
-/** 마크다운 표 데이터 행 (헤더 + 구분자 다음) 셀 텍스트 추출 */
-function extractTableCells(blockLines) {
-  // blockLines 안 `|` 시작 라인 모음. 첫 두 라인(헤더 + ---)을 건너뛰고 데이터 행 셀 추출
-  const tableLines = blockLines.filter((l) => /^\s*\|/.test(l));
-  if (tableLines.length < 3) return [];
-  const sepIdx = tableLines.findIndex((l) => /^\s*\|[\s|:.\-]+\|/.test(l));
-  if (sepIdx < 1) return [];
-  const dataRows = tableLines.slice(sepIdx + 1);
-  const cells = [];
-  for (const row of dataRows) {
-    const inner = row.trim().replace(/^\|/, "").replace(/\|$/, "");
-    for (const cell of inner.split("|")) {
-      cells.push(cell.trim());
-    }
-  }
-  return cells;
-}
+반환은 반드시 단일 JSON 객체. 다른 텍스트·코드블록 0.
+{"adjusted": bool, "adjustedSummaryLine": "...", "reason": "..."}
 
-function validateScenarioConsistency(postMdContent) {
-  // post.md 본문에서 frontmatter 제거
-  const parsed = matter(postMdContent);
-  const body = parsed.content;
-  const lines = body.split(/\r?\n/);
+adjusted=false 면 adjustedSummaryLine 은 원본 한 줄 요약 그대로.`;
 
-  // ### 시나리오 ... 섹션 분할
+/**
+ * post.md 본문에서 "### 시나리오 X — ..." 섹션 추출.
+ *  반환: [{ key, headerLine, summaryLine, summaryLineIdx, bodyLines }]
+ */
+function extractScenarioSections(postBody) {
+  const lines = postBody.split(/\r?\n/);
   const sections = [];
   let current = null;
   for (let i = 0; i < lines.length; i++) {
     const l = lines[i];
-    const headerMatch = /^###\s+시나리오\s+([A-Z](?:-\d+)?)\s*[—\-–]\s*(.+?)\s*$/.exec(l);
+    const headerMatch = /^###\s+시나리오\s+([A-Z](?:-\d+)?)\s*[—\-–]/.exec(l);
     if (headerMatch) {
       if (current) sections.push(current);
-      current = { key: headerMatch[1], title: l.trim(), startLine: i, lines: [] };
+      current = {
+        key: headerMatch[1],
+        headerLine: l,
+        headerLineIdx: i,
+        summaryLine: "",
+        summaryLineIdx: -1,
+        bodyLines: [l],
+      };
       continue;
     }
-    // 다음 ### 또는 ## 만나면 섹션 종료
     if (current && /^(?:##|###)\s+/.test(l)) {
       sections.push(current);
       current = null;
     }
-    if (current) current.lines.push(l);
+    if (current) {
+      if (current.summaryLineIdx === -1) {
+        const t = l.trim();
+        if (t && !/^[|*\->!]/.test(t)) {
+          current.summaryLine = l;
+          current.summaryLineIdx = i;
+        }
+      }
+      current.bodyLines.push(l);
+    }
   }
   if (current) sections.push(current);
-
-  // 비교 요약 섹션은 제외 — 4 시나리오만
-  const scenarios = sections.filter(
-    (s) => /^[A-Z](-\d+)?$/.test(s.key) && s.key !== "비교"
-  );
-
-  const results = [];
-  let failCount = 0;
-
-  for (const sec of scenarios) {
-    const result = {
-      scenario: sec.key,
-      title: sec.title,
-      status: "pass",
-      summaryLine: "",
-      summaries: [],
-      tableCellCount: 0,
-    };
-
-    // 한 줄 요약: 헤더 직후 첫 비공백 줄
-    let summaryLine = "";
-    for (const l of sec.lines) {
-      const t = l.trim();
-      if (!t) continue;
-      if (/^[|*\-]/.test(t)) {
-        // 표 / 리스트 시작 — 한 줄 요약 없음
-        result.status = "skip";
-        break;
-      }
-      summaryLine = t;
-      break;
-    }
-    result.summaryLine = summaryLine;
-
-    if (result.status === "skip") {
-      results.push(result);
-      continue;
-    }
-
-    if (!summaryLine) {
-      result.status = "skip";
-      results.push(result);
-      continue;
-    }
-
-    const summaryNums = extractNumbersFromText(summaryLine);
-    if (summaryNums.length === 0) {
-      // 한 줄 요약은 있으나 숫자+단위 0건 — 비교 대상 0
-      result.status = "no-numbers";
-      results.push(result);
-      continue;
-    }
-
-    const tableCells = extractTableCells(sec.lines);
-    result.tableCellCount = tableCells.length;
-    const tableNums = [];
-    for (const c of tableCells) {
-      tableNums.push(...extractNumbersFromText(c));
-    }
-
-    // 한 줄 요약 각 숫자 → 같은 group 안 가장 가까운 표 숫자 매칭
-    for (const sn of summaryNums) {
-      const sameGroup = tableNums.filter((tn) => tn.group === sn.group);
-      if (sameGroup.length === 0) {
-        result.summaries.push({
-          summary: `${sn.raw}${sn.unit}`,
-          group: sn.group,
-          nearest: null,
-          diff: null,
-          pass: false,
-          reason: "표 안 동일 단위 숫자 0건",
-        });
-        result.status = "fail";
-        continue;
-      }
-      let best = sameGroup[0];
-      let bestDiff =
-        Math.abs(sn.normValue - best.normValue) /
-        Math.max(sn.normValue, best.normValue, 1);
-      for (const tn of sameGroup.slice(1)) {
-        const d =
-          Math.abs(sn.normValue - tn.normValue) /
-          Math.max(sn.normValue, tn.normValue, 1);
-        if (d < bestDiff) {
-          best = tn;
-          bestDiff = d;
-        }
-      }
-      const pass = bestDiff <= 0.05;
-      result.summaries.push({
-        summary: `${sn.raw}${sn.unit}`,
-        group: sn.group,
-        nearest: `${best.raw}${best.unit}`,
-        diff: bestDiff,
-        pass,
-        reason: null,
-      });
-      if (!pass) result.status = "fail";
-    }
-
-    if (result.status === "fail") failCount++;
-    results.push(result);
-  }
-
-  const passCount = results.filter((r) => r.status === "pass").length;
-  const total = scenarios.length;
-  return { ok: failCount === 0, total, passCount, failCount, results };
+  return sections;
 }
 
-function reportConsistency(report) {
-  const { ok, total, passCount, failCount, results } = report;
-  if (ok) {
-    console.log(
-      `=== 정합성 검증 PASS (시나리오 ${passCount}/${total}) ===`
-    );
-  } else {
-    console.error(
-      `=== 정합성 검증 FAIL (시나리오 ${passCount}/${total}, 실패 ${failCount}) ===`
+async function adjustScenarioWithLLM(section) {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      "ANTHROPIC_API_KEY 환경변수가 설정되지 않았습니다. " +
+        "shell 에서 export 하거나 .env.local 에 추가하세요."
     );
   }
-  for (const r of results) {
-    if (r.status === "skip") {
-      console.warn(
-        `  · 시나리오 ${r.scenario} — 한 줄 요약 없음 (표/리스트 시작) → 스킵`
-      );
+
+  const userMessage =
+    `시나리오 ${section.key} 섹션 원본:\n\n` +
+    section.bodyLines.join("\n");
+
+  const reqBody = {
+    model: ANTHROPIC_MODEL,
+    max_tokens: 1024,
+    system: SCENARIO_SYSTEM_PROMPT,
+    messages: [{ role: "user", content: userMessage }],
+  };
+
+  let res;
+  try {
+    res = await fetch(ANTHROPIC_API_URL, {
+      method: "POST",
+      headers: {
+        "x-api-key": apiKey,
+        "anthropic-version": "2023-06-01",
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(reqBody),
+    });
+  } catch (e) {
+    throw new Error(
+      `시나리오 ${section.key} LLM 호출 네트워크 오류: ${e.message}`
+    );
+  }
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(
+      `시나리오 ${section.key} LLM 호출 실패 (HTTP ${res.status}): ${text.slice(0, 500)}`
+    );
+  }
+
+  const json = await res.json();
+  const text = json?.content?.[0]?.text;
+  if (typeof text !== "string") {
+    throw new Error(
+      `시나리오 ${section.key} LLM 응답 형식 비정상: content[0].text 누락`
+    );
+  }
+
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error(
+      `시나리오 ${section.key} LLM 응답에서 JSON 블록 0건: ${text.slice(0, 300)}`
+    );
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(jsonMatch[0]);
+  } catch (e) {
+    throw new Error(
+      `시나리오 ${section.key} LLM JSON 파싱 실패 (${e.message}): ${jsonMatch[0].slice(0, 300)}`
+    );
+  }
+
+  const adjusted = !!parsed.adjusted;
+  const adjustedLine =
+    typeof parsed.adjustedSummaryLine === "string"
+      ? parsed.adjustedSummaryLine
+      : section.summaryLine;
+  const reason = typeof parsed.reason === "string" ? parsed.reason : "";
+
+  return {
+    scenario: section.key,
+    adjusted,
+    originalSummaryLine: section.summaryLine,
+    adjustedSummaryLine: adjustedLine,
+    reason,
+  };
+}
+
+/**
+ * post.md 전체 본문에 시나리오별 LLM 판단 적용.
+ *  - adjusted=true 인 항목은 summaryLineIdx 위치 라인 치환
+ *  - 반환: { adjustedBody, adjustments }
+ *  - 실패 시 throw — publishOne 이 종료 처리
+ */
+async function applyConsistencyAdjustments(postBody) {
+  const sections = extractScenarioSections(postBody);
+  if (sections.length === 0) {
+    return { adjustedBody: postBody, adjustments: [] };
+  }
+
+  const adjustments = [];
+  for (const sec of sections) {
+    if (!sec.summaryLine || sec.summaryLineIdx < 0) {
+      adjustments.push({
+        scenario: sec.key,
+        adjusted: false,
+        originalSummaryLine: "",
+        adjustedSummaryLine: "",
+        reason: "한 줄 요약 없음 (스킵)",
+      });
       continue;
     }
-    if (r.status === "no-numbers") {
-      console.warn(
-        `  · 시나리오 ${r.scenario} — 한 줄 요약에서 숫자+단위 0건 추출 (스킵)`
-      );
-      continue;
-    }
-    if (r.status === "fail") {
-      console.error(
-        `  ✗ 시나리오 ${r.scenario} — 한 줄 요약과 표 숫자 불일치 (표 ${r.tableCellCount}셀)`
-      );
-      for (const s of r.summaries) {
-        if (s.pass) {
-          const dPct = (s.diff * 100).toFixed(1);
-          console.error(
-            `      · "${s.summary}" ↔ 가장 가까운 표 값 ${s.nearest}, 차이 ${dPct}% [PASS — 5% 이내]`
-          );
-        } else if (s.nearest) {
-          const dPct = (s.diff * 100).toFixed(1);
-          console.error(
-            `      · "${s.summary}" ↔ 가장 가까운 표 값 ${s.nearest}, 차이 ${dPct}% [FAIL]`
-          );
-        } else {
-          console.error(
-            `      · "${s.summary}" ↔ ${s.reason} [FAIL]`
-          );
-        }
-      }
-    } else if (r.status === "pass") {
-      const cnt = r.summaries.length;
-      console.log(
-        `  ✓ 시나리오 ${r.scenario} — 한 줄 요약 ${cnt}개 모두 표 숫자와 5% 이내 일치`
-      );
-    }
+    const adj = await adjustScenarioWithLLM(sec);
+    adjustments.push(adj);
   }
-  if (!ok) {
-    console.error(
-      `\n수정 후 재시도하시거나 --force 플래그로 강행하실 수 있습니다.`
-    );
+
+  const lines = postBody.split(/\r?\n/);
+  for (let i = 0; i < sections.length; i++) {
+    const sec = sections[i];
+    const adj = adjustments[i];
+    if (!adj.adjusted || sec.summaryLineIdx < 0) continue;
+    lines[sec.summaryLineIdx] = adj.adjustedSummaryLine;
   }
+
+  return { adjustedBody: lines.join("\n"), adjustments };
 }
 
 /**
@@ -664,8 +598,24 @@ function reportConsistency(report) {
  *
  * 모든 섹션 optional. 누락 시 페이지 컴포넌트는 mdx body fallback (단계 3-1 baseline).
  */
-function buildPublishedMeta(meta, photosMeta, slug) {
+function buildPublishedMeta(meta, photosMeta, slug, adjustments) {
   const out = { slug };
+
+  // 단계 3-5-fix-3: Claude Opus 자체 판단 정합성 조정 기록
+  if (Array.isArray(adjustments) && adjustments.length > 0) {
+    const items = adjustments
+      .filter((a) => a.adjusted)
+      .map((a) => ({
+        scenario: a.scenario,
+        before: a.originalSummaryLine.trim(),
+        after: a.adjustedSummaryLine.trim(),
+        reason: a.reason,
+      }));
+    out.consistencyAdjustments = {
+      count: items.length,
+      items,
+    };
+  }
 
   // highlights — top-level 그대로
   if (Array.isArray(meta.highlights) && meta.highlights.length > 0) {
@@ -814,22 +764,37 @@ async function publishOne(caseNumber, args) {
   }
   if (args.verbose) console.log(`  ✓ §7 + §10-2 통과`);
 
-  // [3.5] 시나리오 정합성 검증 (v3.7, 단계 3-5)
-  console.log(`[3.5] 시나리오 정합성 검증 (한 줄 요약 ↔ 표 숫자, 5% 임계)`);
-  const consistency = validateScenarioConsistency(postRaw);
-  reportConsistency(consistency);
-  if (!consistency.ok && !args.force) {
+  // [3.5] 시나리오 정합성 — Claude Opus 자체 판단 (v3.8, 단계 3-5-fix-3)
+  console.log(`[3.5] 시나리오 정합성 검증 (Claude Opus 자체 판단)`);
+  const matterContent = matterParsed.content;
+  let adjustments = [];
+  let postContentForBody = matterContent;
+  try {
+    const r = await applyConsistencyAdjustments(matterContent);
+    postContentForBody = r.adjustedBody;
+    adjustments = r.adjustments;
+  } catch (e) {
+    console.error(`  ✗ ${e.message}`);
     return { status: "fail-consistency", code: 1, slug };
   }
-  if (!consistency.ok && args.force) {
-    console.warn(
-      `  ⚠ --force 플래그로 정합성 위반을 무시하고 진행합니다.`
-    );
+  for (const a of adjustments) {
+    if (a.adjusted) {
+      console.log(
+        `  · 시나리오 ${a.scenario} — ADJUSTED: "${a.originalSummaryLine.trim()}" → "${a.adjustedSummaryLine.trim()}" (${a.reason})`
+      );
+    } else if (a.reason && a.reason.includes("스킵")) {
+      console.log(`  · 시나리오 ${a.scenario} — SKIP: ${a.reason}`);
+    } else {
+      console.log(`  · 시나리오 ${a.scenario} — PASS (조정 없음)`);
+    }
   }
+  const adjustedCount = adjustments.filter((a) => a.adjusted).length;
 
   const title = meta.card?.title ?? meta.hero?.headline ?? "";
   console.log(`[4] 본문 처리 + 이미지 매핑 (url_map / used) — post.md frontmatter 무시`);
-  const body = transformBody(postRaw, photosMeta, title);
+  // matterContent → adjustment 적용된 본문 → frontmatter 더한 raw 형태 재구성
+  const matterFmText = matter.stringify(postContentForBody, matterParsed.data);
+  const body = transformBody(matterFmText, photosMeta, title);
 
   // updatedAt 결정 (v3.4 §10-7: ISO normalize 적용)
   const outPath = path.join(OUT_DIR, `${slug}.mdx`);
@@ -868,7 +833,7 @@ async function publishOne(caseNumber, args) {
       console.log("\n--- frontmatter preview ---");
       console.log(matter.stringify("", frontmatter));
     }
-    return { status: "success", code: 0, slug, dryRun: true };
+    return { status: "success", code: 0, slug, dryRun: true, adjustedCount };
   }
 
   let mdxNoop = false;
@@ -909,7 +874,7 @@ async function publishOne(caseNumber, args) {
       return {};
     }
   })();
-  const publishedMeta = buildPublishedMeta(meta, photosMetaRaw, slug);
+  const publishedMeta = buildPublishedMeta(meta, photosMetaRaw, slug, adjustments);
   const metaOutPath = path.join(OUT_DIR, `${slug}.meta.json`);
   const metaJson = JSON.stringify(publishedMeta, null, 2) + "\n";
   let metaNoop = false;
@@ -933,7 +898,7 @@ async function publishOne(caseNumber, args) {
     );
   }
 
-  return { status: "success", code: 0, slug };
+  return { status: "success", code: 0, slug, adjustedCount };
 }
 
 /* ─── main dispatcher ─── */
@@ -958,10 +923,20 @@ async function main() {
     }
     const ok = results.filter((r) => r.status === "success").length;
     const fail = results.length - ok;
-    console.log(`\n=== --all 결과 요약: PASS ${ok}건 / FAIL ${fail}건 ===`);
+    const adjusted = results.filter(
+      (r) => r.status === "success" && (r.adjustedCount ?? 0) > 0
+    ).length;
+    console.log(
+      `\n=== --all 결과 요약: PASS ${ok}건 (ADJUSTED ${adjusted}건) / FAIL ${fail}건 ===`
+    );
     for (const r of results) {
-      const tag = r.status === "success" ? "✓" : "✗";
-      console.log(`  ${tag} ${r.caseNumber} — ${r.status}`);
+      if (r.status === "success") {
+        const adj = r.adjustedCount ?? 0;
+        const tag = adj > 0 ? "✓ ADJUSTED" : "✓";
+        console.log(`  ${tag} ${r.caseNumber}${adj > 0 ? ` (한 줄 요약 ${adj}건 조정)` : ""}`);
+      } else {
+        console.log(`  ✗ ${r.caseNumber} — ${r.status}`);
+      }
     }
     process.exit(fail > 0 ? 1 : 0);
   }
