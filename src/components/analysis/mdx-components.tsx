@@ -1,6 +1,5 @@
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import Image from "next/image";
-import { AnalysisMdxImage } from "./AnalysisMdxImage";
 import { Section01Overview } from "./sections/Section01Overview";
 import { Section02BidHistory } from "./sections/Section02BidHistory";
 import { Section03Rights } from "./sections/Section03Rights";
@@ -11,12 +10,10 @@ import { Section07Opinion } from "./sections/Section07Opinion";
 
 /**
  * next-mdx-remote components 오버라이드.
- * Cowork 산출물은 순수 마크다운(커스텀 MDX 태그 없음)이므로,
- * h2/h3/table/p/strong/ul/ol/li/a/img/blockquote만 경매퀵 톤으로 교체한다.
+ * 본문 사진은 Hero 갤러리로 일원화 — 본문 inline img 노출 0건 (mdx Img → null).
+ * 표는 horizontal lines only + tabular-nums(숫자 cell) + 행 색 분기(매각/미납/말소기준/인수).
  *
- * h2 특수 처리:
- *   "## 01 물건 개요" 형태를 파싱하여 "01" 라벨 + "물건 개요" 제목으로 분리.
- *   번호 없는 h2("## 면책 고지")는 일반 제목 스타일로 렌더.
+ * H2 dispatcher: "## NN 제목" → SectionXX, 번호 없는 H2 → 일반 헤더.
  */
 
 function extractText(children: ReactNode): string {
@@ -37,17 +34,11 @@ function extractText(children: ReactNode): string {
 
 /**
  * 마크다운 본문의 H1은 페이지 H1과 중복되므로 렌더하지 않는다.
- * (Cowork 산출물은 상단에 자체 H1을 포함하지만, 상세 페이지의 DetailHero가 페이지 H1 역할)
  */
 function H1() {
   return null;
 }
 
-/**
- * H2 dispatcher (단계 3-1):
- *  - "## 01 물건 개요" 형태는 SectionXX 컴포넌트로 분기 (각 섹션 baseline 헤더)
- *  - "## 면책 고지" 등 번호 없는 H2는 일반 H2 스타일
- */
 function H2({ children, ...rest }: ComponentPropsWithoutRef<"h2">) {
   const text = extractText(children);
   const match = /^(\d{2})\s+(.+)$/.exec(text.trim());
@@ -74,7 +65,7 @@ function H2({ children, ...rest }: ComponentPropsWithoutRef<"h2">) {
             id={`section-${num}`}
             className="mt-20 flex scroll-mt-24 items-baseline gap-4 border-t border-[var(--color-border)] pt-10 first:mt-0 first:border-t-0 first:pt-0"
           >
-            <span className="text-xs font-black uppercase tracking-[0.24em] text-brand-600">
+            <span className="text-xs font-black uppercase tracking-[0.24em] text-brand-600 tabular-nums">
               {num}
             </span>
             <span className="text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
@@ -94,7 +85,22 @@ function H2({ children, ...rest }: ComponentPropsWithoutRef<"h2">) {
   );
 }
 
+/**
+ * H3 — "체크포인트" 또는 "시나리오 X" 패턴은 강조 스타일.
+ * 카드 wrapping 은 remark plugin 없이 불가하므로 헤더 수준 시각 강화만 적용.
+ */
 function H3({ children, ...rest }: ComponentPropsWithoutRef<"h3">) {
+  const text = extractText(children).trim();
+  if (text === "체크포인트" || text.startsWith("체크포인트")) {
+    return (
+      <h3
+        className="mt-10 inline-flex items-center gap-2 rounded-[var(--radius-md)] border-l-4 border-brand-600 bg-[var(--color-brand-50)] py-2 pl-4 pr-5 text-lg font-black tracking-tight text-[var(--color-brand-700)] sm:text-xl"
+        {...rest}
+      >
+        {children}
+      </h3>
+    );
+  }
   return (
     <h3
       className="mt-10 text-lg font-black tracking-tight text-[var(--color-ink-900)] sm:text-xl"
@@ -168,11 +174,15 @@ function Li({ children, ...rest }: ComponentPropsWithoutRef<"li">) {
   );
 }
 
+/**
+ * Table — horizontal lines only, tabular-nums on data cells, header surface-muted bg.
+ * 세로선 0. 행 사이 가로선만.
+ */
 function Table({ children, ...rest }: ComponentPropsWithoutRef<"table">) {
   return (
     <div className="mt-6 overflow-x-auto">
       <table
-        className="w-full min-w-[32rem] border-separate border-spacing-0 overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] text-sm"
+        className="w-full min-w-[32rem] border-collapse text-sm tabular-nums"
         {...rest}
       >
         {children}
@@ -189,8 +199,42 @@ function Thead({ children, ...rest }: ComponentPropsWithoutRef<"thead">) {
   );
 }
 
+/**
+ * Tr — 행 텍스트 키워드로 사실 신호 색 분기.
+ *  - "말소기준" → brand-50 (기준점 강조)
+ *  - "**인수**" 또는 "인수(" / "인수," → danger-soft (권리 인수)
+ *  - "미납" → warning-soft (대금 미납)
+ *  - "매각" + "**" (낙찰 강조) → success-soft
+ *  - 그 외 → 기본
+ *
+ * thead·tfoot 의 행은 영향 안 받음 (배경 thead 별도 지정).
+ */
+function detectRowToneClass(text: string): string {
+  if (/말소기준/.test(text)) {
+    return "bg-[var(--color-brand-50)]";
+  }
+  if (/\*\*\s*인수\s*\*\*|\b인수\s*\(|\b인수\s*,/.test(text)) {
+    return "bg-[var(--color-danger-soft)]";
+  }
+  if (/미납/.test(text)) {
+    return "bg-[var(--color-warning-soft)]";
+  }
+  // "매각" + 굵은 강조 (**낙찰** / **매각**) — 매각 결과 행
+  if (/\*\*\s*매각\s*\*\*|\*\*\s*낙찰\s*\*\*/.test(text)) {
+    return "bg-[var(--color-success-soft)]";
+  }
+  return "";
+}
+
 function Tr({ children, ...rest }: ComponentPropsWithoutRef<"tr">) {
-  return <tr {...rest}>{children}</tr>;
+  // thead 내부 tr 은 부모 background 가 surface-muted 이므로 detectRowToneClass 효과 없음 — OK
+  const text = extractText(children);
+  const toneCls = detectRowToneClass(text);
+  return (
+    <tr className={toneCls} {...rest}>
+      {children}
+    </tr>
+  );
 }
 
 function Th({ children, ...rest }: ComponentPropsWithoutRef<"th">) {
@@ -207,7 +251,7 @@ function Th({ children, ...rest }: ComponentPropsWithoutRef<"th">) {
 function Td({ children, ...rest }: ComponentPropsWithoutRef<"td">) {
   return (
     <td
-      className="border-b border-[var(--color-border)] px-4 py-3 align-top text-sm leading-6 text-[var(--color-ink-700)] tabular-nums"
+      className="border-b border-[var(--color-border)] px-4 py-3 align-top text-sm leading-6 text-[var(--color-ink-700)]"
       {...rest}
     >
       {children}
@@ -270,16 +314,14 @@ export function AnalysisCoverImage({
 }
 
 /**
- * MDX components 오버라이드를 생성.
- * v2: category 인자 폐기 (원칙 5 — 내부 분류 라벨 비노출).
- * 사용처: `<MDXRemote components={buildAnalysisMdxComponents()} />`
+ * 본문 인라인 이미지 차단 — 사진은 Hero 갤러리로 일원화.
+ * post.md 의 ![](...) 노출 0건. data 는 frontmatter / meta.json 으로 보존.
  */
-export function buildAnalysisMdxComponents() {
-  function Img({ src, alt }: ComponentPropsWithoutRef<"img">) {
-    const safeSrc = typeof src === "string" ? src : undefined;
-    return <AnalysisMdxImage src={safeSrc} alt={alt ?? ""} />;
-  }
+function Img() {
+  return null;
+}
 
+export function buildAnalysisMdxComponents() {
   return {
     h1: H1,
     h2: H2,
