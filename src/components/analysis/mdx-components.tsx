@@ -9,11 +9,15 @@ import { Section06SaleHistory } from "./sections/Section06SaleHistory";
 import { Section07Opinion } from "./sections/Section07Opinion";
 
 /**
- * next-mdx-remote components 오버라이드.
- * 본문 사진은 Hero 갤러리로 일원화 — 본문 inline img 노출 0건 (mdx Img → null).
- * 표는 horizontal lines only + tabular-nums(숫자 cell) + 행 색 분기(매각/미납/말소기준/인수).
+ * next-mdx-remote components 오버라이드 (G1 보강).
  *
- * H2 dispatcher: "## NN 제목" → SectionXX, 번호 없는 H2 → 일반 헤더.
+ *  - Img → null (본문 사진 차단, Hero 갤러리 일원화)
+ *  - del/s → passthrough (취소선 차단; remark-gfm singleTilde:false 와 함께)
+ *  - Td 콘텐츠 기반 정렬: 금액·% → text-right tabular-nums nowrap, 회차·날짜·짧은 단어 → nowrap
+ *  - Tr 행 색 분기: 말소기준·인수·미납·매각 강조
+ *  - H2 dispatcher: "## NN 제목" → SectionXX
+ *  - H3: "체크포인트" 강조 + "시나리오 X — ..." 패턴은 remark plugin 이 ScenarioCard 로 wrap
+ *  - 신규 컴포넌트: ScenarioCard / ConclusionCallout / CheckpointList (remark plugin 이 emit)
  */
 
 function extractText(children: ReactNode): string {
@@ -32,9 +36,6 @@ function extractText(children: ReactNode): string {
   return "";
 }
 
-/**
- * 마크다운 본문의 H1은 페이지 H1과 중복되므로 렌더하지 않는다.
- */
 function H1() {
   return null;
 }
@@ -85,10 +86,6 @@ function H2({ children, ...rest }: ComponentPropsWithoutRef<"h2">) {
   );
 }
 
-/**
- * H3 — "체크포인트" 또는 "시나리오 X" 패턴은 강조 스타일.
- * 카드 wrapping 은 remark plugin 없이 불가하므로 헤더 수준 시각 강화만 적용.
- */
 function H3({ children, ...rest }: ComponentPropsWithoutRef<"h3">) {
   const text = extractText(children).trim();
   if (text === "체크포인트" || text.startsWith("체크포인트")) {
@@ -144,6 +141,11 @@ function Em({ children, ...rest }: ComponentPropsWithoutRef<"em">) {
   );
 }
 
+/** 취소선 차단 — del/s 모두 passthrough (효과 0, 텍스트만 노출) */
+function PassThrough({ children }: { children?: ReactNode }) {
+  return <>{children}</>;
+}
+
 function Ul({ children, ...rest }: ComponentPropsWithoutRef<"ul">) {
   return (
     <ul
@@ -174,15 +176,11 @@ function Li({ children, ...rest }: ComponentPropsWithoutRef<"li">) {
   );
 }
 
-/**
- * Table — horizontal lines only, tabular-nums on data cells, header surface-muted bg.
- * 세로선 0. 행 사이 가로선만.
- */
 function Table({ children, ...rest }: ComponentPropsWithoutRef<"table">) {
   return (
     <div className="mt-6 overflow-x-auto">
       <table
-        className="w-full min-w-[32rem] border-collapse text-sm tabular-nums"
+        className="w-full min-w-[36rem] border-collapse text-sm tabular-nums"
         {...rest}
       >
         {children}
@@ -199,16 +197,6 @@ function Thead({ children, ...rest }: ComponentPropsWithoutRef<"thead">) {
   );
 }
 
-/**
- * Tr — 행 텍스트 키워드로 사실 신호 색 분기.
- *  - "말소기준" → brand-50 (기준점 강조)
- *  - "**인수**" 또는 "인수(" / "인수," → danger-soft (권리 인수)
- *  - "미납" → warning-soft (대금 미납)
- *  - "매각" + "**" (낙찰 강조) → success-soft
- *  - 그 외 → 기본
- *
- * thead·tfoot 의 행은 영향 안 받음 (배경 thead 별도 지정).
- */
 function detectRowToneClass(text: string): string {
   if (/말소기준/.test(text)) {
     return "bg-[var(--color-brand-50)]";
@@ -219,7 +207,6 @@ function detectRowToneClass(text: string): string {
   if (/미납/.test(text)) {
     return "bg-[var(--color-warning-soft)]";
   }
-  // "매각" + 굵은 강조 (**낙찰** / **매각**) — 매각 결과 행
   if (/\*\*\s*매각\s*\*\*|\*\*\s*낙찰\s*\*\*/.test(text)) {
     return "bg-[var(--color-success-soft)]";
   }
@@ -227,7 +214,6 @@ function detectRowToneClass(text: string): string {
 }
 
 function Tr({ children, ...rest }: ComponentPropsWithoutRef<"tr">) {
-  // thead 내부 tr 은 부모 background 가 surface-muted 이므로 detectRowToneClass 효과 없음 — OK
   const text = extractText(children);
   const toneCls = detectRowToneClass(text);
   return (
@@ -237,10 +223,13 @@ function Tr({ children, ...rest }: ComponentPropsWithoutRef<"tr">) {
   );
 }
 
+/** Th — 헤더 텍스트로 nowrap·right-align 분기 */
 function Th({ children, ...rest }: ComponentPropsWithoutRef<"th">) {
+  const text = extractText(children).trim();
+  const cls = thHeaderClass(text);
   return (
     <th
-      className="border-b border-[var(--color-border)] px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--color-ink-500)]"
+      className={`border-b border-[var(--color-border)] px-4 py-3 text-xs font-bold uppercase tracking-wider text-[var(--color-ink-500)] ${cls}`}
       {...rest}
     >
       {children}
@@ -248,15 +237,60 @@ function Th({ children, ...rest }: ComponentPropsWithoutRef<"th">) {
   );
 }
 
+function thHeaderClass(text: string): string {
+  if (/^(채권금액|보증금|최저가|감정가|평균|매도가|매각가|낙찰가|취득세|법무사|예상)/.test(text)) {
+    return "text-right whitespace-nowrap";
+  }
+  if (/^(회차|매각기일|비율|접수일|대항력|기간)$/.test(text)) {
+    return "text-center whitespace-nowrap";
+  }
+  return "text-left";
+}
+
+/** Td — 콘텐츠 기반 정렬·nowrap 자동 감지 */
 function Td({ children, ...rest }: ComponentPropsWithoutRef<"td">) {
+  const text = extractText(children).trim();
+  const cls = tdContentClass(text);
   return (
     <td
-      className="border-b border-[var(--color-border)] px-4 py-3 align-top text-sm leading-6 text-[var(--color-ink-700)]"
+      className={`border-b border-[var(--color-border)] px-4 py-3 align-top text-sm leading-6 text-[var(--color-ink-700)] ${cls}`}
       {...rest}
     >
       {children}
     </td>
   );
+}
+
+function tdContentClass(text: string): string {
+  if (!text) return "";
+
+  // 회차 — 1차 / 2차 ...
+  if (/^\d+차$/.test(text)) {
+    return "text-center whitespace-nowrap font-medium";
+  }
+
+  // 날짜 yyyy-mm-dd / yyyy-mm
+  if (/^\d{4}-\d{2}(-\d{2})?$/.test(text)) {
+    return "whitespace-nowrap";
+  }
+
+  // 비율 % (단순 숫자%)
+  if (/^[\d.,]+\s*%$/.test(text)) {
+    return "text-right tabular-nums whitespace-nowrap";
+  }
+
+  // 금액 (원/만/억 단위, 한글 단위 또는 콤마 정수)
+  if (/^[\d,.\s]+(원|만원?|억(?:\s*[\d,]+만(?:원)?)?)$/.test(text) ||
+      /^\d+억(\s*[\d,]+만(?:원)?)?$/.test(text)) {
+    return "text-right tabular-nums whitespace-nowrap";
+  }
+
+  // 짧은 단일 단어 한글 — 결과 / 대항력 / 결정 등
+  if (/^(있음|없음|유찰|매각|소멸|인수|미상|진행|예정|변경|신청|미신청|—)$/.test(text)) {
+    return "text-center whitespace-nowrap";
+  }
+
+  return "";
 }
 
 function Blockquote({
@@ -291,7 +325,6 @@ function A({ children, href = "#", ...rest }: ComponentPropsWithoutRef<"a">) {
   );
 }
 
-/** next/image 기반 커버 이미지(로드 성공 가정). 포스트 상세 히어로에서 사용. */
 export function AnalysisCoverImage({
   src,
   alt,
@@ -313,12 +346,71 @@ export function AnalysisCoverImage({
   );
 }
 
-/**
- * 본문 인라인 이미지 차단 — 사진은 Hero 갤러리로 일원화.
- * post.md 의 ![](...) 노출 0건. data 는 frontmatter / meta.json 으로 보존.
- */
 function Img() {
   return null;
+}
+
+/* ─── remark-analysis-blocks 가 emit 하는 신규 컴포넌트 ─── */
+
+/**
+ * ScenarioCard — H3 "시나리오 X — ..." + 다음 H3/H2 까지의 콘텐츠를 카드로 wrap.
+ *  - title = H3 텍스트 ("시나리오 A — 실거주 매입" 등)
+ *  - 헤더에서 시나리오명 / 요약 분리 ("—" 또는 "-" 구분자)
+ *  - 시맨틱 색 baseline = 모두 brand-600 (단계 3-2 어댑터에서 loss/neutral/gain 분류)
+ */
+function ScenarioCard({
+  title,
+  children,
+}: {
+  title?: string;
+  children?: ReactNode;
+}) {
+  const [name, summary] = splitScenarioTitle(title ?? "");
+  return (
+    <div className="mt-8 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] border-l-4 border-l-brand-600 bg-white">
+      <div className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)] px-5 py-4 sm:px-6">
+        <p className="text-base font-black tracking-tight text-[var(--color-ink-900)] sm:text-lg">
+          {name}
+        </p>
+        {summary ? (
+          <p className="mt-1 text-sm text-[var(--color-ink-500)]">{summary}</p>
+        ) : null}
+      </div>
+      <div className="px-5 py-4 sm:px-6 sm:py-5 [&>*:first-child]:mt-0">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+function splitScenarioTitle(title: string): [string, string] {
+  const m = title.match(/^(.+?)\s*[—\-–]\s*(.+)$/);
+  if (m) return [m[1].trim(), m[2].trim()];
+  return [title.trim(), ""];
+}
+
+/**
+ * ConclusionCallout — 07 종합 의견 첫 단락을 결론 callout 으로 wrap.
+ */
+function ConclusionCallout({ children }: { children?: ReactNode }) {
+  return (
+    <div className="mt-6 rounded-r-[var(--radius-md)] border-l-4 border-brand-600 bg-[var(--color-brand-50)] px-5 py-4 sm:px-6 sm:py-5">
+      <span className="inline-flex items-center rounded-[var(--radius-xs)] bg-brand-600 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.18em] text-white">
+        결론
+      </span>
+      <div className="mt-2 [&>p]:!mt-0 [&>p]:text-[var(--color-ink-900)] [&>p]:font-medium">
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/**
+ * CheckpointList — 07 체크포인트 ol 을 num-circle 스타일로 wrap.
+ *  실제 num-circle CSS 는 globals.css 의 .checkpoint-list 클래스가 처리.
+ */
+function CheckpointList({ children }: { children?: ReactNode }) {
+  return <div className="checkpoint-list mt-5">{children}</div>;
 }
 
 export function buildAnalysisMdxComponents() {
@@ -329,6 +421,8 @@ export function buildAnalysisMdxComponents() {
     p: P,
     strong: Strong,
     em: Em,
+    del: PassThrough,
+    s: PassThrough,
     ul: Ul,
     ol: Ol,
     li: Li,
@@ -341,5 +435,9 @@ export function buildAnalysisMdxComponents() {
     hr: Hr,
     a: A,
     img: Img,
+    // remark-analysis-blocks emit
+    ScenarioCard,
+    ConclusionCallout,
+    CheckpointList,
   };
 }
