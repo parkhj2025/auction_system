@@ -7,6 +7,6 @@ import { SectionHeader } from "./SectionHeader";
  */
 export function Section04Market({ title }: { title: string }) {
   return (
-    <SectionHeader num="04" title={title} badge="시세 비교" />
+    <SectionHeader num="04" title={title} />
   );
 }

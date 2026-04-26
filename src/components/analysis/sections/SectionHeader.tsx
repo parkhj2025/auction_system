@@ -1,20 +1,17 @@
 import type { ReactNode } from "react";
-import { Badge } from "@/components/ui/badge";
 
 /**
- * 7섹션 공통 헤더.
- * tone 분기 폐기 — 단색 neutral 만 사용.
- * 분류 신호(색·배지·아이콘)는 색이 아닌 사실 어휘로만 표현.
+ * 7섹션 공통 헤더 (G1 보강).
+ *  - badge prop 폐기 — sub-label chip ("물건 정보" 등) 노출 0
+ *  - SectionHeader 만 단독 노출. 본문 직접 연결.
  */
 export function SectionHeader({
   num,
   title,
-  badge,
   intro,
 }: {
   num: string;
   title: string;
-  badge?: string;
   intro?: ReactNode;
 }) {
   return (
@@ -30,16 +27,6 @@ export function SectionHeader({
           {title}
         </h2>
       </div>
-      {badge ? (
-        <div className="mt-3">
-          <Badge
-            variant="outline"
-            className="border-[var(--color-border)] bg-[var(--color-surface-muted)] text-xs font-bold tracking-tight text-[var(--color-ink-700)]"
-          >
-            {badge}
-          </Badge>
-        </div>
-      ) : null}
       {intro ? (
         <p className="mt-4 max-w-3xl text-sm leading-7 text-[var(--color-ink-500)]">
           {intro}

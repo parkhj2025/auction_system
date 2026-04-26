@@ -7,6 +7,6 @@ import { SectionHeader } from "./SectionHeader";
  */
 export function Section07Opinion({ title }: { title: string }) {
   return (
-    <SectionHeader num="07" title={title} badge="종합 의견" />
+    <SectionHeader num="07" title={title} />
   );
 }

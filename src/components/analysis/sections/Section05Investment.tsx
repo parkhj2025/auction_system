@@ -10,7 +10,6 @@ export function Section05Investment({ title }: { title: string }) {
     <SectionHeader
       num="05"
       title={title}
-      badge="시뮬레이션"
       intro="아래 수치는 공개 시세 데이터 기반 참고 수치입니다. 실제 투자 진행 시 전문가 자문이 필요합니다."
     />
   );
