@@ -12,6 +12,7 @@ import { TimelineSection } from "./TimelineSection";
 import { RightsCallout } from "./RightsCallout";
 import { MarketCompareCard } from "./MarketCompareCard";
 import { ScenarioCardsBoard } from "./ScenarioCardsBoard";
+import { PropertyOverviewCard } from "./PropertyOverviewCard";
 
 /**
  * next-mdx-remote components 오버라이드.
@@ -473,6 +474,15 @@ export function buildAnalysisMdxComponents(
     status: "published",
   } as AnalysisFrontmatter);
 
+  // PropertyOverviewCard — fm/meta closure 캡처 (mdx remark plugin 이 emit 하는 wrap 컴포넌트)
+  function PropertyOverviewCardEnhanced({ children }: { children?: ReactNode }) {
+    return (
+      <PropertyOverviewCard fm={fmSafe} meta={meta ?? null}>
+        {children}
+      </PropertyOverviewCard>
+    );
+  }
+
   return {
     h1: H1,
     h2: buildH2(meta ?? null, fmSafe),
@@ -497,5 +507,6 @@ export function buildAnalysisMdxComponents(
     ScenarioCard,
     ConclusionCallout,
     CheckpointList,
+    PropertyOverviewCard: PropertyOverviewCardEnhanced,
   };
 }

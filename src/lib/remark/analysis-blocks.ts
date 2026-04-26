@@ -1,12 +1,13 @@
 /**
  * remark plugin — 분석 페이지 mdx 트리 구조 변환.
  *
- *  1. "### 시나리오 X — ..." H3 + 다음 H3/H2 까지의 자식 → <ScenarioCard title="...">
- *  2. "## 07 종합 ..." 진입 후 첫 paragraph → <ConclusionCallout>
- *  3. "### 체크포인트" 직후 ol → <CheckpointList>
- *  4. "## 면책 고지" h2 + 그 아래 모든 자식 → 폐기 (ComplianceFooter 컴포넌트로 페이지 끝에 단일 노출)
+ *  1. "## 01 물건 개요" 진입 후 첫 table → <PropertyOverviewCard> 로 wrap (단계 3-5)
+ *  2. "### 시나리오 X — ..." H3 + 다음 H3/H2 까지의 자식 → <ScenarioCard title="...">
+ *  3. "## 07 종합 ..." 진입 후 첫 paragraph → <ConclusionCallout>
+ *  4. "### 체크포인트" 직후 ol → <CheckpointList>
+ *  5. "## 면책 고지" h2 + 그 아래 모든 자식 → 폐기 (ComplianceFooter 컴포넌트로 페이지 끝에 단일 노출)
  *
- * 단계 3-1 baseline. 데이터 어댑터(meta.json) 결합은 단계 3-2 이월.
+ * 단계 3-1 baseline + 단계 3-3 데이터 어댑터 + 단계 3-5 인터랙션.
  */
 
 type AnyNode = {
@@ -24,6 +25,7 @@ const SCENARIO_RE = /^시나리오\s+[A-Z](-\d+)?\s/;
 const CHECKPOINT_RE = /^체크포인트$/;
 const CONCLUSION_H2_RE = /^07\s+종합/;
 const COMPLIANCE_H2_RE = /^면책\s*고지|^면책고지|^면책$/;
+const OVERVIEW_H2_RE = /^01\s+물건\s*개요/;
 
 function getHeadingText(node: AnyNode): string {
   let text = "";
@@ -58,6 +60,9 @@ export function remarkAnalysisBlocks() {
     let conclusionFirstParaSeen = false;
     let checkpointFollowing = false;
     let dropping = false;
+    // 단계 3-5: "## 01 물건 개요" 진입 후 첫 table 만 PropertyOverviewCard wrap
+    let inOverview = false;
+    let overviewFirstTableSeen = false;
 
     function flushScenario() {
       if (scenarioGroup) {
@@ -79,10 +84,19 @@ export function remarkAnalysisBlocks() {
           continue;
         }
 
+        inOverview = OVERVIEW_H2_RE.test(h2text);
+        if (inOverview) overviewFirstTableSeen = false;
         inConclusion = CONCLUSION_H2_RE.test(h2text);
         if (inConclusion) conclusionFirstParaSeen = false;
         checkpointFollowing = false;
         out.push(node);
+        continue;
+      }
+
+      // 01 물건 개요 진입 후 첫 table → <PropertyOverviewCard>{table}</PropertyOverviewCard>
+      if (inOverview && !overviewFirstTableSeen && node.type === "table") {
+        overviewFirstTableSeen = true;
+        out.push(makeJsx("PropertyOverviewCard", {}, [node]));
         continue;
       }
 

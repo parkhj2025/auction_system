@@ -368,6 +368,269 @@ function serializeMdx(frontmatter, body) {
 }
 
 /**
+ * §10-X: 시나리오 정합성 검증 (v3.7 신규, 단계 3-5).
+ *
+ * 사유: v2.7.1 Cowork 동결 + 책임 분리 — Cowork(LLM·주관) vs Code(검증·객관).
+ *      LLM 비결정성은 patch 로 차단 0, post-processing 검증이 본질 해결책.
+ *
+ * 알고리즘:
+ *   1) "### 시나리오 " 헤더로 본문 분할 (4개: A·B·C-1·C-2 등)
+ *   2) 각 섹션에서 한 줄 요약 추출 — 헤더 다음 첫 비공백 줄.
+ *      `|` `-` `*` 시작이면 한 줄 요약 없음 (스킵, WARN)
+ *   3) 한 줄 요약에서 숫자+단위 추출 (만원/억/%/년)
+ *   4) 동일 섹션의 마크다운 표(헤더 행 다음) 안 모든 셀에서 동일 정규식
+ *   5) 한 줄 요약 각 숫자에 대해, 같은 단위 그룹에서 가장 가까운 표 숫자 매칭.
+ *      차이비율 = abs(요약값 - 표값) / max(요약값, 표값). 5% 초과 시 FAIL.
+ *
+ * 단위 정규화: 만원/억은 만원 단위 통일 (1억=10000만). %·년은 그대로.
+ *
+ * 반환: { ok: boolean, results: Array<{ scenario, status, summaries: [{value, unit, nearest, diff, pass}] }> }
+ */
+
+const NUMBER_UNIT_RE = /(\d{1,3}(?:,\d{3})*(?:\.\d+)?)\s*(만원|억|%|년)/g;
+
+function parseNumber(rawDigits) {
+  return parseFloat(String(rawDigits).replace(/,/g, ""));
+}
+
+/** 단위별 정규화: 만원/억은 "만" 단위 정수, %·년은 원본 값. 단위 그룹 키는 "money" 또는 unit 자체 */
+function normalizeNumberUnit(value, unit) {
+  if (unit === "억") return { group: "money", value: value * 10000 };
+  if (unit === "만원") return { group: "money", value };
+  if (unit === "%") return { group: "%", value };
+  if (unit === "년") return { group: "년", value };
+  return { group: unit, value };
+}
+
+function extractNumbersFromText(text) {
+  const out = [];
+  if (!text) return out;
+  let m;
+  NUMBER_UNIT_RE.lastIndex = 0;
+  while ((m = NUMBER_UNIT_RE.exec(text)) !== null) {
+    const raw = m[1];
+    const unit = m[2];
+    const value = parseNumber(raw);
+    if (Number.isFinite(value)) {
+      const norm = normalizeNumberUnit(value, unit);
+      out.push({ raw, unit, value, group: norm.group, normValue: norm.value });
+    }
+  }
+  return out;
+}
+
+/** 마크다운 표 데이터 행 (헤더 + 구분자 다음) 셀 텍스트 추출 */
+function extractTableCells(blockLines) {
+  // blockLines 안 `|` 시작 라인 모음. 첫 두 라인(헤더 + ---)을 건너뛰고 데이터 행 셀 추출
+  const tableLines = blockLines.filter((l) => /^\s*\|/.test(l));
+  if (tableLines.length < 3) return [];
+  const sepIdx = tableLines.findIndex((l) => /^\s*\|[\s|:.\-]+\|/.test(l));
+  if (sepIdx < 1) return [];
+  const dataRows = tableLines.slice(sepIdx + 1);
+  const cells = [];
+  for (const row of dataRows) {
+    const inner = row.trim().replace(/^\|/, "").replace(/\|$/, "");
+    for (const cell of inner.split("|")) {
+      cells.push(cell.trim());
+    }
+  }
+  return cells;
+}
+
+function validateScenarioConsistency(postMdContent) {
+  // post.md 본문에서 frontmatter 제거
+  const parsed = matter(postMdContent);
+  const body = parsed.content;
+  const lines = body.split(/\r?\n/);
+
+  // ### 시나리오 ... 섹션 분할
+  const sections = [];
+  let current = null;
+  for (let i = 0; i < lines.length; i++) {
+    const l = lines[i];
+    const headerMatch = /^###\s+시나리오\s+([A-Z](?:-\d+)?)\s*[—\-–]\s*(.+?)\s*$/.exec(l);
+    if (headerMatch) {
+      if (current) sections.push(current);
+      current = { key: headerMatch[1], title: l.trim(), startLine: i, lines: [] };
+      continue;
+    }
+    // 다음 ### 또는 ## 만나면 섹션 종료
+    if (current && /^(?:##|###)\s+/.test(l)) {
+      sections.push(current);
+      current = null;
+    }
+    if (current) current.lines.push(l);
+  }
+  if (current) sections.push(current);
+
+  // 비교 요약 섹션은 제외 — 4 시나리오만
+  const scenarios = sections.filter(
+    (s) => /^[A-Z](-\d+)?$/.test(s.key) && s.key !== "비교"
+  );
+
+  const results = [];
+  let failCount = 0;
+
+  for (const sec of scenarios) {
+    const result = {
+      scenario: sec.key,
+      title: sec.title,
+      status: "pass",
+      summaryLine: "",
+      summaries: [],
+      tableCellCount: 0,
+    };
+
+    // 한 줄 요약: 헤더 직후 첫 비공백 줄
+    let summaryLine = "";
+    for (const l of sec.lines) {
+      const t = l.trim();
+      if (!t) continue;
+      if (/^[|*\-]/.test(t)) {
+        // 표 / 리스트 시작 — 한 줄 요약 없음
+        result.status = "skip";
+        break;
+      }
+      summaryLine = t;
+      break;
+    }
+    result.summaryLine = summaryLine;
+
+    if (result.status === "skip") {
+      results.push(result);
+      continue;
+    }
+
+    if (!summaryLine) {
+      result.status = "skip";
+      results.push(result);
+      continue;
+    }
+
+    const summaryNums = extractNumbersFromText(summaryLine);
+    if (summaryNums.length === 0) {
+      // 한 줄 요약은 있으나 숫자+단위 0건 — 비교 대상 0
+      result.status = "no-numbers";
+      results.push(result);
+      continue;
+    }
+
+    const tableCells = extractTableCells(sec.lines);
+    result.tableCellCount = tableCells.length;
+    const tableNums = [];
+    for (const c of tableCells) {
+      tableNums.push(...extractNumbersFromText(c));
+    }
+
+    // 한 줄 요약 각 숫자 → 같은 group 안 가장 가까운 표 숫자 매칭
+    for (const sn of summaryNums) {
+      const sameGroup = tableNums.filter((tn) => tn.group === sn.group);
+      if (sameGroup.length === 0) {
+        result.summaries.push({
+          summary: `${sn.raw}${sn.unit}`,
+          group: sn.group,
+          nearest: null,
+          diff: null,
+          pass: false,
+          reason: "표 안 동일 단위 숫자 0건",
+        });
+        result.status = "fail";
+        continue;
+      }
+      let best = sameGroup[0];
+      let bestDiff =
+        Math.abs(sn.normValue - best.normValue) /
+        Math.max(sn.normValue, best.normValue, 1);
+      for (const tn of sameGroup.slice(1)) {
+        const d =
+          Math.abs(sn.normValue - tn.normValue) /
+          Math.max(sn.normValue, tn.normValue, 1);
+        if (d < bestDiff) {
+          best = tn;
+          bestDiff = d;
+        }
+      }
+      const pass = bestDiff <= 0.05;
+      result.summaries.push({
+        summary: `${sn.raw}${sn.unit}`,
+        group: sn.group,
+        nearest: `${best.raw}${best.unit}`,
+        diff: bestDiff,
+        pass,
+        reason: null,
+      });
+      if (!pass) result.status = "fail";
+    }
+
+    if (result.status === "fail") failCount++;
+    results.push(result);
+  }
+
+  const passCount = results.filter((r) => r.status === "pass").length;
+  const total = scenarios.length;
+  return { ok: failCount === 0, total, passCount, failCount, results };
+}
+
+function reportConsistency(report) {
+  const { ok, total, passCount, failCount, results } = report;
+  if (ok) {
+    console.log(
+      `=== 정합성 검증 PASS (시나리오 ${passCount}/${total}) ===`
+    );
+  } else {
+    console.error(
+      `=== 정합성 검증 FAIL (시나리오 ${passCount}/${total}, 실패 ${failCount}) ===`
+    );
+  }
+  for (const r of results) {
+    if (r.status === "skip") {
+      console.warn(
+        `  · 시나리오 ${r.scenario} — 한 줄 요약 없음 (표/리스트 시작) → 스킵`
+      );
+      continue;
+    }
+    if (r.status === "no-numbers") {
+      console.warn(
+        `  · 시나리오 ${r.scenario} — 한 줄 요약에서 숫자+단위 0건 추출 (스킵)`
+      );
+      continue;
+    }
+    if (r.status === "fail") {
+      console.error(
+        `  ✗ 시나리오 ${r.scenario} — 한 줄 요약과 표 숫자 불일치 (표 ${r.tableCellCount}셀)`
+      );
+      for (const s of r.summaries) {
+        if (s.pass) {
+          const dPct = (s.diff * 100).toFixed(1);
+          console.error(
+            `      · "${s.summary}" ↔ 가장 가까운 표 값 ${s.nearest}, 차이 ${dPct}% [PASS — 5% 이내]`
+          );
+        } else if (s.nearest) {
+          const dPct = (s.diff * 100).toFixed(1);
+          console.error(
+            `      · "${s.summary}" ↔ 가장 가까운 표 값 ${s.nearest}, 차이 ${dPct}% [FAIL]`
+          );
+        } else {
+          console.error(
+            `      · "${s.summary}" ↔ ${s.reason} [FAIL]`
+          );
+        }
+      }
+    } else if (r.status === "pass") {
+      const cnt = r.summaries.length;
+      console.log(
+        `  ✓ 시나리오 ${r.scenario} — 한 줄 요약 ${cnt}개 모두 표 숫자와 5% 이내 일치`
+      );
+    }
+  }
+  if (!ok) {
+    console.error(
+      `\n수정 후 재시도하시거나 --force 플래그로 강행하실 수 있습니다.`
+    );
+  }
+}
+
+/**
  * §3-3-7: content/analysis/{slug}.meta.json 동행 출력 (v3.6 신규).
  *
  * 컴포넌트(Timeline / RightsCallout / MarketCompare / ScenarioCards / PhotoGalleryStrip)가
@@ -531,6 +794,19 @@ async function main() {
     process.exit(2);
   }
   if (args.verbose) console.log(`  ✓ §7 + §10-2 통과`);
+
+  // [3.5] 시나리오 정합성 검증 (v3.7 신규, 단계 3-5)
+  console.log(`[3.5] 시나리오 정합성 검증 (한 줄 요약 ↔ 표 숫자, 5% 임계)`);
+  const consistency = validateScenarioConsistency(postRaw);
+  reportConsistency(consistency);
+  if (!consistency.ok) {
+    if (!args.force) {
+      process.exit(1);
+    }
+    console.warn(
+      `  ⚠ --force 플래그로 정합성 위반을 무시하고 진행합니다.`
+    );
+  }
 
   const title = meta.card?.title ?? meta.hero?.headline ?? "";
   console.log(`[4] 본문 처리 + 이미지 매핑 (url_map / used) — post.md frontmatter 무시`);
