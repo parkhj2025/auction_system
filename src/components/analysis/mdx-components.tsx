@@ -1,6 +1,13 @@
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import Image from "next/image";
 import { AnalysisMdxImage } from "./AnalysisMdxImage";
+import { Section01Overview } from "./sections/Section01Overview";
+import { Section02BidHistory } from "./sections/Section02BidHistory";
+import { Section03Rights } from "./sections/Section03Rights";
+import { Section04Market } from "./sections/Section04Market";
+import { Section05Investment } from "./sections/Section05Investment";
+import { Section06SaleHistory } from "./sections/Section06SaleHistory";
+import { Section07Opinion } from "./sections/Section07Opinion";
 
 /**
  * next-mdx-remote components 오버라이드.
@@ -36,24 +43,46 @@ function H1() {
   return null;
 }
 
+/**
+ * H2 dispatcher (단계 3-1):
+ *  - "## 01 물건 개요" 형태는 SectionXX 컴포넌트로 분기 (각 섹션 baseline 헤더)
+ *  - "## 면책 고지" 등 번호 없는 H2는 일반 H2 스타일
+ */
 function H2({ children, ...rest }: ComponentPropsWithoutRef<"h2">) {
   const text = extractText(children);
   const match = /^(\d{2})\s+(.+)$/.exec(text.trim());
   if (match) {
     const [, num, title] = match;
-    return (
-      <h2
-        id={`section-${num}`}
-        className="mt-20 flex scroll-mt-24 items-baseline gap-4 border-t border-[var(--color-border)] pt-10 first:mt-0 first:border-t-0 first:pt-0"
-      >
-        <span className="text-xs font-black uppercase tracking-[0.24em] text-brand-600">
-          {num}
-        </span>
-        <span className="text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
-          {title}
-        </span>
-      </h2>
-    );
+    switch (num) {
+      case "01":
+        return <Section01Overview title={title} />;
+      case "02":
+        return <Section02BidHistory title={title} />;
+      case "03":
+        return <Section03Rights title={title} />;
+      case "04":
+        return <Section04Market title={title} />;
+      case "05":
+        return <Section05Investment title={title} />;
+      case "06":
+        return <Section06SaleHistory title={title} />;
+      case "07":
+        return <Section07Opinion title={title} />;
+      default:
+        return (
+          <h2
+            id={`section-${num}`}
+            className="mt-20 flex scroll-mt-24 items-baseline gap-4 border-t border-[var(--color-border)] pt-10 first:mt-0 first:border-t-0 first:pt-0"
+          >
+            <span className="text-xs font-black uppercase tracking-[0.24em] text-brand-600">
+              {num}
+            </span>
+            <span className="text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+              {title}
+            </span>
+          </h2>
+        );
+    }
   }
   return (
     <h2
