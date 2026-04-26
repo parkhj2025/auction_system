@@ -1,5 +1,6 @@
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import Image from "next/image";
+import { Home, TrendingUp, Users, RefreshCw, Ban } from "lucide-react";
 import type { AnalysisFrontmatter, AnalysisMeta } from "@/types/content";
 import { Section01Overview } from "./sections/Section01Overview";
 import { Section02BidHistory } from "./sections/Section02BidHistory";
@@ -393,6 +394,77 @@ function Img() {
 
 /* ─── remark-analysis-blocks 가 emit 하는 신규 컴포넌트 ─── */
 
+/**
+ * 단계 4-1: 시나리오 헤더에서 키 (A·B·C-1·C-2) 추출.
+ *  지원 패턴:
+ *   - "시나리오 A — 실거주 매입"
+ *   - "시나리오 C-1 전세 갭투자" (정규화 후)
+ *   - "시나리오 C-1 — 지분 임대 (단독 운용 불가)"
+ */
+function parseScenarioKey(title: string): string | null {
+  const m = title.match(/^시나리오\s+([A-Z](?:-\d+)?)/);
+  return m ? m[1] : null;
+}
+
+/** 시나리오 카드 색상·아이콘 매핑 (단계 4-1 결정) */
+const SCENARIO_THEME: Record<
+  string,
+  {
+    icon: typeof Home;
+    border: string;
+    bg: string;
+    chip: string;
+    iconColor: string;
+  }
+> = {
+  A: {
+    icon: Home,
+    border: "border-l-blue-500",
+    bg: "bg-blue-50/40",
+    chip: "bg-blue-100 text-blue-700",
+    iconColor: "text-blue-600",
+  },
+  B: {
+    icon: TrendingUp,
+    border: "border-l-orange-500",
+    bg: "bg-orange-50/40",
+    chip: "bg-orange-100 text-orange-700",
+    iconColor: "text-orange-600",
+  },
+  "C-1": {
+    icon: Users,
+    border: "border-l-purple-500",
+    bg: "bg-purple-50/40",
+    chip: "bg-purple-100 text-purple-700",
+    iconColor: "text-purple-600",
+  },
+  "C-2": {
+    icon: RefreshCw,
+    border: "border-l-green-500",
+    bg: "bg-green-50/40",
+    chip: "bg-green-100 text-green-700",
+    iconColor: "text-green-600",
+  },
+};
+
+const DISABLED_THEME = {
+  icon: Ban,
+  border: "border-l-[var(--color-ink-300)]",
+  bg: "bg-[var(--color-surface-muted)]",
+  chip: "bg-[var(--color-ink-100)] text-[var(--color-ink-500)]",
+  iconColor: "text-[var(--color-ink-500)]",
+};
+
+/** 시나리오 본문에 "단독 운용 불가" / "적용하지 않습니다" / "본 사건 적용 불가" 키워드 감지 */
+function detectScenarioDisabled(title: string, children: ReactNode): boolean {
+  const titleHit = /(단독\s*운용\s*불가|적용\s*불가)/.test(title ?? "");
+  if (titleHit) return true;
+  const txt = extractText(children);
+  return /(단독\s*운용\s*불가|본\s*사건에서\s*적용하지\s*않습니다|적용하지\s*않습니다)/.test(
+    txt
+  );
+}
+
 function ScenarioCard({
   title,
   children,
@@ -401,17 +473,47 @@ function ScenarioCard({
   children?: ReactNode;
 }) {
   const [name, summary] = splitScenarioTitle(title ?? "");
+  const key = parseScenarioKey(title ?? "") ?? "";
+  const disabled = detectScenarioDisabled(title ?? "", children);
+  const theme = disabled ? DISABLED_THEME : SCENARIO_THEME[key] ?? null;
+  const Icon = theme?.icon ?? Home;
+  const borderCls = theme?.border ?? "border-l-brand-600";
+  const bgCls = theme?.bg ?? "bg-white";
+  const chipCls = theme?.chip ?? "bg-[var(--color-surface-muted)] text-[var(--color-ink-700)]";
+  const iconColorCls = theme?.iconColor ?? "text-brand-600";
+
   return (
-    <div className="mt-8 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] border-l-4 border-l-brand-600 bg-white">
-      <div className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)] px-5 py-4 sm:px-6">
-        <p className="text-base font-black tracking-tight text-[var(--color-ink-900)] sm:text-lg">
-          {name}
-        </p>
-        {summary ? (
-          <p className="mt-1 text-sm text-[var(--color-ink-500)]">{summary}</p>
-        ) : null}
+    <div
+      className={`mt-8 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] border-l-4 ${borderCls} ${bgCls}`}
+    >
+      <div className="flex items-start gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]/60 px-5 py-4 sm:px-6">
+        <span
+          className={`mt-0.5 inline-flex h-9 w-9 flex-none items-center justify-center rounded-full bg-white ${iconColorCls}`}
+          aria-hidden="true"
+        >
+          <Icon size={18} />
+        </span>
+        <div className="min-w-0 flex-1">
+          <p className="text-base font-black tracking-tight text-[var(--color-ink-900)] sm:text-lg">
+            {name}
+          </p>
+          <div className="mt-1 flex flex-wrap items-baseline gap-2">
+            {summary ? (
+              <p className="text-sm text-[var(--color-ink-500)]">{summary}</p>
+            ) : null}
+            {disabled ? (
+              <span
+                className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold ${chipCls}`}
+              >
+                본 사건 적용 불가
+              </span>
+            ) : null}
+          </div>
+        </div>
       </div>
-      <div className="px-5 py-4 sm:px-6 sm:py-5 [&>*:first-child]:mt-0">
+      <div
+        className={`px-5 py-4 sm:px-6 sm:py-5 [&>*:first-child]:mt-0 ${disabled ? "text-[var(--color-ink-500)]" : ""}`}
+      >
         {children}
       </div>
     </div>
@@ -419,7 +521,9 @@ function ScenarioCard({
 }
 
 function splitScenarioTitle(title: string): [string, string] {
-  const m = title.match(/^(.+?)\s*[—\-–]\s*(.+)$/);
+  // 단계 4-1 fix: em-dash(—)·en-dash(–) 만 separator. ASCII hyphen(-) 는 "C-1" 같은
+  // 시나리오 키 구분자라 separator 로 매칭하면 잘못 split.
+  const m = title.match(/^(.+?)\s*[—–]\s*(.+)$/);
   if (m) return [m[1].trim(), m[2].trim()];
   return [title.trim(), ""];
 }

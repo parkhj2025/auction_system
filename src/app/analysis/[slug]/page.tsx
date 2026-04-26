@@ -13,7 +13,7 @@ import { DetailSidebar } from "@/components/analysis/DetailSidebar";
 import { TrustBlock } from "@/components/analysis/TrustBlock";
 import { ApplyCTA } from "@/components/analysis/ApplyCTA";
 import { RelatedCards } from "@/components/analysis/RelatedCards";
-import { ComplianceFooter } from "@/components/analysis/ComplianceFooter";
+import { ContentComplianceNotice } from "@/components/analysis/ContentComplianceNotice";
 import { PhotoGalleryStrip } from "@/components/analysis/PhotoGalleryStrip";
 import { buildAnalysisMdxComponents } from "@/components/analysis/mdx-components";
 import { GatingWrapper } from "@/components/analysis/GatingWrapper";
@@ -128,7 +128,10 @@ export default async function AnalysisDetailPage({
               />
             </GatingWrapper>
 
-            {/* dedicated 갤러리 — 본문 끝 / Trust 위 (단계 3-1 mdx Img null 보존, Hero strip 보강) */}
+            {/* 본문(07 종합 의견) 직후 — 산문 1단락 컴플라이언스 (단계 4-1) */}
+            <ContentComplianceNotice />
+
+            {/* dedicated 갤러리 — 본문 끝 / Trust 위 (단계 3-1 mdx Img null 보존) */}
             <PhotoGalleryStrip
               photos={meta?.photos}
               coverImage={fm.coverImage}
@@ -138,7 +141,6 @@ export default async function AnalysisDetailPage({
             <TrustBlock />
             <ApplyCTA fm={fm} />
             <RelatedCards posts={related} />
-            <ComplianceFooter />
           </article>
 
           <DetailSidebar fm={fm} />

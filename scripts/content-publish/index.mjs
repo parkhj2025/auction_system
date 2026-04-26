@@ -282,6 +282,14 @@ function transformBody(postRaw, photosMeta, title) {
   const parsed = matter(postRaw);
   let body = parsed.content;
 
+  // 단계 4-1: 시나리오 C 라벨 정규화 (in-memory, raw-content 무수정).
+  // "### 시나리오 C\n1 — 전세 갭투자" → "### 시나리오 C-1 전세 갭투자"
+  // "### 시나리오 C\n2 — 월세 운용"   → "### 시나리오 C-2 월세 운용"
+  body = body.replace(
+    /^###\s+시나리오\s+C\s*\r?\n([12])\s*[—\-–]\s*(.+?)\s*$/gm,
+    (_m, num, label) => `### 시나리오 C-${num} ${label.trim()}`
+  );
+
   // H1 자동 주입 (없을 때만)
   const head = body.trimStart();
   const hasH1 = /^#\s+/.test(head);
