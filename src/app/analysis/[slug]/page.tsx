@@ -9,6 +9,7 @@ import {
 } from "@/lib/content";
 import { DetailHero } from "@/components/analysis/DetailHero";
 import { DetailSidebar } from "@/components/analysis/DetailSidebar";
+import { TrustBlock } from "@/components/analysis/TrustBlock";
 import { ApplyCTA } from "@/components/analysis/ApplyCTA";
 import { RelatedCards } from "@/components/analysis/RelatedCards";
 import { buildAnalysisMdxComponents } from "@/components/analysis/mdx-components";
@@ -68,14 +69,8 @@ export default async function AnalysisDetailPage({
     description: fm.summary,
     datePublished: fm.publishedAt,
     dateModified: fm.updatedAt,
-    author: {
-      "@type": "Organization",
-      name: BRAND_NAME,
-    },
-    publisher: {
-      "@type": "Organization",
-      name: BRAND_NAME,
-    },
+    author: { "@type": "Organization", name: BRAND_NAME },
+    publisher: { "@type": "Organization", name: BRAND_NAME },
     about: {
       "@type": "Thing",
       name: `${fm.court} ${fm.caseNumber}`,
@@ -93,22 +88,18 @@ export default async function AnalysisDetailPage({
       <DetailHero fm={fm} />
 
       <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <div className="grid gap-12 lg:grid-cols-[minmax(0,1fr)_320px]">
+        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
           <article className="min-w-0">
-            {/* MDX 본문만 게이팅 대상. ApplyCTA/RelatedCards는 전환 경로 보호 목적으로
-                게이팅 영역 밖에 유지 (CLAUDE.md 판단기준 ① 전환 경로 유지). */}
+            {/* MDX 본문만 게이팅 대상. Trust/CTA/RelatedCards 는 전환 경로 보호로 게이팅 영역 밖. */}
             <GatingWrapper slug={slug}>
               <MDXRemote
                 source={post.content}
                 components={components}
-                options={{
-                  mdxOptions: {
-                    remarkPlugins: [remarkGfm],
-                  },
-                }}
+                options={{ mdxOptions: { remarkPlugins: [remarkGfm] } }}
               />
             </GatingWrapper>
 
+            <TrustBlock />
             <ApplyCTA fm={fm} />
             <RelatedCards posts={related} />
           </article>
