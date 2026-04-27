@@ -163,7 +163,7 @@ export function PriceScatter({
           <p className="mt-2 text-[length:var(--text-caption)] font-bold uppercase tracking-wider text-[var(--color-ink-700)]">
             {currentRound}차 진입가
           </p>
-          <p className="mt-1 text-[length:var(--text-display)] font-black tabular-nums leading-[var(--lh-tight)] text-[var(--color-ink-900)]">
+          <p className="mt-1 text-[length:var(--text-h1)] font-bold tabular-nums leading-[var(--lh-tight)] text-[var(--color-ink-900)]">
             {formatKoreanWon(currentPrice)}
           </p>
           <p className="mt-1 text-[length:var(--text-body-sm)] tabular-nums text-[var(--color-ink-700)]">
