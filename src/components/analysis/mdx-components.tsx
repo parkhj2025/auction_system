@@ -15,6 +15,7 @@ import { RightsAnalysisSection } from "./RightsAnalysisSection";
 import { MarketCompareCard } from "./MarketCompareCard";
 import { InvestmentInteractive } from "./InvestmentInteractive";
 import { SaleAreaSummary } from "./SaleAreaSummary";
+import { CheckpointList as CheckpointListClient } from "./CheckpointList";
 import { PropertyOverviewCard } from "./PropertyOverviewCard";
 
 /**
@@ -490,9 +491,7 @@ function ConclusionCallout({ children }: { children?: ReactNode }) {
   );
 }
 
-function CheckpointList({ children }: { children?: ReactNode }) {
-  return <div className="checkpoint-list mt-5">{children}</div>;
-}
+// CheckpointList — client 모듈 (CheckpointList.tsx)로 분리. 단계 5-4-2-fix-2 Phase 4 단락 fade-in stagger.
 
 /**
  * mdx components 빌더.
@@ -559,7 +558,7 @@ export function buildAnalysisMdxComponents(
     img: Img,
     ScenarioCard,
     ConclusionCallout,
-    CheckpointList,
+    CheckpointList: CheckpointListClient,
     PropertyOverviewCard: PropertyOverviewCardEnhanced,
   };
 }

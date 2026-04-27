@@ -279,6 +279,25 @@ body {
   font-size: 0.8125rem;
   font-weight: 700;
 }
+/* 단계 5-4-2-fix-2 Phase 4 — 체크포인트 단락 fade-in stagger.
+ * CheckpointList container 가 viewport 진입 시 .checkpoint-revealed 클래스 추가.
+ * 자식 li 들이 CSS animation 으로 stagger fade-in (좌→우 + opacity). */
+.checkpoint-list ol > li {
+  opacity: 0;
+  transform: translateX(-12px);
+}
+.checkpoint-list.checkpoint-revealed ol > li {
+  animation: checkpoint-stagger-in 600ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.checkpoint-list.checkpoint-revealed ol > li:nth-child(1) { animation-delay: 50ms; }
+.checkpoint-list.checkpoint-revealed ol > li:nth-child(2) { animation-delay: 200ms; }
+.checkpoint-list.checkpoint-revealed ol > li:nth-child(3) { animation-delay: 350ms; }
+.checkpoint-list.checkpoint-revealed ol > li:nth-child(4) { animation-delay: 500ms; }
+.checkpoint-list.checkpoint-revealed ol > li:nth-child(5) { animation-delay: 650ms; }
+.checkpoint-list.checkpoint-revealed ol > li:nth-child(n+6) { animation-delay: 800ms; }
+@keyframes checkpoint-stagger-in {
+  to { opacity: 1; transform: translateX(0); }
+}
 /*
   ---break---
 */

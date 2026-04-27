@@ -78,27 +78,27 @@ export function SaleAreaSummary({
           }}
           initial={{ scaleX: 0 }}
           animate={inView ? { scaleX: 1 } : { scaleX: 0 }}
-          transition={{ duration: 0.5, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.7, delay: 0.4, ease: [0.16, 1, 0.3, 1] }}
         />
-        {/* 시세 평균 진입선 */}
+        {/* 시세 평균 진입선 — spring 으로 부드러운 진입 */}
         <motion.div
           className="absolute top-0 bottom-0 w-px bg-[var(--color-ink-700)]"
           style={{ left: `${avgPercent}%` }}
-          initial={{ opacity: 0 }}
-          animate={inView ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.3, delay: 0.7 }}
+          initial={{ opacity: 0, scaleY: 0.4 }}
+          animate={inView ? { opacity: 1, scaleY: 1 } : { opacity: 0, scaleY: 0.4 }}
+          transition={{ type: "spring", stiffness: 220, damping: 22, delay: 0.7 }}
         >
           <p className="absolute -top-5 left-0 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold tabular-nums text-[var(--color-ink-700)]">
             시세 {avgPercent}%
           </p>
         </motion.div>
-        {/* 본 물건 진입선 (현재 회차) */}
+        {/* 본 물건 진입선 (현재 회차) — spring 강조 */}
         <motion.div
           className="absolute -top-1 -bottom-1 w-0.5 bg-[var(--color-ink-900)]"
           style={{ left: `${percent}%` }}
-          initial={{ opacity: 0 }}
-          animate={inView ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.3, delay: 0.9 }}
+          initial={{ opacity: 0, scaleY: 0.4 }}
+          animate={inView ? { opacity: 1, scaleY: 1 } : { opacity: 0, scaleY: 0.4 }}
+          transition={{ type: "spring", stiffness: 200, damping: 18, delay: 0.95 }}
         >
           <p className="absolute top-full mt-1 left-0 -translate-x-1/2 whitespace-nowrap text-[10px] font-black tabular-nums text-[var(--color-ink-900)]">
             본 물건 {percent}%
@@ -108,9 +108,9 @@ export function SaleAreaSummary({
         <motion.div
           className="absolute top-0 bottom-0 w-px bg-[var(--color-ink-300)]"
           style={{ left: "100%" }}
-          initial={{ opacity: 0 }}
-          animate={inView ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ duration: 0.3, delay: 1.0 }}
+          initial={{ opacity: 0, scaleY: 0.4 }}
+          animate={inView ? { opacity: 1, scaleY: 1 } : { opacity: 0, scaleY: 0.4 }}
+          transition={{ type: "spring", stiffness: 220, damping: 22, delay: 1.1 }}
         >
           <p className="absolute -top-5 left-0 -translate-x-1/2 whitespace-nowrap text-[10px] font-medium tabular-nums text-[var(--color-ink-500)]">
             감정가 100%
@@ -118,14 +118,14 @@ export function SaleAreaSummary({
         </motion.div>
       </div>
 
-      {/* 결과 요약 */}
-      <motion.div
-        className="mt-12 grid gap-3 sm:grid-cols-3"
-        initial={{ opacity: 0 }}
-        animate={inView ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.4, delay: 1.2 }}
-      >
-        <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-ink-50)] p-3">
+      {/* 결과 요약 — stagger spring fade-in */}
+      <div className="mt-12 grid gap-3 sm:grid-cols-3">
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+          transition={{ type: "spring", stiffness: 220, damping: 22, delay: 1.3 }}
+          className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-ink-50)] p-3"
+        >
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">
             시세 평균
           </p>
@@ -135,8 +135,13 @@ export function SaleAreaSummary({
           <p className="mt-0.5 text-[11px] tabular-nums text-[var(--color-ink-500)]">
             감정가의 {avgPercent}%
           </p>
-        </div>
-        <div className="rounded-[var(--radius-md)] border-2 border-[var(--color-ink-900)] bg-white p-3">
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+          transition={{ type: "spring", stiffness: 220, damping: 22, delay: 1.45 }}
+          className="rounded-[var(--radius-md)] border-2 border-[var(--color-ink-900)] bg-white p-3"
+        >
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-900)]">
             현재 회차 진입가
           </p>
@@ -146,8 +151,13 @@ export function SaleAreaSummary({
           <p className="mt-0.5 text-[11px] tabular-nums text-[var(--color-ink-700)]">
             감정가의 {percent}%
           </p>
-        </div>
-        <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white p-3">
+        </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 12 }}
+          animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}
+          transition={{ type: "spring", stiffness: 220, damping: 22, delay: 1.6 }}
+          className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white p-3"
+        >
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">
             시세 대비
           </p>
@@ -157,8 +167,8 @@ export function SaleAreaSummary({
           <p className="mt-0.5 text-[11px] tabular-nums text-[var(--color-ink-500)]">
             평균 매각가 대비
           </p>
-        </div>
-      </motion.div>
+        </motion.div>
+      </div>
     </div>
   );
 }
