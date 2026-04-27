@@ -14,7 +14,7 @@ import { TrustBlock } from "@/components/analysis/TrustBlock";
 import { ApplyCTA } from "@/components/analysis/ApplyCTA";
 import { RelatedCards } from "@/components/analysis/RelatedCards";
 import { ContentComplianceNotice } from "@/components/analysis/ContentComplianceNotice";
-import { PhotoGalleryStrip } from "@/components/analysis/PhotoGalleryStrip";
+// PhotoGalleryStrip — 룰 15-D 폐기 (Hero HeroGallery 가 전체 사진 grid + Lightbox 일원화)
 import { buildAnalysisMdxComponents } from "@/components/analysis/mdx-components";
 import { GatingWrapper } from "@/components/analysis/GatingWrapper";
 import { remarkAnalysisBlocks } from "@/lib/remark/analysis-blocks";
@@ -131,12 +131,8 @@ export default async function AnalysisDetailPage({
             {/* 본문(07 종합 의견) 직후 — 산문 1단락 컴플라이언스 (단계 4-1) */}
             <ContentComplianceNotice />
 
-            {/* dedicated 갤러리 — 본문 끝 / Trust 위 (단계 3-1 mdx Img null 보존) */}
-            <PhotoGalleryStrip
-              photos={meta?.photos}
-              coverImage={fm.coverImage}
-              alt={`${fm.buildingName ?? fm.title} 현장 사진`}
-            />
+            {/* 룰 15-D (단계 5-4-2-fix-5): 페이지 맨 아래 별도 사진 grid 폐기.
+             * Hero 영역의 HeroGallery 가 전체 사진 grid + Lightbox 일원화. */}
 
             <TrustBlock />
             <ApplyCTA fm={fm} />

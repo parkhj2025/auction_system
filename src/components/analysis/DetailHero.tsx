@@ -1,3 +1,4 @@
+import Image from "next/image";
 import Link from "next/link";
 import { ChevronRight, Clock } from "lucide-react";
 import type { ReactNode } from "react";
@@ -96,6 +97,8 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
             minPrice={fm.minPrice}
             percentOfAppraisal={fm.percent}
             appraisalDisplay={fm.appraisalDisplay}
+            thumbnail={fm.coverImage}
+            thumbnailAlt={`${fm.buildingName ?? fm.title} 대표 사진`}
           />
           <div className="grid grid-cols-3 gap-px bg-[var(--color-border)]">
             <Stat
@@ -136,6 +139,8 @@ function DominantStat({
   minPrice,
   percentOfAppraisal,
   appraisalDisplay,
+  thumbnail,
+  thumbnailAlt,
 }: {
   label: string;
   value: string;
@@ -143,19 +148,38 @@ function DominantStat({
   minPrice: number;
   percentOfAppraisal: number;
   appraisalDisplay?: string;
+  thumbnail?: string;
+  thumbnailAlt?: string;
 }) {
   return (
-    <div className="flex flex-col gap-2 bg-[var(--color-ink-900)] p-6 text-white sm:p-8">
-      <p className="text-[11px] font-bold uppercase tracking-widest text-white/80">
+    <div className="flex flex-col gap-3 bg-[var(--color-ink-900)] p-6 text-white sm:p-8">
+      <p className="text-[length:var(--text-caption)] font-bold uppercase tracking-widest text-white/70">
         {label}
       </p>
-      <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-        <p className="text-[2.25rem] font-black leading-none tabular-nums tracking-tight sm:text-[3rem]">
-          {value}
-        </p>
-        <p className="text-sm font-medium tabular-nums text-white/85 sm:text-base">
-          감정가의 {percentOfAppraisal}%
-        </p>
+      {/* 룰 15-A: 좌측 56px (sm+) / 48px (mobile) 원형 썸네일 + 우측 가격 가로 layout */}
+      <div className="flex items-center gap-4">
+        {thumbnail ? (
+          <div
+            aria-hidden="true"
+            className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border-2 border-white/30 sm:h-14 sm:w-14"
+          >
+            <Image
+              src={thumbnail}
+              alt={thumbnailAlt ?? ""}
+              fill
+              sizes="56px"
+              className="object-cover"
+            />
+          </div>
+        ) : null}
+        <div className="flex flex-1 flex-wrap items-baseline gap-x-4 gap-y-1">
+          <p className="text-[length:var(--text-h1)] font-black leading-[var(--lh-tight)] tabular-nums tracking-tight sm:text-[length:var(--text-display)]">
+            {value}
+          </p>
+          <p className="text-[length:var(--text-body-sm)] font-medium tabular-nums text-white/80 sm:text-[length:var(--text-body)]">
+            감정가의 {percentOfAppraisal}%
+          </p>
+        </div>
       </div>
       <HoverableDropRateBar
         appraisal={appraisal}
