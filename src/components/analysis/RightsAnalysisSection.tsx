@@ -88,6 +88,7 @@ export function RightsAnalysisSection({ rights }: { rights: RightsMeta }) {
       {steps.map((step, idx) => (
         <motion.li
           key={`rights-step-${idx}`}
+          tabIndex={0}
           initial={{ opacity: 0, x: -16 }}
           animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -16 }}
           transition={{
@@ -95,7 +96,9 @@ export function RightsAnalysisSection({ rights }: { rights: RightsMeta }) {
             delay: 0.1 + idx * 0.08,
             ease: [0.16, 1, 0.3, 1],
           }}
-          className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-5"
+          whileHover={{ y: -2, transition: { duration: 0.2, ease: "easeOut" } }}
+          whileFocus={{ y: -2, transition: { duration: 0.2, ease: "easeOut" } }}
+          className="cursor-pointer rounded-[var(--radius-xl)] border border-[var(--color-ink-200)] bg-white p-5 outline-none transition-colors duration-200 ease-out hover:border-[var(--color-ink-900)] hover:bg-[var(--color-ink-50)] hover:shadow-[var(--shadow-card)] focus-visible:border-[var(--color-ink-900)] focus-visible:bg-[var(--color-ink-50)] focus-visible:shadow-[0_0_0_3px_rgba(15,23,42,0.15)]"
         >
           <div className="flex items-baseline gap-3">
             <span className="text-xs font-black uppercase tracking-[0.18em] tabular-nums text-[var(--color-ink-500)]">

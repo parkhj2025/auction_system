@@ -2,6 +2,7 @@ import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import Image from "next/image";
 import { Home, TrendingUp, Users, RefreshCw, Ban } from "lucide-react";
 import type { AnalysisFrontmatter, AnalysisMeta } from "@/types/content";
+import { MdxTable, MdxThead, MdxTr } from "./MdxTableElements";
 import { Section01Overview } from "./sections/Section01Overview";
 import { Section02BidHistory } from "./sections/Section02BidHistory";
 import { Section03Rights } from "./sections/Section03Rights";
@@ -245,52 +246,7 @@ function Li({ children, ...rest }: ComponentPropsWithoutRef<"li">) {
   );
 }
 
-function Table({ children, ...rest }: ComponentPropsWithoutRef<"table">) {
-  return (
-    <div className="mt-6 overflow-x-auto">
-      <table
-        className="w-full min-w-[36rem] border-collapse text-sm tabular-nums"
-        {...rest}
-      >
-        {children}
-      </table>
-    </div>
-  );
-}
-
-function Thead({ children, ...rest }: ComponentPropsWithoutRef<"thead">) {
-  return (
-    <thead className="bg-[var(--color-surface-muted)]" {...rest}>
-      {children}
-    </thead>
-  );
-}
-
-function detectRowToneClass(text: string): string {
-  if (/말소기준/.test(text)) {
-    return "bg-[var(--color-ink-50)]";
-  }
-  if (/\*\*\s*인수\s*\*\*|\b인수\s*\(|\b인수\s*,/.test(text)) {
-    return "bg-[var(--color-danger-soft)]";
-  }
-  if (/미납/.test(text)) {
-    return "bg-[var(--color-warning-soft)]";
-  }
-  if (/\*\*\s*매각\s*\*\*|\*\*\s*낙찰\s*\*\*/.test(text)) {
-    return "bg-[var(--color-success-soft)]";
-  }
-  return "";
-}
-
-function Tr({ children, ...rest }: ComponentPropsWithoutRef<"tr">) {
-  const text = extractText(children);
-  const toneCls = detectRowToneClass(text);
-  return (
-    <tr className={toneCls} {...rest}>
-      {children}
-    </tr>
-  );
-}
+// Table·Thead·Tr 는 client API (motion·useInView·context) 활용 위해 MdxTableElements.tsx 로 분리.
 
 function Th({ children, ...rest }: ComponentPropsWithoutRef<"th">) {
   const text = extractText(children).trim();
@@ -592,9 +548,9 @@ export function buildAnalysisMdxComponents(
     ul: Ul,
     ol: Ol,
     li: Li,
-    table: Table,
-    thead: Thead,
-    tr: Tr,
+    table: MdxTable,
+    thead: MdxThead,
+    tr: MdxTr,
     th: Th,
     td: Td,
     blockquote: Blockquote,
