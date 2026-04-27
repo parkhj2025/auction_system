@@ -1,69 +1,79 @@
 "use client";
 
 /**
- * 단계 5-4-2: 04 시세 비교 — 1D scatter + 사용자 가격 입력 (Show-and-Play 본질).
+ * 04 시세 비교 — 단계 5-4-2-fix Phase 3: input 폐기 + 슬라이더 + 분포 강화.
+ *
+ * 변경 (형준님 본질 통찰):
+ *  - input field "내 입찰가 시뮬레이션" 폐기 → 슬라이더 (drag 즉시 4번째 점 + 차이 % 재계산)
+ *  - 분포 시각 강화: 시세 평균 ± 시세 중앙값 산포 폭 표시 (sale_avg vs sale_median) + sale_count 카운트 강조
+ *  - 슬라이더 range: minPrice ~ appraisal (100만원 step / 키보드 arrow ±5%)
  *
  * 시각 구조:
  *  - 수평 축선 (가격 0 → max)
  *  - 점 3개: 감정가 (ink-500) / 시세 평균 (ink-900) / 최저가 (ink-900 outline)
- *  - 사용자 가격 입력 → 4번째 점 (ink-900 dashed) + 차이 % 즉시 계산
+ *  - 시세 분포 영역: avg ~ median 사이 음영 (분포의 비대칭성 시각화)
+ *  - 슬라이더 drag 시 4번째 점 (ink-900 dashed) + 차이 % 즉시 표시
  *
- * 스크롤 모션:
- *  - 0~25% 축선 line draw
- *  - 25~50% 점 3개 stagger fade-in (감정가 → 시세 → 최저가, 100ms 간격)
- *  - 50~75% 차이 화살표 + count-up
- *  - 75~100% 사용자 가격 input fade-in
- *
- * 인터랙션 (Show-and-Play):
- *  - 사용자가 input 에 가격 입력 → 4번째 점 추가 + "시세 평균 대비 X% / 감정가 대비 Y%" 즉시 표시
- *  - 점 hover (desktop) → 정확 가격 tooltip
- *  - 키보드: Tab → input → arrow ±100만원
- *
- * 모노톤: 감정가 ink-500 / 시세평균 ink-900 / 최저가 ink-900 outline / 사용자 점 ink-900 dashed.
- *
- * case study 인용: scrollytelling Show-and-Play + chart-visualization scatter + Distill "Parameter sliders update plots in real-time".
+ * 데이터 경계 (CLAUDE.md "가짜 데이터 금지"):
+ *  - 개별 매물 51건의 가격 리스트는 raw-content 에 부재 → 정규분포 mock 시각화 안 함
+ *  - sale_avg / sale_median / sale_count 만 활용 (실 데이터)
  */
 import { motion, useInView } from "motion/react";
 import { useRef, useState, useEffect } from "react";
+import type { MarketMeta } from "@/types/content";
 import { formatKoreanWon } from "@/lib/utils";
 
 interface PriceScatterProps {
   appraisal: number;
-  saleAvg: number;
+  market: MarketMeta;
   minPrice: number;
   round: number;
 }
 
-export function PriceScatter({ appraisal, saleAvg, minPrice, round }: PriceScatterProps) {
+export function PriceScatter({ appraisal, market, minPrice, round }: PriceScatterProps) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.3 });
 
-  const max = Math.max(appraisal, saleAvg, minPrice) * 1.05;
+  const saleAvg = market.sale_avg ?? 0;
+  const saleMedian = market.sale_median ?? saleAvg;
+  const saleCount = market.sale_count ?? 0;
+
+  const max = Math.max(appraisal, saleAvg, saleMedian, minPrice) * 1.05;
   const pos = (v: number) => (v / max) * 100;
 
   const dropFromAppraisal = Math.round(((appraisal - minPrice) / appraisal) * 100);
-  const dropFromSaleAvg = Math.round(((saleAvg - minPrice) / saleAvg) * 100);
+  const dropFromSaleAvg =
+    saleAvg > 0 ? Math.round(((saleAvg - minPrice) / saleAvg) * 100) : 0;
   const animatedDropAppraisal = useCountUp(dropFromAppraisal, inView, 600, 1500);
   const animatedDropSaleAvg = useCountUp(dropFromSaleAvg, inView, 600, 1500);
 
-  // 사용자 가격 입력 (Show-and-Play 본질)
-  const [userPriceWon, setUserPriceWon] = useState<number | null>(null);
-  const userVsAppraisal =
-    userPriceWon != null
-      ? Math.round(((appraisal - userPriceWon) / appraisal) * 100)
-      : null;
+  // 슬라이더 (Show-and-Play 본질 — drag 즉시 4번째 점 + 차이 % 재계산)
+  const [userPriceWon, setUserPriceWon] = useState<number>(minPrice);
+  const userVsAppraisal = Math.round(((appraisal - userPriceWon) / appraisal) * 100);
   const userVsSaleAvg =
-    userPriceWon != null
-      ? Math.round(((saleAvg - userPriceWon) / saleAvg) * 100)
-      : null;
+    saleAvg > 0 ? Math.round(((saleAvg - userPriceWon) / saleAvg) * 100) : 0;
+
+  // 분포 영역 — saleAvg ↔ saleMedian (비대칭성 시각)
+  const distMin = Math.min(saleAvg, saleMedian);
+  const distMax = Math.max(saleAvg, saleMedian);
 
   return (
     <div ref={ref} className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6">
-      <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">
-        가격 분포
-      </p>
+      <div className="flex items-center justify-between">
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">
+          가격 분포
+        </p>
+        {saleCount > 0 ? (
+          <p className="text-[11px] font-medium tabular-nums text-[var(--color-ink-500)]">
+            인근 매물{" "}
+            <span className="font-black text-[var(--color-ink-900)]">
+              {saleCount}건
+            </span>
+          </p>
+        ) : null}
+      </div>
 
-      {/* scatter — sm+ 표시. 모바일은 stack fallback 으로 carousel 보다 입력만 사용 */}
+      {/* scatter — sm+ 표시. 모바일은 슬라이더 + 결과 텍스트만 */}
       <div className="relative mt-8 hidden h-32 w-full sm:block" role="img" aria-label="가격 비교 산점도">
         {/* 축선 line draw */}
         <motion.span
@@ -73,6 +83,22 @@ export function PriceScatter({ appraisal, saleAvg, minPrice, round }: PriceScatt
           animate={inView ? { scaleX: 1 } : { scaleX: 0 }}
           transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
         />
+        {/* 분포 영역 — saleAvg ↔ saleMedian 음영 */}
+        {saleCount > 0 && distMin !== distMax ? (
+          <motion.span
+            aria-hidden="true"
+            className="absolute top-1/2 h-3 -translate-y-1/2 origin-left rounded-full bg-[var(--color-ink-100)]"
+            style={{
+              left: `${pos(distMin)}%`,
+              width: `${pos(distMax) - pos(distMin)}%`,
+            }}
+            initial={{ scaleX: 0, opacity: 0 }}
+            animate={
+              inView ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 }
+            }
+            transition={{ duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
+          />
+        ) : null}
         <ScatterPoint
           leftPercent={pos(appraisal)}
           size={10}
@@ -93,6 +119,19 @@ export function PriceScatter({ appraisal, saleAvg, minPrice, round }: PriceScatt
           delay={0.5}
           inView={inView}
         />
+        {saleMedian !== saleAvg && saleMedian > 0 ? (
+          <ScatterPoint
+            leftPercent={pos(saleMedian)}
+            size={10}
+            fillCls="bg-[var(--color-ink-700)]"
+            label="시세 중앙값"
+            valueLabel={formatKoreanWon(saleMedian)}
+            labelPosition="bottom"
+            delay={0.6}
+            inView={inView}
+            small
+          />
+        ) : null}
         <ScatterPoint
           leftPercent={pos(minPrice)}
           size={16}
@@ -100,26 +139,25 @@ export function PriceScatter({ appraisal, saleAvg, minPrice, round }: PriceScatt
           label={`${round}차 최저가`}
           valueLabel={formatKoreanWon(minPrice)}
           labelPosition="top"
-          delay={0.6}
+          delay={0.7}
           inView={inView}
           accent
         />
-        {/* 사용자 입력 점 — Show-and-Play */}
-        {userPriceWon != null && userPriceWon > 0 && userPriceWon <= max ? (
+        {/* 사용자 슬라이더 점 (Show-and-Play) */}
+        {userPriceWon >= minPrice && userPriceWon <= appraisal ? (
           <motion.div
-            key={userPriceWon}
             initial={{ opacity: 0, scale: 0 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.3 }}
+            animate={inView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
+            transition={{ delay: 0.9, duration: 0.3 }}
             className="absolute top-1/2 -translate-y-1/2"
             style={{ left: `${pos(userPriceWon)}%` }}
           >
             <span
               aria-hidden="true"
-              className="block h-3.5 w-3.5 -translate-x-1/2 rounded-full border-2 border-dashed border-[var(--color-ink-900)] bg-white"
+              className="block h-4 w-4 -translate-x-1/2 rounded-full border-2 border-dashed border-[var(--color-ink-900)] bg-white"
             />
-            <p className="absolute -top-7 left-0 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold tabular-nums text-[var(--color-ink-900)]">
-              내 입력
+            <p className="absolute top-full mt-3 left-0 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold tabular-nums text-[var(--color-ink-900)]">
+              내 입찰가
             </p>
           </motion.div>
         ) : null}
@@ -132,65 +170,61 @@ export function PriceScatter({ appraisal, saleAvg, minPrice, round }: PriceScatt
         animate={inView ? { opacity: 1 } : { opacity: 0 }}
         transition={{ delay: 1.5, duration: 0.4 }}
       >
-        {`최저가는 감정가 대비 −${animatedDropAppraisal}% · 시세 평균 대비 −${animatedDropSaleAvg}% 위치`}
+        {`${round}차 최저가는 감정가 대비 −${animatedDropAppraisal}% · 시세 평균 대비 −${animatedDropSaleAvg}% 위치`}
       </motion.div>
 
-      {/* 사용자 가격 입력 (Show-and-Play 본질) */}
+      {/* 슬라이더 (Show-and-Play 본질) */}
       <motion.div
-        className="mt-6 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4"
-        initial={{ opacity: 0, y: 8 }}
-        animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
+        className="mt-6 origin-left rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4"
+        initial={{ opacity: 0, x: -16 }}
+        animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -16 }}
         transition={{ delay: 1.8, duration: 0.4 }}
       >
-        <label
-          htmlFor="user-price-input"
-          className="block text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-700)]"
-        >
-          내 입찰가 시뮬레이션
-        </label>
-        <div className="mt-3 flex flex-wrap items-baseline gap-3">
-          <input
-            id="user-price-input"
-            type="number"
-            inputMode="numeric"
-            placeholder={`${(minPrice / 10000).toFixed(0)}`}
-            min={0}
-            step={1000}
-            onChange={(e) => {
-              const v = e.target.value;
-              if (!v) {
-                setUserPriceWon(null);
-                return;
-              }
-              const won = Math.round(parseFloat(v) * 10000); // 만원 → 원 환산
-              setUserPriceWon(Number.isFinite(won) && won > 0 ? won : null);
-            }}
-            className="w-32 rounded-[var(--radius-sm)] border border-[var(--color-border)] px-3 py-1.5 text-sm tabular-nums focus-visible:border-[var(--color-ink-900)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ink-900)]/30"
-          />
-          <span className="text-xs text-[var(--color-ink-500)]">만원</span>
-          {userPriceWon != null && userPriceWon > 0 ? (
-            <p className="text-xs tabular-nums text-[var(--color-ink-700)]">
-              ={" "}
-              <span className="font-bold">
-                {formatKoreanWon(userPriceWon)}
-              </span>
-              {userVsAppraisal != null && userVsSaleAvg != null ? (
-                <>
-                  {" · 감정가 대비 "}
-                  <span className="font-bold text-[var(--color-ink-900)]">
-                    {userVsAppraisal > 0 ? "−" : "+"}
-                    {Math.abs(userVsAppraisal)}%
-                  </span>
-                  {" · 시세 평균 대비 "}
-                  <span className="font-bold text-[var(--color-ink-900)]">
-                    {userVsSaleAvg > 0 ? "−" : "+"}
-                    {Math.abs(userVsSaleAvg)}%
-                  </span>
-                </>
-              ) : null}
-            </p>
-          ) : null}
+        <div className="flex items-baseline justify-between">
+          <label
+            htmlFor="user-price-slider"
+            className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-700)]"
+          >
+            내 입찰가 시뮬레이션
+          </label>
+          <span className="text-xs font-black tabular-nums text-[var(--color-ink-900)]">
+            {formatKoreanWon(userPriceWon)}
+          </span>
         </div>
+        <input
+          id="user-price-slider"
+          type="range"
+          min={minPrice}
+          max={appraisal}
+          step={1_000_000}
+          value={userPriceWon}
+          onChange={(e) => setUserPriceWon(Number(e.target.value))}
+          aria-valuemin={minPrice}
+          aria-valuemax={appraisal}
+          aria-valuenow={userPriceWon}
+          aria-valuetext={`${formatKoreanWon(userPriceWon)}, 감정가 대비 ${userVsAppraisal > 0 ? "−" : "+"}${Math.abs(userVsAppraisal)}%`}
+          className="mt-3 w-full accent-[var(--color-ink-900)]"
+        />
+        <div className="mt-3 flex items-baseline justify-between text-[11px] tabular-nums text-[var(--color-ink-500)]">
+          <span>최저가 {formatKoreanWon(minPrice)}</span>
+          <span>감정가 {formatKoreanWon(appraisal)}</span>
+        </div>
+        <p className="mt-3 text-xs leading-5 tabular-nums text-[var(--color-ink-700)]">
+          감정가 대비{" "}
+          <span className="font-black text-[var(--color-ink-900)]">
+            {userVsAppraisal > 0 ? "−" : "+"}
+            {Math.abs(userVsAppraisal)}%
+          </span>
+          {saleAvg > 0 ? (
+            <>
+              {" · 시세 평균 대비 "}
+              <span className="font-black text-[var(--color-ink-900)]">
+                {userVsSaleAvg > 0 ? "−" : "+"}
+                {Math.abs(userVsSaleAvg)}%
+              </span>
+            </>
+          ) : null}
+        </p>
       </motion.div>
     </div>
   );
@@ -206,6 +240,7 @@ function ScatterPoint({
   delay,
   inView,
   accent,
+  small,
 }: {
   leftPercent: number;
   size: number;
@@ -216,6 +251,7 @@ function ScatterPoint({
   delay: number;
   inView: boolean;
   accent?: boolean;
+  small?: boolean;
 }) {
   const isTop = labelPosition === "top";
   return (
@@ -237,16 +273,14 @@ function ScatterPoint({
         transition={{ duration: 0.3, delay: delay + 0.2 }}
       >
         <p
-          className={`text-[9px] font-bold uppercase tracking-wider ${
+          className={`uppercase tracking-wider ${small ? "text-[8px]" : "text-[9px]"} font-bold ${
             accent ? "text-[var(--color-ink-900)]" : "text-[var(--color-ink-500)]"
           }`}
         >
           {label}
         </p>
         <p
-          className={`mt-0.5 text-xs font-black tabular-nums ${
-            accent ? "text-[var(--color-ink-900)]" : "text-[var(--color-ink-900)]"
-          }`}
+          className={`mt-0.5 ${small ? "text-[10px]" : "text-xs"} font-black tabular-nums text-[var(--color-ink-900)]`}
         >
           {valueLabel}
         </p>

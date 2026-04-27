@@ -52,7 +52,7 @@ export function MarketCompareCard({
 
       <PriceScatter
         appraisal={appraisal}
-        saleAvg={saleAvg}
+        market={market}
         minPrice={minPrice}
         round={round}
       />

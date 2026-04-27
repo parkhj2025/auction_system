@@ -13,6 +13,7 @@ import { TimelineSection } from "./TimelineSection";
 import { RightsAnalysisSection } from "./RightsAnalysisSection";
 import { MarketCompareCard } from "./MarketCompareCard";
 import { ScenarioComparisonBox } from "./ScenarioComparisonBox";
+import { SaleAreaSummary } from "./SaleAreaSummary";
 import { PropertyOverviewCard } from "./PropertyOverviewCard";
 
 /**
@@ -112,7 +113,19 @@ function buildH2(
             </>
           );
         case "06":
-          return <Section06SaleHistory title={title} />;
+          return (
+            <>
+              <Section06SaleHistory title={title} />
+              {meta?.market ? (
+                <SaleAreaSummary
+                  market={meta.market}
+                  appraisal={fm.appraisal}
+                  minPrice={fm.minPrice}
+                  percent={fm.percent}
+                />
+              ) : null}
+            </>
+          );
         case "07":
           return <Section07Opinion title={title} />;
         default:

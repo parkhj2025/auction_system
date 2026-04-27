@@ -1,24 +1,23 @@
 "use client";
 
 /**
- * 단계 5-4-2: 05 시나리오 비교 — 단일 박스 인터랙티브 toggle (본질 핵심).
+ * 05 시나리오 비교 — 단계 5-4-2-fix Phase 3: 컴팩트 비교 표 (4 컬럼 × 4 차원 + 슬라이더).
  *
- * 시각 구조:
- *  - Tab nav (4 시나리오, 단계 5-2 무채색 + 번호 보존)
- *  - Active scenario detail (4 차원 stat: 자기자본·예상 수익·기간·리스크)
- *  - Bottom mini comparison chart (4 막대 자기자본 + 4 점 수익)
- *  - 낙찰가 슬라이더 (1.246억 ~ 1.78억) drag → 4 시나리오 실시간 재계산
+ * 변경 (형준님 본질 통찰 — 세로 쌓임 평이 → 컴팩트 비교 표):
+ *  - 단계 5-4-2 tab → detail → mini chart → 슬라이더 세로 쌓임 폐기
+ *  - 컴팩트 비교 표 (가로 4 시나리오 컬럼 × 세로 4 차원 행)
+ *    · 자기자본: 숫자 + 가로 막대 (시나리오 간 비교)
+ *    · 예상수익: 숫자 + 점 위치 (좌 손실 / 우 수익)
+ *    · 보유 기간: 숫자
+ *    · 리스크: 라벨 (낮음·중간·높음 — ink 농도 차등)
+ *  - 활성 시나리오 (hover·click) → ink-900 strong / 비활성 → ink-300 또는 opacity 0.5
+ *  - 슬라이더 drag 시 모든 셀 실시간 재계산 (자기자본·예상수익)
  *
- * 인터랙션 (Animated Transition + Show-and-Play):
- *  - tab click → active detail crossfade
- *  - 슬라이더 drag → mini chart 막대 width animate + 점 위치 update + detail 재계산
- *
- * 모노톤: ink + ink-900 단일 강조. active = ink-900 underline / fill solid.
- * case study 인용: scrollytelling Animated Transition + Show-and-Play / chart-visualization radar+bar / Distill "Parameter sliders update plots in real-time".
+ * 모노톤: ink-900/700/500/300/100 + ink-900 단일 강조.
+ * 의도: 다이어그램 적재적소 분배 (05 컴팩트 강화).
  */
-import { motion, AnimatePresence, useInView } from "motion/react";
+import { motion, useInView } from "motion/react";
 import { useRef, useState, useMemo } from "react";
-import { Home, TrendingUp, Users, RefreshCw } from "lucide-react";
 import type { InvestmentMeta, ScenarioFields } from "@/types/content";
 import { formatKoreanWon } from "@/lib/utils";
 
@@ -31,11 +30,11 @@ interface ScenarioComparisonBoxProps {
 const SCENARIO_KEYS = ["A", "B", "C-1", "C-2"] as const;
 type ScenarioKey = (typeof SCENARIO_KEYS)[number];
 
-const SCENARIO_ICONS: Record<ScenarioKey, typeof Home> = {
-  A: Home,
-  B: TrendingUp,
-  "C-1": Users,
-  "C-2": RefreshCw,
+const SCENARIO_DEFAULT_LABELS: Record<ScenarioKey, string> = {
+  A: "실거주",
+  B: "1년 매도",
+  "C-1": "갭투자",
+  "C-2": "월세",
 };
 
 interface ScenarioStat {
@@ -54,209 +53,309 @@ export function ScenarioComparisonBox({
 }: ScenarioComparisonBoxProps) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.2 });
-  const [activeKey, setActiveKey] = useState<ScenarioKey>("A");
-  // 사용자 슬라이더 가격 (낙찰가) — 0~100 → minPrice ~ appraisal
+  const [activeKey, setActiveKey] = useState<ScenarioKey | null>(null);
   const [biddingPercent, setBiddingPercent] = useState<number>(0);
-  const userBidPrice = Math.round(minPrice + (biddingPercent / 100) * (appraisal - minPrice));
+  const userBidPrice = Math.round(
+    minPrice + (biddingPercent / 100) * (appraisal - minPrice)
+  );
 
-  // 시나리오 4건 → ScenarioStat 배열 (실시간 재계산)
   const scenarios: Record<ScenarioKey, ScenarioStat | null> = useMemo(() => {
     return {
-      A: buildScenarioStat(investment.scenario_a, "A 실거주 매입", userBidPrice, minPrice),
-      B: buildScenarioStat(investment.scenario_b, "B 1년 이내 매도", userBidPrice, minPrice),
-      "C-1": buildScenarioStat(investment.scenario_c1, "C-1 전세 갭투자", userBidPrice, minPrice),
-      "C-2": buildScenarioStat(investment.scenario_c2, "C-2 월세 운용", userBidPrice, minPrice),
+      A: buildScenarioStat(investment.scenario_a, "A", userBidPrice, minPrice),
+      B: buildScenarioStat(investment.scenario_b, "B", userBidPrice, minPrice),
+      "C-1": buildScenarioStat(investment.scenario_c1, "C-1", userBidPrice, minPrice),
+      "C-2": buildScenarioStat(investment.scenario_c2, "C-2", userBidPrice, minPrice),
     };
   }, [investment, userBidPrice, minPrice]);
 
   const visible = SCENARIO_KEYS.filter((k) => scenarios[k] !== null);
   if (visible.length === 0) return null;
 
-  const activeStat = scenarios[activeKey];
+  const visibleStats = visible
+    .map((k) => scenarios[k])
+    .filter((s): s is ScenarioStat => s !== null);
 
-  const maxCapital = Math.max(
-    ...Object.values(scenarios)
-      .filter((s): s is ScenarioStat => s !== null)
-      .map((s) => Math.abs(s.selfCapital))
-  );
-  const maxProfit = Math.max(
-    ...Object.values(scenarios)
-      .filter((s): s is ScenarioStat => s !== null)
-      .map((s) => Math.abs(s.profit)),
-    1
-  );
+  const maxCapital = Math.max(...visibleStats.map((s) => Math.abs(s.selfCapital)), 1);
+  const maxProfitAbs = Math.max(...visibleStats.map((s) => Math.abs(s.profit)), 1);
 
   return (
     <div
       ref={ref}
-      className="mt-6 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)] sm:p-8"
+      className="mt-6 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-5 shadow-[var(--shadow-card)] sm:p-7"
     >
-      {/* Tab nav (단계 5-2 무채색 + 번호 보존) */}
-      <div role="tablist" aria-label="시나리오 4종 선택" className="flex flex-wrap gap-1 border-b border-[var(--color-border)]">
-        {visible.map((key) => {
-          const Icon = SCENARIO_ICONS[key];
-          const isActive = key === activeKey;
-          const stat = scenarios[key];
-          return (
-            <button
-              key={key}
-              role="tab"
-              type="button"
-              aria-selected={isActive}
-              aria-controls={`scenario-panel-${key}`}
-              tabIndex={isActive ? 0 : -1}
-              onClick={() => setActiveKey(key)}
-              onKeyDown={(e) => {
-                if (e.key === "ArrowRight") {
-                  e.preventDefault();
-                  const idx = visible.indexOf(activeKey);
-                  setActiveKey(visible[(idx + 1) % visible.length]);
-                } else if (e.key === "ArrowLeft") {
-                  e.preventDefault();
-                  const idx = visible.indexOf(activeKey);
-                  setActiveKey(visible[(idx - 1 + visible.length) % visible.length]);
-                }
-              }}
-              className={`relative flex items-center gap-2 px-4 py-3 text-sm font-bold transition-colors ${
-                isActive
-                  ? "text-[var(--color-ink-900)]"
-                  : "text-[var(--color-ink-500)] hover:text-[var(--color-ink-700)]"
-              }`}
-            >
-              <span className="text-base font-black tabular-nums">{key}</span>
-              <Icon size={14} aria-hidden="true" />
-              <span className="hidden sm:inline">{stat?.label.replace(/^[A-Z](-\d+)?\s/, "") ?? ""}</span>
-              {isActive ? (
-                <motion.span
-                  layoutId="scenario-tab-underline"
-                  className="absolute -bottom-px left-0 right-0 h-0.5 bg-[var(--color-ink-900)]"
-                  transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
-                />
-              ) : null}
-            </button>
-          );
-        })}
+      <div className="flex items-baseline justify-between">
+        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">
+          시나리오 비교
+        </p>
+        <p className="text-[11px] tabular-nums text-[var(--color-ink-500)]">
+          입찰가{" "}
+          <span className="font-black text-[var(--color-ink-900)]">
+            {formatKoreanWon(userBidPrice)}
+          </span>{" "}
+          기준
+        </p>
       </div>
 
-      {/* Active detail — crossfade Animated Transition */}
-      <AnimatePresence mode="wait">
-        {activeStat ? (
-          <motion.div
-            key={activeKey}
-            id={`scenario-panel-${activeKey}`}
-            role="tabpanel"
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -8 }}
-            transition={{ duration: 0.25 }}
-            className="mt-6"
-          >
-            <h3 className="text-base font-black text-[var(--color-ink-900)] sm:text-lg">
-              {activeStat.label}
-            </h3>
-            <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 sm:grid-cols-4">
-              <DetailStat label="자기자본" value={formatKoreanWon(activeStat.selfCapital)} />
-              <DetailStat
-                label="예상 수익"
-                value={
-                  activeStat.profit === 0
-                    ? "—"
-                    : `${activeStat.profit < 0 ? "−" : "+"}${formatKoreanWon(Math.abs(activeStat.profit))}`
-                }
-              />
-              <DetailStat
-                label="보유 기간"
-                value={activeStat.holdingYears != null ? `${activeStat.holdingYears}년` : "—"}
-              />
-              <DetailStat label="리스크" value={resolveRiskLabel(activeStat.riskLevel)} />
-            </dl>
-            <p className="mt-4 text-sm leading-6 text-[var(--color-ink-700)]">{activeStat.summary}</p>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
-
-      {/* Mini comparison chart — 4 막대 + 4 점 */}
-      <div className="mt-8 border-t border-[var(--color-border)] pt-6">
-        <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">
-          4 시나리오 비교
-        </p>
-        <div className="mt-3 space-y-3">
-          {visible.map((key) => {
-            const stat = scenarios[key]!;
-            const isActive = key === activeKey;
-            const capitalWidth = (Math.abs(stat.selfCapital) / maxCapital) * 100;
-            const profitOffset = (stat.profit / maxProfit) * 50; // -50% ~ +50% 위치
-            return (
-              <button
-                key={key}
-                type="button"
-                onClick={() => setActiveKey(key)}
-                className="block w-full text-left"
+      {/* 컴팩트 비교 표 */}
+      <div className="mt-5 overflow-x-auto">
+        <table
+          className="w-full min-w-[480px] border-collapse text-left"
+          aria-label="시나리오 4종 비교"
+        >
+          {/* 헤더 (4 컬럼 = 시나리오) */}
+          <thead>
+            <tr>
+              <th
+                scope="col"
+                className="w-[15%] py-2 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]"
               >
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`w-10 shrink-0 text-xs font-black tabular-nums ${
-                      isActive ? "text-[var(--color-ink-900)]" : "text-[var(--color-ink-500)]"
-                    }`}
+                차원
+              </th>
+              {visible.map((key) => {
+                const isActive = key === activeKey;
+                return (
+                  <th
+                    key={key}
+                    scope="col"
+                    className="px-2 py-2 align-bottom"
                   >
-                    {key}
-                  </span>
-                  <div className="relative flex-1">
-                    {/* 자기자본 막대 */}
-                    <div className="h-3 rounded-full bg-[var(--color-ink-100)]">
-                      <motion.div
-                        className={`h-3 rounded-full ${
+                    <button
+                      type="button"
+                      onClick={() =>
+                        setActiveKey(activeKey === key ? null : key)
+                      }
+                      onMouseEnter={() => setActiveKey(key)}
+                      onMouseLeave={() => setActiveKey(null)}
+                      onKeyDown={(e) => {
+                        if (e.key === "ArrowRight") {
+                          e.preventDefault();
+                          const idx = visible.indexOf(key);
+                          setActiveKey(visible[(idx + 1) % visible.length]);
+                        } else if (e.key === "ArrowLeft") {
+                          e.preventDefault();
+                          const idx = visible.indexOf(key);
+                          setActiveKey(
+                            visible[(idx - 1 + visible.length) % visible.length]
+                          );
+                        }
+                      }}
+                      aria-pressed={isActive}
+                      className={`block w-full text-left transition-colors ${
+                        isActive
+                          ? "text-[var(--color-ink-900)]"
+                          : "text-[var(--color-ink-500)]"
+                      }`}
+                    >
+                      <div className="text-base font-black tabular-nums">
+                        {key}
+                      </div>
+                      <div
+                        className={`text-[11px] font-medium ${
+                          isActive ? "" : "opacity-70"
+                        }`}
+                      >
+                        {SCENARIO_DEFAULT_LABELS[key]}
+                      </div>
+                      {/* active 표시 underline */}
+                      <motion.span
+                        aria-hidden="true"
+                        className="mt-1.5 block h-0.5 w-full bg-[var(--color-ink-900)]"
+                        initial={false}
+                        animate={{ scaleX: isActive ? 1 : 0, originX: 0 }}
+                        transition={{ duration: 0.2 }}
+                      />
+                    </button>
+                  </th>
+                );
+              })}
+            </tr>
+          </thead>
+          <tbody>
+            {/* Row 1 — 자기자본 (숫자 + 막대) */}
+            <tr className="border-t border-[var(--color-border)]">
+              <th
+                scope="row"
+                className="py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]"
+              >
+                자기자본
+              </th>
+              {visible.map((key) => {
+                const stat = scenarios[key]!;
+                const isActive = key === activeKey;
+                const widthPct = (Math.abs(stat.selfCapital) / maxCapital) * 100;
+                return (
+                  <td key={key} className="px-2 py-3 align-top">
+                    <div
+                      className={`text-sm tabular-nums ${
+                        isActive
+                          ? "font-black text-[var(--color-ink-900)]"
+                          : activeKey
+                            ? "font-medium text-[var(--color-ink-500)] opacity-50"
+                            : "font-bold text-[var(--color-ink-700)]"
+                      }`}
+                    >
+                      {formatKoreanWon(stat.selfCapital)}
+                    </div>
+                    <div className="mt-1 h-1.5 w-full rounded-full bg-[var(--color-ink-100)]">
+                      <motion.span
+                        aria-hidden="true"
+                        className={`block h-1.5 origin-left rounded-full ${
                           isActive
                             ? "bg-[var(--color-ink-900)]"
-                            : "bg-[var(--color-ink-300)]"
+                            : activeKey
+                              ? "bg-[var(--color-ink-300)]"
+                              : "bg-[var(--color-ink-700)]"
                         }`}
                         animate={{
-                          width: inView ? `${capitalWidth}%` : "0%",
+                          width: inView ? `${widthPct}%` : "0%",
                         }}
                         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                       />
                     </div>
-                    {/* 수익 점 (막대 위 absolute, profit 부호에 따라 ink-900 또는 ink-300) */}
-                    <motion.span
-                      className={`absolute -top-1.5 h-6 w-1 -translate-x-1/2 rounded-full ${
-                        stat.profit > 0
-                          ? "bg-[var(--color-ink-900)]"
-                          : stat.profit < 0
-                            ? "bg-[var(--color-ink-700)]"
-                            : "bg-[var(--color-ink-300)]"
+                  </td>
+                );
+              })}
+            </tr>
+            {/* Row 2 — 예상 수익 (숫자 + 점 위치) */}
+            <tr className="border-t border-[var(--color-border)]">
+              <th
+                scope="row"
+                className="py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]"
+              >
+                예상 수익
+              </th>
+              {visible.map((key) => {
+                const stat = scenarios[key]!;
+                const isActive = key === activeKey;
+                const offset = (stat.profit / maxProfitAbs) * 50; // -50% ~ +50%
+                return (
+                  <td key={key} className="px-2 py-3 align-top">
+                    <div
+                      className={`text-sm tabular-nums ${
+                        isActive
+                          ? "font-black text-[var(--color-ink-900)]"
+                          : activeKey
+                            ? "font-medium text-[var(--color-ink-500)] opacity-50"
+                            : "font-bold text-[var(--color-ink-700)]"
                       }`}
-                      animate={{
-                        left: inView ? `${50 + profitOffset}%` : "50%",
-                      }}
-                      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                    />
-                  </div>
-                  <span className="w-20 shrink-0 text-right text-xs font-bold tabular-nums text-[var(--color-ink-700)]">
-                    {stat.profit === 0
-                      ? "—"
-                      : `${stat.profit < 0 ? "−" : "+"}${(Math.abs(stat.profit) / 10000).toFixed(0)}만`}
-                  </span>
-                </div>
-              </button>
-            );
-          })}
-        </div>
-        <p className="mt-3 text-[10px] tabular-nums text-[var(--color-ink-500)]">
-          좌: 자기자본 막대 / 우: 예상 수익 점 (← 손실 / 우 → 수익)
-        </p>
+                    >
+                      {stat.profit === 0
+                        ? "—"
+                        : `${stat.profit < 0 ? "−" : "+"}${formatKoreanWon(Math.abs(stat.profit))}`}
+                    </div>
+                    {/* 점 위치 라인 (좌 손실 ← 0 → 우 수익) */}
+                    <div className="relative mt-1.5 h-2 w-full">
+                      <span
+                        aria-hidden="true"
+                        className="absolute left-0 right-0 top-1/2 h-px -translate-y-1/2 bg-[var(--color-ink-100)]"
+                      />
+                      <span
+                        aria-hidden="true"
+                        className="absolute left-1/2 top-1/2 h-2 w-px -translate-x-1/2 -translate-y-1/2 bg-[var(--color-ink-300)]"
+                      />
+                      <motion.span
+                        aria-hidden="true"
+                        className={`absolute top-1/2 h-2 w-2 -translate-x-1/2 -translate-y-1/2 rounded-full ${
+                          isActive
+                            ? "bg-[var(--color-ink-900)]"
+                            : activeKey
+                              ? "bg-[var(--color-ink-300)]"
+                              : "bg-[var(--color-ink-700)]"
+                        }`}
+                        animate={{
+                          left: inView ? `${50 + offset}%` : "50%",
+                        }}
+                        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
+                      />
+                    </div>
+                  </td>
+                );
+              })}
+            </tr>
+            {/* Row 3 — 보유 기간 */}
+            <tr className="border-t border-[var(--color-border)]">
+              <th
+                scope="row"
+                className="py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]"
+              >
+                보유 기간
+              </th>
+              {visible.map((key) => {
+                const stat = scenarios[key]!;
+                const isActive = key === activeKey;
+                return (
+                  <td key={key} className="px-2 py-3 align-top">
+                    <span
+                      className={`text-sm tabular-nums ${
+                        isActive
+                          ? "font-black text-[var(--color-ink-900)]"
+                          : activeKey
+                            ? "font-medium text-[var(--color-ink-500)] opacity-50"
+                            : "font-bold text-[var(--color-ink-700)]"
+                      }`}
+                    >
+                      {stat.holdingYears != null ? `${stat.holdingYears}년` : "—"}
+                    </span>
+                  </td>
+                );
+              })}
+            </tr>
+            {/* Row 4 — 리스크 */}
+            <tr className="border-t border-[var(--color-border)]">
+              <th
+                scope="row"
+                className="py-3 text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]"
+              >
+                리스크
+              </th>
+              {visible.map((key) => {
+                const stat = scenarios[key]!;
+                const isActive = key === activeKey;
+                return (
+                  <td key={key} className="px-2 py-3 align-top">
+                    <span
+                      className={`inline-flex items-center rounded-[var(--radius-xs)] px-2 py-0.5 text-[11px] font-bold ${resolveRiskClass(stat.riskLevel, isActive, !!activeKey)}`}
+                    >
+                      {resolveRiskLabel(stat.riskLevel)}
+                    </span>
+                  </td>
+                );
+              })}
+            </tr>
+          </tbody>
+        </table>
       </div>
 
-      {/* 낙찰가 슬라이더 (Show-and-Play 본질) */}
-      <div className="mt-8 border-t border-[var(--color-border)] pt-6">
-        <label
-          htmlFor="bidding-slider"
-          className="block text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-700)]"
+      {/* 활성 시나리오 summary */}
+      {activeKey && scenarios[activeKey] ? (
+        <motion.p
+          key={activeKey}
+          initial={{ opacity: 0, x: -8 }}
+          animate={{ opacity: 1, x: 0 }}
+          transition={{ duration: 0.2 }}
+          className="mt-4 rounded-[var(--radius-md)] border-l-4 border-[var(--color-ink-900)] bg-[var(--color-ink-50)] px-4 py-3 text-sm leading-6 text-[var(--color-ink-700)]"
         >
-          낙찰가 시뮬레이션 — 슬라이더 drag 시 4 시나리오 실시간 재계산
-        </label>
-        <div className="mt-4 flex items-center gap-4">
-          <span className="text-xs tabular-nums text-[var(--color-ink-500)]">
-            {formatKoreanWon(minPrice)}
+          <span className="font-bold text-[var(--color-ink-900)]">{activeKey}.</span>{" "}
+          {scenarios[activeKey]!.summary || "시나리오 상세 요약 부재."}
+        </motion.p>
+      ) : null}
+
+      {/* 낙찰가 슬라이더 (Show-and-Play 본질) */}
+      <div className="mt-6 border-t border-[var(--color-border)] pt-5">
+        <div className="flex items-baseline justify-between">
+          <label
+            htmlFor="bidding-slider"
+            className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-700)]"
+          >
+            낙찰가 시뮬레이션
+          </label>
+          <span className="text-xs font-black tabular-nums text-[var(--color-ink-900)]">
+            {formatKoreanWon(userBidPrice)}
+          </span>
+        </div>
+        <div className="mt-3 flex items-center gap-3">
+          <span className="text-[11px] tabular-nums text-[var(--color-ink-500)]">
+            최저가
           </span>
           <input
             id="bidding-slider"
@@ -265,21 +364,18 @@ export function ScenarioComparisonBox({
             max={100}
             value={biddingPercent}
             onChange={(e) => setBiddingPercent(Number(e.target.value))}
-            aria-label="낙찰가 슬라이더"
+            aria-valuemin={0}
+            aria-valuemax={100}
             aria-valuenow={biddingPercent}
             aria-valuetext={`${formatKoreanWon(userBidPrice)} (최저가 + ${biddingPercent}%)`}
             className="flex-1 accent-[var(--color-ink-900)]"
           />
-          <span className="text-xs tabular-nums text-[var(--color-ink-500)]">
-            {formatKoreanWon(appraisal)}
+          <span className="text-[11px] tabular-nums text-[var(--color-ink-500)]">
+            감정가
           </span>
         </div>
-        <p className="mt-3 text-center text-sm font-bold tabular-nums text-[var(--color-ink-900)]">
-          입찰가{" "}
-          <span className="text-[var(--color-ink-900)]">
-            {formatKoreanWon(userBidPrice)}
-          </span>{" "}
-          기준
+        <p className="mt-2 text-[11px] tabular-nums text-[var(--color-ink-500)]">
+          drag 시 4 시나리오 자기자본·예상 수익 셀 실시간 재계산
         </p>
       </div>
     </div>
@@ -288,25 +384,23 @@ export function ScenarioComparisonBox({
 
 function buildScenarioStat(
   raw: ScenarioFields | null,
-  defaultLabel: string,
+  key: ScenarioKey,
   userBidPrice: number,
   baseMinPrice: number
 ): ScenarioStat | null {
   if (!raw) return null;
   const baseSelfCapital = asNumber(raw.self_capital_with_loan) ?? userBidPrice;
-  // 사용자 입찰가가 baseMinPrice 와 다르면 자기자본도 비례 조정
-  const ratio = userBidPrice / baseMinPrice;
+  const ratio = baseMinPrice > 0 ? userBidPrice / baseMinPrice : 1;
   const selfCapital = Math.round(baseSelfCapital * ratio);
   const baseProfit = asNumber(raw.after_tax_profit) ?? 0;
-  // 사용자 입찰가 상승분만큼 수익 차감 (낙찰가 ↑ = 수익 ↓ 단순 모델)
   const priceDiff = userBidPrice - baseMinPrice;
   const profit = baseProfit - priceDiff;
   const holdingYears = asNumber(raw.holding_period_years);
   const riskLevel = String(raw.risk_level ?? "mid");
-  const label = String(raw.label ?? defaultLabel);
+  const label = String(raw.label ?? SCENARIO_DEFAULT_LABELS[key]);
   const summary = String(raw.summary ?? "");
   return {
-    label: defaultLabel.split(" ")[0] + " " + label,
+    label,
     selfCapital,
     profit,
     holdingYears,
@@ -332,15 +426,21 @@ function resolveRiskLabel(level: string): string {
   }
 }
 
-function DetailStat({ label, value }: { label: string; value: string }) {
-  return (
-    <div>
-      <dt className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">
-        {label}
-      </dt>
-      <dd className="mt-1 text-base font-black tabular-nums text-[var(--color-ink-900)]">
-        {value}
-      </dd>
-    </div>
-  );
+function resolveRiskClass(
+  level: string,
+  isActive: boolean,
+  anyActive: boolean
+): string {
+  if (anyActive && !isActive) {
+    return "bg-[var(--color-ink-100)] text-[var(--color-ink-500)] opacity-50";
+  }
+  switch (level) {
+    case "low":
+      return "bg-[var(--color-ink-100)] text-[var(--color-ink-700)]";
+    case "high":
+      return "bg-[var(--color-ink-900)] text-white";
+    case "mid":
+    default:
+      return "bg-[var(--color-ink-300)] text-[var(--color-ink-900)]";
+  }
 }
