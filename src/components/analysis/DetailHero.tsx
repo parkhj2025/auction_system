@@ -56,16 +56,16 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
           </div>
         ) : null}
 
-        {/* H1 — 강한 위계 */}
+        {/* H1 — 룰 24-A·B (단계 5-4-2-fix-6): h1 토큰 + weight 600 (semibold). display 토큰 폐기. */}
         <h1
           id="detail-title"
-          className="mt-5 max-w-4xl text-4xl font-extrabold leading-[1.15] tracking-tight text-[var(--color-ink-900)] sm:text-5xl lg:text-6xl"
+          className="mt-5 max-w-4xl text-[length:var(--text-h1)] font-semibold leading-[var(--lh-snug)] tracking-tight text-[var(--color-ink-900)]"
         >
           {fm.title}
         </h1>
 
-        {/* Meta line — h1 직하 단일 행 */}
-        <p className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-sm text-[var(--color-ink-500)]">
+        {/* Meta line — h1 직하 단일 행 (Tier 3 body 16 ink-500) */}
+        <p className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-[length:var(--text-body-sm)] text-[var(--color-ink-500)]">
           <span className="font-semibold text-[var(--color-ink-700)]">
             {fm.court}
             {fm.courtDivision ? ` ${fm.courtDivision}` : ""}
@@ -76,9 +76,9 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
           <span>{fm.address}</span>
         </p>
 
-        {/* Lead (summary) */}
+        {/* Lead (summary) — Tier 2 body-lg ink-700 */}
         {fm.summary ? (
-          <p className="mt-3 max-w-3xl text-base leading-relaxed text-[var(--color-ink-700)] line-clamp-3 lg:text-lg lg:leading-[1.7]">
+          <p className="mt-3 max-w-3xl text-[length:var(--text-body)] leading-[var(--lh-relaxed)] text-[var(--color-ink-700)] line-clamp-3 lg:text-[length:var(--text-body-lg)]">
             {fm.summary}
           </p>
         ) : null}
@@ -153,10 +153,11 @@ function DominantStat({
 }) {
   return (
     <div className="flex flex-col gap-3 bg-[var(--color-ink-900)] p-6 text-white sm:p-8">
-      <p className="text-[length:var(--text-caption)] font-bold uppercase tracking-widest text-white/70">
+      {/* Tier 2 라벨 — body-lg 18 / 500 / white 70% */}
+      <p className="text-[length:var(--text-body-lg)] font-medium tracking-wide text-white/70">
         {label}
       </p>
-      {/* 룰 15-A: 좌측 56px (sm+) / 48px (mobile) 원형 썸네일 + 우측 가격 가로 layout */}
+      {/* 룰 15-A: 좌측 48px (mobile) / 56px (sm+) 원형 썸네일 + 우측 가격 가로 layout (룰 24-A·B 동등 h1) */}
       <div className="flex items-center gap-4">
         {thumbnail ? (
           <div
@@ -173,10 +174,12 @@ function DominantStat({
           </div>
         ) : null}
         <div className="flex flex-1 flex-wrap items-baseline gap-x-4 gap-y-1">
-          <p className="text-[length:var(--text-h1)] font-black leading-[var(--lh-tight)] tabular-nums tracking-tight sm:text-[length:var(--text-display)]">
+          {/* Tier 1 가격 수치 — h1 40 (mobile auto h2 32) / 700 (bold) / white 100% / tabular-nums */}
+          <p className="text-[length:var(--text-h1)] font-bold leading-[var(--lh-tight)] tabular-nums tracking-tight text-white">
             {value}
           </p>
-          <p className="text-[length:var(--text-body-sm)] font-medium tabular-nums text-white/80 sm:text-[length:var(--text-body)]">
+          {/* Tier 2 % 라벨 — body-lg 18 / 500 / white 70% */}
+          <p className="text-[length:var(--text-body-lg)] font-medium tabular-nums text-white/70">
             감정가의 {percentOfAppraisal}%
           </p>
         </div>
@@ -204,14 +207,17 @@ function Stat({
 }) {
   return (
     <div className="flex flex-col gap-1 bg-white p-4 text-[var(--color-ink-900)] sm:p-5">
-      <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--color-ink-500)]">
+      {/* Tier 4 라벨 — caption 12 / 500 / letter-spacing 0.05em / ink-500 */}
+      <p className="flex items-center gap-1.5 text-[length:var(--text-caption)] font-medium uppercase tracking-[0.05em] text-[var(--color-ink-500)]">
         {icon}
         {label}
       </p>
-      <p className="mt-1 text-base font-black leading-tight tabular-nums sm:text-lg">
+      {/* Tier 3 stat 수치 — body-lg 18 / 600 / tabular-nums / ink-900 */}
+      <p className="mt-1 text-[length:var(--text-body-lg)] font-semibold leading-[var(--lh-tight)] tabular-nums">
         {value}
       </p>
-      <p className="text-[11px] font-medium tabular-nums text-[var(--color-ink-500)]">
+      {/* Tier 4 sub — caption / 500 / ink-500 */}
+      <p className="text-[length:var(--text-caption)] font-medium tabular-nums text-[var(--color-ink-500)]">
         {sub}
       </p>
     </div>
