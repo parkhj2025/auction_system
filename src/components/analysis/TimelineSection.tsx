@@ -1,14 +1,13 @@
 "use client";
 
 /**
- * 02 입찰 경과 — 단계 5-4-2 Side-by-Side Sticky + Graphic Sequence.
+ * 02 입찰 경과 — 단계 5-4-2-fix Phase 2: Side-by-Side Sticky + 시각 위계.
  *
- * 단계 5-4-2 변경:
- *  - 단계 3-3 정적 timeline 폐기 → SideBySideSticky 안에 BiddingTimeline 배치
+ * 시각 위계 (형준님 본질 통찰):
+ *  - 진행 회차 STEP → strong (text-ink-900 + 굵기 강조)
+ *  - 과거 회차 (매각·유찰·미납) STEP → weak (text-ink-500 + opacity 0.6)
  *  - 좌측 narrative step 별 우측 graphic active idx 변화 (Graphic Sequence)
  *  - 모바일 stack fallback (graphic top + steps 아래)
- *
- * case study 인용: scrollytelling Layout Pattern 1 + Graphic Sequence + chart-visualization line/funnel.
  */
 import type { BiddingHistoryEntry } from "@/types/content";
 import { SideBySideSticky } from "./SideBySideSticky";
@@ -22,34 +21,73 @@ export function TimelineSection({
 }) {
   if (!history || history.length === 0) return null;
 
-  const steps = history.map((entry, idx) => ({
-    id: `bidding-step-${idx}`,
-    body: (
-      <div>
-        <h3 className="text-base font-black text-[var(--color-ink-900)] sm:text-lg">
-          {entry.round}차 매각
-        </h3>
-        <p className="mt-2 text-sm leading-6 text-[var(--color-ink-700)]">
-          <span className="font-bold tabular-nums">{entry.date}</span>
-          {entry.rate != null ? (
-            <>
-              {" · 감정가의 "}
-              <span className="font-bold tabular-nums">{entry.rate}%</span>
-              {" 진입선 "}
-              <span className="font-bold tabular-nums">
-                {entry.minimum != null
-                  ? formatKoreanWon(entry.minimum)
-                  : "—"}
+  const steps = history.map((entry, idx) => {
+    const isCurrent = isCurrentEntry(entry);
+
+    return {
+      id: `bidding-step-${idx}`,
+      body: (
+        <div className={isCurrent ? "" : "opacity-60"}>
+          <div className="flex items-baseline gap-2">
+            <h3
+              className={`tabular-nums sm:text-lg ${
+                isCurrent
+                  ? "text-base font-black text-[var(--color-ink-900)]"
+                  : "text-base font-bold text-[var(--color-ink-500)]"
+              }`}
+            >
+              {entry.round}차 {isCurrent ? "진행" : resolveResultLabel(entry.result)}
+            </h3>
+            {isCurrent ? (
+              <span className="rounded-[var(--radius-xs)] bg-[var(--color-ink-900)] px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.18em] text-white">
+                현재
               </span>
-            </>
-          ) : null}
-        </p>
-        <p className="mt-3 text-sm leading-6 text-[var(--color-ink-500)]">
-          {resolveStepNarrative(entry, idx, history)}
-        </p>
-      </div>
-    ),
-  }));
+            ) : null}
+          </div>
+          <p
+            className={`mt-2 text-sm leading-6 ${
+              isCurrent
+                ? "text-[var(--color-ink-700)]"
+                : "text-[var(--color-ink-500)]"
+            }`}
+          >
+            <span
+              className={`tabular-nums ${
+                isCurrent ? "font-bold" : "font-medium"
+              }`}
+            >
+              {entry.date}
+            </span>
+            {entry.rate != null ? (
+              <>
+                {" · 감정가의 "}
+                <span
+                  className={`tabular-nums ${
+                    isCurrent ? "font-bold" : "font-medium"
+                  }`}
+                >
+                  {entry.rate}%
+                </span>
+                {" 진입선 "}
+                <span
+                  className={`tabular-nums ${
+                    isCurrent ? "font-bold" : "font-medium"
+                  }`}
+                >
+                  {entry.minimum != null
+                    ? formatKoreanWon(entry.minimum)
+                    : "—"}
+                </span>
+              </>
+            ) : null}
+          </p>
+          <p className="mt-3 text-sm leading-6 text-[var(--color-ink-500)]">
+            {resolveStepNarrative(entry, idx, history)}
+          </p>
+        </div>
+      ),
+    };
+  });
 
   return (
     <SideBySideSticky
@@ -60,6 +98,19 @@ export function TimelineSection({
       mobileGraphicPosition="top"
     />
   );
+}
+
+function isCurrentEntry(entry: BiddingHistoryEntry): boolean {
+  const r = (entry.result ?? "").trim();
+  return r === "" || r.includes("진행");
+}
+
+function resolveResultLabel(result: string): string {
+  const r = (result ?? "").trim();
+  if (r.includes("매각")) return "매각";
+  if (r.includes("미납")) return "미납";
+  if (r.includes("유찰")) return "유찰";
+  return r || "—";
 }
 
 function resolveStepNarrative(
