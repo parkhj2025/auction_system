@@ -31,7 +31,7 @@ export function MdxP({ children, ...rest }: ComponentPropsWithoutRef<"p">) {
     <motion.p
       ref={ref}
       id={id}
-      className="mt-5 text-[length:var(--text-body)] leading-[1.6] text-[var(--color-ink-700)]"
+      className="mt-6 text-[length:var(--text-body)] leading-[1.6] text-[var(--color-ink-700)]"
       initial={{ opacity: 0, y: 8 }}
       animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
       transition={REVEAL_TRANSITION}
@@ -49,7 +49,7 @@ export function MdxUl({ children, ...rest }: ComponentPropsWithoutRef<"ul">) {
     <motion.ul
       ref={ref}
       id={id}
-      className="mt-5 flex list-disc flex-col gap-2 pl-6 text-[length:var(--text-body)] leading-[1.6] text-[var(--color-ink-700)] marker:text-[var(--color-ink-900)]"
+      className="mt-6 flex list-disc flex-col gap-3 pl-6 text-[length:var(--text-body)] leading-[1.6] text-[var(--color-ink-700)] marker:text-[var(--color-ink-900)]"
       initial={{ opacity: 0, y: 8 }}
       animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
       transition={REVEAL_TRANSITION}
@@ -67,7 +67,7 @@ export function MdxOl({ children, ...rest }: ComponentPropsWithoutRef<"ol">) {
     <motion.ol
       ref={ref}
       id={id}
-      className="mt-5 flex list-decimal flex-col gap-2 pl-6 text-[length:var(--text-body)] leading-[1.6] text-[var(--color-ink-700)] marker:font-bold marker:text-[var(--color-ink-900)]"
+      className="mt-6 flex list-decimal flex-col gap-3 pl-6 text-[length:var(--text-body)] leading-[1.6] text-[var(--color-ink-700)] marker:font-bold marker:text-[var(--color-ink-900)]"
       initial={{ opacity: 0, y: 8 }}
       animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }}
       transition={REVEAL_TRANSITION}

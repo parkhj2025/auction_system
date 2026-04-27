@@ -144,6 +144,18 @@
   --lh-normal: 1.3;
   --lh-relaxed: 1.6;
 
+  /* 룰 14-D 강화 (단계 5-4-2-fix-5) — Vertical Rhythm 4pt grid + 강화.
+   * 섹션 간 = 128/80, 카드 padding = 32/24, 카드 간 gap = 32/24, 본문 단락 = 24 */
+  --gap-section: 8rem;          /* 128px desktop */
+  --gap-section-mobile: 5rem;   /* 80px */
+  --gap-card: 2rem;             /* 32px */
+  --gap-card-mobile: 1.5rem;    /* 24px */
+  --gap-paragraph: 1.5rem;      /* 24px */
+  --gap-list-item: 0.75rem;     /* 12px */
+  --gap-table-head: 1rem;       /* 16px */
+  --pad-card: 2rem;             /* 32px */
+  --pad-card-mobile: 1.5rem;    /* 24px */
+
   /* legacy numeric-dominant alias — display 동등 (단계 5-2 호환) */
   --text-numeric: var(--text-h2);
   --text-numeric-dominant: var(--text-display);

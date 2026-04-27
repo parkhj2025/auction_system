@@ -137,12 +137,12 @@ function buildH2(
           return (
             <h2
               id={`section-${num}`}
-              className="mt-20 flex scroll-mt-24 items-baseline gap-4 border-t border-[var(--color-border)] pt-10 first:mt-0 first:border-t-0 first:pt-0"
+              className="mt-20 flex scroll-mt-24 items-baseline gap-4 border-t border-[var(--color-border)] pt-10 first:mt-0 first:border-t-0 first:pt-0 sm:mt-32 sm:pt-12"
             >
-              <span className="text-xs font-black uppercase tracking-[0.24em] text-[var(--color-ink-900)] tabular-nums">
+              <span className="text-[length:var(--text-caption)] font-black uppercase tracking-[0.24em] text-[var(--color-ink-500)] tabular-nums">
                 {num}
               </span>
-              <span className="text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+              <span className="text-[length:var(--text-h2)] font-black tracking-tight leading-[var(--lh-snug)] text-[var(--color-ink-900)]">
                 {title}
               </span>
             </h2>
