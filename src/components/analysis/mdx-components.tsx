@@ -240,7 +240,7 @@ function Th({ children, ...rest }: ComponentPropsWithoutRef<"th">) {
   const cls = thHeaderClass(text);
   return (
     <th
-      className={`border-b border-[var(--color-border)] px-4 py-3 text-[length:var(--text-caption)] font-semibold uppercase tracking-wider text-[var(--color-ink-700)] ${cls}`}
+      className={`border-b border-[var(--color-border)] px-2 py-2 text-[10px] font-semibold uppercase tracking-wider text-[var(--color-ink-700)] md:px-4 md:py-3 md:text-[length:var(--text-caption)] ${cls}`}
       {...rest}
     >
       {children}
@@ -262,13 +262,15 @@ function Td({ children, ...rest }: ComponentPropsWithoutRef<"td">) {
   const text = extractText(children).trim();
   const align = detectTdAlign(text);
   const isNumber = align.kind === "number";
-  // 룰 17 mobile card stack: block + 좌측 정렬 / desktop: table-cell + 의미 정렬
+  // 룰 19 (단계 5-4-2-fix-6): table-cell default (card stack 폐기).
+  // 룰 19-B: mobile px-2 py-2 (캡션) / desktop px-4 py-3 (body-sm) 폰트·패딩 축소.
+  // cell wrap: whitespace-normal break-words 긴 텍스트 영역 (정렬 영역 외).
   return (
     <td
-      className={`block border-b-0 px-0 py-1 align-top text-[length:var(--text-body-sm)] leading-6 first:mt-0 md:table-cell md:border-b md:border-[var(--color-border)] md:px-4 md:py-3 ${
+      className={`border-b border-[var(--color-border)] px-2 py-2 align-top text-[10px] leading-relaxed md:px-4 md:py-3 md:text-[length:var(--text-body-sm)] md:leading-6 ${
         isNumber
           ? "font-medium tabular-nums text-[var(--color-ink-900)]"
-          : "text-[var(--color-ink-700)]"
+          : "text-[var(--color-ink-700)] break-words"
       } ${align.cls}`}
       {...rest}
     >

@@ -53,7 +53,7 @@ export function MdxTable({
       className={`mt-6 overflow-x-auto mdx-table-wrapper ${isInView ? "mdx-table-revealed" : ""}`}
     >
       <table
-        className="block w-full border-collapse md:table md:min-w-[36rem] md:text-[length:var(--text-body-sm)] md:tabular-nums"
+        className="w-full border-collapse text-[length:var(--text-caption)] tabular-nums md:min-w-[36rem] md:text-[length:var(--text-body-sm)]"
         {...rest}
       >
         {children}
@@ -67,10 +67,7 @@ export function MdxThead({
   ...rest
 }: ComponentPropsWithoutRef<"thead">) {
   return (
-    <thead
-      className="hidden bg-[var(--color-surface-muted)] md:table-header-group"
-      {...rest}
-    >
+    <thead className="bg-[var(--color-surface-muted)]" {...rest}>
       {children}
     </thead>
   );
@@ -113,9 +110,8 @@ function detectRowToneClass(text: string): {
 }
 
 /**
- * 룰 17-A 카드 stack 패턴 — Tr mobile = card, desktop = table-row.
- * mobile: block + border + rounded + p-4 + mb-3 (각 row 가 카드)
- * desktop: table-row (정상 표)
+ * 룰 19 (단계 5-4-2-fix-6) — Tr mobile + desktop 모두 table-row default.
+ * card stack 패턴 폐기 (border-rounded-mb-p 폐기). 표 형태 보존.
  */
 export function MdxTr({
   children,
@@ -123,7 +119,7 @@ export function MdxTr({
 }: ComponentPropsWithoutRef<"tr">) {
   const text = extractText(children);
   const tone = detectRowToneClass(text);
-  const cls = `block rounded-[var(--radius-md)] border border-[var(--color-border)] mb-3 p-4 last:mb-0 md:table-row md:rounded-none md:border-x-0 md:border-t-0 md:border-b md:p-0 md:mb-0 ${tone.bgCls} ${tone.weightCls} ${tone.textCls} transition-colors duration-200 hover:bg-[var(--color-ink-50)]`;
+  const cls = `border-b border-[var(--color-border)] ${tone.bgCls} ${tone.weightCls} ${tone.textCls} transition-colors duration-200 hover:bg-[var(--color-ink-50)]`;
   return (
     <tr className={cls} {...rest}>
       {children}
