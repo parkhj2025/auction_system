@@ -74,7 +74,7 @@ export function SaleAreaSummary({
   return (
     <div
       ref={ref}
-      className="mt-6 rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] p-5 sm:p-6"
+      className="mt-6 rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] p-6 sm:p-8"
     >
       <div className="flex items-baseline justify-between">
         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">

@@ -101,7 +101,7 @@ export function ScenarioComparisonBox({
   return (
     <div
       ref={ref}
-      className="mt-6 rounded-[var(--radius-md)] border border-[var(--color-ink-200)] bg-white p-5 sm:p-6"
+      className="mt-6 rounded-[var(--radius-md)] border border-[var(--color-ink-200)] bg-white p-6 sm:p-8"
     >
       <div className="flex items-baseline justify-between">
         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">

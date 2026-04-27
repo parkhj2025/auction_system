@@ -48,7 +48,7 @@ export function PhotoGalleryStrip({
     <>
       <section
         aria-label="현장 사진"
-        className="mt-12 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-5 sm:p-6"
+        className="mt-12 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 sm:p-8"
       >
         <div className="flex items-baseline justify-between gap-3">
           <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-700)]">

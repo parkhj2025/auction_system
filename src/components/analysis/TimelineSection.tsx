@@ -98,7 +98,7 @@ function StepCard({
       ) : null}
 
       <div
-        className={`relative rounded-[var(--radius-md)] border bg-white p-5 sm:p-6 transition-transform duration-[var(--duration-md)] ease-out ${
+        className={`relative rounded-[var(--radius-md)] border bg-white p-6 sm:p-8 transition-transform duration-[var(--duration-md)] ease-out ${
           isCurrent
             ? "scale-[1.02] border-[var(--color-ink-900)] shadow-[var(--shadow-card)]"
             : "border-[var(--color-border)] opacity-70"

@@ -98,7 +98,7 @@ export function PriceScatter({
   return (
     <div
       ref={ref}
-      className="rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] p-5 sm:p-6"
+      className="rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] p-6 sm:p-8"
     >
       <div className="flex items-baseline justify-between">
         <p className="text-[length:var(--text-caption)] font-semibold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">
