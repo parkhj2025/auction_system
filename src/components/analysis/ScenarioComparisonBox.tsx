@@ -101,7 +101,7 @@ export function ScenarioComparisonBox({
   return (
     <div
       ref={ref}
-      className="mt-6 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-5 shadow-[var(--shadow-card)] sm:p-7"
+      className="mt-6 rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] p-5 sm:p-6"
     >
       <div className="flex items-baseline justify-between">
         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">

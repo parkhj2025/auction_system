@@ -1,6 +1,5 @@
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
 import Image from "next/image";
-import { Home, TrendingUp, Users, RefreshCw, Ban } from "lucide-react";
 import type { AnalysisFrontmatter, AnalysisMeta } from "@/types/content";
 import { MdxTable, MdxThead, MdxTr } from "./MdxTableElements";
 import { Section01Overview } from "./sections/Section01Overview";
@@ -367,116 +366,14 @@ function Img() {
   return null;
 }
 
-/* ─── remark-analysis-blocks 가 emit 하는 신규 컴포넌트 ─── */
-
 /**
- * 단계 4-1: 시나리오 헤더에서 키 (A·B·C-1·C-2) 추출.
- *  지원 패턴:
- *   - "시나리오 A — 실거주 매입"
- *   - "시나리오 C-1 전세 갭투자" (정규화 후)
- *   - "시나리오 C-1 — 지분 임대 (단독 운용 불가)"
+ * 단계 5-4-2-fix-3 룰 3 (Q2 (가)): ScenarioCard mdx override 비활성.
+ * mdx 본문 4 시나리오 카드 영역 미렌더 — ScenarioCarousel 한 축 통합으로 일원화.
+ * 기존 단계 5-2/4-1 ScenarioCard 디테일 (parseScenarioKey·SCENARIO_ICONS·SCENARIO_BASE_THEME·
+ * DISABLED_THEME·detectScenarioDisabled·splitScenarioTitle) 일괄 폐기.
  */
-function parseScenarioKey(title: string): string | null {
-  const m = title.match(/^시나리오\s+([A-Z](?:-\d+)?)/);
-  return m ? m[1] : null;
-}
-
-/** 단계 5-2 #1: 시나리오 카드 — 색상 의존 폐기 (CLAUDE.md §13 절대 규칙 준수).
- *  4 카드 모두 동일 무채색. 시나리오 구분은 아이콘 + 본문 헤더 텍스트.
- *  disabled 카드 (적용 불가) 만 별도 회색 + opacity 표현 유지. */
-const SCENARIO_ICONS: Record<string, typeof Home> = {
-  A: Home,
-  B: TrendingUp,
-  "C-1": Users,
-  "C-2": RefreshCw,
-};
-
-const SCENARIO_BASE_THEME = {
-  border: "border-l-[var(--color-ink-900)]",
-  bg: "bg-[var(--color-surface)]",
-  chip: "bg-[var(--color-surface-muted)] text-[var(--color-ink-700)]",
-  iconColor: "text-[var(--color-ink-900)]",
-};
-
-const DISABLED_THEME = {
-  icon: Ban,
-  border: "border-l-[var(--color-ink-300)]",
-  bg: "bg-[var(--color-surface-muted)]",
-  chip: "bg-[var(--color-ink-100)] text-[var(--color-ink-500)]",
-  iconColor: "text-[var(--color-ink-500)]",
-};
-
-/** 시나리오 본문에 "단독 운용 불가" / "적용하지 않습니다" / "본 사건 적용 불가" 키워드 감지 */
-function detectScenarioDisabled(title: string, children: ReactNode): boolean {
-  const titleHit = /(단독\s*운용\s*불가|적용\s*불가)/.test(title ?? "");
-  if (titleHit) return true;
-  const txt = extractText(children);
-  return /(단독\s*운용\s*불가|본\s*사건에서\s*적용하지\s*않습니다|적용하지\s*않습니다)/.test(
-    txt
-  );
-}
-
-function ScenarioCard({
-  title,
-  children,
-}: {
-  title?: string;
-  children?: ReactNode;
-}) {
-  const [name, summary] = splitScenarioTitle(title ?? "");
-  const key = parseScenarioKey(title ?? "") ?? "";
-  const disabled = detectScenarioDisabled(title ?? "", children);
-  // 단계 5-2 #1: disabled 카드만 별도 theme. 일반 카드는 무채색 base + 키별 아이콘.
-  const Icon = disabled ? DISABLED_THEME.icon : SCENARIO_ICONS[key] ?? Home;
-  const borderCls = disabled ? DISABLED_THEME.border : SCENARIO_BASE_THEME.border;
-  const bgCls = disabled ? DISABLED_THEME.bg : SCENARIO_BASE_THEME.bg;
-  const chipCls = disabled ? DISABLED_THEME.chip : SCENARIO_BASE_THEME.chip;
-  const iconColorCls = disabled ? DISABLED_THEME.iconColor : SCENARIO_BASE_THEME.iconColor;
-
-  return (
-    <div
-      className={`mt-8 overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] border-l-4 ${borderCls} ${bgCls}`}
-    >
-      <div className="flex items-start gap-3 border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]/60 px-5 py-4 sm:px-6">
-        <span
-          className={`mt-0.5 inline-flex h-9 w-9 flex-none items-center justify-center rounded-full bg-white ${iconColorCls}`}
-          aria-hidden="true"
-        >
-          <Icon size={18} />
-        </span>
-        <div className="min-w-0 flex-1">
-          <p className="text-base font-black tracking-tight text-[var(--color-ink-900)] sm:text-lg">
-            {name}
-          </p>
-          <div className="mt-1 flex flex-wrap items-baseline gap-2">
-            {summary ? (
-              <p className="text-sm text-[var(--color-ink-500)]">{summary}</p>
-            ) : null}
-            {disabled ? (
-              <span
-                className={`inline-flex items-center rounded-full px-2 py-0.5 text-[11px] font-bold ${chipCls}`}
-              >
-                본 사건 적용 불가
-              </span>
-            ) : null}
-          </div>
-        </div>
-      </div>
-      <div
-        className={`px-5 py-4 sm:px-6 sm:py-5 [&>*:first-child]:mt-0 ${disabled ? "text-[var(--color-ink-500)]" : ""}`}
-      >
-        {children}
-      </div>
-    </div>
-  );
-}
-
-function splitScenarioTitle(title: string): [string, string] {
-  // 단계 4-1 fix: em-dash(—)·en-dash(–) 만 separator. ASCII hyphen(-) 는 "C-1" 같은
-  // 시나리오 키 구분자라 separator 로 매칭하면 잘못 split.
-  const m = title.match(/^(.+?)\s*[—–]\s*(.+)$/);
-  if (m) return [m[1].trim(), m[2].trim()];
-  return [title.trim(), ""];
+function ScenarioCard() {
+  return null;
 }
 
 function ConclusionCallout({ children }: { children?: ReactNode }) {
