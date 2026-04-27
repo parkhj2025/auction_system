@@ -1,0 +1,16 @@
+{
+  "caseNumber": "2024타경540431",
+  "slug": "2024타경540431",
+  "publishedAt": "2026-04-26",
+  "supervisorAdjustments": {
+    "count": 1,
+    "items": [
+      {
+        "category": "forbidden_term",
+        "before": "적합 자금 성격",
+        "after": "자금 성격",
+        "reason": "주관적 판정 어휘('적합')가 포함된 표 제목을 객관적 용어로 순화"
+      }
+    ]
+  }
+}

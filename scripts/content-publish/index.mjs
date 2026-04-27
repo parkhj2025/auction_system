@@ -904,22 +904,11 @@ function supplementFrontmatterFromAdjustments(adjustedFm, adjustments) {
  *
  * 모든 섹션 optional. 누락 시 페이지 컴포넌트는 mdx body fallback (단계 3-1 baseline).
  */
-function buildPublishedMeta(meta, photosMeta, slug, adjustments) {
+function buildPublishedMeta(meta, photosMeta, slug) {
   const out = { slug };
 
-  // 단계 4-2: Gemini 콘텐츠 2차 감시자 통합 결과 기록 (count>0 일 때만 노출)
-  // adjustments 항목 = { category, before, after, reason }
-  if (Array.isArray(adjustments) && adjustments.length > 0) {
-    out.supervisorAdjustments = {
-      count: adjustments.length,
-      items: adjustments.map((a) => ({
-        category: a.category,
-        before: a.before,
-        after: a.after,
-        reason: a.reason,
-      })),
-    };
-  }
+  // 단계 4-2-fix-5: supervisorAdjustments 는 .audit.json 에 분리 (RSC payload 정화).
+  // 페이지 컴포넌트가 .meta.json 만 읽으므로 audit 데이터는 props 미오염.
 
   // highlights — top-level 그대로
   if (Array.isArray(meta.highlights) && meta.highlights.length > 0) {
@@ -1304,7 +1293,7 @@ async function publishOne(caseNumber, args) {
       return {};
     }
   })();
-  const publishedMeta = buildPublishedMeta(meta, photosMetaRaw, slug, adjustments);
+  const publishedMeta = buildPublishedMeta(meta, photosMetaRaw, slug);
   const metaOutPath = path.join(OUT_DIR, `${slug}.meta.json`);
   const metaJson = JSON.stringify(publishedMeta, null, 2) + "\n";
   let metaNoop = false;
@@ -1326,6 +1315,56 @@ async function publishOne(caseNumber, args) {
     console.log(
       `[9] meta.json 동행: ${path.relative(REPO_ROOT, metaOutPath)}  ${metaJson.length}B`
     );
+  }
+
+  // [9.1] audit.json 동행 출력 (단계 4-2-fix-5 — supervisor 기록 분리)
+  // 페이지 props 미오염. RSC payload 정화 (HTML 인라인 직렬화 차단).
+  const auditOutPath = path.join(OUT_DIR, `${slug}.audit.json`);
+  if (Array.isArray(adjustments) && adjustments.length > 0) {
+    const auditPayload = {
+      caseNumber,
+      slug,
+      publishedAt: frontmatter.publishedAt ?? "",
+      supervisorAdjustments: {
+        count: adjustments.length,
+        items: adjustments.map((a) => ({
+          category: a.category,
+          before: a.before,
+          after: a.after,
+          reason: a.reason,
+        })),
+      },
+    };
+    const auditJson = JSON.stringify(auditPayload, null, 2) + "\n";
+    let auditNoop = false;
+    if (fs.existsSync(auditOutPath)) {
+      const existing = fs.readFileSync(auditOutPath, "utf8");
+      if (existing === auditJson) {
+        console.log(`[9.1] audit.json — 기존 파일과 byte-identical → no-op`);
+        auditNoop = true;
+      }
+    }
+    if (!auditNoop) {
+      try {
+        fs.writeFileSync(auditOutPath, auditJson, "utf8");
+      } catch (e) {
+        console.error(`[9.1] audit.json 쓰기 실패: ${e.message}`);
+        return { status: "fail-write", code: 4, slug };
+      }
+      console.log(
+        `[9.1] audit.json 동행: ${path.relative(REPO_ROOT, auditOutPath)}  ${auditJson.length}B (조정 ${adjustments.length}건)`
+      );
+    }
+  } else if (fs.existsSync(auditOutPath)) {
+    // 조정 0 건인데 stale audit.json 잔존 시 삭제
+    try {
+      fs.unlinkSync(auditOutPath);
+      console.log(
+        `[9.1] audit.json 삭제: ${path.relative(REPO_ROOT, auditOutPath)} (조정 0건 — stale 정리)`
+      );
+    } catch {
+      // ignore
+    }
   }
 
   return { status: "success", code: 0, slug, adjustedCount };

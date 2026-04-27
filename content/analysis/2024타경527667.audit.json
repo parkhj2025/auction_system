@@ -1,0 +1,40 @@
+{
+  "caseNumber": "2024타경527667",
+  "slug": "2024타경527667",
+  "publishedAt": "2026-04-27",
+  "supervisorAdjustments": {
+    "count": 5,
+    "items": [
+      {
+        "category": "missing_data",
+        "before": "region: \"\"",
+        "after": "region: \"인천 남동구\"",
+        "reason": "본문 '물건 개요'에서 추출하여 frontmatter의 빈 region 필드 보강"
+      },
+      {
+        "category": "missing_data",
+        "before": "address: \"\"",
+        "after": "address: \"인천 남동구 논현동 601-1, 별빛마을웰카운티 1005동 1층 102호\"",
+        "reason": "본문 '물건 개요'에서 추출하여 frontmatter의 빈 address 필드 보강"
+      },
+      {
+        "category": "missing_data",
+        "before": "propertyType: \"\"",
+        "after": "propertyType: \"아파트\"",
+        "reason": "본문 '물건 개요'에서 추출하여 frontmatter의 빈 propertyType 필드 보강"
+      },
+      {
+        "category": "missing_data",
+        "before": "areaM2: 0",
+        "after": "areaM2: 128.33",
+        "reason": "본문 '물건 개요'에서 추출하여 frontmatter의 빈 areaM2 필드 보강"
+      },
+      {
+        "category": "missing_data",
+        "before": "areaPyeong: 0",
+        "after": "areaPyeong: 38.82",
+        "reason": "본문 '물건 개요'에서 추출하여 frontmatter의 빈 areaPyeong 필드 보강"
+      }
+    ]
+  }
+}
