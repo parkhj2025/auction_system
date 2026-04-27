@@ -15,6 +15,7 @@ import { MarketCompareCard } from "./MarketCompareCard";
 import { InvestmentInteractive } from "./InvestmentInteractive";
 import { SaleAreaSummary } from "./SaleAreaSummary";
 import { CheckpointList as CheckpointListClient } from "./CheckpointList";
+import { MdxP, MdxUl, MdxOl } from "./MdxBodyElements";
 import { PropertyOverviewCard } from "./PropertyOverviewCard";
 
 /**
@@ -181,16 +182,7 @@ function H3({ children, ...rest }: ComponentPropsWithoutRef<"h3">) {
   );
 }
 
-function P({ children, ...rest }: ComponentPropsWithoutRef<"p">) {
-  return (
-    <p
-      className="mt-5 text-base leading-[1.8] text-[var(--color-ink-700)]"
-      {...rest}
-    >
-      {children}
-    </p>
-  );
-}
+// P — client 모듈 (MdxBodyElements.MdxP) 로 분리. 룰 13 mdx reveal 적용.
 
 function Strong({ children, ...rest }: ComponentPropsWithoutRef<"strong">) {
   return (
@@ -219,27 +211,7 @@ function PassThrough({ children }: { children?: ReactNode }) {
   return <>{children}</>;
 }
 
-function Ul({ children, ...rest }: ComponentPropsWithoutRef<"ul">) {
-  return (
-    <ul
-      className="mt-5 flex list-disc flex-col gap-2 pl-6 text-base leading-[1.8] text-[var(--color-ink-700)] marker:text-[var(--color-ink-900)]"
-      {...rest}
-    >
-      {children}
-    </ul>
-  );
-}
-
-function Ol({ children, ...rest }: ComponentPropsWithoutRef<"ol">) {
-  return (
-    <ol
-      className="mt-5 flex list-decimal flex-col gap-2 pl-6 text-base leading-[1.8] text-[var(--color-ink-700)] marker:font-bold marker:text-[var(--color-ink-900)]"
-      {...rest}
-    >
-      {children}
-    </ol>
-  );
-}
+// Ul·Ol — client 모듈 (MdxBodyElements.MdxUl/MdxOl) 로 분리. 룰 13 mdx reveal 적용.
 
 function Li({ children, ...rest }: ComponentPropsWithoutRef<"li">) {
   return (
@@ -251,12 +223,24 @@ function Li({ children, ...rest }: ComponentPropsWithoutRef<"li">) {
 
 // Table·Thead·Tr 는 client API (motion·useInView·context) 활용 위해 MdxTableElements.tsx 로 분리.
 
+/**
+ * 룰 11 표 정렬 글로벌:
+ *  - 텍스트 (제목·라벨) → left
+ *  - 숫자 (가격·비율·건수·인수) → right (tabular-nums)
+ *  - 결과·태그·뱃지·날짜·회차 → center
+ *  - thead 정렬 = tbody 셀 정렬 동일
+ *
+ * 룰 14-B Typography:
+ *  - thead = caption 600 ink-700 uppercase
+ *  - tbody td 텍스트 = body-sm 400 ink-700
+ *  - tbody td 숫자 = body-sm 500 ink-900 tabular-nums
+ */
 function Th({ children, ...rest }: ComponentPropsWithoutRef<"th">) {
   const text = extractText(children).trim();
   const cls = thHeaderClass(text);
   return (
     <th
-      className={`border-b border-[var(--color-border)] px-4 py-3 text-xs font-bold uppercase tracking-wider text-[var(--color-ink-500)] ${cls}`}
+      className={`border-b border-[var(--color-border)] px-4 py-3 text-[length:var(--text-caption)] font-semibold uppercase tracking-wider text-[var(--color-ink-700)] ${cls}`}
       {...rest}
     >
       {children}
@@ -265,10 +249,10 @@ function Th({ children, ...rest }: ComponentPropsWithoutRef<"th">) {
 }
 
 function thHeaderClass(text: string): string {
-  if (/^(채권금액|보증금|최저가|감정가|평균|매도가|매각가|낙찰가|취득세|법무사|예상)/.test(text)) {
+  if (/^(채권금액|보증금|최저가|감정가|평균|매도가|매각가|낙찰가|취득세|법무사|예상|건수|입찰인수|매각가율|비율)/.test(text)) {
     return "text-right whitespace-nowrap";
   }
-  if (/^(회차|매각기일|비율|접수일|대항력|기간)$/.test(text)) {
+  if (/^(회차|매각기일|접수일|대항력|기간|결과|소멸\s*여부|구분)$/.test(text)) {
     return "text-center whitespace-nowrap";
   }
   return "text-left";
@@ -276,10 +260,15 @@ function thHeaderClass(text: string): string {
 
 function Td({ children, ...rest }: ComponentPropsWithoutRef<"td">) {
   const text = extractText(children).trim();
-  const cls = tdContentClass(text);
+  const align = detectTdAlign(text);
+  const isNumber = align.kind === "number";
   return (
     <td
-      className={`border-b border-[var(--color-border)] px-4 py-3 align-top text-sm leading-6 text-[var(--color-ink-700)] ${cls}`}
+      className={`border-b border-[var(--color-border)] px-4 py-3 align-top text-[length:var(--text-body-sm)] leading-6 ${
+        isNumber
+          ? "font-medium text-[var(--color-ink-900)]"
+          : "text-[var(--color-ink-700)]"
+      } ${align.cls}`}
       {...rest}
     >
       {children}
@@ -287,31 +276,40 @@ function Td({ children, ...rest }: ComponentPropsWithoutRef<"td">) {
   );
 }
 
-function tdContentClass(text: string): string {
-  if (!text) return "";
+function detectTdAlign(text: string): { kind: "text" | "number" | "tag"; cls: string } {
+  if (!text) return { kind: "text", cls: "" };
+  // 회차 ("1차"·"2차") → center
   if (/^\d+차$/.test(text)) {
-    return "text-center whitespace-nowrap font-medium";
+    return { kind: "tag", cls: "text-center whitespace-nowrap font-medium" };
   }
+  // 날짜 (yyyy-mm-dd) → center
   if (/^\d{4}-\d{2}(-\d{2})?$/.test(text)) {
-    return "whitespace-nowrap";
+    return { kind: "tag", cls: "text-center whitespace-nowrap tabular-nums" };
   }
+  // % 비율 → right
   if (/^[\d.,]+\s*%$/.test(text)) {
-    return "text-right tabular-nums whitespace-nowrap";
+    return { kind: "number", cls: "text-right tabular-nums whitespace-nowrap" };
   }
+  // 가격 (원·만원·억) → right
   if (
     /^[\d,.\s]+(원|만원?|억(?:\s*[\d,]+만(?:원)?)?)$/.test(text) ||
     /^\d+억(\s*[\d,]+만(?:원)?)?$/.test(text)
   ) {
-    return "text-right tabular-nums whitespace-nowrap";
+    return { kind: "number", cls: "text-right tabular-nums whitespace-nowrap" };
   }
+  // 건수·명·평·㎡·회 → right
+  if (/^[\d.,]+\s*(건|명|평|㎡|회|개)$/.test(text)) {
+    return { kind: "number", cls: "text-right tabular-nums whitespace-nowrap" };
+  }
+  // 결과·태그 → center
   if (
-    /^(있음|없음|유찰|매각|소멸|인수|미상|진행|예정|변경|신청|미신청|—)$/.test(
+    /^(있음|없음|유찰|매각|소멸|인수|미상|진행|예정|변경|신청|미신청|—|낙찰|미납)$/.test(
       text
     )
   ) {
-    return "text-center whitespace-nowrap";
+    return { kind: "tag", cls: "text-center whitespace-nowrap" };
   }
-  return "";
+  return { kind: "text", cls: "" };
 }
 
 function Blockquote({
@@ -454,13 +452,13 @@ export function buildAnalysisMdxComponents(
     h1: H1,
     h2: buildH2(meta ?? null, fmSafe),
     h3: H3,
-    p: P,
+    p: MdxP,
     strong: Strong,
     em: Em,
     del: PassThrough,
     s: PassThrough,
-    ul: Ul,
-    ol: Ol,
+    ul: MdxUl,
+    ol: MdxOl,
     li: Li,
     table: MdxTable,
     thead: MdxThead,
