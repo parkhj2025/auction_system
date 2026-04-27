@@ -1,27 +1,27 @@
 "use client";
 
 /**
- * 단계 5-4-2-fix-2 Phase 1 — mdx 표 클라이언트 요소.
+ * 단계 5-4-2-fix-3 룰 4 — mdx 표 클라이언트 요소 (CSS nth-child stagger 패턴).
  *
- * mdx-components.tsx 가 server component 이므로 motion / useContext / useInView 활용 위해
+ * mdx-components.tsx 가 server component 이므로 motion / useInView / context 활용 위해
  * Table / Thead / Tr 만 별도 client 모듈로 분리.
  *
- * 시각 위계 (단계 5-4-2-fix-2):
+ * 시각 위계 (단계 5-4-2-fix-2 룰 유지):
  *  - 진행 회차 / 말소기준 → bg-ink-50 + font-bold + text-ink-900 (strong)
  *  - 인수 → bg-ink-100 + font-bold (강조)
  *  - 유찰 / 매각 / 미납 (과거) → opacity-60 + text-ink-500 (weak)
  *  - hover → bg-ink-50 transition-colors duration-200
  *
- * 스크롤 reveal:
- *  - 헤더 행 (thead 자식 tr) 즉시 노출
- *  - 본문 행 (tbody 자식 tr) viewport 진입 시 fade-in (opacity 0→1, x: -8 → 0)
+ * 스크롤 reveal (룰 4 + 룰 1 once: false):
+ *  - MdxTable 자체 useInView (once: false)
+ *  - 진입 시 .mdx-table-revealed 클래스 토글 → CSS nth-child stagger 발동
+ *  - tbody tr 들이 80~120ms 간격으로 fade-in (07 체크포인트 패턴 동등)
+ *  - 위·아래 스크롤 재실행 — viewport 밖 → 들어옴 시 stagger 재발동
  */
 
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
-import { createContext, useContext, useRef } from "react";
-import { motion, useInView } from "motion/react";
-
-const TheadContext = createContext<boolean>(false);
+import { useRef } from "react";
+import { useInView } from "motion/react";
 
 function extractText(children: ReactNode): string {
   if (children == null || children === false || children === true) return "";
@@ -43,8 +43,14 @@ export function MdxTable({
   children,
   ...rest
 }: ComponentPropsWithoutRef<"table">) {
+  const ref = useRef<HTMLDivElement>(null);
+  // 룰 1 (단계 5-4-2-fix-3): once: false — 위·아래 스크롤 시 stagger 재실행
+  const isInView = useInView(ref, { once: false, amount: 0.2 });
   return (
-    <div className="mt-6 overflow-x-auto">
+    <div
+      ref={ref}
+      className={`mt-6 overflow-x-auto mdx-table-wrapper ${isInView ? "mdx-table-revealed" : ""}`}
+    >
       <table
         className="w-full min-w-[36rem] border-collapse text-sm tabular-nums"
         {...rest}
@@ -60,11 +66,9 @@ export function MdxThead({
   ...rest
 }: ComponentPropsWithoutRef<"thead">) {
   return (
-    <TheadContext.Provider value={true}>
-      <thead className="bg-[var(--color-surface-muted)]" {...rest}>
-        {children}
-      </thead>
-    </TheadContext.Provider>
+    <thead className="bg-[var(--color-surface-muted)]" {...rest}>
+      {children}
+    </thead>
   );
 }
 
@@ -110,32 +114,11 @@ export function MdxTr({
 }: ComponentPropsWithoutRef<"tr">) {
   const text = extractText(children);
   const tone = detectRowToneClass(text);
-  const isHeader = useContext(TheadContext);
-  const rowRef = useRef<HTMLTableRowElement>(null);
-  const isInView = useInView(rowRef, { once: true, amount: 0.3 });
-
   const cls = `${tone.bgCls} ${tone.weightCls} ${tone.textCls} transition-colors duration-200 hover:bg-[var(--color-ink-50)]`;
-
-  if (isHeader) {
-    return (
-      <tr className={cls} {...rest}>
-        {children}
-      </tr>
-    );
-  }
-
-  const { id } = rest;
-
+  // 룰 4 — motion.tr 폐기. CSS nth-child stagger (globals.css `.mdx-table-revealed tbody tr:nth-child(N)`) 활용.
   return (
-    <motion.tr
-      ref={rowRef}
-      id={id}
-      className={cls}
-      initial={{ opacity: 0, x: -8 }}
-      animate={isInView ? { opacity: 1, x: 0 } : { opacity: 0, x: -8 }}
-      transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-    >
+    <tr className={cls} {...rest}>
       {children}
-    </motion.tr>
+    </tr>
   );
 }

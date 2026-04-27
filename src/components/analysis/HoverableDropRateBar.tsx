@@ -32,6 +32,7 @@ export function HoverableDropRateBar({
   appraisalLabel,
 }: DropRateBarProps) {
   const ref = useRef<HTMLDivElement>(null);
+  // once: true 사유: count-up 숫자 카운트 + fill bar line draw 1회 진행 본질 (룰 1 예외)
   const inView = useInView(ref, { once: true, amount: 0.4 });
   const dropRate = computeDropRate(appraisal, minPrice);
   const animatedDrop = useCountUp(dropRate, inView, 600, 600);

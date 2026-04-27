@@ -60,7 +60,8 @@ export function ScenarioComparisonBox({
   onActiveKeyChange,
 }: ScenarioComparisonBoxProps) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.2 });
+  // 룰 1 (단계 5-4-2-fix-3): once: false — 위·아래 스크롤 재실행 의무
+  const inView = useInView(ref, { once: false, amount: 0.2 });
   const [internalActiveKey, setInternalActiveKey] = useState<ScenarioKey | null>(null);
   const [internalBiddingPercent, setInternalBiddingPercent] = useState<number>(0);
   const activeKey = activeKeyProp !== undefined ? activeKeyProp : internalActiveKey;

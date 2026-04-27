@@ -14,7 +14,8 @@ import type { ReactNode } from "react";
 
 export function CheckpointList({ children }: { children?: ReactNode }) {
   const ref = useRef<HTMLDivElement>(null);
-  const isInView = useInView(ref, { once: true, amount: 0.2 });
+  // 룰 1 (단계 5-4-2-fix-3): once: false — 위·아래 스크롤 시 stagger 재실행
+  const isInView = useInView(ref, { once: false, amount: 0.2 });
 
   return (
     <div

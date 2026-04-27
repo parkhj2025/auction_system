@@ -31,7 +31,8 @@ export function SaleAreaSummary({
   percent: number;
 }) {
   const ref = useRef<HTMLDivElement>(null);
-  const inView = useInView(ref, { once: true, amount: 0.3 });
+  // 룰 1 (단계 5-4-2-fix-3): once: false — 위·아래 스크롤 재실행 의무
+  const inView = useInView(ref, { once: false, amount: 0.3 });
 
   const saleAvg = market.sale_avg ?? 0;
   const saleCount = market.sale_count ?? 0;

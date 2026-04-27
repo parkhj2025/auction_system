@@ -298,6 +298,28 @@ body {
 @keyframes checkpoint-stagger-in {
   to { opacity: 1; transform: translateX(0); }
 }
+/* 단계 5-4-2-fix-3 룰 4 — mdx 표 tbody tr CSS nth-child stagger.
+ * MdxTable container 가 viewport 진입 시 .mdx-table-revealed 클래스 추가.
+ * tbody tr 들이 80~120ms 간격으로 fade-in (07 체크포인트 패턴 동등).
+ * thead tr 즉시 노출. 룰 1 once: false 적용 — viewport 재진입 시 재발동. */
+.mdx-table-wrapper tbody tr {
+  opacity: 0;
+  transform: translateX(-8px);
+}
+.mdx-table-wrapper.mdx-table-revealed tbody tr {
+  animation: mdx-tr-stagger-in 400ms cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+.mdx-table-wrapper.mdx-table-revealed tbody tr:nth-child(1) { animation-delay: 50ms; }
+.mdx-table-wrapper.mdx-table-revealed tbody tr:nth-child(2) { animation-delay: 150ms; }
+.mdx-table-wrapper.mdx-table-revealed tbody tr:nth-child(3) { animation-delay: 250ms; }
+.mdx-table-wrapper.mdx-table-revealed tbody tr:nth-child(4) { animation-delay: 350ms; }
+.mdx-table-wrapper.mdx-table-revealed tbody tr:nth-child(5) { animation-delay: 450ms; }
+.mdx-table-wrapper.mdx-table-revealed tbody tr:nth-child(6) { animation-delay: 550ms; }
+.mdx-table-wrapper.mdx-table-revealed tbody tr:nth-child(7) { animation-delay: 650ms; }
+.mdx-table-wrapper.mdx-table-revealed tbody tr:nth-child(n+8) { animation-delay: 750ms; }
+@keyframes mdx-tr-stagger-in {
+  to { opacity: 1; transform: translateX(0); }
+}
 /*
   ---break---
 */
