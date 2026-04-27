@@ -4,6 +4,7 @@ import type { ReactNode } from "react";
 import type { AnalysisFrontmatter } from "@/types/content";
 import { formatKoreanWon } from "@/lib/utils";
 import { HeroGallery } from "./HeroGallery";
+import { HoverableDropRateBar } from "./HoverableDropRateBar";
 
 /**
  * 분석 상세 Hero (G1 보강).
@@ -91,8 +92,10 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
           <DominantStat
             label={`${fm.round}차 최저가`}
             value={fm.minPriceDisplay ?? formatKoreanWon(fm.minPrice)}
+            appraisal={fm.appraisal}
+            minPrice={fm.minPrice}
             percentOfAppraisal={fm.percent}
-            dropRate={computeDropRate(fm.appraisal, fm.minPrice)}
+            appraisalDisplay={fm.appraisalDisplay}
           />
           <div className="grid grid-cols-3 gap-px bg-[var(--color-border)]">
             <Stat
@@ -124,18 +127,22 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
   );
 }
 
-/** 단계 5-2 #2: Hero dominant stat — 최저가 + 감정가 대비 하락률.
- *  text-numeric-dominant (48px) + brand-600 fill 로 시각 무게 1순위. */
+/** 단계 5-4-2: Hero DominantStat + HoverableDropRateBar 통합 (Show-and-Play 본질).
+ *  단계 5-2 dominant 구조 보존 + DropRateBar 가 −30% 칩을 다이어그램 안에 통합. */
 function DominantStat({
   label,
   value,
+  appraisal,
+  minPrice,
   percentOfAppraisal,
-  dropRate,
+  appraisalDisplay,
 }: {
   label: string;
   value: string;
+  appraisal: number;
+  minPrice: number;
   percentOfAppraisal: number;
-  dropRate: number;
+  appraisalDisplay?: string;
 }) {
   return (
     <div className="flex flex-col gap-2 bg-[var(--color-brand-600)] p-6 text-white sm:p-8">
@@ -146,16 +153,16 @@ function DominantStat({
         <p className="text-[2.25rem] font-black leading-none tabular-nums tracking-tight sm:text-[3rem]">
           {value}
         </p>
-        {dropRate > 0 ? (
-          <p className="flex items-baseline gap-2 text-sm font-medium text-white/85 sm:text-base">
-            <span className="tabular-nums">감정가의 {percentOfAppraisal}%</span>
-            <span aria-hidden="true">·</span>
-            <span className="rounded-[var(--radius-xs)] bg-white/15 px-2 py-0.5 font-bold tabular-nums">
-              −{dropRate}%
-            </span>
-          </p>
-        ) : null}
+        <p className="text-sm font-medium tabular-nums text-white/85 sm:text-base">
+          감정가의 {percentOfAppraisal}%
+        </p>
       </div>
+      <HoverableDropRateBar
+        appraisal={appraisal}
+        minPrice={minPrice}
+        percent={percentOfAppraisal}
+        appraisalLabel={appraisalDisplay}
+      />
     </div>
   );
 }
@@ -191,13 +198,7 @@ function computeDeposit(minPrice: number): number {
   return Math.round(minPrice * 0.1);
 }
 
-/** 단계 5-2 #2: 감정가 대비 최저가 하락률 % (정수 반올림).
- *  example: appraisal=178000000, minPrice=124600000 → 30 (= -30%) */
-function computeDropRate(appraisal: number, minPrice: number): number {
-  if (!appraisal || !minPrice) return 0;
-  const rate = ((appraisal - minPrice) / appraisal) * 100;
-  return Math.round(rate);
-}
+// 단계 5-4-2: computeDropRate 는 HoverableDropRateBar 컴포넌트로 이동.
 
 function formatDay(yyyyMmDd: string): string {
   if (!yyyyMmDd) return "";

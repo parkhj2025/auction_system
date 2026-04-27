@@ -534,6 +534,7 @@ Phase 2 (목표)
 
 ### 코드 컨벤션
 
+- **신규 라이브러리 추가 정책 (단계 5-4-2 변경)**: shadcn Dialog + **`motion` (구 framer-motion) 외 신규 라이브러리 추가 금지**. motion 도입 사유 — Phase 7 시각화 본질 (Animated Transition + Show-and-Play / Side-by-Side Sticky 의 useScroll·useTransform·useSpring·useInView·AnimatePresence) 충족 위한 도입. 단계 5-4-1 의 native IntersectionObserver + RAF 만으로는 03 권리분석 node-link morph + 05 시나리오 슬라이더 실시간 재계산 정교 구현 어려움 실증.
 - **날짜·시간**: 서버 사이드 날짜/시간 생성 시 반드시 `src/lib/datetime.ts` 유틸 사용. `new Date().toISOString()` 직접 호출 금지. 모든 날짜 처리는 Asia/Seoul 기준. (Vercel 서버는 UTC라 한국 새벽 0~9시 KST 시각이 전날로 기록되는 버그 발생)
 - **PDF 생성 검증 (서버 PDFKit 단일 소스)**: 위임장 PDF 생성 코드(`src/lib/pdf/delegation.ts`) 수정 시 **서버 PDFKit 스모크 PASS 후 커밋**. 절차: `pnpm dlx tsx scripts/gen-sample-delegation.ts` 실행 → `node scripts/verify-pdf-text.mjs` 1페이지 + 한글 + 도메인 키워드 검증. 클라이언트 PDF 생성은 폐기됨 (Phase 6.5-POST-FIX, 2026-04-19) — 미리보기는 `/api/preview-delegation` 서버 호출로 일원화.
 

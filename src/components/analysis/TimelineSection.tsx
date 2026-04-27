@@ -1,17 +1,20 @@
-import type { BiddingHistoryEntry } from "@/types/content";
-import { formatKoreanWon } from "@/lib/utils";
+"use client";
 
 /**
- * 02 입찰 경과 — vertical timeline.
- *  - 유찰 → ink-300 (neutral)
- *  - 매각 → success
- *  - 미납 → warning
- *  - 진행 → brand-600 + "▶ 진행" chip (현재 회차)
- *  - 그 외 (변경 등) → ink-500 단색 표기
+ * 02 입찰 경과 — 단계 5-4-2 Side-by-Side Sticky + Graphic Sequence.
  *
- * voice_guide §5-4 사실 신호 어휘만 — "위험·매력·교훈·함정" 0건.
- * meta.bidding.history 누락 시 0 렌더 (mdx body 표가 fallback — 단계 3-1 baseline).
+ * 단계 5-4-2 변경:
+ *  - 단계 3-3 정적 timeline 폐기 → SideBySideSticky 안에 BiddingTimeline 배치
+ *  - 좌측 narrative step 별 우측 graphic active idx 변화 (Graphic Sequence)
+ *  - 모바일 stack fallback (graphic top + steps 아래)
+ *
+ * case study 인용: scrollytelling Layout Pattern 1 + Graphic Sequence + chart-visualization line/funnel.
  */
+import type { BiddingHistoryEntry } from "@/types/content";
+import { SideBySideSticky } from "./SideBySideSticky";
+import { BiddingTimeline } from "./BiddingTimeline";
+import { formatKoreanWon } from "@/lib/utils";
+
 export function TimelineSection({
   history,
 }: {
@@ -19,94 +22,70 @@ export function TimelineSection({
 }) {
   if (!history || history.length === 0) return null;
 
+  const steps = history.map((entry, idx) => ({
+    id: `bidding-step-${idx}`,
+    body: (
+      <div>
+        <h3 className="text-base font-black text-[var(--color-ink-900)] sm:text-lg">
+          {entry.round}차 매각
+        </h3>
+        <p className="mt-2 text-sm leading-6 text-[var(--color-ink-700)]">
+          <span className="font-bold tabular-nums">{entry.date}</span>
+          {entry.rate != null ? (
+            <>
+              {" · 감정가의 "}
+              <span className="font-bold tabular-nums">{entry.rate}%</span>
+              {" 진입선 "}
+              <span className="font-bold tabular-nums">
+                {entry.minimum != null
+                  ? formatKoreanWon(entry.minimum)
+                  : "—"}
+              </span>
+            </>
+          ) : null}
+        </p>
+        <p className="mt-3 text-sm leading-6 text-[var(--color-ink-500)]">
+          {resolveStepNarrative(entry, idx, history)}
+        </p>
+      </div>
+    ),
+  }));
+
   return (
-    <div className="mt-6">
-      <ol className="relative space-y-5 pl-6">
-        {/* vertical line — 좌측 inset */}
-        <span
-          aria-hidden="true"
-          className="absolute left-2 top-2 bottom-2 w-px bg-[var(--color-border)]"
-        />
-        {history.map((entry, idx) => {
-          const tone = resolveTone(entry.result);
-          const isLast = idx === history.length - 1;
-          return (
-            <li key={`${entry.round}-${idx}`} className="relative">
-              {/* dot */}
-              <span
-                aria-hidden="true"
-                className={`absolute -left-[18px] top-1.5 inline-flex h-3 w-3 items-center justify-center rounded-full ring-4 ring-white ${tone.dotCls}`}
-              />
-              <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
-                <span className="text-sm font-black tabular-nums text-[var(--color-ink-900)]">
-                  {entry.round != null ? `${entry.round}차` : "—"}
-                </span>
-                <span className="text-sm tabular-nums text-[var(--color-ink-500)]">
-                  {entry.date || "—"}
-                </span>
-                <span className="text-sm font-bold tabular-nums text-[var(--color-ink-900)]">
-                  {entry.minimum != null ? formatKoreanWon(entry.minimum) : "—"}
-                </span>
-                {entry.rate != null ? (
-                  <span className="text-xs tabular-nums text-[var(--color-ink-500)]">
-                    {entry.rate}%
-                  </span>
-                ) : null}
-                <span
-                  className={`ml-auto inline-flex items-center rounded-[var(--radius-xs)] px-2 py-0.5 text-xs font-bold ${tone.chipCls}`}
-                >
-                  {isLast && tone.label === "진행" ? "▶ 진행" : tone.label}
-                </span>
-              </div>
-            </li>
-          );
-        })}
-      </ol>
-    </div>
+    <SideBySideSticky
+      steps={steps}
+      graphic={(activeIdx) => (
+        <BiddingTimeline history={history} activeIdx={activeIdx} />
+      )}
+      mobileGraphicPosition="top"
+    />
   );
 }
 
-function resolveTone(result: string): {
-  label: string;
-  dotCls: string;
-  chipCls: string;
-} {
-  const r = (result ?? "").trim();
-  if (r.includes("매각")) {
-    return {
-      label: "매각",
-      dotCls: "bg-[var(--color-success)]",
-      chipCls:
-        "bg-[var(--color-success-soft)] text-[var(--color-success)]",
-    };
+function resolveStepNarrative(
+  entry: BiddingHistoryEntry,
+  idx: number,
+  history: BiddingHistoryEntry[]
+): string {
+  const result = (entry.result ?? "").trim();
+  if (result.includes("유찰")) {
+    return "응찰자 부재로 유찰. 다음 회차에서 30% 저감 후 재진행.";
   }
-  if (r.includes("미납")) {
-    return {
-      label: "미납",
-      dotCls: "bg-[var(--color-warning)]",
-      chipCls:
-        "bg-[var(--color-warning-soft)] text-[var(--color-warning)]",
-    };
+  if (result.includes("매각")) {
+    return "낙찰자 결정. 잔금 납부·소유권 이전 절차 진입.";
   }
-  if (r.includes("진행") || r === "") {
-    return {
-      label: "진행",
-      dotCls: "bg-[var(--color-brand-600)]",
-      chipCls: "bg-[var(--color-brand-50)] text-[var(--color-brand-700)]",
-    };
+  if (result.includes("미납")) {
+    return "낙찰자 잔금 미납. 다음 회차에서 재매각.";
   }
-  if (r.includes("유찰")) {
-    return {
-      label: "유찰",
-      dotCls: "bg-[var(--color-ink-300)]",
-      chipCls:
-        "bg-[var(--color-surface-muted)] text-[var(--color-ink-500)]",
-    };
+  if (result.includes("진행") || result === "") {
+    if (idx > 0 && history[idx - 1]) {
+      const prevRate = history[idx - 1].rate;
+      const currRate = entry.rate;
+      if (prevRate != null && currRate != null) {
+        return `이전 회차 대비 ${prevRate - currRate}%p 인하된 가격. 응찰 시점.`;
+      }
+    }
+    return "현재 진행 예정 회차. 응찰 시점.";
   }
-  // 변경 등 기타
-  return {
-    label: r || "—",
-    dotCls: "bg-[var(--color-ink-300)]",
-    chipCls: "bg-[var(--color-surface-muted)] text-[var(--color-ink-500)]",
-  };
+  return result || "회차 정보";
 }

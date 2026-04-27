@@ -215,12 +215,22 @@ body {
   }
 }
 
-/* prefers-reduced-motion 대응: 모션 토큰을 0에 가깝게 */
+/* 단계 5-4-2: prefers-reduced-motion 글로벌 룰.
+ * ui-ux-pro-max#reduced-motion + web-design-guidelines#reduced-motion 정합.
+ * scroll-triggered Side-by-Side Sticky · Animated Transition · Show-and-Play 모두 즉시 최종 상태 fallback. */
 @media (prefers-reduced-motion: reduce) {
   :root {
     --duration-fast: 0.01ms;
     --duration-base: 0.01ms;
     --duration-slow: 0.01ms;
+  }
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }
 

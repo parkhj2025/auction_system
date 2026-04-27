@@ -10,9 +10,9 @@ import { Section05Investment } from "./sections/Section05Investment";
 import { Section06SaleHistory } from "./sections/Section06SaleHistory";
 import { Section07Opinion } from "./sections/Section07Opinion";
 import { TimelineSection } from "./TimelineSection";
-import { RightsCallout } from "./RightsCallout";
+import { RightsAnalysisSection } from "./RightsAnalysisSection";
 import { MarketCompareCard } from "./MarketCompareCard";
-import { ScenarioCardsBoard } from "./ScenarioCardsBoard";
+import { ScenarioComparisonBox } from "./ScenarioComparisonBox";
 import { PropertyOverviewCard } from "./PropertyOverviewCard";
 
 /**
@@ -80,7 +80,7 @@ function buildH2(
           return (
             <>
               <Section03Rights title={title} />
-              {meta?.rights ? <RightsCallout rights={meta.rights} /> : null}
+              {meta?.rights ? <RightsAnalysisSection rights={meta.rights} /> : null}
             </>
           );
         case "04":
@@ -103,7 +103,11 @@ function buildH2(
             <>
               <Section05Investment title={title} />
               {meta?.investment ? (
-                <ScenarioCardsBoard inv={meta.investment} />
+                <ScenarioComparisonBox
+                  investment={meta.investment}
+                  appraisal={fm.appraisal}
+                  minPrice={fm.minPrice}
+                />
               ) : null}
             </>
           );

@@ -18,7 +18,7 @@
     "exclusive_area_m2": 40.55,
     "exclusive_area_pyeong": 12.27,
     "land_area_m2": 6.6205,
-    "land_area_pyeong": 2.00
+    "land_area_pyeong": 2
   },
   "price": {
     "appraisal": 178000000,
@@ -37,25 +37,57 @@
     "price_badge": "최저가 1억 2,460만원 (감정가 70%)"
   },
   "highlights": [
-    { "label": "최저가", "value": "1억 2,460만원 (감정가 70%)" },
-    { "label": "회차", "value": "2차 · 2026-05-29" },
-    { "label": "임차보증금 인수", "value": "1억 8,800만원 (HUG 말소동의 확약서 제출)" },
-    { "label": "본 단지 직전 실거래", "value": "약 1억 7,500만원 (2023-02 매매)" },
-    { "label": "역세권", "value": "수인분당선 숭의역 338m" }
+    {
+      "label": "최저가",
+      "value": "1억 2,460만원 (감정가 70%)"
+    },
+    {
+      "label": "회차",
+      "value": "2차 · 2026-05-29"
+    },
+    {
+      "label": "임차보증금 인수",
+      "value": "1억 8,800만원 (HUG 말소동의 확약서 제출)"
+    },
+    {
+      "label": "본 단지 직전 실거래",
+      "value": "약 1억 7,500만원 (2023-02 매매)"
+    },
+    {
+      "label": "역세권",
+      "value": "수인분당선 숭의역 338m"
+    }
   ],
   "card": {
     "title": "하모니 오피스텔 402호 — HUG 말소동의 확약서 제출 · 2차 최저가 1억 2,460만원",
     "summary": "하모니 오피스텔 402호 2차 매각. 최저가 1억 2,460만원(감정가 70%). 임차보증금 1억 8,800만원 인수 구조이나 주택도시보증공사가 말소동의 확약서를 제출. 외국인 임차인 점유 변수가 명도 단계의 검토 포인트입니다.",
     "cover_image": "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/0.webp",
     "tags": [
-      "경매", "인천경매", "중구경매", "신흥동경매",
-      "오피스텔경매", "경매입찰대리", "임차권등기", "HUG말소동의"
+      "경매",
+      "인천경매",
+      "중구경매",
+      "신흥동경매",
+      "오피스텔경매",
+      "경매입찰대리",
+      "임차권등기",
+      "HUG말소동의"
     ],
     "seo_tags": [
-      "경매", "경매입찰", "경매물건분석", "경매대리입찰",
-      "인천지방법원 경매", "인천 중구 경매", "신흥동 경매", "오피스텔 경매",
-      "임차권등기", "HUG 말소동의", "보증금 인수", "대항력",
-      "말소기준등기", "수인분당선 숭의역", "외국인 임차인"
+      "경매",
+      "경매입찰",
+      "경매물건분석",
+      "경매대리입찰",
+      "인천지방법원 경매",
+      "인천 중구 경매",
+      "신흥동 경매",
+      "오피스텔 경매",
+      "임차권등기",
+      "HUG 말소동의",
+      "보증금 인수",
+      "대항력",
+      "말소기준등기",
+      "수인분당선 숭의역",
+      "외국인 임차인"
     ]
   },
   "market_data": {
@@ -70,17 +102,69 @@
     "rent_avg_monthly": 580000,
     "rent_avg_deposit": 5850000,
     "complex_real_transactions": [
-      { "date": "2023-02", "count": 1, "avg": 175000000 },
-      { "date": "2022-11", "count": 2, "avg": 185000000 },
-      { "date": "2022-06", "count": 1, "avg": 180000000 },
-      { "date": "2021-07", "count": 1, "avg": 177000000 },
-      { "date": "2018-05", "count": 11, "avg": 172270000 }
+      {
+        "date": "2023-02",
+        "count": 1,
+        "avg": 175000000
+      },
+      {
+        "date": "2022-11",
+        "count": 2,
+        "avg": 185000000
+      },
+      {
+        "date": "2022-06",
+        "count": 1,
+        "avg": 180000000
+      },
+      {
+        "date": "2021-07",
+        "count": 1,
+        "avg": 177000000
+      },
+      {
+        "date": "2018-05",
+        "count": 11,
+        "avg": 172270000
+      }
     ],
     "auction_stats": [
-      { "period": "1개월", "count": 3, "avg_appraisal": 230000000, "avg_sale": 129664692, "avg_rate": 56.31, "avg_bidders": 3.33, "expected_sale": 100231801 },
-      { "period": "3개월", "count": 3, "avg_appraisal": 230000000, "avg_sale": 129664692, "avg_rate": 56.31, "avg_bidders": 3.33, "expected_sale": 100231801 },
-      { "period": "6개월", "count": 4, "avg_appraisal": 232500000, "avg_sale": 139723519, "avg_rate": 59.93, "avg_bidders": 2.75, "expected_sale": 106675400 },
-      { "period": "12개월", "count": 7, "avg_appraisal": 239571429, "avg_sale": 158424294, "avg_rate": 66.83, "avg_bidders": 2.71, "expected_sale": 118957400 }
+      {
+        "period": "1개월",
+        "count": 3,
+        "avg_appraisal": 230000000,
+        "avg_sale": 129664692,
+        "avg_rate": 56.31,
+        "avg_bidders": 3.33,
+        "expected_sale": 100231801
+      },
+      {
+        "period": "3개월",
+        "count": 3,
+        "avg_appraisal": 230000000,
+        "avg_sale": 129664692,
+        "avg_rate": 56.31,
+        "avg_bidders": 3.33,
+        "expected_sale": 100231801
+      },
+      {
+        "period": "6개월",
+        "count": 4,
+        "avg_appraisal": 232500000,
+        "avg_sale": 139723519,
+        "avg_rate": 59.93,
+        "avg_bidders": 2.75,
+        "expected_sale": 106675400
+      },
+      {
+        "period": "12개월",
+        "count": 7,
+        "avg_appraisal": 239571429,
+        "avg_sale": 158424294,
+        "avg_rate": 66.83,
+        "avg_bidders": 2.71,
+        "expected_sale": 118957400
+      }
     ]
   },
   "rights": {
@@ -94,10 +178,27 @@
     "non_extinct_rights_note": "을구 순위 3번 주택임차권등기 (HUG 말소동의 확약서 제출)"
   },
   "scenarios": {
-    "A_residence": { "self_capital": 133470000, "result": "본 단지 매매 평균 대비 4,153만원 할인 입주", "buyer_type": "실거주자" },
-    "B_short_sale": { "self_capital": 133470000, "after_tax_profit": 9350000, "buyer_type": "단기 회전" },
-    "C1_jeonse_gap": { "self_capital": 48470000, "result": "본 단지 매매 상승 시 자본이득", "buyer_type": "장기 보유" },
-    "C2_monthly_rent": { "self_capital": 127620000, "annual_yield": 5.5, "payback_years": 18.3, "buyer_type": "현금 유동성 확보" }
+    "A_residence": {
+      "self_capital": 133470000,
+      "result": "본 단지 매매 평균 대비 4,153만원 할인 입주",
+      "buyer_type": "실거주자"
+    },
+    "B_short_sale": {
+      "self_capital": 133470000,
+      "after_tax_profit": 9350000,
+      "buyer_type": "단기 회전"
+    },
+    "C1_jeonse_gap": {
+      "self_capital": 48470000,
+      "result": "본 단지 매매 상승 시 자본이득",
+      "buyer_type": "장기 보유"
+    },
+    "C2_monthly_rent": {
+      "self_capital": 127620000,
+      "annual_yield": 5.5,
+      "payback_years": 18.3,
+      "buyer_type": "현금 유동성 확보"
+    }
   },
   "photos": {
     "total": 12,
@@ -134,5 +235,88 @@
     "crawled_at": "2026-04-27T13:47:00"
   },
   "published_at": "2026-04-27T13:50:00+09:00",
-  "packaged_at": "2026-04-27T13:50:00+09:00"
+  "packaged_at": "2026-04-27T13:50:00+09:00",
+  "sections": {
+    "bidding": {
+      "history": [
+        {
+          "round": 1,
+          "date": "2026-04-23",
+          "minimum": 178000000,
+          "rate": 100,
+          "result": "유찰"
+        },
+        {
+          "round": 2,
+          "date": "2026-05-29",
+          "minimum": 124600000,
+          "rate": 70,
+          "result": "진행"
+        }
+      ]
+    },
+    "rights": {
+      "basis_type": "근저당권",
+      "basis_date": "2017-03",
+      "basis_holder": "근저당권자",
+      "total_claims": null,
+      "tenants": [
+        {
+          "name": "외국인 임차인 (마스킹)",
+          "move_in_date": "2024-08",
+          "deposit": 188000000,
+          "opposing_power": true,
+          "analysis": "대항력 보유. HUG 임차권 등기 + 보증보험 가입. 외국인(아시아계) 점유로 명도 시 통역·서류 협의 변수."
+        }
+      ]
+    },
+    "market": {
+      "sale_avg": 160990000,
+      "sale_count": 51,
+      "lease_avg": 85000000,
+      "lease_count": 4,
+      "rent_count": 16,
+      "byPeriod": {
+        "total": {
+          "rate": 70,
+          "count": 51
+        }
+      }
+    },
+    "investment": {
+      "real_acquisition_cost": 312600000,
+      "scenario_a": {
+        "label": "실거주 매입",
+        "self_capital_with_loan": 124600000,
+        "after_tax_profit": 0,
+        "holding_period_years": 5,
+        "risk_level": "low",
+        "summary": "낙찰가 1.246억 기준 실거주. 임차보증금 1.88억 인수 + 명도 후 이주 시점 결정."
+      },
+      "scenario_b": {
+        "label": "1년 이내 매도",
+        "self_capital_with_loan": 124600000,
+        "after_tax_profit": -50000000,
+        "holding_period_years": 1,
+        "risk_level": "high",
+        "summary": "단기 매도 양도세 77% (1년 미만). 시세 1.61억 매도 시 인수보증금·세금 후 손실 가능성."
+      },
+      "scenario_c1": {
+        "label": "전세 갭투자",
+        "self_capital_with_loan": 60000000,
+        "after_tax_profit": 80000000,
+        "holding_period_years": 3,
+        "risk_level": "mid",
+        "summary": "전세 1.0억 (전세가율 62%) 가정. 자기자본 약 6,000만원 + 시세 회복 대기."
+      },
+      "scenario_c2": {
+        "label": "월세 운용",
+        "self_capital_with_loan": 124600000,
+        "after_tax_profit": 30000000,
+        "holding_period_years": 5,
+        "risk_level": "mid",
+        "summary": "월세 60만원 (시세 평균 가정). 5년 보유 시 월세 누적 수익 + 시세 회복."
+      }
+    }
+  }
 }

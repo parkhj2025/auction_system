@@ -1,14 +1,19 @@
-import type { MarketMeta } from "@/types/content";
-import { formatKoreanWon } from "@/lib/utils";
+"use client";
 
 /**
- * 04 시세 비교 — 3 카드 grid.
- *  - 감정가 / 시세 평균 (강조 brand-50) / 회차 최저가
- *  - 한 줄 결론 callout 위쪽 노출 (사실 신호 — 비교 결과 수치만)
+ * 04 시세 비교 — 단계 5-4-2 callout + PriceScatter (Show-and-Play) + 3 카드 grid 보존.
+ *
+ * 단계 5-4-2 변경:
+ *  - PriceScatter 신규 통합 (1D scatter + 사용자 가격 입력)
+ *  - 모바일은 carousel 보다 input 만 활용 (PriceScatter 안 sm: hidden 처리)
+ *  - callout + 3 카드 grid 보존 (정보 손실 0)
  *
  * voice_guide §5-4 — "저평가·고평가·할인 추천" 판정 어휘 0.
- * 비교 결론 = 사실 비율 표기만.
  */
+import type { MarketMeta } from "@/types/content";
+import { formatKoreanWon } from "@/lib/utils";
+import { PriceScatter } from "./PriceScatter";
+
 export function MarketCompareCard({
   market,
   appraisal,
@@ -44,6 +49,13 @@ export function MarketCompareCard({
         ) : null}
         .
       </div>
+
+      <PriceScatter
+        appraisal={appraisal}
+        saleAvg={saleAvg}
+        minPrice={minPrice}
+        round={round}
+      />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
         <CompareCell label="감정가" value={formatKoreanWon(appraisal)} sub="기준가" />
