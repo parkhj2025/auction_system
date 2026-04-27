@@ -10,7 +10,7 @@
  *
  * voice_guide §5-4 — "저평가·고평가·할인 추천" 판정 어휘 0.
  */
-import type { MarketMeta } from "@/types/content";
+import type { MarketMeta, BiddingHistoryEntry } from "@/types/content";
 import { formatKoreanWon } from "@/lib/utils";
 import { PriceScatter } from "./PriceScatter";
 
@@ -20,12 +20,14 @@ export function MarketCompareCard({
   minPrice,
   round,
   percent,
+  bidding,
 }: {
   market: MarketMeta;
   appraisal: number;
   minPrice: number;
   round: number;
   percent: number;
+  bidding?: { history: BiddingHistoryEntry[] };
 }) {
   const saleAvg = market.sale_avg;
   const saleCount = market.sale_count;
@@ -55,6 +57,7 @@ export function MarketCompareCard({
         market={market}
         minPrice={minPrice}
         round={round}
+        history={bidding?.history ?? []}
       />
 
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">

@@ -97,6 +97,7 @@ function buildH2(
                   minPrice={fm.minPrice}
                   round={fm.round}
                   percent={fm.percent}
+                  bidding={meta.bidding}
                 />
               ) : null}
             </>
