@@ -8,12 +8,17 @@ import { HeroGallery } from "./HeroGallery";
 import { HoverableDropRateBar } from "./HoverableDropRateBar";
 
 /**
- * 분석 상세 Hero (G1 보강).
- *  - h1 위계 강화: text-4xl→text-6xl, font-extrabold, lead 의 1.5배 이상
- *  - 메타 라인: h1 직하 단일 행 inline (법원·사건·주소)
- *  - lead: text-base lg:text-lg ink-700, line-clamp-3 fallback
- *  - 단일 컬럼 (우측 photos column 폐기)
- *  - stat-grid 후 갤러리 strip 가로 4열 (Hero 본문 하부)
+ * 분석 상세 Hero — 단계 5-4-2-fix-7 룰 26 (영역 통합 정보 꾸러미).
+ *
+ * 통합 layout:
+ *  ┌ breadcrumbs · 사건 카테고리 칩 (페이지 최상단 보존)
+ *  ├ 다크 박스 (정보 꾸러미 1)
+ *  │   원형 56/48 + 우측 stack (제목·서브타이틀·가격·라벨·progress bar)
+ *  ├ 흰 배경 영역 (정보 꾸러미 2)
+ *  │   본문 산문 + border-t + stat-grid (분리 박스 X)
+ *  └ 사진 carousel (HeroGallery)
+ *
+ * a11y: h1 의미 마크업 보존 (다크 박스 안 위치). 시각 토큰은 Phase 3 (룰 24 정정)에서 h3.
  */
 export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
   const depositAmount = computeDeposit(fm.minPrice);
@@ -27,7 +32,7 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
         {/* Breadcrumb */}
         <nav
           aria-label="Breadcrumb"
-          className="flex items-center gap-1 text-xs font-medium text-[var(--color-ink-500)]"
+          className="flex items-center gap-1 text-[length:var(--text-caption)] font-medium text-[var(--color-ink-500)]"
         >
           <Link href="/" className="hover:text-[var(--color-ink-900)]">
             홈
@@ -48,7 +53,7 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
             {fm.tags.slice(0, 7).map((t) => (
               <span
                 key={t}
-                className="inline-flex h-6 items-center rounded-[var(--radius-xs)] bg-[var(--color-ink-100)] px-2 text-[11px] font-medium text-[var(--color-ink-700)]"
+                className="inline-flex h-6 items-center rounded-[var(--radius-xs)] bg-[var(--color-ink-100)] px-2 text-[length:var(--text-caption)] font-medium text-[var(--color-ink-700)]"
               >
                 {t}
               </span>
@@ -56,51 +61,18 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
           </div>
         ) : null}
 
-        {/* H1 — 룰 24-A·B (단계 5-4-2-fix-6): h1 토큰 + weight 600 (semibold). display 토큰 폐기. */}
-        <h1
-          id="detail-title"
-          className="mt-5 max-w-4xl text-[length:var(--text-h1)] font-semibold leading-[var(--lh-snug)] tracking-tight text-[var(--color-ink-900)]"
-        >
-          {fm.title}
-        </h1>
+        {/* 룰 26 — 다크 박스 (정보 꾸러미 1) */}
+        <DarkInfoCluster fm={fm} />
 
-        {/* Meta line — h1 직하 단일 행 (Tier 3 body 16 ink-500) */}
-        <p className="mt-4 flex flex-wrap items-center gap-x-2 gap-y-1 text-[length:var(--text-body-sm)] text-[var(--color-ink-500)]">
-          <span className="font-semibold text-[var(--color-ink-700)]">
-            {fm.court}
-            {fm.courtDivision ? ` ${fm.courtDivision}` : ""}
-          </span>
-          <span aria-hidden="true">·</span>
-          <span className="tabular-nums">사건 {fm.caseNumber}</span>
-          <span aria-hidden="true">·</span>
-          <span>{fm.address}</span>
-        </p>
-
-        {/* Lead (summary) — Tier 2 body-lg ink-700 */}
-        {fm.summary ? (
-          <p className="mt-3 max-w-3xl text-[length:var(--text-body)] leading-[var(--lh-relaxed)] text-[var(--color-ink-700)] line-clamp-3 lg:text-[length:var(--text-body-lg)]">
-            {fm.summary}
-          </p>
-        ) : null}
-
-        {/* 단계 5-2 #2: Hero stat — dominant + supporting 위계.
-         *  · dominant: {round}차 최저가 (Hero 의 핵심 결정 정보)
-         *    - text-numeric-dominant (48px)
-         *    - 감정가 대비 하락률 (computed) 표시
-         *  · supporting: 감정가 / 입찰보증금 / 입찰기일 (3-cell)
-         *  근거: frontend-design "dominant + sharp accents" + ui-ux-pro-max "primary-action" + visual-hierarchy. */}
-        <div className="mt-9 space-y-px overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-border)]">
-          <DominantStat
-            label={`${fm.round}차 최저가`}
-            value={fm.minPriceDisplay ?? formatKoreanWon(fm.minPrice)}
-            appraisal={fm.appraisal}
-            minPrice={fm.minPrice}
-            percentOfAppraisal={fm.percent}
-            appraisalDisplay={fm.appraisalDisplay}
-            thumbnail={fm.coverImage}
-            thumbnailAlt={`${fm.buildingName ?? fm.title} 대표 사진`}
-          />
-          <div className="grid grid-cols-3 gap-px bg-[var(--color-border)]">
+        {/* 룰 26 — 흰 배경 영역 (정보 꾸러미 2: 본문 산문 + stat-grid) */}
+        <div className="mt-8 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 sm:p-8">
+          {fm.summary ? (
+            <p className="max-w-3xl text-[length:var(--text-body)] leading-[var(--lh-relaxed)] text-[var(--color-ink-700)] line-clamp-3 lg:text-[length:var(--text-body-lg)]">
+              {fm.summary}
+            </p>
+          ) : null}
+          {/* border-t 약한 ink-200 + padding-top 24 (분리 박스 X) */}
+          <div className="mt-6 grid grid-cols-1 gap-px border-t border-[var(--color-ink-200)] bg-[var(--color-border)] pt-px sm:grid-cols-3">
             <Stat
               label="감정가"
               value={fm.appraisalDisplay ?? formatKoreanWon(fm.appraisal)}
@@ -120,7 +92,7 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
           </div>
         </div>
 
-        {/* 갤러리 strip — Hero 본문 하부 가로 4열 */}
+        {/* 갤러리 strip — Hero 본문 하부 carousel (룰 18 보존) */}
         <HeroGallery
           coverImage={fm.coverImage}
           alt={`${fm.buildingName ?? fm.title} 외관 대표 사진`}
@@ -130,66 +102,77 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
   );
 }
 
-/** 단계 5-4-2: Hero DominantStat + HoverableDropRateBar 통합 (Show-and-Play 본질).
- *  단계 5-2 dominant 구조 보존 + DropRateBar 가 −30% 칩을 다이어그램 안에 통합. */
-function DominantStat({
-  label,
-  value,
-  appraisal,
-  minPrice,
-  percentOfAppraisal,
-  appraisalDisplay,
-  thumbnail,
-  thumbnailAlt,
-}: {
-  label: string;
-  value: string;
-  appraisal: number;
-  minPrice: number;
-  percentOfAppraisal: number;
-  appraisalDisplay?: string;
-  thumbnail?: string;
-  thumbnailAlt?: string;
-}) {
+/**
+ * 룰 26-B — 다크 박스 안 통합 layout.
+ * 좌측 원형 + 우측 stack (제목·서브타이틀·가격·라벨·progress bar).
+ */
+function DarkInfoCluster({ fm }: { fm: AnalysisFrontmatter }) {
   return (
-    <div className="flex flex-col gap-3 bg-[var(--color-ink-900)] p-6 text-white sm:p-8">
-      {/* Tier 2 라벨 — body-lg 18 / 500 / white 70% */}
-      <p className="text-[length:var(--text-body-lg)] font-medium tracking-wide text-white/70">
-        {label}
-      </p>
-      {/* 룰 15-A: 좌측 48px (mobile) / 56px (sm+) 원형 썸네일 + 우측 가격 가로 layout (룰 24-A·B 동등 h1) */}
-      <div className="flex items-center gap-4">
-        {thumbnail ? (
-          <div
-            aria-hidden="true"
-            className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border-2 border-white/30 sm:h-14 sm:w-14"
+    <div className="mt-8 flex flex-col gap-5 rounded-[var(--radius-xl)] bg-[var(--color-ink-900)] p-6 text-white sm:flex-row sm:gap-6 sm:p-8">
+      {/* 좌측 원형 썸네일 */}
+      {fm.coverImage ? (
+        <div
+          aria-hidden="true"
+          className="relative h-12 w-12 shrink-0 overflow-hidden rounded-full border-2 border-white/30 sm:h-14 sm:w-14"
+        >
+          <Image
+            src={fm.coverImage}
+            alt={`${fm.buildingName ?? fm.title} 대표 사진`}
+            fill
+            sizes="56px"
+            className="object-cover"
+          />
+        </div>
+      ) : null}
+
+      {/* 우측 stack: 제목 + 서브타이틀 + 가격 + 라벨 + progress bar */}
+      <div className="flex min-w-0 flex-1 flex-col gap-4">
+        {/* 룰 24-C 정정 (Phase 3 적용 영역) — Tier 2 페이지 제목 h3 / 600 / white 90 */}
+        <div>
+          <h1
+            id="detail-title"
+            className="text-[length:var(--text-h3)] font-semibold leading-[var(--lh-snug)] tracking-tight text-white/90"
           >
-            <Image
-              src={thumbnail}
-              alt={thumbnailAlt ?? ""}
-              fill
-              sizes="56px"
-              className="object-cover"
-            />
-          </div>
-        ) : null}
-        <div className="flex flex-1 flex-wrap items-baseline gap-x-4 gap-y-1">
-          {/* Tier 1 가격 수치 — h1 40 (mobile auto h2 32) / 700 (bold) / white 100% / tabular-nums */}
-          <p className="text-[length:var(--text-h1)] font-bold leading-[var(--lh-tight)] tabular-nums tracking-tight text-white">
-            {value}
-          </p>
-          {/* Tier 2 % 라벨 — body-lg 18 / 500 / white 70% */}
-          <p className="text-[length:var(--text-body-lg)] font-medium tabular-nums text-white/70">
-            감정가의 {percentOfAppraisal}%
+            {fm.title}
+          </h1>
+          {/* Tier 3 서브타이틀 — body-sm / 400 / white 60 */}
+          <p className="mt-1 flex flex-wrap items-center gap-x-2 gap-y-1 text-[length:var(--text-body-sm)] text-white/60">
+            <span className="font-medium text-white/70">
+              {fm.court}
+              {fm.courtDivision ? ` ${fm.courtDivision}` : ""}
+            </span>
+            <span aria-hidden="true">·</span>
+            <span className="tabular-nums">사건 {fm.caseNumber}</span>
+            <span aria-hidden="true">·</span>
+            <span>{fm.address}</span>
           </p>
         </div>
+
+        {/* 가격 + 라벨 영역 */}
+        <div>
+          {/* Tier 2 "{round}차 최저가" 라벨 — body-lg / 500 / white 70 */}
+          <p className="text-[length:var(--text-body-lg)] font-medium tracking-wide text-white/70">
+            {fm.round}차 최저가
+          </p>
+          {/* Tier 1 가격 수치 — h2 / 700 / white 100 / tabular-nums */}
+          <div className="mt-1 flex flex-wrap items-baseline gap-x-4 gap-y-1">
+            <p className="text-[length:var(--text-h2)] font-bold leading-[var(--lh-tight)] tabular-nums tracking-tight text-white">
+              {fm.minPriceDisplay ?? formatKoreanWon(fm.minPrice)}
+            </p>
+            <p className="text-[length:var(--text-body-lg)] font-medium tabular-nums text-white/70">
+              감정가의 {fm.percent}%
+            </p>
+          </div>
+        </div>
+
+        {/* progress bar */}
+        <HoverableDropRateBar
+          appraisal={fm.appraisal}
+          minPrice={fm.minPrice}
+          percent={fm.percent}
+          appraisalLabel={fm.appraisalDisplay}
+        />
       </div>
-      <HoverableDropRateBar
-        appraisal={appraisal}
-        minPrice={minPrice}
-        percent={percentOfAppraisal}
-        appraisalLabel={appraisalDisplay}
-      />
     </div>
   );
 }
@@ -227,8 +210,6 @@ function Stat({
 function computeDeposit(minPrice: number): number {
   return Math.round(minPrice * 0.1);
 }
-
-// 단계 5-4-2: computeDropRate 는 HoverableDropRateBar 컴포넌트로 이동.
 
 function formatDay(yyyyMmDd: string): string {
   if (!yyyyMmDd) return "";
