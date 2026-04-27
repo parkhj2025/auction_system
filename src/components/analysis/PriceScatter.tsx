@@ -1,22 +1,25 @@
 "use client";
 
 /**
- * 04 시세 비교 — 단계 5-4-2-fix Phase 3: input 폐기 + 슬라이더 + 분포 강화.
+ * 04 시세 비교 — 단계 5-4-2-fix-2 Phase 2: 세로 막대 그래프 + 스크롤 reveal + 가로 라인.
  *
- * 변경 (형준님 본질 통찰):
- *  - input field "내 입찰가 시뮬레이션" 폐기 → 슬라이더 (drag 즉시 4번째 점 + 차이 % 재계산)
- *  - 분포 시각 강화: 시세 평균 ± 시세 중앙값 산포 폭 표시 (sale_avg vs sale_median) + sale_count 카운트 강조
- *  - 슬라이더 range: minPrice ~ appraisal (100만원 step / 키보드 arrow ±5%)
+ * 변경 (형준님 본질 통찰 — 우측 쏠림 1D scatter 폐기):
+ *  - 1D scatter 점 3개 폐기 → 세로 막대 3 (감정가·최저가·시세평균) 좌→우 배치
+ *  - 막대 fill: 감정가 ink-500 / 최저가 ink-900 / 시세평균 ink-700 (강조 차등)
+ *  - 막대 height = 가격 / max * container 영역
+ *  - 슬라이더 drag → 4번째 막대 (사용자 입력가, ink-900 dashed outline) 추가
  *
- * 시각 구조:
- *  - 수평 축선 (가격 0 → max)
- *  - 점 3개: 감정가 (ink-500) / 시세 평균 (ink-900) / 최저가 (ink-900 outline)
- *  - 시세 분포 영역: avg ~ median 사이 음영 (분포의 비대칭성 시각화)
- *  - 슬라이더 drag 시 4번째 점 (ink-900 dashed) + 차이 % 즉시 표시
+ * 스크롤 reveal 순서 (좌→우 / 아래→위):
+ *  - 0~25%: y축선 line draw (origin-bottom scaleY)
+ *  - 25~45%: 감정가 막대 grow (origin-bottom scaleY 0→1, 600ms ease-out)
+ *  - 45~65%: 최저가 막대 grow (delay 200ms)
+ *  - 65~85%: 시세평균 막대 grow (delay 400ms)
+ *  - 85~100%: 가로 dashed line (시세평균 끝점 → 감정가 막대 끝점) draw + 차이 % count-up
  *
+ * 모노톤: 감정가 ink-500 / 최저가 ink-900 / 시세평균 ink-700 / 사용자 ink-900 dashed.
  * 데이터 경계 (CLAUDE.md "가짜 데이터 금지"):
- *  - 개별 매물 51건의 가격 리스트는 raw-content 에 부재 → 정규분포 mock 시각화 안 함
- *  - sale_avg / sale_median / sale_count 만 활용 (실 데이터)
+ *  - sale_avg / sale_count / sale_median 만 활용 (실 데이터)
+ *  - 51건 개별 가격 mock 미생성
  */
 import { motion, useInView } from "motion/react";
 import { useRef, useState, useEffect } from "react";
@@ -30,145 +33,216 @@ interface PriceScatterProps {
   round: number;
 }
 
-export function PriceScatter({ appraisal, market, minPrice, round }: PriceScatterProps) {
+interface BarConfig {
+  key: string;
+  label: string;
+  value: number;
+  fillCls: string;
+  isAccent: boolean;
+}
+
+export function PriceScatter({
+  appraisal,
+  market,
+  minPrice,
+  round,
+}: PriceScatterProps) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.3 });
 
   const saleAvg = market.sale_avg ?? 0;
-  const saleMedian = market.sale_median ?? saleAvg;
   const saleCount = market.sale_count ?? 0;
-
-  const max = Math.max(appraisal, saleAvg, saleMedian, minPrice) * 1.05;
-  const pos = (v: number) => (v / max) * 100;
+  const max = Math.max(appraisal, saleAvg, minPrice) * 1.05;
 
   const dropFromAppraisal = Math.round(((appraisal - minPrice) / appraisal) * 100);
   const dropFromSaleAvg =
     saleAvg > 0 ? Math.round(((saleAvg - minPrice) / saleAvg) * 100) : 0;
-  const animatedDropAppraisal = useCountUp(dropFromAppraisal, inView, 600, 1500);
-  const animatedDropSaleAvg = useCountUp(dropFromSaleAvg, inView, 600, 1500);
+  const animatedDropAppraisal = useCountUp(dropFromAppraisal, inView, 600, 1700);
+  const animatedDropSaleAvg = useCountUp(dropFromSaleAvg, inView, 600, 1700);
 
-  // 슬라이더 (Show-and-Play 본질 — drag 즉시 4번째 점 + 차이 % 재계산)
   const [userPriceWon, setUserPriceWon] = useState<number>(minPrice);
   const userVsAppraisal = Math.round(((appraisal - userPriceWon) / appraisal) * 100);
   const userVsSaleAvg =
     saleAvg > 0 ? Math.round(((saleAvg - userPriceWon) / saleAvg) * 100) : 0;
 
-  // 분포 영역 — saleAvg ↔ saleMedian (비대칭성 시각)
-  const distMin = Math.min(saleAvg, saleMedian);
-  const distMax = Math.max(saleAvg, saleMedian);
+  // 막대 3 (또는 4 with user) — 좌→우 순서
+  const bars: BarConfig[] = [
+    {
+      key: "appraisal",
+      label: "감정가",
+      value: appraisal,
+      fillCls: "bg-[var(--color-ink-500)]",
+      isAccent: false,
+    },
+    {
+      key: "minPrice",
+      label: `${round}차 최저가`,
+      value: minPrice,
+      fillCls: "bg-[var(--color-ink-900)]",
+      isAccent: true,
+    },
+    ...(saleAvg > 0
+      ? [
+          {
+            key: "saleAvg",
+            label: "시세 평균",
+            value: saleAvg,
+            fillCls: "bg-[var(--color-ink-700)]",
+            isAccent: false,
+          } as BarConfig,
+        ]
+      : []),
+  ];
 
   return (
-    <div ref={ref} className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6">
-      <div className="flex items-center justify-between">
+    <div
+      ref={ref}
+      className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6"
+    >
+      <div className="flex items-baseline justify-between">
         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">
-          가격 분포
+          가격 비교
         </p>
         {saleCount > 0 ? (
           <p className="text-[11px] font-medium tabular-nums text-[var(--color-ink-500)]">
             인근 매물{" "}
             <span className="font-black text-[var(--color-ink-900)]">
               {saleCount}건
-            </span>
+            </span>{" "}
+            평균
           </p>
         ) : null}
       </div>
 
-      {/* scatter — sm+ 표시. 모바일은 슬라이더 + 결과 텍스트만 */}
-      <div className="relative mt-8 hidden h-32 w-full sm:block" role="img" aria-label="가격 비교 산점도">
-        {/* 축선 line draw */}
+      {/* 세로 막대 그래프 — desktop 전용. 모바일은 슬라이더 + 결과 텍스트만 */}
+      <div className="relative mt-6 hidden h-56 w-full sm:block" role="img" aria-label="가격 비교 세로 막대">
+        {/* y축 line draw (origin-bottom) */}
         <motion.span
           aria-hidden="true"
-          className="absolute left-0 right-0 top-1/2 h-px origin-left -translate-y-1/2 bg-[var(--color-border)]"
+          className="absolute bottom-0 left-0 top-0 w-px origin-bottom bg-[var(--color-border)]"
+          initial={{ scaleY: 0 }}
+          animate={inView ? { scaleY: 1 } : { scaleY: 0 }}
+          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        />
+        {/* x축 (baseline) line draw (origin-left) */}
+        <motion.span
+          aria-hidden="true"
+          className="absolute bottom-0 left-0 right-0 h-px origin-left bg-[var(--color-border)]"
           initial={{ scaleX: 0 }}
           animate={inView ? { scaleX: 1 } : { scaleX: 0 }}
-          transition={{ duration: 0.7, ease: [0.16, 1, 0.3, 1] }}
+          transition={{ duration: 0.5, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
         />
-        {/* 분포 영역 — saleAvg ↔ saleMedian 음영 */}
-        {saleCount > 0 && distMin !== distMax ? (
-          <motion.span
-            aria-hidden="true"
-            className="absolute top-1/2 h-3 -translate-y-1/2 origin-left rounded-full bg-[var(--color-ink-100)]"
-            style={{
-              left: `${pos(distMin)}%`,
-              width: `${pos(distMax) - pos(distMin)}%`,
-            }}
-            initial={{ scaleX: 0, opacity: 0 }}
-            animate={
-              inView ? { scaleX: 1, opacity: 1 } : { scaleX: 0, opacity: 0 }
-            }
-            transition={{ duration: 0.5, delay: 0.3, ease: [0.16, 1, 0.3, 1] }}
-          />
-        ) : null}
-        <ScatterPoint
-          leftPercent={pos(appraisal)}
-          size={10}
-          fillCls="bg-[var(--color-ink-500)]"
-          label="감정가"
-          valueLabel={formatKoreanWon(appraisal)}
-          labelPosition="top"
-          delay={0.4}
-          inView={inView}
+
+        {/* 가로 dashed line — 감정가 막대 끝 → 최저가 막대 끝 (감정가 - 최저가 차이 시각) */}
+        <motion.div
+          aria-hidden="true"
+          className="absolute left-[6%] right-[40%] origin-left border-t border-dashed border-[var(--color-ink-500)]"
+          style={{ bottom: `${(appraisal / max) * 100}%` }}
+          initial={{ scaleX: 0, opacity: 0 }}
+          animate={
+            inView ? { scaleX: 1, opacity: 0.5 } : { scaleX: 0, opacity: 0 }
+          }
+          transition={{ duration: 0.5, delay: 1.4, ease: [0.16, 1, 0.3, 1] }}
         />
-        <ScatterPoint
-          leftPercent={pos(saleAvg)}
-          size={14}
-          fillCls="bg-[var(--color-ink-900)]"
-          label="시세 평균"
-          valueLabel={formatKoreanWon(saleAvg)}
-          labelPosition="bottom"
-          delay={0.5}
-          inView={inView}
-        />
-        {saleMedian !== saleAvg && saleMedian > 0 ? (
-          <ScatterPoint
-            leftPercent={pos(saleMedian)}
-            size={10}
-            fillCls="bg-[var(--color-ink-700)]"
-            label="시세 중앙값"
-            valueLabel={formatKoreanWon(saleMedian)}
-            labelPosition="bottom"
-            delay={0.6}
-            inView={inView}
-            small
-          />
-        ) : null}
-        <ScatterPoint
-          leftPercent={pos(minPrice)}
-          size={16}
-          fillCls="border-2 border-[var(--color-ink-900)] bg-white"
-          label={`${round}차 최저가`}
-          valueLabel={formatKoreanWon(minPrice)}
-          labelPosition="top"
-          delay={0.7}
-          inView={inView}
-          accent
-        />
-        {/* 사용자 슬라이더 점 (Show-and-Play) */}
-        {userPriceWon >= minPrice && userPriceWon <= appraisal ? (
-          <motion.div
-            initial={{ opacity: 0, scale: 0 }}
-            animate={inView ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0 }}
-            transition={{ delay: 0.9, duration: 0.3 }}
-            className="absolute top-1/2 -translate-y-1/2"
-            style={{ left: `${pos(userPriceWon)}%` }}
-          >
-            <span
-              aria-hidden="true"
-              className="block h-4 w-4 -translate-x-1/2 rounded-full border-2 border-dashed border-[var(--color-ink-900)] bg-white"
-            />
-            <p className="absolute top-full mt-3 left-0 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold tabular-nums text-[var(--color-ink-900)]">
-              내 입찰가
-            </p>
-          </motion.div>
-        ) : null}
+
+        {/* 막대 3 — 좌→우 stagger */}
+        <div className="absolute inset-0 flex items-end justify-around gap-3 px-6">
+          {bars.map((bar, idx) => {
+            const heightPercent = (bar.value / max) * 100;
+            return (
+              <div
+                key={bar.key}
+                className="relative flex h-full w-full max-w-[80px] flex-col items-center justify-end"
+              >
+                {/* 가격 라벨 (상단 count-up 풍 — 막대 위) */}
+                <motion.div
+                  className="mb-2 text-center"
+                  initial={{ opacity: 0, y: 8 }}
+                  animate={
+                    inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 8 }
+                  }
+                  transition={{ delay: 0.4 + idx * 0.2 + 0.4, duration: 0.4 }}
+                >
+                  <p
+                    className={`text-xs font-black tabular-nums ${
+                      bar.isAccent
+                        ? "text-[var(--color-ink-900)]"
+                        : "text-[var(--color-ink-700)]"
+                    }`}
+                  >
+                    {formatKoreanWon(bar.value)}
+                  </p>
+                </motion.div>
+                {/* 막대 grow (origin-bottom scaleY 0→1) */}
+                <motion.div
+                  className={`w-full origin-bottom rounded-t-[var(--radius-xs)] ${bar.fillCls}`}
+                  style={{ height: `${heightPercent}%` }}
+                  initial={{ scaleY: 0 }}
+                  animate={inView ? { scaleY: 1 } : { scaleY: 0 }}
+                  transition={{
+                    delay: 0.4 + idx * 0.2,
+                    duration: 0.6,
+                    ease: [0.16, 1, 0.3, 1],
+                  }}
+                />
+              </div>
+            );
+          })}
+          {/* 사용자 입찰가 4번째 막대 (슬라이더 drag 시 표시) */}
+          {userPriceWon !== minPrice ? (
+            <motion.div
+              key={`user-${Math.floor(userPriceWon / 1_000_000)}`}
+              className="relative flex h-full w-full max-w-[80px] flex-col items-center justify-end"
+              initial={{ opacity: 0, y: 8 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.3 }}
+            >
+              <div className="mb-2 text-center">
+                <p className="text-xs font-black tabular-nums text-[var(--color-ink-900)]">
+                  {formatKoreanWon(userPriceWon)}
+                </p>
+                <p className="mt-0.5 text-[9px] font-bold uppercase tracking-wider text-[var(--color-ink-700)]">
+                  내 입찰가
+                </p>
+              </div>
+              <div
+                className="w-full rounded-t-[var(--radius-xs)] border-2 border-dashed border-[var(--color-ink-900)] bg-white"
+                style={{ height: `${(userPriceWon / max) * 100}%` }}
+              />
+            </motion.div>
+          ) : null}
+        </div>
+
+        {/* 막대 라벨 (하단) */}
+        <div className="absolute bottom-[-32px] left-0 right-0 flex items-start justify-around gap-3 px-6">
+          {bars.map((bar, idx) => (
+            <motion.div
+              key={`${bar.key}-label`}
+              className="w-full max-w-[80px] text-center"
+              initial={{ opacity: 0 }}
+              animate={inView ? { opacity: 1 } : { opacity: 0 }}
+              transition={{ delay: 0.5 + idx * 0.2 + 0.3, duration: 0.4 }}
+            >
+              <p
+                className={`text-[10px] font-bold uppercase tracking-wider ${
+                  bar.isAccent
+                    ? "text-[var(--color-ink-900)]"
+                    : "text-[var(--color-ink-500)]"
+                }`}
+              >
+                {bar.label}
+              </p>
+            </motion.div>
+          ))}
+        </div>
       </div>
 
       {/* 차이 % count-up */}
       <motion.div
-        className="mt-4 text-center text-xs font-medium tabular-nums text-[var(--color-ink-500)]"
+        className="mt-12 sm:mt-14 text-center text-xs font-medium tabular-nums text-[var(--color-ink-500)]"
         initial={{ opacity: 0 }}
         animate={inView ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ delay: 1.5, duration: 0.4 }}
+        transition={{ delay: 1.6, duration: 0.4 }}
       >
         {`${round}차 최저가는 감정가 대비 −${animatedDropAppraisal}% · 시세 평균 대비 −${animatedDropSaleAvg}% 위치`}
       </motion.div>
@@ -230,66 +304,12 @@ export function PriceScatter({ appraisal, market, minPrice, round }: PriceScatte
   );
 }
 
-function ScatterPoint({
-  leftPercent,
-  size,
-  fillCls,
-  label,
-  valueLabel,
-  labelPosition,
-  delay,
-  inView,
-  accent,
-  small,
-}: {
-  leftPercent: number;
-  size: number;
-  fillCls: string;
-  label: string;
-  valueLabel: string;
-  labelPosition: "top" | "bottom";
-  delay: number;
-  inView: boolean;
-  accent?: boolean;
-  small?: boolean;
-}) {
-  const isTop = labelPosition === "top";
-  return (
-    <div className="absolute top-1/2 -translate-y-1/2" style={{ left: `${leftPercent}%` }}>
-      <motion.span
-        aria-hidden="true"
-        className={`block -translate-x-1/2 rounded-full ${fillCls}`}
-        style={{ width: `${size}px`, height: `${size}px` }}
-        initial={{ scale: 0 }}
-        animate={inView ? { scale: 1 } : { scale: 0 }}
-        transition={{ duration: 0.3, delay, ease: [0.16, 1, 0.3, 1] }}
-      />
-      <motion.div
-        className={`absolute left-0 -translate-x-1/2 whitespace-nowrap text-center ${
-          isTop ? "bottom-full mb-2" : "top-full mt-2"
-        }`}
-        initial={{ opacity: 0 }}
-        animate={inView ? { opacity: 1 } : { opacity: 0 }}
-        transition={{ duration: 0.3, delay: delay + 0.2 }}
-      >
-        <p
-          className={`uppercase tracking-wider ${small ? "text-[8px]" : "text-[9px]"} font-bold ${
-            accent ? "text-[var(--color-ink-900)]" : "text-[var(--color-ink-500)]"
-          }`}
-        >
-          {label}
-        </p>
-        <p
-          className={`mt-0.5 ${small ? "text-[10px]" : "text-xs"} font-black tabular-nums text-[var(--color-ink-900)]`}
-        >
-          {valueLabel}
-        </p>
-      </motion.div>
-    </div>
-  );
-}
-
-function useCountUp(target: number, active: boolean, duration: number, delay: number): number {
+function useCountUp(
+  target: number,
+  active: boolean,
+  duration: number,
+  delay: number
+): number {
   const [value, setValue] = useState(0);
   useEffect(() => {
     if (!active || target === 0) return;
