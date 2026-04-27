@@ -33,7 +33,7 @@ export function MobileSticky() {
         </Link>
         <Link
           href={PRIMARY_CTA.href}
-          className="flex min-h-12 flex-[1.3] items-center justify-center rounded-[var(--radius-md)] bg-brand-600 px-3 text-sm font-bold text-white shadow-[var(--shadow-card)] hover:bg-brand-700"
+          className="flex min-h-12 flex-[1.3] items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-3 text-sm font-bold text-white shadow-[var(--shadow-card)] hover:bg-black"
         >
           {PRIMARY_CTA.label}
         </Link>

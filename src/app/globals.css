@@ -52,12 +52,15 @@
   --color-brand-900: #1e3a8a;
   --color-brand-950: #172554;
 
-  /* 1-2. 중립 ink 5단계 + 표면 */
+  /* 1-2. 중립 ink 9단계 + 표면 (단계 5-4-2-fix 모노톤 강제 시 ink-50/200/950 추가) */
+  --color-ink-950: #020617; /* 다크 섹션 배경 (brand-950 대체) */
   --color-ink-900: #0f172a; /* 제목 */
   --color-ink-700: #334155; /* 본문 */
   --color-ink-500: #64748b; /* 보조 */
   --color-ink-300: #cbd5e1; /* 비활성 (텍스트 사용 금지 — AA 미달) */
+  --color-ink-200: #e2e8f0; /* 약화 보더·구분선 */
   --color-ink-100: #f1f5f9; /* 배경 */
+  --color-ink-50:  #f8fafc; /* 약화 배경 (surface-muted 동등) */
   --color-surface: #ffffff;
   --color-surface-muted: #f8fafc;
 
@@ -199,7 +202,7 @@ body {
  * CLAUDE.md §10: "커스텀 focus ring (box-shadow 0 0 0 3px rgba(37,99,235,0.3))" 명시.
  * outline + box-shadow 이중 적용으로 시각 가시성 확보 (Windows 고대비 모드 대응). */
 :where(a, button, input, textarea, select, summary, [role="button"], [tabindex]):focus-visible {
-  outline: 2px solid var(--color-brand-600);
+  outline: 2px solid var(--color-ink-900);
   outline-offset: 2px;
   box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
   border-radius: var(--radius-xs);
@@ -271,7 +274,7 @@ body {
   align-items: center;
   justify-content: center;
   border-radius: 9999px;
-  background: var(--color-brand-600);
+  background: var(--color-ink-900);
   color: #fff;
   font-size: 0.8125rem;
   font-weight: 700;

@@ -29,7 +29,7 @@ export function PropertyCard({
       <h3 className="mt-4 text-lg font-black tracking-tight text-[var(--color-ink-900)]">
         <Link
           href={`/analysis/${fm.slug}`}
-          className="before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:before:rounded-[var(--radius-xl)] focus-visible:before:outline focus-visible:before:outline-2 focus-visible:before:outline-offset-2 focus-visible:before:outline-brand-600"
+          className="before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:before:rounded-[var(--radius-xl)] focus-visible:before:outline focus-visible:before:outline-2 focus-visible:before:outline-offset-2 focus-visible:before:outline-[var(--color-ink-900)]"
           aria-label={`${fm.title} 상세 분석 열기`}
         >
           {fm.title}
@@ -83,7 +83,7 @@ export function PropertyCard({
 
       <span
         aria-hidden="true"
-        className="mt-6 inline-flex items-center gap-1 text-sm font-bold text-brand-600 transition group-hover:text-brand-700"
+        className="mt-6 inline-flex items-center gap-1 text-sm font-bold text-[var(--color-ink-900)] transition group-hover:text-black"
       >
         분석 전체 보기
         <ArrowRight

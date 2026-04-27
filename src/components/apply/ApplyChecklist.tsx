@@ -54,15 +54,15 @@ export function ApplyChecklist({
                 displayOnly
                   ? "border-[var(--color-border)] bg-[var(--color-surface-muted)] cursor-default"
                   : checked
-                    ? "border-brand-600 bg-brand-50/50"
-                    : "border-[var(--color-border)] bg-white hover:border-brand-300"
+                    ? "border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/70"
+                    : "border-[var(--color-border)] bg-white hover:border-[var(--color-ink-300)]"
               )}
             >
               <span
                 className={cn(
                   "flex h-6 w-6 shrink-0 items-center justify-center rounded-[var(--radius-xs)] border transition",
                   checked
-                    ? "border-brand-600 bg-brand-600 text-white"
+                    ? "border-[var(--color-ink-900)] bg-[var(--color-ink-900)] text-white"
                     : "border-[var(--color-border)] bg-white"
                 )}
                 aria-hidden="true"

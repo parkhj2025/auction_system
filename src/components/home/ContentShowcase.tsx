@@ -26,7 +26,7 @@ export function ContentShowcase() {
       <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-brand-600">
+            <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-900)]">
               콘텐츠 허브
             </p>
             <h2
@@ -38,7 +38,7 @@ export function ContentShowcase() {
           </div>
           <Link
             href="/guide"
-            className="hidden items-center gap-1 text-sm font-bold text-brand-600 hover:text-brand-700 sm:inline-flex"
+            className="hidden items-center gap-1 text-sm font-bold text-[var(--color-ink-900)] hover:text-black sm:inline-flex"
           >
             가이드 전체 보기
             <ArrowRight size={16} aria-hidden="true" />
@@ -53,7 +53,7 @@ export function ContentShowcase() {
                 href={`/guide/${g.frontmatter.slug}`}
                 className="group flex items-start gap-5 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]"
               >
-                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-brand-50 text-brand-600">
+                <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-50)] text-[var(--color-ink-900)]">
                   <BookOpen size={22} aria-hidden="true" />
                 </span>
                 <div className="flex-1">
@@ -65,7 +65,7 @@ export function ContentShowcase() {
                       {DIFFICULTY_LABEL[g.frontmatter.difficulty]}
                     </span>
                   </div>
-                  <h3 className="mt-2 text-lg font-black tracking-tight text-[var(--color-ink-900)] group-hover:text-brand-700">
+                  <h3 className="mt-2 text-lg font-black tracking-tight text-[var(--color-ink-900)] group-hover:text-black">
                     {g.frontmatter.title}
                   </h3>
                   {g.frontmatter.subtitle && (
@@ -84,7 +84,7 @@ export function ContentShowcase() {
           {news && (
             <Link
               href={`/news/${news.frontmatter.slug}`}
-              className="group flex flex-col justify-between rounded-[var(--radius-xl)] bg-brand-700 p-7 text-white shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]"
+              className="group flex flex-col justify-between rounded-[var(--radius-xl)] bg-black p-7 text-white shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]"
             >
               <div>
                 <span className="inline-flex h-6 items-center gap-1.5 rounded-full bg-white/15 px-2.5 text-[11px] font-bold uppercase tracking-wider text-white">
@@ -95,13 +95,13 @@ export function ContentShowcase() {
                   {news.frontmatter.title}
                 </h3>
                 {news.frontmatter.subtitle && (
-                  <p className="mt-3 text-sm leading-6 text-brand-100">
+                  <p className="mt-3 text-sm leading-6 text-white/85">
                     {news.frontmatter.subtitle}
                   </p>
                 )}
               </div>
               <div className="mt-8 flex items-center justify-between">
-                <span className="text-xs font-medium text-brand-200">
+                <span className="text-xs font-medium text-white/70">
                   {formatKoreanDate(news.frontmatter.publishedAt)}
                 </span>
                 <span className="inline-flex items-center gap-1 text-sm font-bold">

@@ -65,11 +65,11 @@ export function Step5Complete({
 
   return (
     <div className="flex flex-col gap-8">
-      <header className="rounded-[var(--radius-2xl)] border-2 border-brand-600 bg-brand-50/40 p-8 text-center">
-        <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-brand-600 text-white">
+      <header className="rounded-[var(--radius-2xl)] border-2 border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/60 p-8 text-center">
+        <span className="inline-flex h-14 w-14 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-white">
           <CheckCircle2 size={28} aria-hidden="true" />
         </span>
-        <p className="mt-5 text-xs font-black uppercase tracking-[0.2em] text-brand-600">
+        <p className="mt-5 text-xs font-black uppercase tracking-[0.2em] text-[var(--color-ink-900)]">
           접수 완료
         </p>
         <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
@@ -129,8 +129,8 @@ export function Step5Complete({
         </section>
       )}
 
-      <section className="rounded-[var(--radius-xl)] border-2 border-brand-600 bg-brand-50/30 p-6">
-        <h3 className="text-sm font-black uppercase tracking-wider text-brand-700">
+      <section className="rounded-[var(--radius-xl)] border-2 border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/50 p-6">
+        <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-900)]">
           전용계좌 송금
         </h3>
 
@@ -140,7 +140,7 @@ export function Step5Complete({
         </p>
 
         {/* 송금 금액 강조 */}
-        <div className="mt-4 rounded-[var(--radius-lg)] border border-brand-600 bg-white p-5">
+        <div className="mt-4 rounded-[var(--radius-lg)] border border-[var(--color-ink-900)] bg-white p-5">
           <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-bold text-[var(--color-ink-500)]">
@@ -162,7 +162,7 @@ export function Step5Complete({
             <button
               type="button"
               onClick={copyAmount}
-              className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-sm font-bold text-[var(--color-ink-900)] hover:border-brand-600 hover:text-brand-700"
+              className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-sm font-bold text-[var(--color-ink-900)] hover:border-[var(--color-ink-900)] hover:text-black"
             >
               {copiedField === "amount" ? (
                 <>
@@ -196,7 +196,7 @@ export function Step5Complete({
           <button
             type="button"
             onClick={copyAccount}
-            className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-sm font-bold text-[var(--color-ink-900)] hover:border-brand-600 hover:text-brand-700"
+            className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-sm font-bold text-[var(--color-ink-900)] hover:border-[var(--color-ink-900)] hover:text-black"
           >
             {copiedField === "account" ? (
               <>
@@ -246,7 +246,7 @@ export function Step5Complete({
         </h3>
         <ol className="mt-4 flex flex-col gap-3 text-sm leading-6 text-[var(--color-ink-700)]">
           <li className="flex gap-3">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-600 text-[11px] font-black text-white">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-[11px] font-black text-white">
               1
             </span>
             <span>
@@ -259,13 +259,13 @@ export function Step5Complete({
             </span>
           </li>
           <li className="flex gap-3">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-600 text-[11px] font-black text-white">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-[11px] font-black text-white">
               2
             </span>
             <span>입찰일 전일까지 서류 최종 확인 및 보증금 입금 확인.</span>
           </li>
           <li className="flex gap-3">
-            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-brand-600 text-[11px] font-black text-white">
+            <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-[11px] font-black text-white">
               3
             </span>
             <span>
@@ -285,7 +285,7 @@ export function Step5Complete({
         </Link>
         <Link
           href="/"
-          className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-5 text-sm font-bold text-white hover:bg-brand-700"
+          className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-5 text-sm font-bold text-white hover:bg-black"
         >
           <Home size={16} aria-hidden="true" />
           홈으로

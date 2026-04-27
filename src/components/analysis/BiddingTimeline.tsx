@@ -4,13 +4,13 @@
  * 단계 5-4-2: 02 입찰 경과 우측 sticky graphic — Graphic Sequence 패턴.
  *
  * 좌측 step active idx 별 다른 state 표시:
- *  - 1차 step active: 1차 dot brand-600 fill (current) + 2차·3차 dot ink-300 outline
- *  - 2차 step active: 1차 dot ink-500 (이전) + 2차 dot brand-600 fill (current) + line draw 1→2
+ *  - 1차 step active: 1차 dot ink-900 fill (current) + 2차·3차 dot ink-300 outline
+ *  - 2차 step active: 1차 dot ink-500 (이전) + 2차 dot ink-900 fill (current) + line draw 1→2
  *  ... (각 step 별)
  *
  * dot 크기 = 매각가율 매핑 (단계 5-4-1 동일): rate * 0.08 + 8 → 100% = 16px / 70% = 14px
  *
- * 모노톤: ink-300/500/700/900 + brand-600 단일 액센트.
+ * 모노톤: ink-300/500/700/900 + ink-900 단일 강조.
  * case study 인용: scrollytelling "Side-by-Side Sticky" + "Graphic Sequence" + Apple "line draw" + chart-visualization "line/funnel".
  */
 import type { BiddingHistoryEntry } from "@/types/content";
@@ -102,9 +102,9 @@ export function BiddingTimeline({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.3 }}
-            className="mt-6 rounded-[var(--radius-md)] border-l-4 border-[var(--color-brand-600)] bg-[var(--color-brand-50)] px-4 py-3 text-sm text-[var(--color-ink-700)]"
+            className="mt-6 rounded-[var(--radius-md)] border-l-4 border-[var(--color-ink-900)] bg-[var(--color-ink-50)] px-4 py-3 text-sm text-[var(--color-ink-700)]"
           >
-            <span className="font-bold tabular-nums text-[var(--color-brand-700)]">
+            <span className="font-bold tabular-nums text-[var(--color-ink-900)]">
               {history[activeIdx - 1].rate! - history[activeIdx].rate!}%p 인하
             </span>
             : 이전 회차 대비 진입 가격 변화
@@ -143,9 +143,9 @@ function resolveTone(
   if (r.includes("진행") || r === "") {
     return {
       label: "진행 예정",
-      dotCls: isActive ? "bg-[var(--color-brand-600)]" : "bg-[var(--color-ink-300)]",
+      dotCls: isActive ? "bg-[var(--color-ink-900)]" : "bg-[var(--color-ink-300)]",
       chipCls: isActive
-        ? "font-bold text-[var(--color-brand-700)]"
+        ? "font-bold text-[var(--color-ink-900)]"
         : "font-bold text-[var(--color-ink-500)]",
     };
   }

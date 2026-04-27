@@ -5,8 +5,8 @@
  *
  * 시각 구조:
  *  - 수평 축선 (가격 0 → max)
- *  - 점 3개: 감정가 (ink-500) / 시세 평균 (ink-900) / 최저가 (brand-600 outline)
- *  - 사용자 가격 입력 → 4번째 점 (brand-600 dashed) + 차이 % 즉시 계산
+ *  - 점 3개: 감정가 (ink-500) / 시세 평균 (ink-900) / 최저가 (ink-900 outline)
+ *  - 사용자 가격 입력 → 4번째 점 (ink-900 dashed) + 차이 % 즉시 계산
  *
  * 스크롤 모션:
  *  - 0~25% 축선 line draw
@@ -19,7 +19,7 @@
  *  - 점 hover (desktop) → 정확 가격 tooltip
  *  - 키보드: Tab → input → arrow ±100만원
  *
- * 모노톤: 감정가 ink-500 / 시세평균 ink-900 / 최저가 brand-600 outline / 사용자 점 brand-600 dashed.
+ * 모노톤: 감정가 ink-500 / 시세평균 ink-900 / 최저가 ink-900 outline / 사용자 점 ink-900 dashed.
  *
  * case study 인용: scrollytelling Show-and-Play + chart-visualization scatter + Distill "Parameter sliders update plots in real-time".
  */
@@ -96,7 +96,7 @@ export function PriceScatter({ appraisal, saleAvg, minPrice, round }: PriceScatt
         <ScatterPoint
           leftPercent={pos(minPrice)}
           size={16}
-          fillCls="border-2 border-[var(--color-brand-600)] bg-white"
+          fillCls="border-2 border-[var(--color-ink-900)] bg-white"
           label={`${round}차 최저가`}
           valueLabel={formatKoreanWon(minPrice)}
           labelPosition="top"
@@ -116,9 +116,9 @@ export function PriceScatter({ appraisal, saleAvg, minPrice, round }: PriceScatt
           >
             <span
               aria-hidden="true"
-              className="block h-3.5 w-3.5 -translate-x-1/2 rounded-full border-2 border-dashed border-[var(--color-brand-600)] bg-white"
+              className="block h-3.5 w-3.5 -translate-x-1/2 rounded-full border-2 border-dashed border-[var(--color-ink-900)] bg-white"
             />
-            <p className="absolute -top-7 left-0 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold tabular-nums text-[var(--color-brand-700)]">
+            <p className="absolute -top-7 left-0 -translate-x-1/2 whitespace-nowrap text-[10px] font-bold tabular-nums text-[var(--color-ink-900)]">
               내 입력
             </p>
           </motion.div>
@@ -165,7 +165,7 @@ export function PriceScatter({ appraisal, saleAvg, minPrice, round }: PriceScatt
               const won = Math.round(parseFloat(v) * 10000); // 만원 → 원 환산
               setUserPriceWon(Number.isFinite(won) && won > 0 ? won : null);
             }}
-            className="w-32 rounded-[var(--radius-sm)] border border-[var(--color-border)] px-3 py-1.5 text-sm tabular-nums focus-visible:border-[var(--color-brand-600)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-brand-600)]/30"
+            className="w-32 rounded-[var(--radius-sm)] border border-[var(--color-border)] px-3 py-1.5 text-sm tabular-nums focus-visible:border-[var(--color-ink-900)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ink-900)]/30"
           />
           <span className="text-xs text-[var(--color-ink-500)]">만원</span>
           {userPriceWon != null && userPriceWon > 0 ? (
@@ -177,12 +177,12 @@ export function PriceScatter({ appraisal, saleAvg, minPrice, round }: PriceScatt
               {userVsAppraisal != null && userVsSaleAvg != null ? (
                 <>
                   {" · 감정가 대비 "}
-                  <span className="font-bold text-[var(--color-brand-700)]">
+                  <span className="font-bold text-[var(--color-ink-900)]">
                     {userVsAppraisal > 0 ? "−" : "+"}
                     {Math.abs(userVsAppraisal)}%
                   </span>
                   {" · 시세 평균 대비 "}
-                  <span className="font-bold text-[var(--color-brand-700)]">
+                  <span className="font-bold text-[var(--color-ink-900)]">
                     {userVsSaleAvg > 0 ? "−" : "+"}
                     {Math.abs(userVsSaleAvg)}%
                   </span>
@@ -238,14 +238,14 @@ function ScatterPoint({
       >
         <p
           className={`text-[9px] font-bold uppercase tracking-wider ${
-            accent ? "text-[var(--color-brand-700)]" : "text-[var(--color-ink-500)]"
+            accent ? "text-[var(--color-ink-900)]" : "text-[var(--color-ink-500)]"
           }`}
         >
           {label}
         </p>
         <p
           className={`mt-0.5 text-xs font-black tabular-nums ${
-            accent ? "text-[var(--color-brand-700)]" : "text-[var(--color-ink-900)]"
+            accent ? "text-[var(--color-ink-900)]" : "text-[var(--color-ink-900)]"
           }`}
         >
           {valueLabel}

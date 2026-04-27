@@ -51,7 +51,7 @@ export default async function GuideListPage({
     <main className="flex flex-1 flex-col">
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
         <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             경매가이드
           </p>
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
@@ -80,8 +80,8 @@ export default async function GuideListPage({
                   className={cn(
                     "inline-flex h-10 min-w-[56px] items-center justify-center rounded-full border px-4 text-sm font-bold transition",
                     isActive
-                      ? "border-brand-600 bg-brand-600 text-white"
-                      : "border-[var(--color-border)] bg-white text-[var(--color-ink-700)] hover:border-brand-300 hover:text-brand-700"
+                      ? "border-[var(--color-ink-900)] bg-[var(--color-ink-900)] text-white"
+                      : "border-[var(--color-border)] bg-white text-[var(--color-ink-700)] hover:border-[var(--color-ink-300)] hover:text-black"
                   )}
                 >
                   {chip.label}

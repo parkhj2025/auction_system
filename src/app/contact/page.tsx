@@ -21,7 +21,7 @@ export default function ContactPage() {
       {/* Hero */}
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
         <div className="mx-auto w-full max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
-          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             문의하기
           </p>
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
@@ -36,8 +36,8 @@ export default function ContactPage() {
 
       {/* 접수 우선 안내 */}
       <section className="mx-auto w-full max-w-4xl px-4 pt-10 sm:px-6 sm:pt-14">
-        <div className="flex items-start gap-4 rounded-[var(--radius-xl)] border border-brand-600 bg-brand-50/40 p-6">
-          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-brand-600 text-white">
+        <div className="flex items-start gap-4 rounded-[var(--radius-xl)] border border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/60 p-6">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] text-white">
             <Info size={18} aria-hidden="true" />
           </span>
           <div className="flex-1">
@@ -51,7 +51,7 @@ export default function ContactPage() {
             </p>
             <Link
               href="/apply"
-              className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-5 text-sm font-bold text-white hover:bg-brand-700"
+              className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-5 text-sm font-bold text-white hover:bg-black"
             >
               신청 페이지로 이동
               <ArrowRight size={14} aria-hidden="true" />
@@ -62,7 +62,7 @@ export default function ContactPage() {
 
       {/* 채널 카드 */}
       <section className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
-        <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+        <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
           상담 채널
         </p>
         <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
@@ -71,7 +71,7 @@ export default function ContactPage() {
 
         <div className="mt-10 grid gap-5 sm:grid-cols-2">
           <article className="flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">
-            <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-brand-50 text-brand-600">
+            <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-50)] text-[var(--color-ink-900)]">
               <MessageCircle size={22} aria-hidden="true" />
             </span>
             <div>
@@ -95,7 +95,7 @@ export default function ContactPage() {
           </article>
 
           <article className="flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">
-            <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-brand-50 text-brand-600">
+            <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-50)] text-[var(--color-ink-900)]">
               <Mail size={22} aria-hidden="true" />
             </span>
             <div>
@@ -109,7 +109,7 @@ export default function ContactPage() {
             </div>
             <a
               href="mailto:contact@example.com"
-              className="mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-900)] hover:border-brand-600 hover:text-brand-700"
+              className="mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-900)] hover:border-[var(--color-ink-900)] hover:text-black"
             >
               메일 보내기
             </a>
@@ -120,7 +120,7 @@ export default function ContactPage() {
       {/* 회사 정보 */}
       <section className="border-t border-[var(--color-border)] bg-[var(--color-surface-muted)]">
         <div className="mx-auto w-full max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
-          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             회사 정보
           </p>
           <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)]">

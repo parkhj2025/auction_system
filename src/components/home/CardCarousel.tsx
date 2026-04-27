@@ -21,7 +21,7 @@ export function CardCarousel() {
       <div className="mx-auto w-full max-w-6xl px-4 pt-20 sm:px-6 sm:pt-24">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-brand-600">
+            <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-900)]">
               무료 물건분석
             </p>
             <h2
@@ -37,7 +37,7 @@ export function CardCarousel() {
           </div>
           <Link
             href="/analysis"
-            className="hidden items-center gap-1 text-sm font-bold text-brand-600 hover:text-brand-700 sm:inline-flex"
+            className="hidden items-center gap-1 text-sm font-bold text-[var(--color-ink-900)] hover:text-black sm:inline-flex"
           >
             전체 보기
             <ArrowRight size={16} aria-hidden="true" />
@@ -69,7 +69,7 @@ export function CardCarousel() {
             >
               <Link
                 href="/analysis"
-                className="flex h-full w-full flex-col items-start justify-center rounded-[var(--radius-xl)] border-2 border-dashed border-brand-200 bg-brand-50 p-6 text-brand-700 transition hover:border-brand-600 hover:bg-brand-100"
+                className="flex h-full w-full flex-col items-start justify-center rounded-[var(--radius-xl)] border-2 border-dashed border-[var(--color-ink-200)] bg-[var(--color-ink-50)] p-6 text-[var(--color-ink-900)] transition hover:border-[var(--color-ink-900)] hover:bg-[var(--color-ink-100)]"
               >
                 <span className="text-xs font-bold uppercase tracking-wider">
                   더 많은 분석

@@ -27,7 +27,7 @@ export function StatsCards({ stats }: { stats: Stat[] }) {
           <Link
             key={stat.label}
             href={stat.href}
-            className="group flex flex-col gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-5 shadow-sm transition hover:border-brand-600 hover:shadow-[var(--shadow-card)]"
+            className="group flex flex-col gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-5 shadow-sm transition hover:border-[var(--color-ink-900)] hover:shadow-[var(--shadow-card)]"
           >
             <div className="flex items-center justify-between">
               <span
@@ -35,7 +35,7 @@ export function StatsCards({ stats }: { stats: Stat[] }) {
                   "inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)]",
                   stat.accent === "yellow"
                     ? "bg-yellow-100 text-yellow-700"
-                    : "bg-brand-50 text-brand-700"
+                    : "bg-[var(--color-ink-50)] text-[var(--color-ink-900)]"
                 )}
               >
                 <Icon size={18} aria-hidden="true" />

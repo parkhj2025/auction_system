@@ -124,7 +124,7 @@ export function PhoneVerifyModal({
             id="phone-verify-title"
             className="flex items-center gap-2 text-base font-black text-[var(--color-ink-900)]"
           >
-            <ShieldCheck size={18} aria-hidden="true" className="text-brand-600" />
+            <ShieldCheck size={18} aria-hidden="true" className="text-[var(--color-ink-900)]" />
             휴대폰 본인인증
           </h2>
           <button
@@ -199,7 +199,7 @@ export function PhoneVerifyModal({
             type="button"
             onClick={handleVerify}
             disabled={verifying}
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-4 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-4 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-black disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
           >
             {verifying ? "인증 중..." : "인증 완료"}
           </button>

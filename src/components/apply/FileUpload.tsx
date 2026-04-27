@@ -73,7 +73,7 @@ export function FileUpload({
             href={helperLink.href}
             target="_blank"
             rel="noopener noreferrer"
-            className="text-xs font-bold text-brand-600 underline decoration-brand-300 underline-offset-2 hover:text-brand-700"
+            className="text-xs font-bold text-[var(--color-ink-900)] underline decoration-[var(--color-ink-300)] underline-offset-2 hover:text-black"
           >
             {helperLink.text}
           </a>
@@ -84,10 +84,10 @@ export function FileUpload({
       </p>
 
       {file ? (
-        <div className="flex items-center gap-3 rounded-[var(--radius-md)] border border-brand-600 bg-brand-50/50 p-4">
+        <div className="flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/70 p-4">
           <FileText
             size={20}
-            className="shrink-0 text-brand-600"
+            className="shrink-0 text-[var(--color-ink-900)]"
             aria-hidden="true"
           />
           <div className="min-w-0 flex-1">
@@ -116,7 +116,7 @@ export function FileUpload({
             "flex min-h-[112px] cursor-pointer flex-col items-center justify-center gap-2 rounded-[var(--radius-md)] border-2 border-dashed p-6 text-center transition",
             error
               ? "border-[var(--color-accent-red)] bg-[var(--color-accent-red-soft)]/40"
-              : "border-[var(--color-border)] bg-[var(--color-surface-muted)] hover:border-brand-600 hover:bg-brand-50/40"
+              : "border-[var(--color-border)] bg-[var(--color-surface-muted)] hover:border-[var(--color-ink-900)] hover:bg-[var(--color-ink-50)]/40"
           )}
         >
           <Upload

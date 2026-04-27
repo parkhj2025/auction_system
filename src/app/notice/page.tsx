@@ -28,7 +28,7 @@ export default async function NoticeListPage() {
             <ChevronRight size={12} aria-hidden="true" />
             <span className="text-[var(--color-ink-700)]">공지사항</span>
           </nav>
-          <p className="mt-5 text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="mt-5 text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             공지사항
           </p>
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
@@ -57,7 +57,7 @@ export default async function NoticeListPage() {
                     className="flex items-center gap-4 px-6 py-5 transition hover:bg-[var(--color-surface-muted)]"
                   >
                     <div className="flex-1">
-                      <p className="text-base font-bold text-[var(--color-ink-900)] group-hover:text-brand-700">
+                      <p className="text-base font-bold text-[var(--color-ink-900)] group-hover:text-black">
                         {fm.title}
                       </p>
                     </div>

@@ -4,12 +4,12 @@
  * 단계 5-4-2: 03 권리분석 우측 sticky graphic — node-link + HUG morph (Animated Transition).
  *
  * 좌측 step active idx 별 다이어그램 state:
- *  - Step 0 (말소기준 식별): 말소기준 노드만 active (brand-600 fill, scale 1.15). 다른 노드 ink-300 outline
+ *  - Step 0 (말소기준 식별): 말소기준 노드만 active (ink-900 fill, scale 1.15). 다른 노드 ink-300 outline
  *  - Step 1 (인수 등기): 인수 분기 노드 (위쪽, 임차보증금 1.88억) fade-in + line draw
  *  - Step 2 (HUG 말소동의 효과): 임차보증금 노드 인수→소멸 morph (translate 위→아래, fill solid → outline)
  *  - Step 3 (외국인 임차인 변수): 점유 callout fade-in
  *
- * 모노톤: ink-50/100/300/500/700/900 + brand-600 단일 액센트 (말소기준).
+ * 모노톤: ink-50/100/300/500/700/900 + ink-900 단일 강조 (말소기준).
  * 인수/소멸 = fill 패턴 (solid / outline / dashed) — 색상 0.
  *
  * case study 인용: scrollytelling "Side-by-Side Sticky" + "Animated Transition" + Distill "interactive node" + chart-visualization "network-graph".
@@ -210,7 +210,7 @@ function RightsNode({
 function resolveFillCls(state: RightsState): string {
   switch (state) {
     case "basis":
-      return "bg-[var(--color-brand-600)] text-white";
+      return "bg-[var(--color-ink-900)] text-white";
     case "inherit":
       return "border-2 border-[var(--color-ink-700)] bg-white text-[var(--color-ink-900)]";
     case "extinguish":

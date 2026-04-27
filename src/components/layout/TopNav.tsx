@@ -33,7 +33,7 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
           className="flex items-center gap-2"
           aria-label={`${BRAND_NAME} 홈`}
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-brand-600 text-sm font-black text-white">
+          <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--color-ink-900)] text-sm font-black text-white">
             경
           </span>
           <span className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
@@ -61,7 +61,7 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
             <div className="hidden md:flex md:items-center md:gap-2">
               <Link
                 href={PRIMARY_CTA.href}
-                className="inline-flex h-10 items-center rounded-[var(--radius-md)] bg-brand-600 px-4 text-sm font-bold text-white shadow-[var(--shadow-card)] transition hover:bg-brand-700"
+                className="inline-flex h-10 items-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-4 text-sm font-bold text-white shadow-[var(--shadow-card)] transition hover:bg-black"
               >
                 {PRIMARY_CTA.label}
               </Link>
@@ -77,7 +77,7 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
               </Link>
               <Link
                 href={PRIMARY_CTA.href}
-                className="inline-flex h-10 items-center rounded-[var(--radius-md)] bg-brand-600 px-4 text-sm font-bold text-white shadow-[var(--shadow-card)] transition hover:bg-brand-700"
+                className="inline-flex h-10 items-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-4 text-sm font-bold text-white shadow-[var(--shadow-card)] transition hover:bg-black"
               >
                 {PRIMARY_CTA.label}
               </Link>
@@ -132,7 +132,7 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
           <Link
             href={PRIMARY_CTA.href}
             onClick={() => setOpen(false)}
-            className="mt-3 flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-brand-600 px-4 text-base font-bold text-white hover:bg-brand-700"
+            className="mt-3 flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-4 text-base font-bold text-white hover:bg-black"
           >
             {PRIMARY_CTA.label}
           </Link>

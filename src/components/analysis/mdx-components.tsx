@@ -121,7 +121,7 @@ function buildH2(
               id={`section-${num}`}
               className="mt-20 flex scroll-mt-24 items-baseline gap-4 border-t border-[var(--color-border)] pt-10 first:mt-0 first:border-t-0 first:pt-0"
             >
-              <span className="text-xs font-black uppercase tracking-[0.24em] text-brand-600 tabular-nums">
+              <span className="text-xs font-black uppercase tracking-[0.24em] text-[var(--color-ink-900)] tabular-nums">
                 {num}
               </span>
               <span className="text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
@@ -147,7 +147,7 @@ function H3({ children, ...rest }: ComponentPropsWithoutRef<"h3">) {
   if (text === "체크포인트" || text.startsWith("체크포인트")) {
     return (
       <h3
-        className="mt-10 inline-flex items-center gap-2 rounded-[var(--radius-md)] border-l-4 border-brand-600 bg-[var(--color-brand-50)] py-2 pl-4 pr-5 text-lg font-black tracking-tight text-[var(--color-brand-700)] sm:text-xl"
+        className="mt-10 inline-flex items-center gap-2 rounded-[var(--radius-md)] border-l-4 border-[var(--color-ink-900)] bg-[var(--color-ink-50)] py-2 pl-4 pr-5 text-lg font-black tracking-tight text-[var(--color-ink-900)] sm:text-xl"
         {...rest}
       >
         {children}
@@ -205,7 +205,7 @@ function PassThrough({ children }: { children?: ReactNode }) {
 function Ul({ children, ...rest }: ComponentPropsWithoutRef<"ul">) {
   return (
     <ul
-      className="mt-5 flex list-disc flex-col gap-2 pl-6 text-base leading-[1.8] text-[var(--color-ink-700)] marker:text-brand-600"
+      className="mt-5 flex list-disc flex-col gap-2 pl-6 text-base leading-[1.8] text-[var(--color-ink-700)] marker:text-[var(--color-ink-900)]"
       {...rest}
     >
       {children}
@@ -216,7 +216,7 @@ function Ul({ children, ...rest }: ComponentPropsWithoutRef<"ul">) {
 function Ol({ children, ...rest }: ComponentPropsWithoutRef<"ol">) {
   return (
     <ol
-      className="mt-5 flex list-decimal flex-col gap-2 pl-6 text-base leading-[1.8] text-[var(--color-ink-700)] marker:font-bold marker:text-brand-600"
+      className="mt-5 flex list-decimal flex-col gap-2 pl-6 text-base leading-[1.8] text-[var(--color-ink-700)] marker:font-bold marker:text-[var(--color-ink-900)]"
       {...rest}
     >
       {children}
@@ -255,7 +255,7 @@ function Thead({ children, ...rest }: ComponentPropsWithoutRef<"thead">) {
 
 function detectRowToneClass(text: string): string {
   if (/말소기준/.test(text)) {
-    return "bg-[var(--color-brand-50)]";
+    return "bg-[var(--color-ink-50)]";
   }
   if (/\*\*\s*인수\s*\*\*|\b인수\s*\(|\b인수\s*,/.test(text)) {
     return "bg-[var(--color-danger-soft)]";
@@ -348,7 +348,7 @@ function Blockquote({
 }: ComponentPropsWithoutRef<"blockquote">) {
   return (
     <blockquote
-      className="mt-6 border-l-4 border-brand-600 bg-brand-50/40 px-5 py-4 text-base leading-7 text-[var(--color-ink-700)]"
+      className="mt-6 border-l-4 border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/60 px-5 py-4 text-base leading-7 text-[var(--color-ink-700)]"
       {...rest}
     >
       {children}
@@ -369,7 +369,7 @@ function A({ children, href = "#", ...rest }: ComponentPropsWithoutRef<"a">) {
   return (
     <a
       href={href}
-      className="text-brand-600 underline decoration-brand-300 underline-offset-2 transition hover:text-brand-700 hover:decoration-brand-600"
+      className="text-[var(--color-ink-900)] underline decoration-[var(--color-ink-300)] underline-offset-2 transition hover:text-black hover:decoration-[var(--color-ink-900)]"
       {...rest}
     >
       {children}
@@ -421,10 +421,10 @@ const SCENARIO_ICONS: Record<string, typeof Home> = {
 };
 
 const SCENARIO_BASE_THEME = {
-  border: "border-l-[var(--color-brand-600)]",
+  border: "border-l-[var(--color-ink-900)]",
   bg: "bg-[var(--color-surface)]",
   chip: "bg-[var(--color-surface-muted)] text-[var(--color-ink-700)]",
-  iconColor: "text-[var(--color-brand-600)]",
+  iconColor: "text-[var(--color-ink-900)]",
 };
 
 const DISABLED_THEME = {
@@ -510,8 +510,8 @@ function splitScenarioTitle(title: string): [string, string] {
 
 function ConclusionCallout({ children }: { children?: ReactNode }) {
   return (
-    <div className="mt-6 rounded-r-[var(--radius-md)] border-l-4 border-brand-600 bg-[var(--color-brand-50)] px-5 py-4 sm:px-6 sm:py-5">
-      <span className="inline-flex items-center rounded-[var(--radius-xs)] bg-brand-600 px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.18em] text-white">
+    <div className="mt-6 rounded-r-[var(--radius-md)] border-l-4 border-[var(--color-ink-900)] bg-[var(--color-ink-50)] px-5 py-4 sm:px-6 sm:py-5">
+      <span className="inline-flex items-center rounded-[var(--radius-xs)] bg-[var(--color-ink-900)] px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.18em] text-white">
         결론
       </span>
       <div className="mt-2 [&>p]:!mt-0 [&>p]:text-[var(--color-ink-900)] [&>p]:font-medium">

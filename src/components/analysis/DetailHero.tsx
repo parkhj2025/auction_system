@@ -145,7 +145,7 @@ function DominantStat({
   appraisalDisplay?: string;
 }) {
   return (
-    <div className="flex flex-col gap-2 bg-[var(--color-brand-600)] p-6 text-white sm:p-8">
+    <div className="flex flex-col gap-2 bg-[var(--color-ink-900)] p-6 text-white sm:p-8">
       <p className="text-[11px] font-bold uppercase tracking-widest text-white/80">
         {label}
       </p>

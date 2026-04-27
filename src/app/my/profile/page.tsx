@@ -49,7 +49,7 @@ export default async function MyProfilePage() {
       </nav>
 
       <header className="mt-6">
-        <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+        <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
           Profile
         </p>
         <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">

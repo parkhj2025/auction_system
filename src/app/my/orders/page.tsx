@@ -32,7 +32,7 @@ export default async function MyOrdersListPage() {
   return (
     <section className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
       <header>
-        <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+        <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
           Orders
         </p>
         <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
@@ -55,7 +55,7 @@ export default async function MyOrdersListPage() {
           </p>
           <Link
             href="/apply"
-            className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] bg-brand-600 px-5 text-sm font-bold text-white hover:bg-brand-700"
+            className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-5 text-sm font-bold text-white hover:bg-black"
           >
             입찰 대리 신청
           </Link>

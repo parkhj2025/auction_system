@@ -56,7 +56,7 @@ export function CaseConfirmCard({ data, onChange, mode }: Props) {
           <button
             type="button"
             onClick={handleEditManual}
-            className="inline-flex items-center gap-1 text-xs font-bold text-brand-600 underline-offset-2 hover:underline"
+            className="inline-flex items-center gap-1 text-xs font-bold text-[var(--color-ink-900)] underline-offset-2 hover:underline"
           >
             <Edit3 size={12} aria-hidden="true" />
             정보 수정
@@ -98,7 +98,7 @@ export function CaseConfirmCard({ data, onChange, mode }: Props) {
             type="checkbox"
             checked={data.caseConfirmedByUser}
             onChange={(e) => handleCheck(e.target.checked)}
-            className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-brand-600"
+            className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-[var(--color-ink-900)]"
           />
           <span className="flex-1 text-sm leading-6 text-[var(--color-ink-900)]">
             {CASE_CONFIRM_CHECKBOX_LABEL}

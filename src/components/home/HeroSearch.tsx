@@ -127,14 +127,14 @@ export function HeroSearch() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-brand-700 text-white">
+    <section className="relative overflow-hidden bg-black text-white">
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-brand-500/30 blur-3xl"
+        className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-[var(--color-ink-50)]0/30 blur-3xl"
       />
 
       <div className="relative mx-auto w-full max-w-6xl px-4 pb-16 pt-16 sm:px-6 sm:pb-20 sm:pt-20">
-        <p className="text-sm font-medium tracking-wide text-brand-100">
+        <p className="text-sm font-medium tracking-wide text-white/85">
           법원 안 가는 부동산 경매 입찰 대리
         </p>
         <h1 className="mt-3 text-4xl font-black leading-[1.15] tracking-tight sm:text-5xl">
@@ -145,7 +145,7 @@ export function HeroSearch() {
           </span>
           부터
         </h1>
-        <p className="mt-4 max-w-xl text-brand-100">
+        <p className="mt-4 max-w-xl text-white/85">
           공인중개사·서울보증보험 가입. 패찰 시 보증금 당일 즉시 반환.
         </p>
 
@@ -257,7 +257,7 @@ export function HeroSearch() {
                                 className={cn(
                                   "flex w-full flex-col gap-0.5 border-b border-[var(--color-border)] px-4 py-3 text-left transition last:border-b-0",
                                   idx === activeIdx
-                                    ? "bg-brand-50"
+                                    ? "bg-[var(--color-ink-50)]"
                                     : "hover:bg-[var(--color-surface-muted)]",
                                 )}
                               >
@@ -305,7 +305,7 @@ export function HeroSearch() {
 
             <button
               type="submit"
-              className="flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-6 text-base font-bold text-white shadow-[var(--shadow-card)] transition hover:bg-brand-700"
+              className="flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-6 text-base font-bold text-white shadow-[var(--shadow-card)] transition hover:bg-black"
             >
               <Search size={18} aria-hidden="true" />
               찾아보기
@@ -327,11 +327,11 @@ export function HeroSearch() {
           </p>
         </form>
 
-        <p className="mt-6 text-sm text-brand-100">
+        <p className="mt-6 text-sm text-white/85">
           수수료 체계 ·{" "}
           <a
             href="#pricing"
-            className="font-bold text-white underline decoration-brand-300 underline-offset-4 hover:decoration-white"
+            className="font-bold text-white underline decoration-[var(--color-ink-300)] underline-offset-4 hover:decoration-white"
           >
             얼리버드 5만 · 일반 7만 · 급건 10만
           </a>

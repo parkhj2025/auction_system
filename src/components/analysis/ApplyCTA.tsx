@@ -23,10 +23,10 @@ export function ApplyCTA({ fm }: { fm: AnalysisFrontmatter }) {
       <div className="relative px-6 py-10 sm:px-10 sm:py-12">
         <div
           aria-hidden="true"
-          className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-brand-500/30 blur-3xl"
+          className="pointer-events-none absolute -right-20 -top-20 h-72 w-72 rounded-full bg-[var(--color-ink-50)]0/30 blur-3xl"
         />
 
-        <p className="relative text-xs font-bold uppercase tracking-[0.2em] text-brand-200">
+        <p className="relative text-xs font-bold uppercase tracking-[0.2em] text-white/70">
           Next step
         </p>
         <h2
@@ -36,12 +36,12 @@ export function ApplyCTA({ fm }: { fm: AnalysisFrontmatter }) {
           분석은 끝났습니다.
           <br className="sm:hidden" /> 법원은 저희가 갑니다.
         </h2>
-        <p className="relative mt-4 max-w-2xl text-sm leading-6 text-brand-100 sm:text-base">
+        <p className="relative mt-4 max-w-2xl text-sm leading-6 text-white/85 sm:text-base">
           사건번호 <span className="font-bold text-white tabular-nums">{fm.caseNumber}</span>{" "}
           정보를 자동으로 불러와 신청 페이지로 이동합니다. 패찰 시 보증금은 당일 즉시 반환됩니다.
         </p>
 
-        <ul className="relative mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs text-brand-100">
+        <ul className="relative mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs text-white/85">
           <li className="inline-flex items-center gap-1.5">
             <Clock size={14} aria-hidden="true" />
             신청 약 10분
@@ -55,7 +55,7 @@ export function ApplyCTA({ fm }: { fm: AnalysisFrontmatter }) {
         <div className="relative mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
           <Link
             href={applyHref}
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-white px-6 text-base font-black tracking-tight text-[var(--color-brand-900)] shadow-[var(--shadow-lift)] transition duration-150 ease-out hover:bg-[var(--color-brand-50)]"
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-white px-6 text-base font-black tracking-tight text-[var(--color-ink-900)] shadow-[var(--shadow-lift)] transition duration-150 ease-out hover:bg-[var(--color-ink-50)]"
           >
             이 물건 입찰 대리 신청
             <ArrowRight size={18} aria-hidden="true" />
@@ -70,9 +70,9 @@ export function ApplyCTA({ fm }: { fm: AnalysisFrontmatter }) {
         </div>
 
         {/* 3-column fee grid */}
-        <div className="relative mt-8 grid gap-4 border-t border-white/10 pt-6 text-xs text-brand-100 sm:grid-cols-3">
+        <div className="relative mt-8 grid gap-4 border-t border-white/10 pt-6 text-xs text-white/85 sm:grid-cols-3">
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-brand-300">
+            <p className="text-[10px] uppercase tracking-widest text-white/60">
               수수료
             </p>
             <p className="mt-1 text-sm font-bold text-white tabular-nums">
@@ -80,7 +80,7 @@ export function ApplyCTA({ fm }: { fm: AnalysisFrontmatter }) {
             </p>
           </div>
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-brand-300">
+            <p className="text-[10px] uppercase tracking-widest text-white/60">
               성공보수
             </p>
             <p className="mt-1 text-sm font-bold text-white tabular-nums">
@@ -88,7 +88,7 @@ export function ApplyCTA({ fm }: { fm: AnalysisFrontmatter }) {
             </p>
           </div>
           <div>
-            <p className="text-[10px] uppercase tracking-widest text-brand-300">
+            <p className="text-[10px] uppercase tracking-widest text-white/60">
               패찰 시
             </p>
             <p className="mt-1 text-sm font-bold text-white">

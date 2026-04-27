@@ -67,7 +67,7 @@ export function getStatusBadgeClass(status: OrderStatus): string {
     return "bg-[var(--color-ink-100)] text-[var(--color-ink-700)]";
   }
   if (step <= 2) {
-    return "bg-brand-50 text-brand-700";
+    return "bg-[var(--color-ink-50)] text-[var(--color-ink-900)]";
   }
   // bidding
   return "bg-yellow-100 text-yellow-800";

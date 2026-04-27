@@ -17,7 +17,7 @@ export function VerifiedBadge({
       role="status"
       className="inline-flex items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-3 py-1 text-xs font-bold text-[var(--color-ink-700)]"
     >
-      <ShieldCheck size={12} aria-hidden="true" className="text-brand-600" />
+      <ShieldCheck size={12} aria-hidden="true" className="text-[var(--color-ink-900)]" />
       본인인증 완료 · {verifiedName} 님
     </div>
   );

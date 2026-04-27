@@ -13,7 +13,7 @@ export function RelatedCards({ posts }: { posts: AnalysisPost[] }) {
     >
       <div className="flex items-end justify-between gap-4">
         <div>
-          <p className="text-xs font-bold uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-900)]">
             함께 보면 좋은
           </p>
           <h2
@@ -25,7 +25,7 @@ export function RelatedCards({ posts }: { posts: AnalysisPost[] }) {
         </div>
         <Link
           href="/analysis"
-          className="hidden items-center gap-1 text-sm font-bold text-brand-600 hover:text-brand-700 sm:inline-flex"
+          className="hidden items-center gap-1 text-sm font-bold text-[var(--color-ink-900)] hover:text-black sm:inline-flex"
         >
           전체 보기
           <ArrowRight size={16} aria-hidden="true" />

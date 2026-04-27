@@ -38,7 +38,7 @@ export default function AboutPage() {
       {/* Hero */}
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
         <div className="mx-auto w-full max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
-          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             대표 소개
           </p>
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
@@ -58,7 +58,7 @@ export default function AboutPage() {
           <div className="flex shrink-0 flex-col items-center gap-3 sm:w-48">
             <div
               aria-hidden="true"
-              className="flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-brand-600 to-brand-800 text-4xl font-black text-white"
+              className="flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-[var(--color-ink-900)] to-[var(--color-ink-700)] text-4xl font-black text-white"
             >
               {COMPANY.ceo.slice(0, 1)}
             </div>
@@ -74,7 +74,7 @@ export default function AboutPage() {
               <li className="flex gap-2">
                 <ShieldCheck
                   size={16}
-                  className="mt-0.5 shrink-0 text-brand-600"
+                  className="mt-0.5 shrink-0 text-[var(--color-ink-900)]"
                   aria-hidden="true"
                 />
                 공인중개사 자격 보유 (매수신청대리인 등록)
@@ -82,7 +82,7 @@ export default function AboutPage() {
               <li className="flex gap-2">
                 <ShieldCheck
                   size={16}
-                  className="mt-0.5 shrink-0 text-brand-600"
+                  className="mt-0.5 shrink-0 text-[var(--color-ink-900)]"
                   aria-hidden="true"
                 />
                 서울보증보험 가입 — 사고 발생 시 고객 자산 보호
@@ -90,7 +90,7 @@ export default function AboutPage() {
               <li className="flex gap-2">
                 <Building2
                   size={16}
-                  className="mt-0.5 shrink-0 text-brand-600"
+                  className="mt-0.5 shrink-0 text-[var(--color-ink-900)]"
                   aria-hidden="true"
                 />
                 {COMPANY.court} 관할 경매 물건 대리 입찰 수행
@@ -108,7 +108,7 @@ export default function AboutPage() {
       {/* Values */}
       <section className="border-t border-[var(--color-border)] bg-[var(--color-surface-muted)]">
         <div className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             운영 원칙
           </p>
           <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
@@ -120,7 +120,7 @@ export default function AboutPage() {
                 key={title}
                 className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]"
               >
-                <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-brand-50 text-brand-600">
+                <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-50)] text-[var(--color-ink-900)]">
                   <Icon size={22} aria-hidden="true" />
                 </span>
                 <h3 className="mt-5 text-lg font-black tracking-tight text-[var(--color-ink-900)]">
@@ -138,7 +138,7 @@ export default function AboutPage() {
       {/* Regions */}
       <section className="border-t border-[var(--color-border)] bg-white">
         <div className="mx-auto w-full max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
-          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             서비스 지역
           </p>
           <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
@@ -151,13 +151,13 @@ export default function AboutPage() {
           <ul className="mt-8 flex flex-wrap gap-2">
             {COURTS_ACTIVE.map((c) => (
               <li key={c.value}>
-                <span className="inline-flex h-10 items-center gap-2 rounded-full bg-brand-600 px-5 text-sm font-bold text-white">
+                <span className="inline-flex h-10 items-center gap-2 rounded-full bg-[var(--color-ink-900)] px-5 text-sm font-bold text-white">
                   <span
                     aria-hidden="true"
                     className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent-yellow)]"
                   />
                   {c.label}
-                  <span className="text-xs font-medium text-brand-100">
+                  <span className="text-xs font-medium text-white/85">
                     서비스 중
                   </span>
                 </span>
@@ -178,20 +178,20 @@ export default function AboutPage() {
       </section>
 
       {/* CTA */}
-      <section className="border-t border-[var(--color-border)] bg-[var(--color-brand-950)] text-white">
+      <section className="border-t border-[var(--color-border)] bg-[var(--color-ink-950)] text-white">
         <div className="mx-auto flex w-full max-w-4xl flex-col items-start gap-6 px-4 py-16 sm:px-6 sm:py-20 md:flex-row md:items-center md:justify-between">
           <div>
             <h2 className="text-2xl font-black leading-tight tracking-tight sm:text-3xl">
               준비된 대리인에게 맡기세요
             </h2>
-            <p className="mt-3 text-sm leading-6 text-brand-100 sm:text-base">
+            <p className="mt-3 text-sm leading-6 text-white/85 sm:text-base">
               패찰 시 보증금은 당일 즉시 반환됩니다. 결과와 무관하게 투명합니다.
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link
               href="/apply"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-white px-6 text-sm font-black text-[var(--color-brand-900)] shadow-[var(--shadow-lift)] hover:bg-brand-50"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-white px-6 text-sm font-black text-[var(--color-ink-900)] shadow-[var(--shadow-lift)] hover:bg-[var(--color-ink-50)]"
             >
               입찰 대리 신청
               <ArrowRight size={16} aria-hidden="true" />

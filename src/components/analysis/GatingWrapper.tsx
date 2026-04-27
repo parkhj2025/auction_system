@@ -85,9 +85,9 @@ export function GatingWrapper({
       <div
         role="region"
         aria-label="로그인 유도"
-        className="mt-2 rounded-[var(--radius-2xl)] border-2 border-brand-600 bg-white p-8 text-center shadow-[var(--shadow-card)] sm:p-10"
+        className="mt-2 rounded-[var(--radius-2xl)] border-2 border-[var(--color-ink-900)] bg-white p-8 text-center shadow-[var(--shadow-card)] sm:p-10"
       >
-        <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-brand-50 text-brand-600">
+        <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-ink-50)] text-[var(--color-ink-900)]">
           <Lock size={20} aria-hidden="true" />
         </span>
         <h3 className="mt-4 text-xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-2xl">
@@ -100,7 +100,7 @@ export function GatingWrapper({
         <div className="mt-6 flex flex-col items-center gap-3">
           <Link
             href={loginHref}
-            className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-brand-600 px-8 text-base font-black text-white shadow-[var(--shadow-card)] transition hover:bg-brand-700"
+            className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-8 text-base font-black text-white shadow-[var(--shadow-card)] transition hover:bg-black"
           >
             Google로 로그인
           </Link>

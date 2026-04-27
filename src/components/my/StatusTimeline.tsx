@@ -47,7 +47,7 @@ export function StatusTimeline({ status }: { status: OrderStatus }) {
                   idx === 0
                     ? "invisible"
                     : isComplete || isCurrent
-                      ? "bg-brand-600"
+                      ? "bg-[var(--color-ink-900)]"
                       : "bg-[var(--color-border)]"
                 )}
               />
@@ -56,9 +56,9 @@ export function StatusTimeline({ status }: { status: OrderStatus }) {
                 className={cn(
                   "flex h-8 w-8 shrink-0 items-center justify-center rounded-full border-2 text-xs font-black",
                   isComplete &&
-                    "border-brand-600 bg-brand-600 text-white",
+                    "border-[var(--color-ink-900)] bg-[var(--color-ink-900)] text-white",
                   isCurrent &&
-                    "border-brand-600 bg-white text-brand-700 shadow-[0_0_0_4px_rgba(37,99,235,0.15)]",
+                    "border-[var(--color-ink-900)] bg-white text-[var(--color-ink-900)] shadow-[0_0_0_4px_rgba(37,99,235,0.15)]",
                   isFuture &&
                     "border-[var(--color-border)] bg-white text-[var(--color-ink-500)]"
                 )}
@@ -76,7 +76,7 @@ export function StatusTimeline({ status }: { status: OrderStatus }) {
                   idx === TIMELINE_STEPS.length - 1
                     ? "invisible"
                     : isComplete
-                      ? "bg-brand-600"
+                      ? "bg-[var(--color-ink-900)]"
                       : "bg-[var(--color-border)]"
                 )}
               />

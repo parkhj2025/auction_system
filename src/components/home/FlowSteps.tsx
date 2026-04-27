@@ -42,7 +42,7 @@ export function FlowSteps() {
     >
       <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
         <div className="max-w-2xl">
-          <p className="text-xs font-bold uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-900)]">
             이용 절차
           </p>
           <h2
@@ -61,7 +61,7 @@ export function FlowSteps() {
           {STEPS.map((step, i) => (
             <Fragment key={step.n}>
               <li className="flex flex-col">
-                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-600 text-lg font-black text-white">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-lg font-black text-white">
                   {step.n}
                 </div>
                 <h3 className="mt-6 text-xl font-black tracking-tight text-[var(--color-ink-900)]">
@@ -79,7 +79,7 @@ export function FlowSteps() {
                   <div className="relative h-px w-full bg-[var(--color-border)]">
                     <ArrowRight
                       size={20}
-                      className="absolute -right-2 top-1/2 -translate-y-1/2 text-brand-600"
+                      className="absolute -right-2 top-1/2 -translate-y-1/2 text-[var(--color-ink-900)]"
                     />
                   </div>
                 </li>
@@ -94,7 +94,7 @@ export function FlowSteps() {
             <li key={step.n} className="flex flex-col">
               <div className="flex gap-5">
                 <div className="flex flex-col items-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-600 text-lg font-black text-white">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-lg font-black text-white">
                     {step.n}
                   </div>
                   {i < STEPS.length - 1 && (
@@ -120,7 +120,7 @@ export function FlowSteps() {
                     <ArrowDown
                       size={18}
                       aria-hidden="true"
-                      className="mt-5 text-brand-600"
+                      className="mt-5 text-[var(--color-ink-900)]"
                     />
                   )}
                 </div>

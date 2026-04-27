@@ -58,7 +58,7 @@ function TrustItem({
 }) {
   return (
     <div className="flex flex-col items-start gap-2">
-      <span className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] bg-white text-[var(--color-brand-600)] shadow-[var(--shadow-card)]">
+      <span className="inline-flex h-9 w-9 items-center justify-center rounded-[var(--radius-md)] bg-white text-[var(--color-ink-900)] shadow-[var(--shadow-card)]">
         {icon}
       </span>
       <div>

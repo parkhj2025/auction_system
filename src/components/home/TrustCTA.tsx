@@ -17,12 +17,12 @@ export function TrustCTA() {
   return (
     <section
       aria-labelledby="trust-heading"
-      className="relative overflow-hidden bg-[var(--color-brand-950)] text-white"
+      className="relative overflow-hidden bg-[var(--color-ink-950)] text-white"
     >
       {/* 장식: 좌하단 발광, 과하지 않게 */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-brand-700/40 blur-3xl"
+        className="pointer-events-none absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-black/40 blur-3xl"
       />
 
       <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center px-4 py-20 text-center sm:px-6 sm:py-24">
@@ -44,7 +44,7 @@ export function TrustCTA() {
         >
           입찰일에 법원 방문이 어려우신가요?
         </h2>
-        <p className="mt-5 max-w-2xl text-base leading-7 text-brand-100 sm:text-lg">
+        <p className="mt-5 max-w-2xl text-base leading-7 text-white/85 sm:text-lg">
           물건은 찾았는데 평일에 시간 내기 어려운 분들을 위해, 경매 입찰 대리
           서비스를 운영하고 있습니다. 패찰 시 보증금은 당일 즉시 반환됩니다.
         </p>
@@ -52,7 +52,7 @@ export function TrustCTA() {
         <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Link
             href={PRIMARY_CTA.href}
-            className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-white px-7 text-base font-bold text-[var(--color-brand-900)] shadow-[var(--shadow-lift)] transition hover:bg-brand-50"
+            className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-white px-7 text-base font-bold text-[var(--color-ink-900)] shadow-[var(--shadow-lift)] transition hover:bg-[var(--color-ink-50)]"
           >
             {PRIMARY_CTA.label}
           </Link>

@@ -131,7 +131,7 @@ export function TermsContent() {
             수수료 환불 및 입찰 보증금 반환에 관한 세부 사항은 별도의{" "}
             <a
               href="/refund"
-              className="font-bold text-brand-600 underline decoration-brand-300 underline-offset-2 hover:text-brand-700"
+              className="font-bold text-[var(--color-ink-900)] underline decoration-[var(--color-ink-300)] underline-offset-2 hover:text-black"
             >
               환불 정책
             </a>

@@ -168,7 +168,7 @@ export function Step4Confirm({
     <div className="flex flex-col gap-6">
       <header>
         <div className="flex items-center justify-between gap-3">
-          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             Step 4
           </p>
           <VerifiedBadge verified={data.verified} verifiedName={data.verifiedName} />
@@ -268,7 +268,7 @@ export function Step4Confirm({
                   checked={data.agreedDelegation}
                   onChange={handleAgreeDelegationClick}
                   disabled={!hasSignature || delegationPdfFetching || submitting}
-                  className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-brand-600 disabled:cursor-not-allowed disabled:opacity-50"
+                  className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-[var(--color-ink-900)] disabled:cursor-not-allowed disabled:opacity-50"
                 />
                 <label
                   htmlFor="agree-delegation"
@@ -288,7 +288,7 @@ export function Step4Confirm({
                   <button
                     type="button"
                     onClick={() => setPreviewOpen(true)}
-                    className="ml-2 inline-flex items-center gap-1 text-xs font-bold text-brand-600 underline-offset-2 hover:underline"
+                    className="ml-2 inline-flex items-center gap-1 text-xs font-bold text-[var(--color-ink-900)] underline-offset-2 hover:underline"
                   >
                     <FileText size={12} aria-hidden="true" />
                     위임장 내용 미리보기
@@ -301,14 +301,14 @@ export function Step4Confirm({
                   type="checkbox"
                   checked={data.agreedPrivacy}
                   onChange={(e) => onAgreementChange("agreedPrivacy", e.target.checked)}
-                  className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-brand-600"
+                  className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-[var(--color-ink-900)]"
                 />
                 <label htmlFor="agree-privacy" className="flex-1 cursor-pointer">
                   개인정보 처리방침에 동의합니다.
                   <button
                     type="button"
                     onClick={() => setPrivacyOpen(true)}
-                    className="ml-2 inline-flex items-center gap-1 text-xs font-bold text-brand-600 underline-offset-2 hover:underline"
+                    className="ml-2 inline-flex items-center gap-1 text-xs font-bold text-[var(--color-ink-900)] underline-offset-2 hover:underline"
                   >
                     <FileText size={12} aria-hidden="true" />
                     내용 보기
@@ -321,14 +321,14 @@ export function Step4Confirm({
                   type="checkbox"
                   checked={data.agreedTerms}
                   onChange={(e) => onAgreementChange("agreedTerms", e.target.checked)}
-                  className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-brand-600"
+                  className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-[var(--color-ink-900)]"
                 />
                 <label htmlFor="agree-terms" className="flex-1 cursor-pointer">
                   서비스 이용약관에 동의합니다.
                   <button
                     type="button"
                     onClick={() => setTermsOpen(true)}
-                    className="ml-2 inline-flex items-center gap-1 text-xs font-bold text-brand-600 underline-offset-2 hover:underline"
+                    className="ml-2 inline-flex items-center gap-1 text-xs font-bold text-[var(--color-ink-900)] underline-offset-2 hover:underline"
                   >
                     <FileText size={12} aria-hidden="true" />
                     내용 보기
@@ -368,7 +368,7 @@ export function Step4Confirm({
           type="button"
           onClick={onSubmit}
           disabled={!canSubmit}
-          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
+          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-black disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
         >
           {submitting ? "제출 중..." : "제출"}
           {!submitting && <Send size={16} aria-hidden="true" />}

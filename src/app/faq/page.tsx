@@ -36,7 +36,7 @@ export default function FaqPage() {
       {/* Hero */}
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
         <div className="mx-auto w-full max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
-          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             자주 묻는 질문
           </p>
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
@@ -46,7 +46,7 @@ export default function FaqPage() {
             여기서 답을 찾지 못하신 경우{" "}
             <Link
               href="/contact"
-              className="font-bold text-brand-600 underline decoration-brand-300 underline-offset-2 hover:text-brand-700"
+              className="font-bold text-[var(--color-ink-900)] underline decoration-[var(--color-ink-300)] underline-offset-2 hover:text-black"
             >
               문의하기
             </Link>
@@ -62,7 +62,7 @@ export default function FaqPage() {
               <a
                 key={c.id}
                 href={`#${c.id}`}
-                className="inline-flex h-9 items-center rounded-full border border-[var(--color-border)] bg-white px-4 text-xs font-bold text-[var(--color-ink-700)] hover:border-brand-600 hover:text-brand-700"
+                className="inline-flex h-9 items-center rounded-full border border-[var(--color-border)] bg-white px-4 text-xs font-bold text-[var(--color-ink-700)] hover:border-[var(--color-ink-900)] hover:text-black"
               >
                 {c.label}
               </a>
@@ -82,7 +82,7 @@ export default function FaqPage() {
               className="scroll-mt-24"
             >
               <header>
-                <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+                <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
                   {cat.label}
                 </p>
                 <h2
@@ -96,7 +96,7 @@ export default function FaqPage() {
                 {cat.items.map((it, i) => (
                   <li key={it.q}>
                     <details
-                      className="group rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-5 transition open:border-brand-600 open:bg-brand-50/30"
+                      className="group rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-5 transition open:border-[var(--color-ink-900)] open:bg-[var(--color-ink-50)]/30"
                       {...(i === 0 && cat.id === "fee" ? { open: true } : {})}
                     >
                       <summary className="flex cursor-pointer list-none items-start justify-between gap-4">
@@ -106,7 +106,7 @@ export default function FaqPage() {
                         <ChevronDown
                           size={18}
                           aria-hidden="true"
-                          className="mt-0.5 shrink-0 text-[var(--color-ink-500)] transition group-open:rotate-180 group-open:text-brand-600"
+                          className="mt-0.5 shrink-0 text-[var(--color-ink-500)] transition group-open:rotate-180 group-open:text-[var(--color-ink-900)]"
                         />
                       </summary>
                       <p className="mt-4 text-sm leading-7 text-[var(--color-ink-700)]">
@@ -135,7 +135,7 @@ export default function FaqPage() {
           <div className="flex flex-col gap-3 sm:flex-row">
             <Link
               href="/apply"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-brand-700"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-black"
             >
               입찰 대리 신청
               <ArrowRight size={16} aria-hidden="true" />

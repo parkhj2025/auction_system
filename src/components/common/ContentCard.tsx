@@ -41,7 +41,7 @@ export function ContentCard({
       <h3 className="mt-4 text-lg font-black tracking-tight text-[var(--color-ink-900)]">
         <Link
           href={href}
-          className="before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:before:rounded-[var(--radius-xl)] focus-visible:before:outline focus-visible:before:outline-2 focus-visible:before:outline-offset-2 focus-visible:before:outline-brand-600 group-hover:text-brand-700"
+          className="before:absolute before:inset-0 before:content-[''] focus-visible:outline-none focus-visible:before:rounded-[var(--radius-xl)] focus-visible:before:outline focus-visible:before:outline-2 focus-visible:before:outline-offset-2 focus-visible:before:outline-[var(--color-ink-900)] group-hover:text-black"
         >
           {title}
         </Link>
@@ -72,7 +72,7 @@ export function ContentCard({
         </p>
         <span
           aria-hidden="true"
-          className="inline-flex items-center gap-1 text-xs font-bold text-brand-600 transition group-hover:text-brand-700"
+          className="inline-flex items-center gap-1 text-xs font-bold text-[var(--color-ink-900)] transition group-hover:text-black"
         >
           읽기
           <ArrowRight

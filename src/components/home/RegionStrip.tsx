@@ -19,13 +19,13 @@ export function RegionStrip() {
         <ul className="flex flex-wrap items-center gap-2">
           {COURTS_ACTIVE.map((c) => (
             <li key={c.value}>
-              <span className="inline-flex h-9 items-center gap-1.5 rounded-full bg-brand-600 px-4 text-sm font-bold text-white">
+              <span className="inline-flex h-9 items-center gap-1.5 rounded-full bg-[var(--color-ink-900)] px-4 text-sm font-bold text-white">
                 <span
                   aria-hidden="true"
                   className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent-yellow)]"
                 />
                 {c.label}
-                <span className="ml-1 text-xs font-medium text-brand-100">
+                <span className="ml-1 text-xs font-medium text-white/85">
                   서비스 중
                 </span>
               </span>

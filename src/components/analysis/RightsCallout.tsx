@@ -3,7 +3,7 @@ import { formatKoreanWon } from "@/lib/utils";
 
 /**
  * 03 권리분석 — callout 박스 2종.
- *  - 말소기준등기 callout: brand-600 border + brand-50 bg (사실 신호)
+ *  - 말소기준등기 callout: ink-900 border + ink-50 bg (사실 신호)
  *  - 임차인 callout: 대항력 있음+인수 → danger / 대항력 없음 → neutral
  *
  * voice_guide §5-4 사실 신호 어휘만. "위험" 어휘 0.
@@ -19,8 +19,8 @@ export function RightsCallout({ rights }: { rights: RightsMeta }) {
   return (
     <div className="mt-6 grid gap-3 sm:grid-cols-2">
       {hasBasis ? (
-        <div className="rounded-[var(--radius-md)] border border-l-4 border-[var(--color-border)] border-l-brand-600 bg-[var(--color-brand-50)] p-4">
-          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-brand-700)]">
+        <div className="rounded-[var(--radius-md)] border border-l-4 border-[var(--color-border)] border-l-[var(--color-ink-900)] bg-[var(--color-ink-50)] p-4">
+          <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-900)]">
             말소기준등기
           </p>
           <p className="mt-1.5 text-sm font-bold tabular-nums text-[var(--color-ink-900)]">

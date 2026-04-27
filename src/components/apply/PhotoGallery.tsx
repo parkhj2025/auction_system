@@ -81,7 +81,7 @@ export function PhotoGallery({ docid }: { docid: string }) {
             key={photo.seq}
             type="button"
             onClick={() => setLightboxIdx(idx)}
-            className="group aspect-[4/3] overflow-hidden rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] transition hover:border-brand-400"
+            className="group aspect-[4/3] overflow-hidden rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] transition hover:border-[var(--color-ink-700)]"
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img

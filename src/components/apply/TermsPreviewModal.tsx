@@ -75,7 +75,7 @@ export function TermsPreviewModal({ isOpen, onClose }: Props) {
             href="/terms"
             target="_blank"
             rel="noopener noreferrer"
-            className="inline-flex items-center gap-1 text-xs font-bold text-brand-600 underline-offset-2 hover:underline"
+            className="inline-flex items-center gap-1 text-xs font-bold text-[var(--color-ink-900)] underline-offset-2 hover:underline"
           >
             <ExternalLink size={12} aria-hidden="true" />
             전체 페이지로 보기 (새 탭)

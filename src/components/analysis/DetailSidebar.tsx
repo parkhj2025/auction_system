@@ -6,7 +6,7 @@ import { FEES } from "@/lib/constants";
 
 /**
  * 분석 상세 사이드바 — 데스크톱 전용 sticky 4 block.
- *  block 1: 핵심 수치 MiniStat (감정가/최저가 brand-50 강조/보증금/기일/면적)
+ *  block 1: 핵심 수치 MiniStat (감정가/최저가 ink-50 강조/보증금/기일/면적)
  *  block 2: CTA (입찰 대리 신청 + 카카오 상담)
  *  block 3: TOC 7섹션 (#section-NN 앵커, scroll-mt-24)
  *  block 4: 근거자료 mini list (대법원 / 네○○ / 국토부)
@@ -42,11 +42,11 @@ export function DetailSidebar({ fm }: { fm: AnalysisFrontmatter }) {
                 label="감정가"
                 value={fm.appraisalDisplay ?? formatKoreanWon(fm.appraisal)}
               />
-              <div className="rounded-[var(--radius-md)] bg-[var(--color-brand-50)] p-3">
-                <p className="text-[11px] font-bold text-[var(--color-brand-700)] tabular-nums">
+              <div className="rounded-[var(--radius-md)] bg-[var(--color-ink-50)] p-3">
+                <p className="text-[11px] font-bold text-[var(--color-ink-900)] tabular-nums">
                   {fm.round}차 최저가 · {fm.percent}%
                 </p>
-                <p className="mt-1 text-2xl font-black tabular-nums leading-none text-[var(--color-brand-700)]">
+                <p className="mt-1 text-2xl font-black tabular-nums leading-none text-[var(--color-ink-900)]">
                   {fm.minPriceDisplay ?? formatKoreanWon(fm.minPrice)}
                 </p>
               </div>
@@ -68,7 +68,7 @@ export function DetailSidebar({ fm }: { fm: AnalysisFrontmatter }) {
           <div className="space-y-2 p-5">
             <Link
               href={applyHref}
-              className="flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-brand-600 px-5 text-sm font-black tracking-tight text-white shadow-[var(--shadow-card)] transition duration-150 ease-out hover:bg-brand-700"
+              className="flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-5 text-sm font-black tracking-tight text-white shadow-[var(--shadow-card)] transition duration-150 ease-out hover:bg-black"
             >
               이 물건 입찰 대리 신청
             </Link>
@@ -99,9 +99,9 @@ export function DetailSidebar({ fm }: { fm: AnalysisFrontmatter }) {
               <li key={s.id}>
                 <a
                   href={`#${s.id}`}
-                  className="group flex items-baseline gap-2 text-[var(--color-ink-700)] transition duration-150 ease-out hover:text-[var(--color-brand-700)]"
+                  className="group flex items-baseline gap-2 text-[var(--color-ink-700)] transition duration-150 ease-out hover:text-[var(--color-ink-900)]"
                 >
-                  <span className="text-[11px] font-black tabular-nums text-[var(--color-ink-500)] group-hover:text-brand-600">
+                  <span className="text-[11px] font-black tabular-nums text-[var(--color-ink-500)] group-hover:text-[var(--color-ink-900)]">
                     {s.label}
                   </span>
                   <span className="font-medium">{s.title}</span>

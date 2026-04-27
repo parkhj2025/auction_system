@@ -88,7 +88,7 @@ export default function ApplyGuidePage() {
             <ChevronRight size={12} aria-hidden="true" />
             <span className="text-[var(--color-ink-700)]">신청 가이드</span>
           </nav>
-          <p className="mt-5 text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="mt-5 text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             신청 가이드
           </p>
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
@@ -108,7 +108,7 @@ export default function ApplyGuidePage() {
             return (
               <li key={step.id} className="flex gap-5">
                 <div className="flex flex-col items-center">
-                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-brand-600 text-sm font-black text-white">
+                  <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-sm font-black text-white">
                     {i + 1}
                   </span>
                   {i < APPLY_STEPS.length - 1 && (
@@ -137,7 +137,7 @@ export default function ApplyGuidePage() {
                     ))}
                   </ul>
                   {detail.tip && (
-                    <p className="mt-3 rounded-[var(--radius-md)] bg-brand-50/50 px-4 py-3 text-xs leading-5 text-brand-700">
+                    <p className="mt-3 rounded-[var(--radius-md)] bg-[var(--color-ink-50)]/70 px-4 py-3 text-xs leading-5 text-[var(--color-ink-900)]">
                       TIP · {detail.tip}
                     </p>
                   )}
@@ -150,7 +150,7 @@ export default function ApplyGuidePage() {
 
       <section className="border-t border-[var(--color-border)] bg-[var(--color-surface-muted)]">
         <div className="mx-auto w-full max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
-          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             자주 묻는 질문
           </p>
           <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
@@ -174,7 +174,7 @@ export default function ApplyGuidePage() {
           <div className="mt-10 flex justify-center">
             <Link
               href="/apply"
-              className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-7 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-brand-700"
+              className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-7 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-black"
             >
               신청 페이지로 이동
               <ArrowRight size={16} aria-hidden="true" />

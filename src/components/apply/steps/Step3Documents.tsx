@@ -23,7 +23,7 @@ export function Step3Documents({
     <div className="flex flex-col gap-6">
       <header>
         <div className="flex items-center justify-between gap-3">
-          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             Step 3
           </p>
           <VerifiedBadge verified={data.verified} verifiedName={data.verifiedName} />
@@ -40,7 +40,7 @@ export function Step3Documents({
       <div className="flex items-start gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-5 py-4 text-sm">
         <Info
           size={16}
-          className="mt-0.5 shrink-0 text-brand-600"
+          className="mt-0.5 shrink-0 text-[var(--color-ink-900)]"
           aria-hidden="true"
         />
         <p className="leading-6 text-[var(--color-ink-700)]">
@@ -101,7 +101,7 @@ export function Step3Documents({
           type="button"
           onClick={onNext}
           disabled={!canProceed}
-          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
+          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-black disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
         >
           다음: 확인·제출
           <ArrowRight size={16} aria-hidden="true" />

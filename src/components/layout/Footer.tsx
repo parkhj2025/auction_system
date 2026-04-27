@@ -9,7 +9,7 @@ export function Footer() {
         <div className="grid gap-10 md:grid-cols-4">
           <div className="md:col-span-1">
             <div className="flex items-center gap-2">
-              <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-brand-600 text-sm font-black text-white">
+              <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--color-ink-900)] text-sm font-black text-white">
                 경
               </span>
               <span className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">

@@ -112,7 +112,7 @@ export function ProfileForm({
       <button
         type="submit"
         disabled={saving}
-        className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-brand-600 px-6 text-sm font-black text-white shadow-[var(--shadow-card)] transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-6 text-sm font-black text-white shadow-[var(--shadow-card)] transition hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
       >
         {saving ? "저장 중..." : "저장"}
       </button>

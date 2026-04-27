@@ -49,7 +49,7 @@ export function UserMenu({ displayName, email, initial }: UserMenuProps) {
         aria-label="사용자 메뉴"
         aria-expanded={open}
         aria-haspopup="menu"
-        className="flex h-10 w-10 items-center justify-center rounded-full bg-brand-600 text-sm font-black text-white transition hover:bg-brand-700"
+        className="flex h-10 w-10 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-sm font-black text-white transition hover:bg-black"
       >
         {initial}
       </button>

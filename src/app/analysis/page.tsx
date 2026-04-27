@@ -82,7 +82,7 @@ export default async function AnalysisListPage({
       {/* 섹션 헤더 */}
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
         <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
-          <p className="text-xs font-bold uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-900)]">
             무료 물건분석
           </p>
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
@@ -130,7 +130,7 @@ export default async function AnalysisListPage({
               />
               <button
                 type="submit"
-                className="h-8 rounded-full bg-brand-600 px-3 text-xs font-bold text-white hover:bg-brand-700"
+                className="h-8 rounded-full bg-[var(--color-ink-900)] px-3 text-xs font-bold text-white hover:bg-black"
               >
                 검색
               </button>
@@ -180,7 +180,7 @@ export default async function AnalysisListPage({
           {(activeQ || activeSort !== "latest") && (
             <Link
               href="/analysis"
-              className="text-xs font-bold text-brand-600 hover:text-brand-700"
+              className="text-xs font-bold text-[var(--color-ink-900)] hover:text-black"
             >
               필터 초기화
             </Link>
@@ -197,7 +197,7 @@ export default async function AnalysisListPage({
             </p>
             <Link
               href="/analysis"
-              className="mt-6 inline-flex h-11 items-center rounded-[var(--radius-md)] bg-brand-600 px-5 text-sm font-bold text-white hover:bg-brand-700"
+              className="mt-6 inline-flex h-11 items-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-5 text-sm font-bold text-white hover:bg-black"
             >
               전체 보기
             </Link>

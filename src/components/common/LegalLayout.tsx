@@ -35,7 +35,7 @@ export function LegalLayout({
             <ChevronRight size={12} aria-hidden="true" />
             <span className="text-[var(--color-ink-700)]">{title}</span>
           </nav>
-          <p className="mt-5 text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="mt-5 text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             법적 고지
           </p>
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
@@ -66,7 +66,7 @@ export function LegalLayout({
           <div className="mt-8 flex items-start gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 py-4 text-xs leading-5 text-[var(--color-ink-700)]">
             <Info
               size={14}
-              className="mt-0.5 shrink-0 text-brand-600"
+              className="mt-0.5 shrink-0 text-[var(--color-ink-900)]"
               aria-hidden="true"
             />
             <p>
@@ -89,7 +89,7 @@ export function LegalLayout({
             본 문서와 관련한 문의는{" "}
             <Link
               href="/contact"
-              className="font-bold text-brand-600 underline decoration-brand-300 underline-offset-2 hover:text-brand-700"
+              className="font-bold text-[var(--color-ink-900)] underline decoration-[var(--color-ink-300)] underline-offset-2 hover:text-black"
             >
               문의하기
             </Link>{" "}
@@ -121,7 +121,7 @@ export function Article({
         id={`article-${number}-heading`}
         className="flex items-baseline gap-3 border-t border-[var(--color-border)] pt-8 text-xl font-black tracking-tight text-[var(--color-ink-900)] first:border-t-0 first:pt-0"
       >
-        <span className="text-xs font-black uppercase tracking-[0.2em] text-brand-600">
+        <span className="text-xs font-black uppercase tracking-[0.2em] text-[var(--color-ink-900)]">
           {number}
         </span>
         {title}
@@ -136,7 +136,7 @@ export function Article({
 /** 항목 번호가 매겨진 리스트. */
 export function Clauses({ children }: { children: React.ReactNode }) {
   return (
-    <ol className="flex list-decimal flex-col gap-2 pl-6 marker:font-bold marker:text-brand-600">
+    <ol className="flex list-decimal flex-col gap-2 pl-6 marker:font-bold marker:text-[var(--color-ink-900)]">
       {children}
     </ol>
   );

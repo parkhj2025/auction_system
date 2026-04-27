@@ -56,7 +56,7 @@ export function ScenarioCardsBoard({ inv }: { inv: InvestmentMeta }) {
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
                   <span
-                    className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-brand-50)] text-[var(--color-brand-600)]"
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-ink-50)] text-[var(--color-ink-900)]"
                     aria-hidden="true"
                   >
                     <Icon size={14} />
@@ -83,7 +83,7 @@ export function ScenarioCardsBoard({ inv }: { inv: InvestmentMeta }) {
                     </div>
                   ))}
                 </dl>
-                <p className="mt-3 text-[11px] font-bold text-[var(--color-brand-600)] group-hover:text-[var(--color-brand-700)]">
+                <p className="mt-3 text-[11px] font-bold text-[var(--color-ink-900)] group-hover:text-[var(--color-ink-900)]">
                   전체 표 보기 →
                 </p>
               </div>
@@ -140,7 +140,7 @@ interface ScenarioCard {
  *  근거 — CLAUDE.md §13 절대 규칙 ("오렌지 금지 + 3색 이상 강조 금지").
  *  근거 — frontend-design 스킬: "dominant + sharp accents" + "cohesive aesthetic".
  *  근거 — ui-ux-pro-max: visual-hierarchy ("size, spacing, contrast — not color alone").
- *  4 카드 모두 동일 무채색 디자인. 시나리오 구분은 좌측 대형 번호 + 아이콘 단일 brand-600.
+ *  4 카드 모두 동일 무채색 디자인. 시나리오 구분은 좌측 대형 번호 + 아이콘 단일 ink-900.
  *  ScenarioCard wrap (mdx-components) 측도 동일 정책. */
 const SCENARIO_ICON: Record<string, typeof Home> = {
   A: Home,

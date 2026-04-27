@@ -284,8 +284,8 @@ export default async function AdminOrderDetailPage({
 
         {/* 오른쪽: 상태 변경 + 이력 */}
         <div className="flex flex-col gap-6">
-          <div className="rounded-[var(--radius-xl)] border-2 border-brand-600 bg-brand-50/30 p-6">
-            <h2 className="text-sm font-black uppercase tracking-wider text-brand-700">
+          <div className="rounded-[var(--radius-xl)] border-2 border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/50 p-6">
+            <h2 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-900)]">
               상태 변경
             </h2>
             <div className="mt-4">

@@ -81,7 +81,7 @@ export default function ServicePage() {
       {/* Hero */}
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
         <div className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             서비스 안내
           </p>
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
@@ -97,7 +97,7 @@ export default function ServicePage() {
 
       {/* 업무 범위 비교 */}
       <section className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-        <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+        <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
           업무 범위
         </p>
         <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
@@ -109,8 +109,8 @@ export default function ServicePage() {
         </p>
 
         <div className="mt-10 grid gap-5 md:grid-cols-2">
-          <article className="rounded-[var(--radius-xl)] border border-brand-600 bg-brand-50/30 p-6">
-            <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+          <article className="rounded-[var(--radius-xl)] border border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/50 p-6">
+            <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
               우리가 하는 일
             </p>
             <h3 className="mt-2 text-xl font-black text-[var(--color-ink-900)]">
@@ -121,7 +121,7 @@ export default function ServicePage() {
                 <li key={item} className="flex gap-2">
                   <Check
                     size={16}
-                    className="mt-0.5 shrink-0 text-brand-600"
+                    className="mt-0.5 shrink-0 text-[var(--color-ink-900)]"
                     aria-hidden="true"
                   />
                   <span>{item}</span>
@@ -160,7 +160,7 @@ export default function ServicePage() {
       {/* SOP */}
       <section className="border-t border-[var(--color-border)] bg-white">
         <div className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             진행 절차
           </p>
           <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
@@ -172,7 +172,7 @@ export default function ServicePage() {
               return (
                 <li key={step.id} className="flex gap-5">
                   <div className="flex flex-col items-center">
-                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-brand-600 text-base font-black text-white">
+                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-base font-black text-white">
                       {step.id}
                     </span>
                     {step.id < SOP.length && (
@@ -187,7 +187,7 @@ export default function ServicePage() {
                       <h3 className="text-lg font-black text-[var(--color-ink-900)]">
                         <Icon
                           size={16}
-                          className="mr-1 inline-block text-brand-600"
+                          className="mr-1 inline-block text-[var(--color-ink-900)]"
                           aria-hidden="true"
                         />
                         {step.title}
@@ -210,7 +210,7 @@ export default function ServicePage() {
       {/* 수수료 요약 */}
       <section className="border-t border-[var(--color-border)] bg-[var(--color-surface-muted)]">
         <div className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             수수료 체계
           </p>
           <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
@@ -238,7 +238,7 @@ export default function ServicePage() {
                 key={tier.label}
                 className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6"
               >
-                <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+                <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
                   {tier.label}
                 </p>
                 <p className="mt-2 text-3xl font-black tabular-nums text-[var(--color-ink-900)]">
@@ -262,7 +262,7 @@ export default function ServicePage() {
           <div className="mt-8">
             <Link
               href="/#pricing"
-              className="inline-flex items-center gap-1 text-sm font-bold text-brand-600 hover:text-brand-700"
+              className="inline-flex items-center gap-1 text-sm font-bold text-[var(--color-ink-900)] hover:text-black"
             >
               상세 수수료 비교 보기
               <ArrowRight size={14} aria-hidden="true" />
@@ -274,7 +274,7 @@ export default function ServicePage() {
       {/* 안심 근거 */}
       <section className="border-t border-[var(--color-border)] bg-white">
         <div className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
-          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             안심 근거
           </p>
           <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
@@ -289,7 +289,7 @@ export default function ServicePage() {
           <div className="mt-10 flex flex-col gap-3 sm:flex-row">
             <Link
               href="/apply"
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-brand-700"
+              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-black"
             >
               입찰 대리 신청
               <ArrowRight size={16} aria-hidden="true" />

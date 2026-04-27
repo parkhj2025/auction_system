@@ -182,7 +182,7 @@ export default function RefundPage() {
           환불과 관련한 이견이 있는 경우 먼저{" "}
           <Link
             href="/contact"
-            className="font-bold text-brand-600 underline decoration-brand-300 underline-offset-2 hover:text-brand-700"
+            className="font-bold text-[var(--color-ink-900)] underline decoration-[var(--color-ink-300)] underline-offset-2 hover:text-black"
           >
             문의하기
           </Link>{" "}

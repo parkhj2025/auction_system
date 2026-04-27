@@ -62,7 +62,7 @@ export function DepositStatus({ order }: { order: OrderRow }) {
               {isDone && !isCurrent ? (
                 <Check
                   size={14}
-                  className="shrink-0 text-brand-600"
+                  className="shrink-0 text-[var(--color-ink-900)]"
                   aria-hidden="true"
                 />
               ) : (
@@ -70,7 +70,7 @@ export function DepositStatus({ order }: { order: OrderRow }) {
                   size={14}
                   className={
                     isCurrent
-                      ? "shrink-0 fill-brand-600 text-brand-600"
+                      ? "shrink-0 fill-[var(--color-ink-900)] text-[var(--color-ink-900)]"
                       : "shrink-0 text-[var(--color-ink-300)]"
                   }
                   aria-hidden="true"

@@ -13,7 +13,7 @@
  *  - tab click → active detail crossfade
  *  - 슬라이더 drag → mini chart 막대 width animate + 점 위치 update + detail 재계산
  *
- * 모노톤: ink + brand-600 단일 액센트. active = brand-600 underline / fill solid.
+ * 모노톤: ink + ink-900 단일 강조. active = ink-900 underline / fill solid.
  * case study 인용: scrollytelling Animated Transition + Show-and-Play / chart-visualization radar+bar / Distill "Parameter sliders update plots in real-time".
  */
 import { motion, AnimatePresence, useInView } from "motion/react";
@@ -129,7 +129,7 @@ export function ScenarioComparisonBox({
               {isActive ? (
                 <motion.span
                   layoutId="scenario-tab-underline"
-                  className="absolute -bottom-px left-0 right-0 h-0.5 bg-[var(--color-brand-600)]"
+                  className="absolute -bottom-px left-0 right-0 h-0.5 bg-[var(--color-ink-900)]"
                   transition={{ duration: 0.3, ease: [0.16, 1, 0.3, 1] }}
                 />
               ) : null}
@@ -216,11 +216,11 @@ export function ScenarioComparisonBox({
                         transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
                       />
                     </div>
-                    {/* 수익 점 (막대 위 absolute, profit 부호에 따라 brand-600 또는 ink-300) */}
+                    {/* 수익 점 (막대 위 absolute, profit 부호에 따라 ink-900 또는 ink-300) */}
                     <motion.span
                       className={`absolute -top-1.5 h-6 w-1 -translate-x-1/2 rounded-full ${
                         stat.profit > 0
-                          ? "bg-[var(--color-brand-600)]"
+                          ? "bg-[var(--color-ink-900)]"
                           : stat.profit < 0
                             ? "bg-[var(--color-ink-700)]"
                             : "bg-[var(--color-ink-300)]"
@@ -268,7 +268,7 @@ export function ScenarioComparisonBox({
             aria-label="낙찰가 슬라이더"
             aria-valuenow={biddingPercent}
             aria-valuetext={`${formatKoreanWon(userBidPrice)} (최저가 + ${biddingPercent}%)`}
-            className="flex-1 accent-[var(--color-brand-600)]"
+            className="flex-1 accent-[var(--color-ink-900)]"
           />
           <span className="text-xs tabular-nums text-[var(--color-ink-500)]">
             {formatKoreanWon(appraisal)}
@@ -276,7 +276,7 @@ export function ScenarioComparisonBox({
         </div>
         <p className="mt-3 text-center text-sm font-bold tabular-nums text-[var(--color-ink-900)]">
           입찰가{" "}
-          <span className="text-[var(--color-brand-700)]">
+          <span className="text-[var(--color-ink-900)]">
             {formatKoreanWon(userBidPrice)}
           </span>{" "}
           기준

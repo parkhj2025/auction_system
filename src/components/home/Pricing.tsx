@@ -67,7 +67,7 @@ export function Pricing() {
     >
       <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
         <div className="max-w-2xl">
-          <p className="text-xs font-bold uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-900)]">
             수수료
           </p>
           <h2
@@ -90,17 +90,17 @@ export function Pricing() {
               className={cn(
                 "relative flex flex-col rounded-[var(--radius-xl)] border bg-white p-7 shadow-[var(--shadow-card)]",
                 tier.highlight
-                  ? "border-brand-600 ring-2 ring-brand-600/20"
+                  ? "border-[var(--color-ink-900)] ring-2 ring-[var(--color-ink-900)]/20"
                   : "border-[var(--color-border)]"
               )}
             >
               {tier.highlight && (
-                <span className="absolute -top-3 left-7 inline-flex h-6 items-center rounded-full bg-brand-600 px-3 text-[11px] font-bold uppercase tracking-wide text-white">
+                <span className="absolute -top-3 left-7 inline-flex h-6 items-center rounded-full bg-[var(--color-ink-900)] px-3 text-[11px] font-bold uppercase tracking-wide text-white">
                   추천
                 </span>
               )}
               <header>
-                <p className="text-sm font-bold text-brand-600">{tier.name}</p>
+                <p className="text-sm font-bold text-[var(--color-ink-900)]">{tier.name}</p>
                 <p className="mt-1 text-xs text-[var(--color-ink-500)]">
                   {tier.tag}
                 </p>
@@ -118,7 +118,7 @@ export function Pricing() {
                   <li key={b} className="flex gap-2">
                     <Check
                       size={16}
-                      className="mt-0.5 shrink-0 text-brand-600"
+                      className="mt-0.5 shrink-0 text-[var(--color-ink-900)]"
                       aria-hidden="true"
                     />
                     <span>{b}</span>
@@ -130,7 +130,7 @@ export function Pricing() {
                 className={cn(
                   "mt-8 flex min-h-12 items-center justify-center rounded-[var(--radius-md)] px-4 text-sm font-bold transition",
                   tier.highlight
-                    ? "bg-brand-600 text-white hover:bg-brand-700"
+                    ? "bg-[var(--color-ink-900)] text-white hover:bg-black"
                     : "border border-[var(--color-border)] bg-white text-[var(--color-ink-900)] hover:bg-[var(--color-ink-100)]"
                 )}
               >
@@ -143,13 +143,13 @@ export function Pricing() {
         {/* 성공보수 + 당일 즉시 반환 강조 배너 */}
         <div className="mt-10 grid gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-8">
           <div className="flex items-start gap-4">
-            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-brand-50 text-brand-600">
+            <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-50)] text-[var(--color-ink-900)]">
               <ShieldCheck size={22} aria-hidden="true" />
             </span>
             <div>
               <p className="text-base font-bold text-[var(--color-ink-900)]">
                 낙찰 성공보수{" "}
-                <span className="text-brand-600">
+                <span className="text-[var(--color-ink-900)]">
                   +{feeLabel(FEES.successBonus)}
                 </span>
                 는 낙찰된 경우에만 청구합니다
@@ -165,7 +165,7 @@ export function Pricing() {
           </div>
           <Link
             href={PRIMARY_CTA.href}
-            className="flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-brand-600 px-6 text-sm font-bold text-white hover:bg-brand-700 sm:whitespace-nowrap"
+            className="flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-6 text-sm font-bold text-white hover:bg-black sm:whitespace-nowrap"
           >
             {PRIMARY_CTA.label}
           </Link>

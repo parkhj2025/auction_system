@@ -92,7 +92,7 @@ export default async function AdminDashboardPage() {
           접수 현황과 주요 지표를 한눈에 확인하세요. 전체 내역은{" "}
           <Link
             href="/admin/orders"
-            className="font-bold text-brand-600 hover:text-brand-700"
+            className="font-bold text-[var(--color-ink-900)] hover:text-black"
           >
             접수 목록
           </Link>
@@ -143,7 +143,7 @@ export default async function AdminDashboardPage() {
           </h2>
           <Link
             href="/admin/orders"
-            className="text-xs font-bold text-brand-600 hover:text-brand-700"
+            className="text-xs font-bold text-[var(--color-ink-900)] hover:text-black"
           >
             전체 목록 보기
           </Link>

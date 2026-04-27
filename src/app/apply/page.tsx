@@ -34,7 +34,7 @@ export default function ApplyPage() {
             <span className="text-[var(--color-ink-700)]">입찰 대리 신청</span>
           </nav>
 
-          <p className="mt-5 text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="mt-5 text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             입찰 대리 신청
           </p>
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
@@ -45,7 +45,7 @@ export default function ApplyPage() {
             완결됩니다. 접수 후 확인 연락은 카카오톡으로 드립니다.{" "}
             <Link
               href="/apply/guide"
-              className="font-bold text-brand-600 underline decoration-brand-300 underline-offset-2 hover:text-brand-700"
+              className="font-bold text-[var(--color-ink-900)] underline decoration-[var(--color-ink-300)] underline-offset-2 hover:text-black"
             >
               처음이세요? 신청 가이드
             </Link>

@@ -58,7 +58,7 @@ export function DocumentList({ documents }: { documents: DocumentWithUrl[] }) {
                 href={doc.signedUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-10 items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-white px-3 text-xs font-bold text-[var(--color-ink-900)] hover:border-brand-600 hover:text-brand-700"
+                className="inline-flex min-h-10 items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-white px-3 text-xs font-bold text-[var(--color-ink-900)] hover:border-[var(--color-ink-900)] hover:text-black"
               >
                 <Download size={14} aria-hidden="true" />
                 열기

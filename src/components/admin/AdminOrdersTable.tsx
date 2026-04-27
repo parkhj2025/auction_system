@@ -90,7 +90,7 @@ export function AdminOrdersTable({ orders }: { orders: OrderRow[] }) {
                   <Td>
                     <Link
                       href={`/admin/orders/${o.id}`}
-                      className="text-xs font-bold text-brand-600 hover:text-brand-700"
+                      className="text-xs font-bold text-[var(--color-ink-900)] hover:text-black"
                     >
                       상세 →
                     </Link>
@@ -110,7 +110,7 @@ export function AdminOrdersTable({ orders }: { orders: OrderRow[] }) {
             <Link
               key={o.id}
               href={`/admin/orders/${o.id}`}
-              className="flex flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white p-4 transition hover:border-brand-600"
+              className="flex flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white p-4 transition hover:border-[var(--color-ink-900)]"
             >
               <div className="flex items-center justify-between gap-2">
                 <span

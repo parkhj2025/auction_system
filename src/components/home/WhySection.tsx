@@ -74,7 +74,7 @@ export function WhySection() {
     >
       <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
         <div className="max-w-2xl">
-          <p className="text-xs font-bold uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-900)]">
             왜 {BRAND_NAME}인가
           </p>
           <h2
@@ -108,7 +108,7 @@ export function WhySection() {
                 </th>
                 <th
                   scope="col"
-                  className="px-5 py-4 text-left text-sm font-bold text-brand-700"
+                  className="px-5 py-4 text-left text-sm font-bold text-[var(--color-ink-900)]"
                 >
                   {BRAND_NAME} 입찰 대리
                 </th>
@@ -133,11 +133,11 @@ export function WhySection() {
                       <span>{row.self}</span>
                     </div>
                   </td>
-                  <td className="bg-brand-50/40 px-5 py-4 align-top">
+                  <td className="bg-[var(--color-ink-50)]/60 px-5 py-4 align-top">
                     <div className="flex gap-2 font-medium text-[var(--color-ink-900)]">
                       <Check
                         size={16}
-                        className="mt-0.5 shrink-0 text-brand-600"
+                        className="mt-0.5 shrink-0 text-[var(--color-ink-900)]"
                         aria-hidden="true"
                       />
                       <span>{row.ours}</span>
@@ -156,7 +156,7 @@ export function WhySection() {
               key={title}
               className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]"
             >
-              <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-brand-50 text-brand-600">
+              <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-50)] text-[var(--color-ink-900)]">
                 <Icon size={22} aria-hidden="true" />
               </span>
               <h3 className="mt-5 text-lg font-black tracking-tight text-[var(--color-ink-900)]">

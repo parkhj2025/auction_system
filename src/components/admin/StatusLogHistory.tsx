@@ -24,7 +24,7 @@ export function StatusLogHistory({ logs }: { logs: LogEntry[] }) {
         <li key={log.id} className="relative">
           <span
             aria-hidden="true"
-            className="absolute -left-[27px] top-1.5 h-3 w-3 rounded-full border-2 border-brand-600 bg-white"
+            className="absolute -left-[27px] top-1.5 h-3 w-3 rounded-full border-2 border-[var(--color-ink-900)] bg-white"
           />
           <div className="text-xs">
             <p className="font-bold text-[var(--color-ink-900)]">

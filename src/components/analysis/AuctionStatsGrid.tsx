@@ -36,7 +36,7 @@ export function AuctionStatsGrid({
           <p className="mt-1 text-xs tabular-nums text-[var(--color-ink-500)]">
             {entry.count}건
           </p>
-          <p className="mt-2 text-2xl font-black tabular-nums leading-tight text-[var(--color-brand-700)]">
+          <p className="mt-2 text-2xl font-black tabular-nums leading-tight text-[var(--color-ink-900)]">
             {entry.rate.toFixed(2)}%
           </p>
           <p className="text-[10px] uppercase tracking-widest text-[var(--color-ink-500)]">

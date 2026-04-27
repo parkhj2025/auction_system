@@ -19,7 +19,7 @@ export function OrderCard({ order }: { order: OrderRow }) {
   return (
     <Link
       href={`/my/orders/${order.id}`}
-      className="group relative flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-5 shadow-sm transition hover:border-brand-600 hover:shadow-[var(--shadow-card)]"
+      className="group relative flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-5 shadow-sm transition hover:border-[var(--color-ink-900)] hover:shadow-[var(--shadow-card)]"
     >
       <div className="flex items-start justify-between gap-3">
         <div className="min-w-0 flex-1">
@@ -46,7 +46,7 @@ export function OrderCard({ order }: { order: OrderRow }) {
         </div>
         <ChevronRight
           size={18}
-          className="mt-1 shrink-0 text-[var(--color-ink-500)] transition group-hover:text-brand-600"
+          className="mt-1 shrink-0 text-[var(--color-ink-500)] transition group-hover:text-[var(--color-ink-900)]"
           aria-hidden="true"
         />
       </div>

@@ -74,8 +74,8 @@ export default async function AdminOrdersListPage({
               className={cn(
                 "inline-flex min-h-9 items-center rounded-full border px-4 text-xs font-bold transition",
                 isActive
-                  ? "border-brand-600 bg-brand-600 text-white"
-                  : "border-[var(--color-border)] bg-white text-[var(--color-ink-700)] hover:border-brand-600 hover:text-brand-700"
+                  ? "border-[var(--color-ink-900)] bg-[var(--color-ink-900)] text-white"
+                  : "border-[var(--color-border)] bg-white text-[var(--color-ink-700)] hover:border-[var(--color-ink-900)] hover:text-black"
               )}
             >
               {f.label}

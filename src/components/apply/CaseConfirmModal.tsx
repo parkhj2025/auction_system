@@ -148,7 +148,7 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
           <ShieldCheck
             size={18}
             aria-hidden="true"
-            className="text-brand-600"
+            className="text-[var(--color-ink-900)]"
           />
           <h2
             id="case-confirm-modal-title"
@@ -300,7 +300,7 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
               type="checkbox"
               checked={agreed}
               onChange={(e) => setAgreed(e.target.checked)}
-              className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-brand-600"
+              className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-[var(--color-ink-900)]"
             />
             <span className="flex-1 text-sm leading-6 text-[var(--color-ink-900)]">
               {CASE_CONFIRM_CHECKBOX_LABEL}
@@ -322,7 +322,7 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
               type="button"
               onClick={handleConfirm}
               disabled={!canConfirm}
-              className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-4 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
+              className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-4 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-black disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
             >
               확인
             </button>

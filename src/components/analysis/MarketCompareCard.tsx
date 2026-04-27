@@ -36,9 +36,9 @@ export function MarketCompareCard({
 
   return (
     <div className="mt-6 space-y-4">
-      <div className="rounded-[var(--radius-md)] border-l-4 border-brand-600 bg-[var(--color-brand-50)] px-4 py-3 text-sm leading-6 text-[var(--color-ink-700)]">
+      <div className="rounded-[var(--radius-md)] border-l-4 border-[var(--color-ink-900)] bg-[var(--color-ink-50)] px-4 py-3 text-sm leading-6 text-[var(--color-ink-700)]">
         시세 평균 대비 {round}차 최저가는{" "}
-        <span className="font-bold tabular-nums text-[var(--color-brand-700)]">
+        <span className="font-bold tabular-nums text-[var(--color-ink-900)]">
           {minVsAvgRatio.toFixed(0)}%
         </span>{" "}
         수준
@@ -89,26 +89,26 @@ function CompareCell({
   return (
     <div
       className={`rounded-[var(--radius-md)] border border-[var(--color-border)] p-4 ${
-        accent ? "bg-[var(--color-brand-50)]" : "bg-white"
+        accent ? "bg-[var(--color-ink-50)]" : "bg-white"
       }`}
     >
       <p
         className={`text-[10px] font-bold uppercase tracking-[0.18em] ${
-          accent ? "text-[var(--color-brand-700)]" : "text-[var(--color-ink-500)]"
+          accent ? "text-[var(--color-ink-900)]" : "text-[var(--color-ink-500)]"
         }`}
       >
         {label}
       </p>
       <p
         className={`mt-1.5 text-xl font-black tabular-nums leading-tight sm:text-2xl ${
-          accent ? "text-[var(--color-brand-700)]" : "text-[var(--color-ink-900)]"
+          accent ? "text-[var(--color-ink-900)]" : "text-[var(--color-ink-900)]"
         }`}
       >
         {value}
       </p>
       <p
         className={`mt-1 text-[11px] tabular-nums ${
-          accent ? "text-[var(--color-brand-700)]" : "text-[var(--color-ink-500)]"
+          accent ? "text-[var(--color-ink-900)]" : "text-[var(--color-ink-500)]"
         }`}
       >
         {sub}

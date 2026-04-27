@@ -236,7 +236,7 @@ export function Step1Property({
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+        <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
           Step 1
         </p>
         <h2 className="mt-1 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
@@ -304,7 +304,7 @@ export function Step1Property({
                 disabled={
                   checking || !CASE_NUMBER_PATTERN.test(data.caseNumber.trim())
                 }
-                className="inline-flex h-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-brand-600 bg-white px-4 text-sm font-bold text-brand-700 hover:bg-brand-50 disabled:cursor-not-allowed disabled:border-[var(--color-border)] disabled:bg-[var(--color-ink-100)] disabled:text-[var(--color-ink-500)]"
+                className="inline-flex h-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-ink-900)] bg-white px-4 text-sm font-bold text-[var(--color-ink-900)] hover:bg-[var(--color-ink-50)] disabled:cursor-not-allowed disabled:border-[var(--color-border)] disabled:bg-[var(--color-ink-100)] disabled:text-[var(--color-ink-500)]"
               >
                 {checking ? "확인 중..." : "사건번호 확인"}
               </button>
@@ -365,8 +365,8 @@ export function Step1Property({
 
       {/* 복수 물건 선택 UI (D3: listings 2건 이상) */}
       {listings.length >= 2 && !caseTaken && !listing && (
-        <div className="rounded-[var(--radius-xl)] border-2 border-brand-200 bg-brand-50/20 p-5">
-          <div className="flex items-center gap-2 text-brand-700">
+        <div className="rounded-[var(--radius-xl)] border-2 border-[var(--color-ink-200)] bg-[var(--color-ink-50)]/40 p-5">
+          <div className="flex items-center gap-2 text-[var(--color-ink-900)]">
             <ChevronDown size={18} aria-hidden="true" />
             <p className="text-xs font-black uppercase tracking-wider">
               이 사건에 {listings.length}개 물건이 있습니다. 선택해주세요
@@ -378,7 +378,7 @@ export function Step1Property({
                 key={l.docid}
                 type="button"
                 onClick={() => selectListing(l)}
-                className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white p-4 text-left transition hover:border-brand-400 hover:shadow-[var(--shadow-card)]"
+                className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white p-4 text-left transition hover:border-[var(--color-ink-700)] hover:shadow-[var(--shadow-card)]"
               >
                 <p className="text-sm font-bold text-[var(--color-ink-900)]">
                   {l.address_display}
@@ -392,7 +392,7 @@ export function Step1Property({
                     </span>
                   )}
                   {l.component_count > 1 && (
-                    <span className="text-brand-600">{l.component_count}개 필지 일괄</span>
+                    <span className="text-[var(--color-ink-900)]">{l.component_count}개 필지 일괄</span>
                   )}
                 </div>
               </button>
@@ -403,8 +403,8 @@ export function Step1Property({
 
       {/* court_listings 매칭 카드 (단일 매칭 또는 선택 후) */}
       {listing && !caseTaken && (
-        <div className="rounded-[var(--radius-xl)] border-2 border-brand-600 bg-brand-50/30 p-6">
-          <div className="flex items-center gap-2 text-brand-700">
+        <div className="rounded-[var(--radius-xl)] border-2 border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/50 p-6">
+          <div className="flex items-center gap-2 text-[var(--color-ink-900)]">
             <CheckCircle2 size={18} aria-hidden="true" />
             <p className="text-xs font-black uppercase tracking-wider">
               대법원 경매정보에서 물건을 확인했습니다
@@ -472,7 +472,7 @@ export function Step1Property({
             {listing.component_count > 1 && (
               <div>
                 <dt className="text-xs text-[var(--color-ink-500)]">구성</dt>
-                <dd className="mt-1 font-bold text-brand-600">
+                <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
                   {listing.component_count}개 필지 일괄 매각
                 </dd>
               </div>
@@ -507,8 +507,8 @@ export function Step1Property({
 
       {/* frontmatter 매칭 (폴백, court_listings에 없을 때) */}
       {post && !listing && !caseTaken && (
-        <div className="rounded-[var(--radius-xl)] border-2 border-brand-600 bg-brand-50/30 p-6">
-          <div className="flex items-center gap-2 text-brand-700">
+        <div className="rounded-[var(--radius-xl)] border-2 border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/50 p-6">
+          <div className="flex items-center gap-2 text-[var(--color-ink-900)]">
             <CheckCircle2 size={18} aria-hidden="true" />
             <p className="text-xs font-black uppercase tracking-wider">
               이 물건은 저희 분석 글에 소개되어 있습니다
@@ -599,7 +599,7 @@ export function Step1Property({
           type="button"
           onClick={handleNext}
           disabled={!canProceed}
-          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-6 text-sm font-black text-white shadow-[var(--shadow-card)] transition hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
+          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-6 text-sm font-black text-white shadow-[var(--shadow-card)] transition hover:bg-black disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
         >
           다음: 입찰 정보 입력
           <ArrowRight size={16} aria-hidden="true" />

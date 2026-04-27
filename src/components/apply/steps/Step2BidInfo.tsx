@@ -123,7 +123,7 @@ export function Step2BidInfo({
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-3">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             Step 2
           </p>
           <VerifiedBadge verified={data.verified} verifiedName={data.verifiedName} />
@@ -141,7 +141,7 @@ export function Step2BidInfo({
           <button
             type="button"
             onClick={() => setVerifyModalOpen(true)}
-            className="inline-flex w-fit items-center gap-2 rounded-[var(--radius-md)] border border-brand-600 bg-brand-50 px-4 py-2 text-xs font-bold text-brand-700 hover:bg-brand-100"
+            className="inline-flex w-fit items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-ink-900)] bg-[var(--color-ink-50)] px-4 py-2 text-xs font-bold text-[var(--color-ink-900)] hover:bg-[var(--color-ink-100)]"
           >
             본인인증 시작하기
           </button>
@@ -329,7 +329,7 @@ export function Step2BidInfo({
                 onChange={(e) =>
                   onBidInfoChange({ rebid: e.target.checked })
                 }
-                className="mt-0.5 h-5 w-5 rounded border-[var(--color-border)] accent-brand-600"
+                className="mt-0.5 h-5 w-5 rounded border-[var(--color-border)] accent-[var(--color-ink-900)]"
               />
               <div>
                 <span className="text-sm font-bold text-[var(--color-ink-900)]">
@@ -353,7 +353,7 @@ export function Step2BidInfo({
                 onChange={(e) =>
                   onBidInfoChange({ jointBidding: e.target.checked })
                 }
-                className="h-5 w-5 rounded border-[var(--color-border)] accent-brand-600"
+                className="h-5 w-5 rounded border-[var(--color-border)] accent-[var(--color-ink-900)]"
               />
               <span className="text-sm font-bold text-[var(--color-ink-900)]">
                 공동입찰로 진행합니다
@@ -432,7 +432,7 @@ export function Step2BidInfo({
           type="button"
           onClick={handleNext}
           disabled={inputsDisabled || hasErrors}
-          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-brand-600 px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-brand-700 disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
+          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-black disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
         >
           다음: 서류 업로드
           <ArrowRight size={16} aria-hidden="true" />

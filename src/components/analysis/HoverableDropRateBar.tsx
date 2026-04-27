@@ -11,7 +11,7 @@
  * 인터랙션 (Show-and-Play):
  *  · 사용자 hover/touchmove 시 marker (vertical line + 가격 tooltip) 표시
  *  · 키보드 slider — role="slider" + aria-valuenow + 좌·우 arrow 키 5% 단위
- * 모노톤: brand-600 fill bg + white·white/30·white/15 만.
+ * 모노톤: ink-900 fill bg + white·white/30·white/15 만.
  *
  * case study 인용: Apple "Stat-to-diagram flows" + scrollytelling "Show-and-Play" + Distill "interactive sliders".
  */
@@ -78,7 +78,7 @@ export function HoverableDropRateBar({
           setHoverPercent(Math.round(pct));
         }}
         onTouchEnd={() => setHoverPercent(null)}
-        className="relative h-2 w-full cursor-pointer overflow-visible rounded-full bg-white/30 outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-brand-600)]"
+        className="relative h-2 w-full cursor-pointer overflow-visible rounded-full bg-white/30 outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-ink-900)]"
       >
         {/* fill bar (최저가 percent% width) — motion 으로 width animate */}
         <motion.div

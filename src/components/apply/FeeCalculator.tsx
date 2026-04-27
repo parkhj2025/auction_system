@@ -33,12 +33,12 @@ export function FeeCalculator({
     <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">
       {/* 수수료 */}
       <div className="flex items-start gap-4">
-        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-brand-50 text-brand-600">
+        <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-50)] text-[var(--color-ink-900)]">
           <Wallet size={22} aria-hidden="true" />
         </span>
         <div className="flex-1">
           <div className="flex items-center gap-2">
-            <p className="text-[11px] font-black uppercase tracking-wider text-brand-600">
+            <p className="text-[11px] font-black uppercase tracking-wider text-[var(--color-ink-900)]">
               {fee.tierLabel}
             </p>
             {fm && !isPastBid && (

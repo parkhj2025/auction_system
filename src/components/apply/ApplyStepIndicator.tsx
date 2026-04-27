@@ -33,9 +33,9 @@ export function ApplyStepIndicator({
                   className={cn(
                     "flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-black transition",
                     isCompleted || isPast
-                      ? "bg-brand-600 text-white"
+                      ? "bg-[var(--color-ink-900)] text-white"
                       : isCurrent
-                        ? "bg-[var(--color-ink-900)] text-white ring-4 ring-brand-600/15"
+                        ? "bg-[var(--color-ink-900)] text-white ring-4 ring-[var(--color-ink-900)]/15"
                         : "border border-[var(--color-border)] bg-white text-[var(--color-ink-500)]"
                   )}
                 >
@@ -66,7 +66,7 @@ export function ApplyStepIndicator({
                   aria-hidden="true"
                   className={cn(
                     "mx-2 h-px flex-1 sm:mx-3",
-                    isPast ? "bg-brand-600" : "bg-[var(--color-border)]"
+                    isPast ? "bg-[var(--color-ink-900)]" : "bg-[var(--color-border)]"
                   )}
                 />
               )}

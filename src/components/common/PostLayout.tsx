@@ -55,7 +55,7 @@ export async function PostLayout({
             </Link>
           </nav>
 
-          <p className="mt-5 text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="mt-5 text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             {collectionLabel}
           </p>
           <h1 className="mt-2 text-3xl font-black leading-tight tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
@@ -106,7 +106,7 @@ export async function PostLayout({
         <div className="mt-16 border-t border-[var(--color-border)] pt-8">
           <Link
             href={collectionHref}
-            className="inline-flex items-center gap-1.5 text-sm font-bold text-brand-600 hover:text-brand-700"
+            className="inline-flex items-center gap-1.5 text-sm font-bold text-[var(--color-ink-900)] hover:text-black"
           >
             <ArrowLeft size={16} aria-hidden="true" />
             {collectionLabel} 전체 보기

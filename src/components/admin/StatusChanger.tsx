@@ -131,7 +131,7 @@ export function StatusChanger({
       <button
         type="submit"
         disabled={saving || !toStatus}
-        className="inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] bg-brand-600 px-4 text-sm font-black text-white hover:bg-brand-700 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex min-h-11 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-4 text-sm font-black text-white hover:bg-black disabled:cursor-not-allowed disabled:opacity-60"
       >
         {saving ? "변경 중..." : "상태 변경"}
       </button>

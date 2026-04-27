@@ -60,7 +60,7 @@ export default async function MyDashboardPage() {
     <section className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
       <header className="flex items-end justify-between gap-3">
         <div>
-          <p className="text-xs font-black uppercase tracking-wider text-brand-600">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             My Page
           </p>
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
@@ -69,7 +69,7 @@ export default async function MyDashboardPage() {
         </div>
         <Link
           href="/my/profile"
-          className="inline-flex min-h-10 items-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-sm font-bold text-[var(--color-ink-700)] hover:border-brand-600 hover:text-brand-700"
+          className="inline-flex min-h-10 items-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-sm font-bold text-[var(--color-ink-700)] hover:border-[var(--color-ink-900)] hover:text-black"
         >
           내 정보
         </Link>
@@ -83,7 +83,7 @@ export default async function MyDashboardPage() {
           </h2>
           <Link
             href="/my/orders"
-            className="text-xs font-bold text-brand-600 hover:text-brand-700"
+            className="text-xs font-bold text-[var(--color-ink-900)] hover:text-black"
           >
             전체 내역 보기
           </Link>
@@ -136,13 +136,13 @@ function EmptyActive() {
       <div className="flex flex-col gap-2 sm:flex-row">
         <Link
           href="/analysis"
-          className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-900)] hover:border-brand-600 hover:text-brand-700"
+          className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-900)] hover:border-[var(--color-ink-900)] hover:text-black"
         >
           물건분석 보기
         </Link>
         <Link
           href="/apply"
-          className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] bg-brand-600 px-5 text-sm font-bold text-white hover:bg-brand-700"
+          className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-5 text-sm font-bold text-white hover:bg-black"
         >
           입찰 대리 신청
         </Link>
