@@ -107,7 +107,9 @@
   --shadow-lift: 0 4px 14px rgba(15, 23, 42, 0.08);
 
   /* ─── 4. 폰트 ────────────────────────────────────────────────── */
-  --font-sans: var(--font-noto-kr), ui-sans-serif, system-ui, -apple-system, "Segoe UI", Roboto, sans-serif;
+  /* 룰 23-B (단계 5-4-2-fix-6): Safari/iOS 한글 fallback chain 강화.
+   * Pretendard Variable (loaded) → Noto Sans KR (next/font loaded) → Apple SD Gothic Neo (Safari macOS/iOS 기본 한글) → system-ui (last) */
+  --font-sans: "Pretendard Variable", Pretendard, var(--font-noto-kr), "Apple SD Gothic Neo", "Noto Sans KR", -apple-system, BlinkMacSystemFont, ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
 
   /* ─── 5. 타이포 스케일 (단계 5-4-2-fix-4 룰 14: Major Third 1.25 + 4pt grid).
    * Base 16px · 비율 1.25 · 4pt 정렬 ·  Linear/Carbon/Material 표준.
@@ -241,6 +243,18 @@ body {
   color: var(--color-foreground);
   font-family: var(--font-sans);
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  text-rendering: optimizeLegibility;
+  -webkit-text-size-adjust: 100%;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* 단계 5-4-2-fix-6 룰 23-A: tabular-nums 글로벌 일관 (Safari + Chrome).
+ * font-feature-settings tnum 1 — Safari 가 font-variant-numeric 를 일부 weight·script 에서 무시하는 케이스 보강 */
+.tabular-nums,
+[data-numeric="true"] {
+  font-variant-numeric: tabular-nums;
+  font-feature-settings: "tnum" 1;
 }
 
 /* 단계 5-2 #3: focus-visible 룰 강화.
