@@ -1,0 +1,34 @@
+{
+  "caseNumber": "2026타경500459",
+  "slug": "2026타경500459",
+  "publishedAt": "2026-04-27",
+  "supervisorAdjustments": {
+    "count": 4,
+    "items": [
+      {
+        "category": "missing_data",
+        "before": "\"areaPyeong\": 0",
+        "after": "\"areaPyeong\": 12.27",
+        "reason": "frontmatter의 빈 필드(0)를 본문에서 추출한 12.27평으로 보강"
+      },
+      {
+        "category": "vocabulary",
+        "before": "외국인(아시아계 여성)이 면대됐습니다.",
+        "after": "외국인(아시아계 여성)을 만났습니다.",
+        "reason": "일반 투자자가 잘 사용하지 않는 법원 현황조사서 한자어(면대)를 일상어로 순화"
+      },
+      {
+        "category": "forbidden_term",
+        "before": "진입 여부를 정하는 것이 적절합니다.",
+        "after": "진입 여부를 정하는 것이 필요합니다.",
+        "reason": "주관적 판정 어휘(적절합니다)를 객관적 표현으로 교체"
+      },
+      {
+        "category": "forbidden_term",
+        "before": "진입선을 정하는 것이 합리적입니다.",
+        "after": "진입선을 정하는 것을 고려할 수 있습니다.",
+        "reason": "주관적 판정 어휘(합리적입니다)를 객관적 표현으로 교체"
+      }
+    ]
+  }
+}

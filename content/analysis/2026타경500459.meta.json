@@ -1,0 +1,44 @@
+{
+  "slug": "2026타경500459",
+  "highlights": [
+    {
+      "label": "최저가",
+      "value": "1억 2,460만원 (감정가 70%)"
+    },
+    {
+      "label": "회차",
+      "value": "2차 · 2026-05-29"
+    },
+    {
+      "label": "임차보증금 인수",
+      "value": "1억 8,800만원 (HUG 말소동의 확약서 제출)"
+    },
+    {
+      "label": "본 단지 직전 실거래",
+      "value": "약 1억 7,500만원 (2023-02 매매)"
+    },
+    {
+      "label": "역세권",
+      "value": "수인분당선 숭의역 338m"
+    }
+  ],
+  "market": {
+    "sale_avg": 160990000,
+    "sale_median": null,
+    "sale_count": 51,
+    "lease_avg": 85000000,
+    "lease_count": 4,
+    "rent_count": 16
+  },
+  "photos": [
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/0.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/1.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/2.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/4.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/5.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/6.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/7.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/9.webp",
+    "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/11.webp"
+  ]
+}

@@ -1,0 +1,242 @@
+{
+  "case_number": "2026타경500459",
+  "court": "인천지방법원",
+  "court_code": "B000240",
+  "court_division": "경매19계",
+  "court_phone": "032-860-1619",
+  "sale_date": "2026-05-29",
+  "sale_time": "10:00",
+  "case_type": "임차권등기/HUG 임차권 인수조건변경",
+
+  "property": {
+    "address": "인천광역시 중구 신흥동3가 17-15 하모니 1동 4층402호",
+    "sido": "인천광역시",
+    "sigungu": "중구",
+    "dong": "신흥동3가",
+    "name": "하모니",
+    "ho": "402호",
+    "floor": "4층",
+    "total_floor": "13층",
+    "type": "오피스텔",
+    "auction_type": "강제경매",
+    "building_area_m2": 40.55,
+    "building_area_pyeong": 12.266,
+    "land_area_m2": 6.6205,
+    "land_area_pyeong": 2.003,
+    "appraisal_price": 178000000,
+    "minimum_price": 124600000,
+    "minimum_rate": 70.0,
+    "bid_round": 2,
+    "deposit_rate": 10,
+    "deposit_amount": 12460000,
+    "appraiser": "대양촌",
+    "appraisal_date": "2026-02-05",
+    "preservation_date": "2017-12-01"
+  },
+
+  "owner": {
+    "name": "이형민",
+    "debtor": "이형민",
+    "creditor": "주택도시보증공사"
+  },
+
+  "building_info": {
+    "approval_date": "2017-11-22",
+    "permit_date": "2016-11-08",
+    "construction_start_date": "2016-12-17",
+    "floors": "지하2층 / 지상13층",
+    "units": 47,
+    "buildings": 1,
+    "main_use": "업무시설",
+    "lot_address": "인천광역시 중구 인중로 40",
+    "lot_area_m2": 410.40,
+    "building_area_m2": 293.24,
+    "total_floor_area_m2": 3673.24,
+    "building_coverage_ratio": 71.45,
+    "floor_area_ratio": 773.90,
+    "parking": "옥내자주식주차 33대 (세대당 0.70대)",
+    "heating": "개별난방 / 도시가스",
+    "elevator": "0대 / 1대",
+    "constructor": "(주)실용건설",
+    "area_types": ["51㎡", "82A㎡", "82B㎡", "86㎡"],
+    "nearest_station": "수도권 수인선 숭의 338m, 수도권 1호선 도원 638m",
+    "age_years": 9
+  },
+
+  "bid_history": [
+    {
+      "round": 1,
+      "date": "2026-04-24",
+      "minimum": 178000000,
+      "rate": 100,
+      "result": "유찰",
+      "note": null
+    },
+    {
+      "round": 2,
+      "date": "2026-05-29",
+      "minimum": 124600000,
+      "rate": 70,
+      "result": "예정",
+      "note": null
+    }
+  ],
+
+  "registry": {
+    "basis_date": "2023-12-01",
+    "basis_type": "가압류",
+    "basis_holder": "주택도시보증공사",
+    "total_claims": 373000000,
+    "small_amount_basis_date": "2026-05-29",
+    "dividend_demand_deadline": "2026-03-23",
+    "entries": [
+      {
+        "date": "2022-05-27",
+        "section": "갑(3)",
+        "type": "소유권이전",
+        "holder": "이형민",
+        "amount": null,
+        "note": "매매 / 거래가액 188,000,000원",
+        "extinct": false
+      },
+      {
+        "date": "2023-12-01",
+        "section": "갑(4)",
+        "type": "가압류",
+        "holder": "주택도시보증공사",
+        "amount": 185000000,
+        "note": "말소기준등기 / 2023카단107263",
+        "extinct": true
+      },
+      {
+        "date": "2024-07-05",
+        "section": "을(3)",
+        "type": "주택임차권",
+        "holder": "안연주",
+        "amount": 188000000,
+        "note": "범위:전부 / 2024카임12568 / 전입 2022.04.29 / 확정 2022.03.21",
+        "extinct": false
+      },
+      {
+        "date": "2026-01-20",
+        "section": "갑(5)",
+        "type": "강제경매",
+        "holder": "주택도시보증공사",
+        "amount": 188000000,
+        "note": "청구금액 / 2026타경500459",
+        "extinct": true
+      }
+    ]
+  },
+
+  "tenants": [
+    {
+      "name": "안연주",
+      "type": "임차권등기자",
+      "occupied_part": "주거용 전부",
+      "occupied_period": "2022. 4. 29.~",
+      "move_in_date": "2022-04-29",
+      "fixed_date": "2022-03-21",
+      "dividend_demand_date": "2024-07-05",
+      "deposit": 188000000,
+      "rent": null,
+      "dividend_claim": true,
+      "opposing_power": true,
+      "opposing_reason": "전입(2022-04-29)이 말소기준등기일(2023-12-01)보다 빠름. 임차권등기 명도 시점까지 대항력 유지.",
+      "analysis": "순위배당. 미배당 보증금은 매수인 인수. 다만 주택도시보증공사가 말소동의 확약서 제출."
+    },
+    {
+      "name": "주택도시보증공사 (임차인 안연주 양수)",
+      "type": "임차인",
+      "occupied_part": "주거용 전부",
+      "occupied_period": "2022. 4. 29.~2024. 4. 28.",
+      "move_in_date": "2022-04-29",
+      "fixed_date": "2022-03-21",
+      "dividend_demand_date": "2026-03-19",
+      "deposit": 188000000,
+      "rent": null,
+      "dividend_claim": true,
+      "opposing_power": true,
+      "opposing_reason": "주택임대차보호법 제3조의2 제7항 제9호 기관으로 보증금반환채권 양수.",
+      "analysis": "순위배당. 미배당 보증금은 매수인 인수 가능성. 잔존 보증금반환채권 포기 및 주택임차권등기 말소동의 확약서 제출."
+    },
+    {
+      "name": "타우헐럴 설렁거(tovvvxhorol solongo)",
+      "type": "임차인",
+      "occupied_part": "주거용",
+      "occupied_period": null,
+      "move_in_date": null,
+      "fixed_date": null,
+      "dividend_demand_date": null,
+      "deposit": null,
+      "rent": null,
+      "dividend_claim": false,
+      "opposing_power": false,
+      "opposing_reason": null,
+      "analysis": "전입·확정·배당 미상. 외국인체류확인서 미등재로 추가 확인 필요."
+    }
+  ],
+
+  "tenant_notes": "현황조사 시 임차인 가족 점유 진술 (아시아계 여성 면대). 임차인 권리신고방법 안내문 교부. 주택도시보증공사 말소동의 확약서 제출.",
+
+  "remarks": [
+    "매각허가에 의하여 소멸되지 아니하는 것: 을구 순위 3번 주택임차권등기 (다만 주택도시보증공사의 말소동의 확약서가 제출됨)"
+  ],
+
+  "related_cases": [
+    {
+      "court": "인천지방법원",
+      "case_number": "2025차전130948",
+      "case_type": "지급명령",
+      "result": null
+    }
+  ],
+
+  "real_transaction_data": {
+    "complex": "하모니",
+    "area_m2": 40.55,
+    "sales": [
+      {"year_month": "2023-02", "count": 1, "min": 175000000, "avg": 175000000, "max": 175000000},
+      {"year_month": "2022-11", "count": 2, "min": 185000000, "avg": 185000000, "max": 185000000},
+      {"year_month": "2022-06", "count": 1, "min": 180000000, "avg": 180000000, "max": 180000000},
+      {"year_month": "2021-07", "count": 1, "min": 177000000, "avg": 177000000, "max": 177000000},
+      {"year_month": "2018-05", "count": 11, "min": 168000000, "avg": 172270000, "max": 175000000}
+    ],
+    "jeonse": [
+      {"year_month": "2023-08", "count": 1, "min": 100000000, "avg": 100000000, "max": 100000000},
+      {"year_month": "2023-05", "count": 1, "min": 100000000, "avg": 100000000, "max": 100000000},
+      {"year_month": "2023-01", "count": 1, "min": 171000000, "avg": 171000000, "max": 171000000},
+      {"year_month": "2022-04", "count": 2, "min": 180000000, "avg": 180000000, "max": 180000000},
+      {"year_month": "2022-03", "count": 1, "min": 188000000, "avg": 188000000, "max": 188000000},
+      {"year_month": "2021-07", "count": 1, "min": 140000000, "avg": 140000000, "max": 140000000}
+    ]
+  },
+
+  "auction_stats": {
+    "region": "인천 중구 신흥동3가 오피스텔(주거)",
+    "periods": [
+      {"period": "1개월", "count": 3, "avg_appraisal": 230000000, "avg_sale": 129664692, "avg_rate": 56.31, "avg_bidders": 3.33, "expected_sale": 100231801},
+      {"period": "3개월", "count": 3, "avg_appraisal": 230000000, "avg_sale": 129664692, "avg_rate": 56.31, "avg_bidders": 3.33, "expected_sale": 100231801},
+      {"period": "6개월", "count": 4, "avg_appraisal": 232500000, "avg_sale": 139723519, "avg_rate": 59.93, "avg_bidders": 2.75, "expected_sale": 106675400},
+      {"period": "12개월", "count": 7, "avg_appraisal": 239571429, "avg_sale": 158424294, "avg_rate": 66.83, "avg_bidders": 2.71, "expected_sale": 118957400}
+    ]
+  },
+
+  "administrative_offices": {
+    "registry_office": "인천지방법원 본원 등기국",
+    "tax_office": "인천세무서",
+    "regional_tax_office": "인천지방국세청",
+    "community_center": "신흥동 행정복지센터"
+  },
+
+  "surroundings": [
+    "인천광역시 중구 신흥동3가 소재 인천신광초등학교 동측 인근",
+    "주변은 오피스텔, 다세대주택, 학교 및 근린생활시설 등이 혼재",
+    "차량접근 가능, 인근 노선버스정류장 및 수인분당선 숭의역 소재",
+    "사다리형 토지로서 오피스텔 부지 등으로 이용 중",
+    "남측 인중로를 통하여 인근지역과의 연계 가능",
+    "전기·위생·급배수·소화·승강기 설비 완비"
+  ],
+
+  "arrears": null
+}

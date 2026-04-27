@@ -1,0 +1,138 @@
+{
+  "schema": "auction-content/v1",
+  "case_number": "2026타경500459",
+  "court": "인천지방법원 19계",
+  "court_division": "19계",
+  "court_code": "B000240",
+  "bid_date": "2026-05-29",
+  "bid_time": "10:00",
+  "property": {
+    "address": "인천광역시 중구 신흥동3가 17-15 하모니 1동 4층402호",
+    "sido": "인천광역시",
+    "sigungu": "중구",
+    "dong": "신흥동3가",
+    "name": "하모니",
+    "ho": "402호",
+    "type": "오피스텔",
+    "auction_type": "강제경매",
+    "exclusive_area_m2": 40.55,
+    "exclusive_area_pyeong": 12.27,
+    "land_area_m2": 6.6205,
+    "land_area_pyeong": 2.00
+  },
+  "price": {
+    "appraisal": 178000000,
+    "min_price": 124600000,
+    "min_rate": 70,
+    "deposit_amount": 12460000,
+    "deposit_rate": 10,
+    "bid_round": 2
+  },
+  "hero": {
+    "image": "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/0.webp",
+    "headline": "보증금 1.88억 인수 사건, 진입선 1.25억",
+    "sub_headline": "HUG 확약서가 매수인 인수 부담을 지운다",
+    "archive_headline": "하모니 오피스텔 402호 — HUG 말소동의 확약서 제출 · 2차 최저가 1억 2,460만원",
+    "archive_sub_headline": "임차보증금 1억 8,800만원 인수 구조이나 HUG 말소동의 확약서 첨부",
+    "price_badge": "최저가 1억 2,460만원 (감정가 70%)"
+  },
+  "highlights": [
+    { "label": "최저가", "value": "1억 2,460만원 (감정가 70%)" },
+    { "label": "회차", "value": "2차 · 2026-05-29" },
+    { "label": "임차보증금 인수", "value": "1억 8,800만원 (HUG 말소동의 확약서 제출)" },
+    { "label": "본 단지 직전 실거래", "value": "약 1억 7,500만원 (2023-02 매매)" },
+    { "label": "역세권", "value": "수인분당선 숭의역 338m" }
+  ],
+  "card": {
+    "title": "하모니 오피스텔 402호 — HUG 말소동의 확약서 제출 · 2차 최저가 1억 2,460만원",
+    "summary": "하모니 오피스텔 402호 2차 매각. 최저가 1억 2,460만원(감정가 70%). 임차보증금 1억 8,800만원 인수 구조이나 주택도시보증공사가 말소동의 확약서를 제출. 외국인 임차인 점유 변수가 명도 단계의 검토 포인트입니다.",
+    "cover_image": "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/0.webp",
+    "tags": [
+      "경매", "인천경매", "중구경매", "신흥동경매",
+      "오피스텔경매", "경매입찰대리", "임차권등기", "HUG말소동의"
+    ],
+    "seo_tags": [
+      "경매", "경매입찰", "경매물건분석", "경매대리입찰",
+      "인천지방법원 경매", "인천 중구 경매", "신흥동 경매", "오피스텔 경매",
+      "임차권등기", "HUG 말소동의", "보증금 인수", "대항력",
+      "말소기준등기", "수인분당선 숭의역", "외국인 임차인"
+    ]
+  },
+  "market_data": {
+    "tier_final": "T3",
+    "sale_count": 51,
+    "sale_avg": 160990000,
+    "sale_range_min": 65000000,
+    "sale_range_max": 230000000,
+    "lease_count": 4,
+    "lease_avg": 85000000,
+    "rent_count": 16,
+    "rent_avg_monthly": 580000,
+    "rent_avg_deposit": 5850000,
+    "complex_real_transactions": [
+      { "date": "2023-02", "count": 1, "avg": 175000000 },
+      { "date": "2022-11", "count": 2, "avg": 185000000 },
+      { "date": "2022-06", "count": 1, "avg": 180000000 },
+      { "date": "2021-07", "count": 1, "avg": 177000000 },
+      { "date": "2018-05", "count": 11, "avg": 172270000 }
+    ],
+    "auction_stats": [
+      { "period": "1개월", "count": 3, "avg_appraisal": 230000000, "avg_sale": 129664692, "avg_rate": 56.31, "avg_bidders": 3.33, "expected_sale": 100231801 },
+      { "period": "3개월", "count": 3, "avg_appraisal": 230000000, "avg_sale": 129664692, "avg_rate": 56.31, "avg_bidders": 3.33, "expected_sale": 100231801 },
+      { "period": "6개월", "count": 4, "avg_appraisal": 232500000, "avg_sale": 139723519, "avg_rate": 59.93, "avg_bidders": 2.75, "expected_sale": 106675400 },
+      { "period": "12개월", "count": 7, "avg_appraisal": 239571429, "avg_sale": 158424294, "avg_rate": 66.83, "avg_bidders": 2.71, "expected_sale": 118957400 }
+    ]
+  },
+  "rights": {
+    "basis_date": "2023-12-01",
+    "basis_type": "가압류",
+    "basis_holder": "주택도시보증공사",
+    "total_claims": 373000000,
+    "tenants_with_opposing_power": 2,
+    "tenant_deposit_to_assume": 188000000,
+    "hug_consent_to_dismiss": true,
+    "non_extinct_rights_note": "을구 순위 3번 주택임차권등기 (HUG 말소동의 확약서 제출)"
+  },
+  "scenarios": {
+    "A_residence": { "self_capital": 133470000, "result": "본 단지 매매 평균 대비 4,153만원 할인 입주", "buyer_type": "실거주자" },
+    "B_short_sale": { "self_capital": 133470000, "after_tax_profit": 9350000, "buyer_type": "단기 회전" },
+    "C1_jeonse_gap": { "self_capital": 48470000, "result": "본 단지 매매 상승 시 자본이득", "buyer_type": "장기 보유" },
+    "C2_monthly_rent": { "self_capital": 127620000, "annual_yield": 5.5, "payback_years": 18.3, "buyer_type": "현금 유동성 확보" }
+  },
+  "photos": {
+    "total": 12,
+    "category_distribution": {
+      "000241": 4,
+      "000244": 1,
+      "000245": 6,
+      "000247": 1
+    },
+    "used": [
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/0.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/1.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/2.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/4.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/5.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/6.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/7.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/9.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/11.webp"
+    ],
+    "unused": [
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/3.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/8.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-500459-1/10.webp"
+    ],
+    "fetched_at": "2026-04-27T13:50:00"
+  },
+  "crawler_summary": {
+    "tier_final": "T3",
+    "sale_count": 51,
+    "lease_count": 4,
+    "rent_count": 16,
+    "total_articles": 1023,
+    "crawled_at": "2026-04-27T13:47:00"
+  },
+  "published_at": "2026-04-27T13:50:00+09:00",
+  "packaged_at": "2026-04-27T13:50:00+09:00"
+}
