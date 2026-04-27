@@ -181,26 +181,35 @@ function buildFrontmatter(meta, slug, opts) {
   const card = meta.card ?? {};
   const hero = meta.hero ?? {};
 
+  // 단계 4-2-fix-2: 빈 값·null·undefined 허용 (supervisor 보강 위임).
+  // 매핑 가능 값은 기존 동작 유지 — 알 수 없는 비-빈 값만 throw.
   const rawType = property.type ?? "";
-  const propertyType = PROPERTY_TYPE_NORMALIZE[rawType] ?? rawType;
-  if (!PROPERTY_TYPE_VALID.has(propertyType)) {
-    throw new Error(`Unsupported propertyType: "${rawType}" → "${propertyType}"`);
+  let propertyType = "";
+  if (rawType) {
+    propertyType = PROPERTY_TYPE_NORMALIZE[rawType] ?? rawType;
+    if (!PROPERTY_TYPE_VALID.has(propertyType)) {
+      throw new Error(`Unsupported propertyType: "${rawType}" → "${propertyType}"`);
+    }
   }
   // v2.6.2 schema 호환: auction_type 누락 시 "임의경매" 기본값 (Cowork 영역 영향 0)
   const rawAuction = property.auction_type ?? "";
-  let auctionType = AUCTION_TYPE_NORMALIZE[rawAuction];
-  if (!auctionType) {
-    if (!rawAuction) {
-      console.warn(`  · property.auction_type 누락 — "임의경매" 기본값 적용`);
-      auctionType = "임의경매";
-    } else {
+  let auctionType = "";
+  if (rawAuction) {
+    auctionType = AUCTION_TYPE_NORMALIZE[rawAuction];
+    if (!auctionType) {
       throw new Error(`Unsupported auctionType: "${rawAuction}"`);
     }
+  } else {
+    // 빈 값 — "임의경매" 기본값 (기존 동작 보존)
+    auctionType = "임의경매";
   }
   const sido = property.sido ?? "";
-  const region = SIDO_TO_REGION[sido];
-  if (!region) {
-    throw new Error(`Unknown sido for region mapping: "${sido}"`);
+  let region = "";
+  if (sido) {
+    region = SIDO_TO_REGION[sido];
+    if (!region) {
+      throw new Error(`Unknown sido for region mapping: "${sido}"`);
+    }
   }
 
   const buildingName = property.building
@@ -281,11 +290,13 @@ function buildFrontmatter(meta, slug, opts) {
   return fm;
 }
 
-/* ─── §4: 본문 처리 (v3.3 — post.md frontmatter 무시, 절대 URL 통과, used fallback) ─── */
-function transformBody(postRaw, photosMeta, title) {
-  // v3.3 §4-3: post.md frontmatter는 무시, 본문만 사용
-  const parsed = matter(postRaw);
-  let body = parsed.content;
+/* ─── §4: 본문 처리 (절대 URL 통과, used fallback)
+ *  단계 4-2-fix: 입력은 frontmatter 가 분리된 순수 본문 문자열.
+ *  publishOne 측에서 supervisor 결과 (adjustedBody) 또는 originalBody 를 직접 전달.
+ *  단계 4-2-fix-3: post.md frontmatter 는 더 이상 무시 대상이 아님 (publishOne 의
+ *  [3.45] 단계에서 진실 소스로 사용). 본 함수는 본문 마크다운만 변환. */
+function transformBody(bodyInput, photosMeta, title) {
+  let body = bodyInput;
 
   // 단계 4-1: 시나리오 C 라벨 정규화 (in-memory, raw-content 무수정).
   // "### 시나리오 C\n1 — 전세 갭투자" → "### 시나리오 C-1 전세 갭투자"
@@ -518,10 +529,19 @@ async function supervisorContent({ body, frontmatter, slug, caseNumber }) {
     `라우트 컨텍스트:\n` +
     `  caseNumber: ${caseNumber}\n` +
     `  slug: ${slug}\n\n` +
-    `frontmatter (JSON):\n` +
+    `frontmatter (JSON, AnalysisFrontmatter 스키마):\n` +
     `${JSON.stringify(frontmatter, null, 2)}\n\n` +
     `본문 (post.md body):\n` +
-    `${body}`;
+    `${body}\n\n` +
+    `[출력 형식 강제]\n` +
+    `- 위 frontmatter 의 어떤 필드를 보강·정정할 때, 반드시 응답 JSON 의 ` +
+    `adjustedFrontmatter 객체에 해당 키-값 전부를 담아 반환하라.\n` +
+    `- 빈 필드 (값이 "" / 0 / null) 를 본문에서 추출한 값으로 채울 때, ` +
+    `같은 키 이름을 그대로 사용하라 (예: bidDate, round, areaM2, address, ` +
+    `propertyType, areaPyeong).\n` +
+    `- adjustments 배열에만 텍스트로 기록하지 말고, adjustedFrontmatter 에 ` +
+    `반드시 실제 키-값을 함께 출력하라.\n` +
+    `- 본문에 정보가 없으면 그 필드는 채우지 말라 (허위 채움 절대 금지).`;
 
   const reqBody = {
     systemInstruction: {
@@ -598,6 +618,274 @@ async function supervisorContent({ body, frontmatter, slug, caseNumber }) {
     : [];
 
   return { status, adjustedBody, adjustedFrontmatter, adjustments };
+}
+
+/* ─── 단계 4-2-fix: supervisor adjustedFrontmatter ↔ AnalysisFrontmatter alias 매핑.
+ *  supervisor 가 본문에서 추출한 키 이름이 AnalysisFrontmatter 와 다를 때 안전 매핑.
+ *  병합 정책:
+ *   1) AnalysisFrontmatter 에 없는 키는 skip (스키마 외 필드 거부)
+ *   2) base 의 빈 필드 ("" / 0 / null / undefined / 빈 배열) 만 보강 (덮어쓰기 금지)
+ *   3) supervisor 가 빈 값을 줘도 무시 (허위 채움 차단) */
+const FRONTMATTER_KEY_ALIASES = {
+  location: "address",
+  exclusiveArea: "areaM2",
+  exclusive_area: "areaM2",
+  area_m2: "areaM2",
+  area_pyeong: "areaPyeong",
+  saleDate: "bidDate",
+  sale_date: "bidDate",
+  biddingDate: "bidDate",
+  bidding_date: "bidDate",
+  bid_date: "bidDate",
+  saleTime: "bidTime",
+  sale_time: "bidTime",
+  property_type: "propertyType",
+  case_number: "caseNumber",
+  cover_image: "coverImage",
+  // 단계 4-2-fix-3: post.md frontmatter (Cowork v2.x 카피 표준 키) 추가 alias
+  bidRound: "round",
+  bid_round: "round",
+  minRate: "percent",
+  min_rate: "percent",
+};
+
+/* ─── 단계 4-2-fix-3: post.md frontmatter 진실 소스 활용 정책.
+ *  post.md frontmatter 의 어떤 키를 AnalysisFrontmatter 에 올릴지 화이트리스트.
+ *  (alias 매핑 후 결과 키 기준. updatedAt/type/slug/status 는 publish CLI 결정 우선) */
+const POST_FM_OVERLAY_FIELDS = new Set([
+  "title",
+  "summary",
+  "court",
+  "courtDivision",
+  "caseNumber",
+  "appraisal",
+  "minPrice",
+  "round",
+  "percent",
+  "bidDate",
+  "bidTime",
+  "address",
+  "sido",
+  "sigungu",
+  "dong",
+  "buildingName",
+  "ho",
+  "propertyType",
+  "auctionType",
+  "areaM2",
+  "areaPyeong",
+  "landAreaM2",
+  "landAreaPyeong",
+  "appraisalDisplay",
+  "minPriceDisplay",
+  "tags",
+  "seoTags",
+  "coverImage",
+  "publishedAt",
+  "region",
+]);
+
+/* post.md frontmatter (raw key) → AnalysisFrontmatter 스키마 키 alias 매핑.
+ *  날짜 필드는 ISO timestamp → "YYYY-MM-DD" normalize 적용. */
+function mapPostFrontmatterToAnalysis(postFm) {
+  if (!postFm || typeof postFm !== "object") return {};
+  const out = {};
+  for (const [k, v] of Object.entries(postFm)) {
+    const targetKey = FRONTMATTER_KEY_ALIASES[k] ?? k;
+    out[targetKey] = v;
+  }
+  for (const k of ["publishedAt", "updatedAt", "bidDate"]) {
+    if (typeof out[k] === "string") out[k] = normalizeDate(out[k]);
+  }
+  return out;
+}
+
+/* meta.json 기반 base + post.md frontmatter 진실값 overlay.
+ *  - 화이트리스트 (POST_FM_OVERLAY_FIELDS) 안 키만 받음
+ *  - post.md 빈 값은 base 값 유지 (덮어쓰기 0)
+ *  - post.md 비-빈 값은 base 값을 덮어쓰기 (진실 소스 우선)
+ *  반환: { merged, applied: [{key, value, base}] } */
+function applyPostFrontmatterOverlay(baseFm, postFmMapped) {
+  const out = { ...baseFm };
+  const applied = [];
+  for (const [k, v] of Object.entries(postFmMapped)) {
+    if (!POST_FM_OVERLAY_FIELDS.has(k)) continue;
+    if (isEmptyFrontmatterValue(v)) continue;
+    const baseVal = out[k];
+    if (baseVal === v) continue;
+    out[k] = v;
+    applied.push({ key: k, value: v, base: baseVal });
+  }
+  return { merged: out, applied };
+}
+
+function isEmptyFrontmatterValue(v) {
+  if (v == null) return true;
+  if (v === "") return true;
+  if (v === 0) return true;
+  if (Array.isArray(v) && v.length === 0) return true;
+  if (typeof v === "object" && Object.keys(v).length === 0) return true;
+  return false;
+}
+
+/* ─── 단계 4-2-fix-2: 최종 frontmatter 필수 필드 검증.
+ *  buildFrontmatter() 빈 값 허용 + supervisor 보강 위임 패턴 도입에 따라,
+ *  보강 후에도 빈 값 잔존 시 publish FAIL 처리. 페이지 렌더에 핵심인 필드만 검증.
+ *  areaPyeong/areaM2 등 보조 필드는 "한 쌍 중 하나라도 채워지면 OK" 정책. */
+const REQUIRED_FRONTMATTER_FIELDS = [
+  "title",
+  "caseNumber",
+  "court",
+  "region",
+  "address",
+  "propertyType",
+  "bidDate",
+  "appraisal",
+  "minPrice",
+];
+
+function findEmptyRequiredFields(fm) {
+  const missing = [];
+  for (const k of REQUIRED_FRONTMATTER_FIELDS) {
+    if (isEmptyFrontmatterValue(fm[k])) missing.push(k);
+  }
+  return missing;
+}
+
+/* address 가 채워졌고 region 이 빈 경우, address 시작 단어로 region 결정론적 추론.
+ * supervisor 가 enum (incheon/seoul/...) 으로 region 을 직접 채우기 어렵기 때문. */
+const SIDO_SHORT_TO_LONG = {
+  "인천": "인천광역시",
+  "서울": "서울특별시",
+  "경기": "경기도",
+  "부산": "부산광역시",
+  "대구": "대구광역시",
+  "대전": "대전광역시",
+  "광주": "광주광역시",
+  "울산": "울산광역시",
+  "세종": "세종특별자치시",
+  "강원": "강원특별자치도",
+  "충북": "충청북도",
+  "충남": "충청남도",
+  "전북": "전북특별자치도",
+  "전남": "전라남도",
+  "경북": "경상북도",
+  "경남": "경상남도",
+  "제주": "제주특별자치도",
+};
+
+function deriveRegionFromAddress(address) {
+  if (typeof address !== "string" || !address.trim()) return "";
+  const first = address.trim().split(/\s+/)[0];
+  const sidoLong = SIDO_SHORT_TO_LONG[first] ?? first;
+  return SIDO_TO_REGION[sidoLong] ?? "";
+}
+
+function mergeAdjustedFrontmatter(baseFm, adjustedFm) {
+  if (!adjustedFm || typeof adjustedFm !== "object") {
+    return { merged: baseFm, applied: [] };
+  }
+  const out = { ...baseFm };
+  const applied = [];
+  for (const [k, v] of Object.entries(adjustedFm)) {
+    const targetKey = FRONTMATTER_KEY_ALIASES[k] ?? k;
+    if (!(targetKey in out)) continue; // AnalysisFrontmatter 외 키 거부
+    if (isEmptyFrontmatterValue(v)) continue; // 허위 빈 값 차단
+    if (!isEmptyFrontmatterValue(out[targetKey])) continue; // base 값 보존
+    out[targetKey] = v;
+    applied.push({ from: k, to: targetKey, value: v });
+  }
+  return { merged: out, applied };
+}
+
+/* ─── 단계 4-2-fix: adjustments 텍스트 파싱 fallback.
+ *  supervisor 가 adjustedFrontmatter 객체를 비워두고 adjustments 배열에만
+ *  텍스트로 기록하는 LLM 동작 보정. after 텍스트를 JSON 객체로 wrap-parse 시도.
+ *  지원 형식:
+ *   - '"keyName": <value>' (단일)
+ *   - '"keyA": valA, "keyB": valB' (복수)
+ *   - '{ "keyA": valA, "keyB": valB }' (JSON object)
+ *  반환: [{ key, value }, ...] (복수 가능, 매칭 실패 시 빈 배열) */
+function extractFrontmatterFromAdjustment(adj) {
+  if (!adj || typeof adj !== "object") return [];
+  const after = String(adj.after ?? "").trim();
+  if (!after) return [];
+
+  const tryParseAsObject = (s) => {
+    try {
+      const obj = JSON.parse(s);
+      if (obj && typeof obj === "object" && !Array.isArray(obj)) {
+        return Object.entries(obj).map(([k, v]) => ({ key: k, value: v }));
+      }
+    } catch {
+      // fallthrough
+    }
+    return null;
+  };
+
+  // 시도 1: 이미 JSON object 형식 (`{...}`)
+  if (/^\{[\s\S]*\}$/.test(after)) {
+    const r = tryParseAsObject(after);
+    if (r) return r;
+  }
+
+  // 시도 2: "keyA": valA, "keyB": valB → wrap 후 파싱
+  const trimmed = after.replace(/[,;]\s*$/, "").trim();
+  const r2 = tryParseAsObject(`{${trimmed}}`);
+  if (r2) return r2;
+
+  // 시도 3: 자연어 prefix 허용 (예: 'frontmatter 필드 bidDate: "...", round: 2')
+  // — 텍스트 안의 모든 `"key": value` 또는 `key: value` 패턴 전역 추출.
+  // value 형식: 따옴표 문자열 / 숫자 / true/false/null
+  const results = [];
+  const seen = new Set();
+  const re = /"?([a-zA-Z_][a-zA-Z0-9_]*)"?\s*:\s*("[^"]*"|[+-]?\d+(?:\.\d+)?|true|false|null)/g;
+  let m;
+  while ((m = re.exec(after)) !== null) {
+    const key = m[1];
+    if (seen.has(key)) continue;
+    seen.add(key);
+    let value;
+    try {
+      value = JSON.parse(m[2]);
+    } catch {
+      value = m[2];
+    }
+    results.push({ key, value });
+  }
+  if (results.length > 0) return results;
+
+  // 시도 4: 단일 key: value (따옴표 없는 한글 값 포함, 자연어 prefix 없음)
+  const m4 = trimmed.match(/^"?([a-zA-Z_][a-zA-Z0-9_]*)"?\s*:\s*(.+?)\s*$/);
+  if (m4) {
+    const key = m4[1];
+    const rawVal = m4[2].trim();
+    let value;
+    try {
+      value = JSON.parse(rawVal);
+    } catch {
+      value = rawVal.replace(/^"(.*)"$/, "$1");
+    }
+    return [{ key, value }];
+  }
+
+  return [];
+}
+
+function supplementFrontmatterFromAdjustments(adjustedFm, adjustments) {
+  const out = { ...(adjustedFm ?? {}) };
+  let added = 0;
+  for (const a of adjustments) {
+    if (a.category !== "missing_data" && a.category !== "consistency" && a.category !== "alignment") continue;
+    const exts = extractFrontmatterFromAdjustment(a);
+    for (const { key, value } of exts) {
+      // adjustedFrontmatter 에 이미 같은 키가 있으면 supervisor 의 명시 값 우선 (skip)
+      if (key in out) continue;
+      out[key] = value;
+      added++;
+    }
+  }
+  return { supplemented: out, added };
 }
 
 /**
@@ -780,28 +1068,65 @@ async function publishOne(caseNumber, args) {
   }
   if (args.verbose) console.log(`  ✓ §7 + §10-2 통과`);
 
+  // [3.4] updatedAt 결정 (v3.4 §10-7: ISO normalize 적용)
+  // 단계 4-2-fix: supervisor 호출 앞으로 이동 — baseFrontmatter 빌드 시 필요
+  const outPath = path.join(OUT_DIR, `${slug}.mdx`);
+  const outExists = fs.existsSync(outPath);
+  const today = new Date().toISOString().slice(0, 10);
+  let updatedAt;
+  if (!outExists) {
+    updatedAt = normalizeDate(meta.published_at ?? today);
+  } else if (args.force) {
+    updatedAt = today;
+  } else {
+    const existingFm = matter(fs.readFileSync(outPath, "utf8")).data;
+    updatedAt = normalizeDate(
+      existingFm.updatedAt ?? meta.published_at ?? today
+    );
+  }
+
+  // [3.45] baseFrontmatter 사전 빌드 — post.md frontmatter 진실 소스 + meta.json 보조.
+  //  단계 4-2-fix-3: post.md frontmatter (gray-matter 파싱) 가 진실 소스.
+  //  meta.json 은 보조 (post.md 부재 필드 보강). supervisor 는 빈 필드만 부수 보강.
+  //  근거: 메모리 §15 책임 분리 — Cowork raw post.md 가 frontmatter 진실 소스.
+  const metaFrontmatter = buildFrontmatter(meta, slug, { updatedAt });
+  const postFmMapped = mapPostFrontmatterToAnalysis(matterParsed.data);
+  const { merged: baseFrontmatter, applied: postOverlay } =
+    applyPostFrontmatterOverlay(metaFrontmatter, postFmMapped);
+  if (postOverlay.length > 0) {
+    console.log(
+      `[3.45] post.md frontmatter overlay: ${postOverlay.length}건 적용 (진실 소스 우선)`
+    );
+    if (args.verbose) {
+      for (const a of postOverlay) {
+        const valStr = typeof a.value === "string" ? `"${a.value}"` : JSON.stringify(a.value);
+        console.log(`    + ${a.key} = ${valStr}`);
+      }
+    }
+  } else {
+    console.log(`[3.45] post.md frontmatter overlay: 0건 (meta.json 단독 사용)`);
+  }
+
   // [3.5] 콘텐츠 2차 감시 — Gemini 3.1 Pro (v4.0, 단계 4-2)
   // 정합성 + 데이터 누락 + 어휘 순화 + 일관성 + 금지 어휘 통합 1회 호출
   console.log(`[3.5] 콘텐츠 2차 감시 (Gemini 3.1 Pro)`);
   const originalBody = matterParsed.content;
-  const originalFm = matterParsed.data ?? {};
   let adjustments = [];
-  let postContentForBody = originalBody;
-  let postFrontmatterForBody = originalFm;
+  let bodyForOutput = originalBody;
+  let adjustedFrontmatter = null;
   try {
     const r = await supervisorContent({
       body: originalBody,
-      frontmatter: originalFm,
+      frontmatter: baseFrontmatter,
       slug,
       caseNumber: args.caseNumber ?? caseNumber,
     });
     if (r.status === "adjusted") {
       if (r.adjustedBody && r.adjustedBody.length > 0) {
-        postContentForBody = r.adjustedBody;
+        bodyForOutput = r.adjustedBody;
       }
       if (r.adjustedFrontmatter) {
-        // 부분 병합 — Gemini 가 변경한 키만 덮어쓰기 (안전)
-        postFrontmatterForBody = { ...originalFm, ...r.adjustedFrontmatter };
+        adjustedFrontmatter = r.adjustedFrontmatter;
       }
     }
     adjustments = r.adjustments;
@@ -837,29 +1162,68 @@ async function publishOne(caseNumber, args) {
   const adjustedCount = adjustments.length;
 
   const title = meta.card?.title ?? meta.hero?.headline ?? "";
-  console.log(`[4] 본문 처리 + 이미지 매핑 (url_map / used) — post.md frontmatter 무시`);
-  // postContentForBody (supervisor 적용된 본문) + postFrontmatterForBody 재구성
-  const matterFmText = matter.stringify(postContentForBody, postFrontmatterForBody);
-  const body = transformBody(matterFmText, photosMeta, title);
+  console.log(`[4] 본문 처리 + 이미지 매핑 (post.md frontmatter 진실 소스)`);
+  // 단계 4-2-fix: supervisor 결과 본문 (adjustedBody) 또는 원본 본문을 직접 전달
+  const body = transformBody(bodyForOutput, photosMeta, title);
 
-  // updatedAt 결정 (v3.4 §10-7: ISO normalize 적용)
-  const outPath = path.join(OUT_DIR, `${slug}.mdx`);
-  const outExists = fs.existsSync(outPath);
-  const today = new Date().toISOString().slice(0, 10);
-  let updatedAt;
-  if (!outExists) {
-    updatedAt = normalizeDate(meta.published_at ?? today);
-  } else if (args.force) {
-    updatedAt = today;
-  } else {
-    const existingFm = matter(fs.readFileSync(outPath, "utf8")).data;
-    updatedAt = normalizeDate(
-      existingFm.updatedAt ?? meta.published_at ?? today
+  // [5] frontmatter 최종 병합 — base + adjustedFrontmatter (alias 매핑 + 빈 필드 보강)
+  // 단계 4-2-fix: supervisor 가 adjustedFrontmatter 를 비워두고 adjustments 텍스트에만
+  // 기록하는 경우 보정. missing_data/consistency/alignment 항목의 after 텍스트 파싱.
+  const { supplemented: supplementedFm, added: supplementCount } =
+    supplementFrontmatterFromAdjustments(adjustedFrontmatter, adjustments);
+  if (supplementCount > 0) {
+    console.log(
+      `  · adjustments 텍스트 fallback 보강: ${supplementCount}건 (LLM 이 adjustedFrontmatter 누락)`
     );
   }
+  const { merged: mergedFm, applied: fmApplied } = mergeAdjustedFrontmatter(
+    baseFrontmatter,
+    supplementedFm
+  );
+  const frontmatter = { ...mergedFm };
+  if (fmApplied.length > 0) {
+    console.log(
+      `[5] frontmatter 매핑 (updatedAt=${updatedAt}) — adjustedFrontmatter 적용 ${fmApplied.length}건`
+    );
+    for (const a of fmApplied) {
+      const valStr = typeof a.value === "string" ? `"${a.value}"` : JSON.stringify(a.value);
+      const aliasNote = a.from === a.to ? "" : ` (alias: ${a.from} → ${a.to})`;
+      console.log(`    + ${a.to} = ${valStr}${aliasNote}`);
+    }
+  } else {
+    console.log(`[5] frontmatter 매핑 (updatedAt=${updatedAt}) — baseFrontmatter 그대로`);
+  }
 
-  console.log(`[5] frontmatter 매핑 (updatedAt=${updatedAt})`);
-  const frontmatter = buildFrontmatter(meta, slug, { updatedAt });
+  // [5.4] region 검증 + 사후 추론.
+  // supervisor 가 enum (incheon/seoul/...) 외 자연어 ("인천 남동구" 등) 로 채울 수 있음.
+  // SIDO_TO_REGION enum 외 값이면 폐기 후 address 기반 결정론적 추론.
+  const VALID_REGIONS = new Set(Object.values(SIDO_TO_REGION));
+  if (frontmatter.region && !VALID_REGIONS.has(frontmatter.region)) {
+    console.log(
+      `  · region "${frontmatter.region}" enum 외 값 폐기 — address 기반 재추론`
+    );
+    frontmatter.region = "";
+  }
+  if (!frontmatter.region && frontmatter.address) {
+    const inferred = deriveRegionFromAddress(frontmatter.address);
+    if (inferred) {
+      frontmatter.region = inferred;
+      console.log(
+        `  · region 사후 추론: "${frontmatter.address.split(/\s+/)[0]}" → "${inferred}"`
+      );
+    }
+  }
+
+  // [5.5] 최종 frontmatter 필수 필드 검증 (단계 4-2-fix-2)
+  const missingRequired = findEmptyRequiredFields(frontmatter);
+  if (missingRequired.length > 0) {
+    console.error(`\n=== 최종 frontmatter 검증 FAIL ===`);
+    console.error(`${caseNumber} — ${missingRequired.join(" / ")} 필드 빈 값 잔존`);
+    console.error(`원인: post.md frontmatter 부재 + Gemini supervisor 보강 실패 + meta.json 보강 실패`);
+    console.error(`해결: Cowork 산출 재실행 또는 raw-content/${caseNumber}/post.md frontmatter·meta.json 직접 수정\n`);
+    return { status: "fail-required", code: 1, slug, missingRequired };
+  }
+
   const mdxContent = serializeMdx(frontmatter, body);
 
   if (args.dryRun) {

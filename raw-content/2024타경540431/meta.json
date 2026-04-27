@@ -1,0 +1,164 @@
+{
+  "schema": "auction-content/v2",
+  "case_number": "2024타경540431",
+  "court": "인천지방법원 4계",
+  "court_division": "4계",
+  "court_code": "B000240",
+  "bid_date": "2026-05-27",
+  "bid_time": "10:00",
+  "bid_round": 2,
+  "min_rate": 70,
+
+  "property": {
+    "address": "인천 연수구 송도동 111, 2203동 24층 2402호",
+    "sido": "인천광역시",
+    "sigungu": "연수구",
+    "dong": "송도동",
+    "name": "송도더샵마스터뷰22블럭",
+    "dong_no": "2203동",
+    "ho": "2402호",
+    "floor": "24층",
+    "type": "아파트",
+    "auction_type": "강제경매",
+    "share_sale": true,
+    "share_ratio": "1/2",
+    "building_area_m2": 84.92,
+    "building_area_pyeong": 25.69,
+    "share_area_m2": 42.46,
+    "share_area_pyeong": 12.84,
+    "land_area_m2": 52.85,
+    "land_area_pyeong": 15.99,
+    "share_land_m2": 26.42,
+    "share_land_pyeong": 7.99
+  },
+
+  "price": {
+    "appraisal": 434000000,
+    "min_price": 303800000,
+    "min_rate": 70,
+    "deposit_amount": 30380000,
+    "deposit_rate": 10
+  },
+
+  "hero": {
+    "image": "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/0.webp",
+    "headline": "송도 9억대 아파트 1/2 지분, 3억 380만 원부터 시작합니다",
+    "archive_headline": "송도 더샵 마스터뷰 22BL 2402호 지분 1/2 매각 — 2차 70% 3억 380만 원",
+    "sub_headline": "공유자 우선매수권 1회 행사 변수, 임차인 인수 부담은 없음",
+    "archive_sub_headline": "공유자 우선매수권 1회 + 공유물분할 가처분 동반 사건",
+    "price_badge": "최저가 3억 380만 원 (감정가 70%)"
+  },
+
+  "highlights": [
+    { "label": "최저가", "value": "3억 380만 원 (감정가 70%)" },
+    { "label": "회차 / 매각기일", "value": "2차 · 2026-05-27 (수) 10:00" },
+    { "label": "매각 형태", "value": "토지 및 건물 지분 매각 (황은정 지분 1/2)" },
+    { "label": "단지 / 평형", "value": "송도더샵마스터뷰 22BL · 전용 84.92㎡ (전체) / 42.46㎡ (지분)" },
+    { "label": "임차인 / 인수 부담", "value": "임차인 없음 · 등기 전부 소멸" }
+  ],
+
+  "card": {
+    "title": "송도 더샵 마스터뷰 22BL 2402호 지분 1/2 매각 — 2차 70% 3억 380만 원",
+    "summary": "송도더샵마스터뷰 22BL 2203동 2402호 황은정 지분 1/2 강제경매. 1차 유찰 후 2차 최저가 3억 380만 원(감정가 70%). 공유자 우선매수권 1회와 공유물분할 가처분이 함께 등기된 사건입니다.",
+    "cover_image": "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/0.webp",
+    "tags": [
+      "인천경매",
+      "연수구경매",
+      "송도동경매",
+      "지분매각",
+      "공유자우선매수",
+      "송도더샵마스터뷰",
+      "강제경매",
+      "임차인 없음"
+    ]
+  },
+
+  "registry": {
+    "basis_date": "2015-09-30",
+    "basis_type": "근저당권",
+    "basis_holder": "한국산업은행",
+    "basis_amount": 335000000,
+    "total_claims": 395000000,
+    "all_extinguish": true
+  },
+
+  "tenant_status": {
+    "has_tenant": false,
+    "note": "조사된 임차내역 없음. 폐문부재로 점유 관계 미확인. 소유자 가족 외 전입세대 없음."
+  },
+
+  "warnings": [
+    "공유자 우선매수신고 1회에 한하여 행사 가능",
+    "토지 및 건물 지분 1/2 매각 (황은정 지분)",
+    "공유물분할 원인 가처분 등기 (2023카단106945, 김은정)"
+  ],
+
+  "market_data": {
+    "tier_final": "T3",
+    "scope_dong": ["송도동"],
+    "sale_count": 294,
+    "sale_avg": 739595238,
+    "sale_median": 740000000,
+    "sale_min": 265000000,
+    "sale_max": 1350000000,
+    "lease_count": 18,
+    "lease_avg": 481833333,
+    "rent_count": 19,
+    "rent_avg_monthly": 1778947,
+    "rent_avg_deposit": 71052631,
+    "same_complex_sale_count": 10,
+    "same_complex_sale_range": "8억 2,000만 ~ 9억 5,000만 원",
+    "same_complex_sale_avg": 890000000,
+    "same_complex_lease_count": 1,
+    "same_complex_lease_value": 430000000,
+    "same_complex_rent_deposit": 50000000,
+    "same_complex_rent_monthly": 1900000
+  },
+
+  "auction_stats": {
+    "region": "인천 연수구 송도동 아파트",
+    "periods": [
+      {"period": "1개월", "count": 11, "avg_appraisal": 1032272728, "avg_sale": 810597182, "avg_rate": 76.95, "avg_bidders": 4.91},
+      {"period": "3개월", "count": 27, "avg_appraisal": 909444445, "avg_sale": 749866183, "avg_rate": 82.66, "avg_bidders": 5.48},
+      {"period": "6개월", "count": 46, "avg_appraisal": 898891305, "avg_sale": 753983983, "avg_rate": 84.32, "avg_bidders": 6.89},
+      {"period": "12개월", "count": 84, "avg_appraisal": 905785715, "avg_sale": 755930642, "avg_rate": 84.33, "avg_bidders": 7.73}
+    ]
+  },
+
+  "photos": {
+    "total": 10,
+    "category_distribution": {"000241": 4, "000245": 6},
+    "fetched_at": "2026-04-26T17:30:00",
+    "used": [
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/0.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/1.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/2.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/3.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/4.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/5.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/6.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/7.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/8.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-540431-1/9.webp"
+    ],
+    "unused": []
+  },
+
+  "crawler_summary": {
+    "tier_final": "T3",
+    "sale_count": 294,
+    "lease_count": 18,
+    "rent_count": 19,
+    "crawled_at": "2026-04-26T17:33:00"
+  },
+
+  "seo_tags": [
+    "경매", "경매입찰", "경매물건분석", "경매입문", "경매대리입찰",
+    "인천경매", "인천지방법원경매", "연수구경매", "송도동경매", "송도경매",
+    "아파트경매", "지분경매", "지분매각", "공유물분할", "공유자우선매수",
+    "강제경매", "권리분석", "말소기준등기", "송도더샵마스터뷰", "인천대입구역"
+  ],
+
+  "published_at": "2026-04-26T17:35:00+09:00",
+  "packaged_at": "2026-04-26T17:35:00+09:00"
+}

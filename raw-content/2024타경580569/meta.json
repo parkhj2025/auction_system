@@ -1,0 +1,179 @@
+{
+  "schema": "auction-content/v1",
+  "case_number": "2024타경580569",
+  "court": "인천지방법원",
+  "court_division": "24계",
+  "court_code": "B000240",
+  "docid": "B000240-580569-1",
+  "sale_date": "2026-05-28",
+  "sale_time": "10:00",
+  "bid_round": 2,
+
+  "property": {
+    "address": "인천 서구 검암동 511, 풍림아이원(1차) 202동 8층 806호",
+    "sido": "인천광역시",
+    "sigungu": "서구",
+    "dong": "검암동",
+    "name": "풍림아이원(1차)",
+    "ho": "806호",
+    "type": "아파트",
+    "auction_type": "임의경매",
+    "building_area_m2": 71.6238,
+    "building_area_pyeong": 21.666,
+    "land_area_m2": 46.142,
+    "land_area_pyeong": 13.958,
+    "approval_date": "2003-09-06",
+    "age_years": 23,
+    "max_floor": 19,
+    "floor": 8
+  },
+
+  "price": {
+    "appraisal": 370000000,
+    "min_price": 259000000,
+    "min_rate": 70,
+    "deposit_rate": 10,
+    "deposit_amount": 25900000
+  },
+
+  "hero": {
+    "image": "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-580569-1/0.webp",
+    "headline": "검암역 7분 풍림아이원, 감정가 3.7억에서 2.59억으로",
+    "archive_headline": "검암동 풍림아이원 1차 806호 — 검암역 도보권 23년차 아파트, 2차 최저가 2억 5,900만원",
+    "sub_headline": "임차인 없음 · 등기 전부 소멸 · 본 단지 호가 3.3억대",
+    "archive_sub_headline": "임차인 없는 소유자 점유 · 등기 전부 소멸",
+    "price_badge": "2차 최저가 2억 5,900만원 (감정가 70%)"
+  },
+
+  "highlights": [
+    { "label": "최저가", "value": "2억 5,900만원 (감정가 70%)" },
+    { "label": "회차 / 매각기일", "value": "2차 · 2026-05-28" },
+    { "label": "권리 구조", "value": "등기 전부 소멸 · 임차인 없음" },
+    { "label": "본 단지 호가 하단 대비", "value": "2차 최저가 약 78% 수준" },
+    { "label": "검암역 도보거리", "value": "725m (인천2호선)" }
+  ],
+
+  "card": {
+    "title": "검암동 풍림아이원 1차 806호 — 검암역 도보권 23년차 아파트, 2차 최저가 2억 5,900만원 (감정가 70%)",
+    "summary": "풍림아이원(1차) 806호 71.62㎡ 2차 매각. 최저가 2억 5,900만원 (감정가 70%). 임차인 없는 소유자 점유 구조이며, 등기 전부 소멸 사건입니다.",
+    "cover_image": "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-580569-1/0.webp",
+    "tags": ["인천경매", "서구경매", "검암동경매", "아파트경매", "임차인없음", "등기전부소멸", "검암역도보권", "2003년준공", "임의경매", "인천지방법원24계"]
+  },
+
+  "sections": {
+    "01_overview": {
+      "title": "물건 개요",
+      "complex": "풍림아이원(1차)",
+      "households": 280,
+      "buildings": 4,
+      "constructor": "풍림산업(주)",
+      "parking": "312대 (세대당 1.11대)",
+      "heating": "도시가스 개별난방",
+      "nearest_station": "인천2호선 검암역 725m"
+    },
+    "02_bid_history": {
+      "title": "입찰 경과",
+      "rounds": [
+        {"round": 1, "date": "2026-04-23", "minimum": 370000000, "rate": 100, "result": "유찰"},
+        {"round": 2, "date": "2026-05-28", "minimum": 259000000, "rate": 70, "result": "예정"}
+      ]
+    },
+    "03_rights": {
+      "title": "권리분석",
+      "basis_date": "2018-06-26",
+      "basis_holder": "국민은행",
+      "basis_amount": 48000000,
+      "total_claims": 400100253,
+      "tenant_status": "임차인 없음 (소유자 점유 추정)",
+      "extra_burden": "미납관리비 비공개 (관리사무소 직접 확인 필요)"
+    },
+    "04_market": {
+      "title": "시세 비교",
+      "본단지_매매호가_71_평균": 351000000,
+      "본단지_매매호가_71_범위": "3억 3,000만 ~ 3억 8,000만",
+      "본단지_매매호가_71_표본": 5,
+      "국토부_실거래_매매_6개월_평균": 342000000,
+      "국토부_실거래_전세_12개월_평균": 241500000,
+      "국토부_실거래_전세_범위": "2억 2,000만 ~ 2억 8,000만",
+      "최저가_대비_매매호가하단": "약 78%"
+    },
+    "05_simulation": {
+      "title": "투자 수익 시뮬레이션",
+      "assumed_bid_price": 270000000,
+      "scenarios": {
+        "A_residence": {
+          "headline": "실거주 매입",
+          "actual_cost_owner": 285470000,
+          "host_low_diff": 44530000,
+          "discount_vs_appraisal": 100000000
+        },
+        "B_quick_sale": {
+          "headline": "1년 미만 매도",
+          "expected_sale": 330000000,
+          "after_tax_profit": 9940000
+        },
+        "C1_jeonse": {
+          "headline": "전세 갭투자",
+          "gap": 45470000,
+          "conservative_gap": 65470000
+        },
+        "C2_monthly_rent": {
+          "headline": "월세 운용 (인근 평균 가정)",
+          "annual_yield_pct": 7.6,
+          "payback_years": 13.1
+        }
+      }
+    },
+    "06_sale_cases": {
+      "title": "매각사례 참고",
+      "cases": [
+        {"case_number": "2023타경541406", "appraisal": 400000000, "sale_price": 363200000, "sale_rate": 90.8, "bidders": 12, "sale_date": "2025-12-12"}
+      ]
+    },
+    "07_conclusion": {
+      "title": "종합 의견",
+      "core_variable": "낙찰가와 본 단지 실제 시세 사이의 간격",
+      "checkpoints": [
+        "미납관리비 비공개 — 관리사무소(032-562-5410) 직접 확인",
+        "본 단지 71.62㎡ 매매 호가 5건 3억 3,000만~3억 8,000만, 국토부 실거래 6개월 평균 약 3억 4,200만 — 입찰가 산정 기준선",
+        "인접 사례 2023타경541406 매각가율 90.8% (12명 입찰) — 표본 1건이라 변동성 크므로 추가 사례 갱신 시 비교"
+      ]
+    }
+  },
+
+  "photos": {
+    "total": 10,
+    "category_distribution": {
+      "000241": 5,
+      "000244": 1,
+      "000245": 3,
+      "000247": 1
+    },
+    "used": [
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-580569-1/0.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-580569-1/1.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-580569-1/2.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-580569-1/3.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-580569-1/4.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-580569-1/5.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-580569-1/6.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-580569-1/7.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-580569-1/8.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-580569-1/9.webp"
+    ],
+    "unused": [],
+    "fetched_at": "2026-04-26T16:30:00"
+  },
+
+  "crawler_summary": {
+    "tier_final": "T3",
+    "총_매물수": 1083,
+    "매매_건수": 181,
+    "전세_건수": 8,
+    "월세_건수": 9,
+    "검색_지역": "인천광역시 서구 검암동 (인접 동 + bbox 2.5배)"
+  },
+
+  "published_at": "2026-04-26T16:35:00+09:00",
+  "packaged_at": "2026-04-26T16:35:00+09:00"
+}

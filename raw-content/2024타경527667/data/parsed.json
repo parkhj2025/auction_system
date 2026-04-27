@@ -1,0 +1,206 @@
+{
+  "case_number": "2024타경527667",
+  "court": "인천지방법원",
+  "court_code": "B000240",
+  "court_division": "경매26계",
+  "sale_date": "2026-06-11",
+  "sale_time": "10:00",
+  "property": {
+    "address": "인천 남동구 논현동 601-1, 1005동 1층102호 (논현동, 별빛마을웰카운티)",
+    "sido": "인천광역시",
+    "sigungu": "남동구",
+    "dong": "논현동",
+    "name": "별빛마을웰카운티",
+    "ho": "1005동 102호",
+    "type": "아파트",
+    "auction_type": "임의경매",
+    "building_area_m2": 128.33,
+    "building_area_pyeong": 38.82,
+    "land_area_m2": 71.5594,
+    "land_area_pyeong": 21.65,
+    "appraisal_price": 627000000,
+    "minimum_price": 438900000,
+    "minimum_rate": 70.0,
+    "bid_round": 2,
+    "deposit_rate": 10,
+    "deposit_amount": 43890000
+  },
+  "owner": {
+    "name": "정석호",
+    "debtor": "정석호",
+    "creditor": "페퍼저축은행"
+  },
+  "building_info": {
+    "approval_date": "2008-07-16",
+    "floors": "지상 22~29층",
+    "units": 888,
+    "main_use": "공동주택(아파트)",
+    "parking": "옥내자주식 1530대 + 옥외자주식 28대 (총 1558대, 세대당 1.75대)",
+    "elevator": null,
+    "nearest_station": "수도권 수인선 소래포구역 693m",
+    "age_years": 18
+  },
+  "bid_history": [
+    {
+      "round": 1,
+      "date": "2025-04-07",
+      "minimum": 627000000,
+      "rate": 100,
+      "result": "유찰",
+      "note": null
+    },
+    {
+      "round": null,
+      "date": "2025-05-09",
+      "minimum": 438900000,
+      "rate": 70,
+      "result": "변경",
+      "note": "기일 변경"
+    },
+    {
+      "round": 2,
+      "date": "2026-06-11",
+      "minimum": 438900000,
+      "rate": 70,
+      "result": null,
+      "note": "재지정 매각기일"
+    }
+  ],
+  "registry": {
+    "basis_date": "2018-08-28",
+    "basis_type": "근저당권",
+    "basis_holder": "신한은행",
+    "total_claims": 579600000,
+    "entries": [
+      {
+        "date": "2018-08-28",
+        "type": "소유권이전",
+        "holder": "정석호",
+        "amount": null,
+        "note": "매매 거래가액 364,000,000원",
+        "extinguished": null
+      },
+      {
+        "date": "2018-08-28",
+        "type": "근저당권설정",
+        "holder": "신한은행",
+        "amount": 264000000,
+        "note": "말소기준등기",
+        "extinguished": "소멸"
+      },
+      {
+        "date": "2021-01-11",
+        "type": "근저당권설정",
+        "holder": "페퍼저축은행",
+        "amount": 195600000,
+        "note": null,
+        "extinguished": "소멸"
+      },
+      {
+        "date": "2021-10-12",
+        "type": "근저당권설정",
+        "holder": "상상인플러스저축은행",
+        "amount": 120000000,
+        "note": null,
+        "extinguished": "소멸"
+      },
+      {
+        "date": "2024-04-25",
+        "type": "임의경매",
+        "holder": "페퍼저축은행",
+        "amount": 170506856,
+        "note": "2024타경527667 청구금액",
+        "extinguished": "소멸"
+      },
+      {
+        "date": "2024-06-07",
+        "type": "압류",
+        "holder": "국민건강보험공단",
+        "amount": null,
+        "note": null,
+        "extinguished": "소멸"
+      }
+    ]
+  },
+  "tenants": [
+    {
+      "name": null,
+      "move_in_date": null,
+      "fixed_date": null,
+      "deposit": null,
+      "rent": null,
+      "dividend_claim": false,
+      "opposing_power": false,
+      "opposing_reason": null,
+      "analysis": "조사된 임차내역 없음. 폐문부재로 현장 확인 불가. 전입세대 열람 결과 소유자 및 그 가족만 등재. 말소기준일(소액): 2018-08-28, 배당요구종기: 2024-07-31."
+    }
+  ],
+  "arrears": {
+    "amount": 1395160,
+    "months": 4,
+    "note": "조사일 2025-03-19. 난방·전기·수도 포함, 취사용 도시가스 별도"
+  },
+  "complex_info": {
+    "name": "별빛마을웰카운티",
+    "units": 888,
+    "buildings": 9,
+    "builder": "현대건설(주)",
+    "total_parking": 1558,
+    "parking_per_unit": 1.75,
+    "heating": "지역난방",
+    "heating_fuel": "열병합",
+    "floor_area_ratio": 217.00,
+    "building_coverage_ratio": 11.00,
+    "max_floor": 29,
+    "min_floor": 22,
+    "amenities": "공원(근린공원), 관리사무소, 노인정, 주민공동시설, 어린이놀이터, 휴게시설, 커뮤니티공간, 자전거보관소",
+    "schools": "초등학교(은봉초교, 논현초교), 중학교(은봉중교, 백호중교), 고등학교(논현고교)",
+    "ev_chargers": "32대 (지하 32대)",
+    "area_types_m2": ["125A", "126B", "156", "187B", "187A", "239A", "239B", "239C"]
+  },
+  "building_register": {
+    "address": "인천광역시 남동구 논현로 235",
+    "land_area_m2": 59820.00,
+    "building_area_m2": 6673.97,
+    "total_floor_area_m2": 180256.91,
+    "building_coverage_ratio": 11.16,
+    "floor_area_ratio": 217.28,
+    "main_use": "공동주택",
+    "permit_date": "2005-11-04",
+    "construction_start_date": "2005-12-12",
+    "approval_date": "2008-07-16",
+    "data_source": "공공데이터 2022-10-28"
+  },
+  "auction_stats": {
+    "region": "인천 남동구 논현동 아파트",
+    "periods": [
+      {"period": "1개월", "count": 4, "avg_appraisal": 473750000, "avg_sale": 333189250, "avg_rate": 68.21, "avg_bidders": 3.0, "expected_sale": 427676700},
+      {"period": "3개월", "count": 12, "avg_appraisal": 531250000, "avg_sale": 432761334, "avg_rate": 80.94, "avg_bidders": 5.75, "expected_sale": 507493800},
+      {"period": "6개월", "count": 26, "avg_appraisal": 530884616, "avg_sale": 444565188, "avg_rate": 83.23, "avg_bidders": 5.5, "expected_sale": 521852100},
+      {"period": "12개월", "count": 53, "avg_appraisal": 514622642, "avg_sale": 429959202, "avg_rate": 83.97, "avg_bidders": 7.87, "expected_sale": 526491900}
+    ]
+  },
+  "market_data": {
+    "sale": [
+      {"year_month": "2025-12", "count": 1, "min_won": 520000000, "avg_won": 520000000, "max_won": 520000000},
+      {"year_month": "2025-11", "count": 1, "min_won": 540000000, "avg_won": 540000000, "max_won": 540000000},
+      {"year_month": "2025-04", "count": 1, "min_won": 540000000, "avg_won": 540000000, "max_won": 540000000},
+      {"year_month": "2024-12", "count": 1, "min_won": 572500000, "avg_won": 572500000, "max_won": 572500000},
+      {"year_month": "2024-09", "count": 1, "min_won": 550000000, "avg_won": 550000000, "max_won": 550000000},
+      {"year_month": "2024-08", "count": 1, "min_won": 550000000, "avg_won": 550000000, "max_won": 550000000}
+    ],
+    "jeonse": [
+      {"year_month": "2026-02", "count": 1, "min_won": 410000000, "avg_won": 410000000, "max_won": 410000000},
+      {"year_month": "2025-09", "count": 1, "min_won": 370000000, "avg_won": 370000000, "max_won": 370000000},
+      {"year_month": "2024-11", "count": 1, "min_won": 400000000, "avg_won": 400000000, "max_won": 400000000},
+      {"year_month": "2024-02", "count": 3, "min_won": 360000000, "avg_won": 370000000, "max_won": 390000000},
+      {"year_month": "2023-10", "count": 1, "min_won": 400000000, "avg_won": 400000000, "max_won": 400000000},
+      {"year_month": "2023-08", "count": 1, "min_won": 400000000, "avg_won": 400000000, "max_won": 400000000}
+    ]
+  },
+  "agencies": {
+    "registry_office": {"name": "인천지방법원 본원 등기국", "address": "[22134] 인천광역시 미추홀구 경원대로 881(주안동 983)", "phone": "1544-0773", "fax": "(032)620-9099"},
+    "regional_tax": {"name": "인천지방국세청", "address": "[03490] 인천 남동구 남동대로 763 (구월동)", "phone": "032-718-6200", "fax": "032-718-6021"},
+    "local_tax": {"name": "남인천세무서", "address": "[03495] 인천 남동구 인하로 548 (구월동 1447-1)", "phone": "032-460-5200", "fax": "032-463-5778"}
+  }
+}

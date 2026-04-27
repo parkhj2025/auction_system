@@ -1,0 +1,239 @@
+{
+  "case_number": "2024타경580569",
+  "court": "인천지방법원",
+  "court_code": "B000240",
+  "court_division": "경매24계",
+  "sale_date": "2026-05-28",
+  "sale_time": "10:00",
+
+  "property": {
+    "address": "인천 서구 검암동 511, 202동 8층806호 (검암동, 풍림아이원)",
+    "sido": "인천광역시",
+    "sigungu": "서구",
+    "dong": "검암동",
+    "name": "풍림아이원(1차)",
+    "ho": "806호",
+    "type": "아파트",
+    "auction_type": "임의경매",
+    "building_area_m2": 71.6238,
+    "building_area_pyeong": 21.666,
+    "land_area_m2": 46.142,
+    "land_area_pyeong": 13.958,
+    "appraisal_price": 370000000,
+    "minimum_price": 259000000,
+    "minimum_rate": 70.0,
+    "bid_round": 2,
+    "deposit_rate": 10,
+    "deposit_amount": 25900000
+  },
+
+  "owner": {
+    "name": "김주은",
+    "debtor": "김주은",
+    "creditor": "한국자산관리공사"
+  },
+
+  "building_info": {
+    "approval_date": "2003-09-06",
+    "floors": "지상 15~19층",
+    "units": 280,
+    "main_use": "공동주택(아파트)",
+    "parking": "옥외자주식 120대 + 옥내자주식 192대 (총 312대, 세대당 1.11대)",
+    "elevator": null,
+    "nearest_station": "수도권 인천2호선 검암 725m, 수도권 공항철도 검암 919m",
+    "age_years": 23
+  },
+
+  "bid_history": [
+    {
+      "round": 1,
+      "date": "2026-04-23",
+      "minimum": 370000000,
+      "rate": 100,
+      "result": "유찰",
+      "note": null
+    },
+    {
+      "round": 2,
+      "date": "2026-05-28",
+      "minimum": 259000000,
+      "rate": 70,
+      "result": "예정",
+      "note": null
+    }
+  ],
+
+  "registry": {
+    "basis_date": "2018-06-26",
+    "basis_type": "근저당권",
+    "basis_holder": "국민은행",
+    "total_claims": 400100253,
+    "entries": [
+      {
+        "date": "2018-06-26",
+        "rank": "갑(3)",
+        "purpose": "소유권이전",
+        "holder": "김주은",
+        "amount": null,
+        "note": "매매, 거래가액 267,000,000원",
+        "status": null
+      },
+      {
+        "date": "2018-06-26",
+        "rank": "을(6)",
+        "purpose": "근저당권설정",
+        "holder": "국민은행",
+        "amount": 48000000,
+        "note": "말소기준등기",
+        "status": "소멸"
+      },
+      {
+        "date": "2022-01-25",
+        "rank": "을(16)",
+        "purpose": "근저당권설정",
+        "holder": "한국자산관리공사(인천지역본부)",
+        "amount": 300000000,
+        "note": "확정채권양도전: 상상인플러스저축은행",
+        "status": "소멸"
+      },
+      {
+        "date": "2022-09-14",
+        "rank": "을(21)",
+        "purpose": "근저당권설정",
+        "holder": "유미캐피탈대부(주)",
+        "amount": 39000000,
+        "note": null,
+        "status": "소멸"
+      },
+      {
+        "date": "2023-11-02",
+        "rank": "갑(6)",
+        "purpose": "가압류",
+        "holder": "하나캐피탈(주)",
+        "amount": 13100253,
+        "note": "2023카단108865",
+        "status": "소멸"
+      },
+      {
+        "date": "2024-09-13",
+        "rank": "갑(7)",
+        "purpose": "압류",
+        "holder": "서구(인천광역시)",
+        "amount": null,
+        "note": null,
+        "status": "소멸"
+      },
+      {
+        "date": "2024-12-11",
+        "rank": "갑(8)",
+        "purpose": "임의경매",
+        "holder": "한국자산관리공사",
+        "amount": 287113274,
+        "note": "2024타경580569",
+        "status": "소멸"
+      },
+      {
+        "date": "2025-02-20",
+        "rank": "갑(9)",
+        "purpose": "압류",
+        "holder": "인천광역시서구",
+        "amount": null,
+        "note": null,
+        "status": "소멸"
+      }
+    ]
+  },
+
+  "tenants": [
+    {
+      "name": null,
+      "move_in_date": null,
+      "fixed_date": null,
+      "deposit": null,
+      "rent": null,
+      "dividend_claim": false,
+      "opposing_power": false,
+      "opposing_reason": null,
+      "analysis": "조사된 임차내역 없음. 전입세대열람결과 소유자(가족)외 전입세대 없음."
+    }
+  ],
+
+  "arrears": {
+    "amount": null,
+    "months": null,
+    "note": "미납 관리비 비공개 (조사일 2026-04-07)"
+  },
+
+  "appraisal_info": {
+    "appraiser": "대일",
+    "price_date": "2024-12-17",
+    "preservation_date": "2003-10-14",
+    "land_value": 185000000,
+    "building_value": 185000000
+  },
+
+  "case_dates": {
+    "case_start": "2024-12-11",
+    "claim_deadline": "2025-03-03"
+  },
+
+  "complex_info": {
+    "name": "풍림아이원(1차)",
+    "households": 280,
+    "buildings": 4,
+    "constructor": "풍림산업(주)",
+    "parking_total": 312,
+    "parking_per_household": 1.11,
+    "heating": "개별난방 (도시가스)",
+    "floor_ratio": 233.0,
+    "building_coverage": 15.0,
+    "max_floor": 19,
+    "min_floor": 15,
+    "area_types": ["92B㎡", "93A㎡", "108㎡", "138㎡"],
+    "convenience": "관공서(검암경서동사무소), 병원(성모자애병원)",
+    "education": "초등학교(은지초등학교), 중학교(검암중학교), 고등학교(서인천)",
+    "rest": "관리사무소, 노인정, 어린이놀이터, 자전거보관소"
+  },
+
+  "real_transaction": {
+    "area_m2": 71.6238,
+    "sale": [
+      {"yearmonth": "202603", "count": 1, "min": 343000000, "avg": 343000000, "max": 343000000},
+      {"yearmonth": "202602", "count": 1, "min": 342000000, "avg": 342000000, "max": 342000000},
+      {"yearmonth": "202512", "count": 1, "min": 343000000, "avg": 343000000, "max": 343000000},
+      {"yearmonth": "202509", "count": 1, "min": 370000000, "avg": 370000000, "max": 370000000},
+      {"yearmonth": "202505", "count": 2, "min": 325000000, "avg": 326500000, "max": 328000000},
+      {"yearmonth": "202503", "count": 1, "min": 325000000, "avg": 325000000, "max": 325000000}
+    ],
+    "jeonse": [
+      {"yearmonth": "202512", "count": 1, "min": 260000000, "avg": 260000000, "max": 260000000},
+      {"yearmonth": "202511", "count": 2, "min": 220000000, "avg": 240000000, "max": 260000000},
+      {"yearmonth": "202510", "count": 1, "min": 220000000, "avg": 220000000, "max": 220000000},
+      {"yearmonth": "202509", "count": 1, "min": 250000000, "avg": 250000000, "max": 250000000},
+      {"yearmonth": "202507", "count": 1, "min": 220500000, "avg": 220500000, "max": 220500000},
+      {"yearmonth": "202411", "count": 1, "min": 280000000, "avg": 280000000, "max": 280000000}
+    ]
+  },
+
+  "sale_cases": [
+    {
+      "case_number": "2023타경541406",
+      "appraisal": 400000000,
+      "sale_price": 363200000,
+      "sale_rate": 90.8,
+      "bidders": 12,
+      "sale_date": "2025-12-12"
+    }
+  ],
+
+  "auction_stats": {
+    "region": "인천 서구 검암동 아파트",
+    "periods": []
+  },
+
+  "agency": {
+    "registry": "인천지방법원 본원 등기국",
+    "tax_office": "서인천세무서",
+    "admin_center": "검암경서동 행정복지센터"
+  }
+}

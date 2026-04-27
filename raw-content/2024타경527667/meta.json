@@ -1,0 +1,125 @@
+{
+  "schema": "auction-content/v1",
+  "case_number": "2024타경527667",
+  "court": "인천지방법원",
+  "court_division": "26계",
+  "bid_date": "2026-06-11",
+  "bid_time": "10:00",
+  "hero": {
+    "image": "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-527667-1/0.webp",
+    "headline": "임차인 없는 인천 38평, 호가 5.7억 vs 시작 4.4억",
+    "archive_headline": "별빛마을웰카운티 1005동 102호 128㎡ — 임차인 없음·등기 전부 소멸, 2차 최저가 4억 3,890만원",
+    "sub_headline": "감정가에서 1억 8,810만원 깎인 시작가",
+    "archive_sub_headline": "본 단지 매매 호가 5.4~6.5억 대비 약 81% 진입선",
+    "price_badge": "최저가 4억 3,890만원 (감정가의 70%)"
+  },
+  "highlights": [
+    { "label": "최저가", "value": "4억 3,890만원 (감정가 70%)" },
+    { "label": "회차", "value": "2차 · 2026-06-11" },
+    { "label": "임차인", "value": "없음 · 소유자 점유" },
+    { "label": "등기", "value": "전부 소멸 (말소기준 2018-08-28 신한은행)" },
+    { "label": "본 단지 호가 평균", "value": "약 5억 7,500만원 (128.33㎡, 11건)" }
+  ],
+  "sections": {
+    "property": {
+      "address": "인천 남동구 논현동 601-1, 1005동 1층102호 (논현동, 별빛마을웰카운티)",
+      "name": "별빛마을웰카운티",
+      "type": "아파트",
+      "area_m2": 128.33,
+      "area_pyeong": 38.82,
+      "land_area_m2": 71.5594,
+      "land_area_pyeong": 21.65,
+      "approval_date": "2008-07-16",
+      "complex_units": 888,
+      "complex_buildings": 9,
+      "builder": "현대건설(주)",
+      "nearest_station": "수도권 수인선 소래포구역 693m"
+    },
+    "price": {
+      "appraisal": 627000000,
+      "appraisal_display": "6억 2,700만원",
+      "min_price": 438900000,
+      "min_price_display": "4억 3,890만원",
+      "rate": 70.0,
+      "round": 2,
+      "deposit": 43890000,
+      "deposit_display": "4,389만원"
+    },
+    "bidding": {
+      "history": [
+        {"round": 1, "date": "2025-04-07", "minimum": 627000000, "rate": 100, "result": "유찰"},
+        {"round": null, "date": "2025-05-09", "minimum": 438900000, "rate": 70, "result": "변경"},
+        {"round": 2, "date": "2026-06-11", "minimum": 438900000, "rate": 70, "result": null}
+      ]
+    },
+    "rights": {
+      "basis_date": "2018-08-28",
+      "basis_type": "근저당권",
+      "basis_holder": "신한은행",
+      "total_claims": 579600000,
+      "tenants_state": "없음 · 소유자 점유",
+      "arrears_amount": 1395160,
+      "arrears_months": 4
+    },
+    "market": {
+      "본단지_매매_호가_평균": 575000000,
+      "본단지_매매_호가_범위": "5억 4,000만 ~ 6억 5,000만",
+      "본단지_매매_호가_건수": 11,
+      "인근_매매_호가_평균": 640830000,
+      "인근_매매_호가_건수": 48,
+      "인근_전세_호가_평균": 415000000,
+      "인근_전세_호가_건수": 2,
+      "인근_월세_평균_월세": 1500000,
+      "인근_월세_평균_보증금": 50000000,
+      "인근_월세_건수": 1
+    },
+    "investment_summary": {
+      "scenario_A_실거주": "감정가 대비 1억 8,810만 원 할인 / 본 단지 호가 평균 대비 약 1억 1,637만 원 저가 진입",
+      "scenario_B_단기매도_세후": "약 2,280만 원 (1년 미만, 매도가 5.6억 가정)",
+      "scenario_C1_전세갭": "약 4,363만 원 (인근 평균 전세 4.15억 가정)",
+      "scenario_C2_월세_무대출": "연 약 4.4% / 회수 약 22.7년"
+    },
+    "auction_stats_recent": {
+      "1개월_평균_매각가율": 68.21,
+      "3개월_평균_매각가율": 80.94,
+      "6개월_평균_매각가율": 83.23,
+      "12개월_평균_매각가율": 83.97,
+      "예상_매각가_12개월": 526491900
+    }
+  },
+  "photos": {
+    "total": 8,
+    "category_distribution": {
+      "000241": 3,
+      "000243": 1,
+      "000244": 1,
+      "000245": 3
+    },
+    "cover": "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-527667-1/0.webp",
+    "used": [
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-527667-1/0.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-527667-1/1.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-527667-1/2.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-527667-1/3.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-527667-1/4.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-527667-1/5.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-527667-1/6.webp",
+      "https://wyoanhtsrnoxijufawze.supabase.co/storage/v1/object/public/court-photos/B000240/B000240-527667-1/7.webp"
+    ],
+    "unused": [],
+    "fetched_at": "2026-04-27T10:20:00"
+  },
+  "crawler_summary": {
+    "sale_count": 87,
+    "lease_count": 2,
+    "rent_count": 1,
+    "avg_sale": 615747126,
+    "avg_lease": 415000000,
+    "tier_final": "T3"
+  },
+  "seo": {
+    "tags": ["경매", "인천경매", "남동구경매", "논현동경매", "아파트경매", "임차인 없음", "등기 전부 소멸", "소래포구역", "888세대 대단지", "별빛마을웰카운티"],
+    "seo_tags": ["경매", "경매입찰", "경매물건분석", "경매입문", "경매대리입찰", "인천경매", "인천지방법원경매", "남동구경매", "논현동경매", "아파트경매", "별빛마을웰카운티경매", "소래포구역경매", "수인선경매", "임차인없음경매", "등기소멸", "권리분석", "말소기준등기", "경매시세", "갭투자", "월세운용", "888세대대단지", "수도권아파트경매", "경매퀵", "준신축경매"]
+  },
+  "published_at": "2026-04-27T10:30:00+09:00"
+}

@@ -1,0 +1,239 @@
+{
+  "case_number": "2024타경540431",
+  "court": "인천지방법원",
+  "court_code": "B000240",
+  "court_division": "경매4계",
+  "court_phone": "032-860-1604",
+  "sale_date": "2026-05-27",
+  "sale_time": "10:00",
+
+  "property": {
+    "address": "인천 연수구 송도동 111, 2203동 24층2402호 (송도동,송도더샵마스터뷰22블럭)",
+    "sido": "인천광역시",
+    "sigungu": "연수구",
+    "dong": "송도동",
+    "name": "송도더샵마스터뷰22블럭",
+    "dong_no": "2203동",
+    "ho": "2402호",
+    "floor": "24층",
+    "type": "아파트",
+    "auction_type": "강제경매",
+    "share_sale": true,
+    "share_ratio": "1/2",
+    "building_area_m2": 42.46,
+    "building_area_pyeong": 12.844,
+    "building_area_full_m2": 84.92,
+    "building_area_full_pyeong": 25.688,
+    "land_area_m2": 26.4232,
+    "land_area_pyeong": 7.993,
+    "land_area_full_m2": 52.8464,
+    "land_area_full_pyeong": 15.986,
+    "appraisal_price": 434000000,
+    "minimum_price": 303800000,
+    "minimum_rate": 70.0,
+    "bid_round": 2,
+    "deposit_rate": 10,
+    "deposit_amount": 30380000,
+    "appraisal_breakdown": {
+      "land": 173600000,
+      "building": 260400000
+    }
+  },
+
+  "owner": {
+    "name": "황은정",
+    "debtor": "황은정",
+    "creditor": "김은정",
+    "co_owner": "이진철"
+  },
+
+  "building_info": {
+    "complex_name": "송도더샵마스터뷰(F22블럭)",
+    "approval_date": "2015-07-29",
+    "permit_date": "2010-02-16",
+    "construction_start_date": "2012-10-23",
+    "preservation_registry_date": "2015-08-27",
+    "builder": "(주)포스코건설",
+    "total_units": 691,
+    "total_buildings": 6,
+    "max_floor": 32,
+    "min_floor": 26,
+    "main_use": "공동주택",
+    "land_area_total_m2": 41337.5,
+    "building_area_total_m2": 5659.17,
+    "gross_floor_area_m2": 130287.89,
+    "floor_area_ratio": 212.59,
+    "building_coverage_ratio": 13.69,
+    "parking": "옥외 8대 + 옥내 1,129대 = 총 1,137대 (세대당 1.65대)",
+    "parking_total": 1137,
+    "parking_per_unit": 1.65,
+    "heating": "지역난방 (열병합)",
+    "area_types": ["96㎡", "113B㎡", "114A㎡", "115C㎡", "157㎡", "184㎡", "245㎡"],
+    "ev_charging": "27대 (지하 27대)",
+    "elevator": null,
+    "nearest_station": "수도권 인천1호선 인천대입구역 832m",
+    "age_years": 11,
+    "facilities": {
+      "관공서": "연수구청",
+      "대형상가": "롯데마트",
+      "공원": "센트럴파크",
+      "초등학교": "송일초등학교",
+      "중학교": "인천예송중학교",
+      "고등학교": "인천과학예술영재학교",
+      "대학교": "인천대학교"
+    }
+  },
+
+  "bid_history": [
+    {
+      "round": 1,
+      "date": "2026-04-22",
+      "minimum": 434000000,
+      "rate": 100,
+      "result": "유찰",
+      "note": null
+    },
+    {
+      "round": 2,
+      "date": "2026-05-27",
+      "minimum": 303800000,
+      "rate": 70,
+      "result": "진행예정",
+      "note": null
+    }
+  ],
+
+  "registry": {
+    "basis_date": "2015-09-30",
+    "basis_type": "근저당권",
+    "basis_holder": "한국산업은행",
+    "total_claims": 395000000,
+    "appraisal_basis_date": "2024-07-01",
+    "appraisal_company": "티앤비",
+    "dividend_deadline": "2024-09-19",
+    "entries": [
+      {
+        "date": "2015-09-30",
+        "type": "소유권이전",
+        "section": "갑(2)",
+        "holder": "황은정 외1",
+        "amount": null,
+        "note": "매매, 황은정 이진철 각 1/2",
+        "extinguish": null
+      },
+      {
+        "date": "2015-09-30",
+        "type": "근저당권설정",
+        "section": "을(1)",
+        "holder": "한국산업은행",
+        "amount": 335000000,
+        "note": "갑구2번황은정지분전부근저당권설정 / 말소기준등기",
+        "extinguish": "소멸"
+      },
+      {
+        "date": "2018-01-18",
+        "type": "근저당권설정",
+        "section": "을(3)",
+        "holder": "임종일",
+        "amount": 60000000,
+        "note": "갑구2번황은정지분전부근저당권설정",
+        "extinguish": "소멸"
+      },
+      {
+        "date": "2023-08-31",
+        "type": "가처분",
+        "section": "갑(25)",
+        "holder": "김은정",
+        "amount": null,
+        "note": "2번황은정지분가처분 / 공유물분할을 원인으로 한 소유권이전등기청구권 / 2023카단106945",
+        "extinguish": "소멸"
+      },
+      {
+        "date": "2024-06-21",
+        "type": "강제경매개시결정",
+        "section": "갑(28)",
+        "holder": "김은정",
+        "amount": 7500000,
+        "note": "2번황은정지분강제경매개시결정 / 청구금액 750만원 / 2024타경540431",
+        "extinguish": "소멸"
+      }
+    ]
+  },
+
+  "tenants": [
+    {
+      "name": null,
+      "move_in_date": null,
+      "fixed_date": null,
+      "deposit": null,
+      "rent": null,
+      "dividend_claim": false,
+      "opposing_power": false,
+      "opposing_reason": null,
+      "analysis": "조사된 임차내역 없음. 폐문부재로 이해관계인을 만날 수 없어 상세한 점유 및 임대차관계는 알 수 없으나, 소유자 가족외 전입세대는 조사되지 아니 함"
+    }
+  ],
+
+  "arrears": {
+    "amount": null,
+    "months": null,
+    "note": "미납 관리비 없음 (2026-04-08 조사). 난방·전기·수도 포함, 취사용 도시가스 별도",
+    "survey_date": "2026-04-08"
+  },
+
+  "warnings": [
+    "공유자의 우선매수신고는 1회에 한하여 행사할 수 있음",
+    "토지 및 건물 지분 매각 (황은정 지분 1/2)"
+  ],
+
+  "related_cases": [
+    {
+      "court": "부산지방법원",
+      "case_number": "2023가단341440",
+      "case_type": "판결정본",
+      "result": null
+    },
+    {
+      "court": "인천지방법원",
+      "case_number": "2023카단106945",
+      "case_type": "공유물분할 가처분",
+      "result": null
+    }
+  ],
+
+  "auction_stats": {
+    "region": "인천 연수구 송도동 아파트",
+    "periods": [
+      {"period": "1개월", "count": 11, "avg_appraisal": 1032272728, "avg_sale": 810597182, "avg_rate": 76.95, "avg_bidders": 4.91, "expected_sale": 333963001},
+      {"period": "3개월", "count": 27, "avg_appraisal": 909444445, "avg_sale": 749866183, "avg_rate": 82.66, "avg_bidders": 5.48, "expected_sale": 358744400},
+      {"period": "6개월", "count": 46, "avg_appraisal": 898891305, "avg_sale": 753983983, "avg_rate": 84.32, "avg_bidders": 6.89, "expected_sale": 365948800},
+      {"period": "12개월", "count": 84, "avg_appraisal": 905785715, "avg_sale": 755930642, "avg_rate": 84.33, "avg_bidders": 7.73, "expected_sale": 365992200}
+    ]
+  },
+
+  "site_description": {
+    "location": "인천광역시 연수구 송도동 소재 \"인천과학예술영재학교\" 북동측 인근에 위치하며, 주위는 아파트 단지, 학교, 골프장 등이 소재하는 지역으로서 주위환경은 보통임.",
+    "transportation": "본건까지 차량출입이 가능하며, 인근에 노선버스정류장 및 근거리에 인천지하철 1호선 \"인천대입구역\"이 소재하는 등 교통상황은 보통임.",
+    "topography": "인접필지 대비 등고평탄한 가장형 토지로서, 아파트 건부지로 이용중임.",
+    "road": "단지내도로를 통하여 외곽 공도와 접하며 본건 단지 사방으로 폭 약 20-25미터 내외의 포장도로에 각각 접하고 있음.",
+    "utilities": "위생 및 급배수설비, 전기설비, 난방설비, 소화전설비, 승강기설비 등 되어있음."
+  },
+
+  "administrative": {
+    "registry_office": {
+      "name": "인천지방법원 본원 등기국",
+      "address": "[22134] 인천광역시 미추홀구 경원대로 881(주안동 983)",
+      "phone": "1544-0773"
+    },
+    "tax_office": {
+      "name": "연수세무서",
+      "address": "[03500] 인천 연수구 인천타워대로 323 (송도동)",
+      "phone": "032-670-9200"
+    },
+    "community_center": {
+      "name": "송도4동 행정복지센터",
+      "address": "[22009] 인천 연수구 컨벤시아대로252번길 79",
+      "phone": "032-749-6850"
+    }
+  }
+}
