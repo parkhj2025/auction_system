@@ -80,3 +80,8 @@ next-env.d.ts
 .zencoder/
 skills/
 skills-lock.json
+tmp/
+
+# Cowork workspace 백업 (단계 4-2-fix-4: 진실 소스는 /Users/parkhj/Projects/auction_cowork/)
+auction-cowork/
+auction-cowork.zip
