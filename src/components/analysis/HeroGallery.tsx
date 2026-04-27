@@ -88,24 +88,24 @@ export function HeroGallery({
             onClick={prev}
             disabled={activeIdx === 0}
             aria-label="이전 사진"
-            className="absolute left-2 top-1/2 z-10 -translate-y-1/2 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-border)] bg-white text-[var(--color-ink-700)] shadow-[var(--shadow-card)] transition-all duration-[var(--duration-sm)] ease-out hover:scale-105 hover:bg-[var(--color-ink-50)] hover:text-[var(--color-ink-900)] disabled:opacity-0"
+            className="absolute left-2 top-1/2 z-10 -translate-y-1/2 inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--color-border)] bg-white text-[var(--color-ink-700)] shadow-[var(--shadow-card)] transition-all duration-[var(--duration-sm)] ease-out hover:scale-105 hover:bg-[var(--color-ink-50)] hover:text-[var(--color-ink-900)] disabled:opacity-0"
           >
-            <ChevronLeft size={18} aria-hidden="true" />
+            <ChevronLeft size={14} aria-hidden="true" />
           </button>
           <button
             type="button"
             onClick={next}
             disabled={activeIdx === thumbs.length - 1}
             aria-label="다음 사진"
-            className="absolute right-2 top-1/2 z-10 -translate-y-1/2 inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--color-border)] bg-white text-[var(--color-ink-700)] shadow-[var(--shadow-card)] transition-all duration-[var(--duration-sm)] ease-out hover:scale-105 hover:bg-[var(--color-ink-50)] hover:text-[var(--color-ink-900)] disabled:opacity-0"
+            className="absolute right-2 top-1/2 z-10 -translate-y-1/2 inline-flex h-8 w-8 items-center justify-center rounded-full border border-[var(--color-border)] bg-white text-[var(--color-ink-700)] shadow-[var(--shadow-card)] transition-all duration-[var(--duration-sm)] ease-out hover:scale-105 hover:bg-[var(--color-ink-50)] hover:text-[var(--color-ink-900)] disabled:opacity-0"
           >
-            <ChevronRight size={18} aria-hidden="true" />
+            <ChevronRight size={14} aria-hidden="true" />
           </button>
 
-          {/* track — native scroll-snap (swipe 자연 호환) */}
+          {/* track — native scroll-snap (swipe 자연 호환). 단계 5-4-2-fix-7-hotfix 사이즈 1/4 축소 */}
           <div
             ref={trackRef}
-            className="flex snap-x snap-mandatory gap-4 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
+            className="flex snap-x snap-mandatory gap-3 overflow-x-auto scroll-smooth pb-2 [scrollbar-width:none] [-webkit-overflow-scrolling:touch] [&::-webkit-scrollbar]:hidden"
             role="group"
             aria-label="사진 슬라이드"
           >
@@ -116,16 +116,16 @@ export function HeroGallery({
                 onClick={() => handleClick(idx)}
                 aria-label={`${alt} ${idx + 1}번 크게 보기`}
                 aria-roledescription="slide"
-                className="group relative aspect-[4/3] h-60 shrink-0 snap-center overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-ink-100)] outline-none transition-all duration-[var(--duration-sm)] ease-out hover:border-[var(--color-ink-900)] focus-visible:border-[var(--color-ink-900)] focus-visible:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] sm:h-[360px] md:h-[400px]"
+                className="group relative aspect-[4/3] h-[120px] shrink-0 snap-center overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-ink-100)] outline-none transition-all duration-[var(--duration-sm)] ease-out hover:border-[var(--color-ink-900)] focus-visible:border-[var(--color-ink-900)] focus-visible:shadow-[0_0_0_3px_rgba(15,23,42,0.15)] sm:h-[160px] md:h-[180px]"
                 style={{
-                  width: "min(80%, 480px)",
+                  width: "min(40%, 240px)",
                 }}
               >
                 <Image
                   src={src}
                   alt={`${alt} ${idx + 1}`}
                   fill
-                  sizes="(min-width: 1024px) 60vw, (min-width: 640px) 70vw, 80vw"
+                  sizes="(min-width: 1024px) 240px, (min-width: 640px) 30vw, 40vw"
                   className="object-cover transition-transform duration-[var(--duration-md)] ease-out group-hover:scale-105"
                   onError={() => handleError(idx)}
                 />
@@ -137,11 +137,11 @@ export function HeroGallery({
             ))}
           </div>
 
-          {/* dots indicator */}
+          {/* dots indicator — 단계 5-4-2-fix-7-hotfix size 축소 */}
           <div
             role="tablist"
             aria-label="사진 슬라이드 페이지"
-            className="mt-3 flex items-center justify-center gap-2"
+            className="mt-2 flex items-center justify-center gap-1.5"
           >
             {thumbs.map((_, idx) => {
               const isActive = idx === activeIdx;
@@ -153,13 +153,13 @@ export function HeroGallery({
                   aria-selected={isActive}
                   aria-label={`사진 ${idx + 1} 으로 이동`}
                   onClick={() => scrollToIdx(idx)}
-                  className="group inline-flex h-6 w-6 items-center justify-center"
+                  className="group inline-flex h-5 w-5 items-center justify-center"
                 >
                   <span
                     className={`inline-block rounded-full transition-all duration-[var(--duration-sm)] ${
                       isActive
-                        ? "h-2 w-6 bg-[var(--color-ink-900)]"
-                        : "h-2 w-2 bg-[var(--color-ink-300)] group-hover:bg-[var(--color-ink-700)]"
+                        ? "h-1.5 w-5 bg-[var(--color-ink-900)]"
+                        : "h-1.5 w-1.5 bg-[var(--color-ink-300)] group-hover:bg-[var(--color-ink-700)]"
                     }`}
                   />
                 </button>
