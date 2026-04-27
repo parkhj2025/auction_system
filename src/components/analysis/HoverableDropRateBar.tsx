@@ -1,19 +1,19 @@
 "use client";
 
 /**
- * 단계 5-4-2: Hero DropRateBar + 호버 인터랙티브 (Show-and-Play 본질).
+ * Hero progress bar (단계 5-4-2-fix-8 룰 30 — 라이트 토큰 전환).
  *
- * 시각 구조: 감정가 100% base bar (white/30) + 최저가 70% fill (white) + 70% vertical mark.
- * 스크롤 모션:
- *  · 0~30%: base bar fade-in
- *  · 30~60%: fill bar width animate (0% → percent%, motion useScroll·useTransform)
- *  · 60~100%: −30% chip count-up (motion useSpring 부드러운 변화)
- * 인터랙션 (Show-and-Play):
- *  · 사용자 hover/touchmove 시 marker (vertical line + 가격 tooltip) 표시
- *  · 키보드 slider — role="slider" + aria-valuenow + 좌·우 arrow 키 5% 단위
- * 모노톤: ink-900 fill bg + white·white/30·white/15 만.
+ * 변경 (단계 5-4-2-fix-7 다크 영역 → fix-8 라이트 영역):
+ *  - fill bar 영역 white → ink-900
+ *  - fill bar 빈 영역 white/30 → ink-100
+ *  - 70% 마크 white/80 → ink-900
+ *  - hover/marker white → ink-900
+ *  - 라벨 white/70 → ink-700
+ *  - tooltip bg-white text-ink-900 보존 (라이트에서 강조 색)
+ *  - "−X%" 칩 bg-brand-300/70 + ink-900 (룰 24-D 보존)
  *
- * case study 인용: Apple "Stat-to-diagram flows" + scrollytelling "Show-and-Play" + Distill "interactive sliders".
+ * 룰 7 motion 본질 100% 보존 (1.6초 cubic + count-up 동기화 + once: true 예외).
+ * 룰 24-D monochrome + 1 accent 본질 보존 (brand-300/70 1 곳).
  */
 import { motion, useInView } from "motion/react";
 import { useRef, useState, useEffect } from "react";
@@ -38,9 +38,9 @@ export function HoverableDropRateBar({
   // 룰 7 (단계 5-4-2-fix-4): count-up duration 1600ms (fill bar 와 동기화)
   const animatedDrop = useCountUp(dropRate, inView, 1600, 200);
 
-  // 호버 marker 상태 (사용자 능동 인터랙션 — Show-and-Play)
+  // 호버 marker 상태 (Show-and-Play)
   const [hoverPercent, setHoverPercent] = useState<number | null>(null);
-  // 키보드 slider 상태 (키보드 사용자용 marker)
+  // 키보드 slider 상태
   const [keyboardPercent, setKeyboardPercent] = useState<number>(percent);
 
   const activePercent = hoverPercent ?? keyboardPercent;
@@ -80,11 +80,11 @@ export function HoverableDropRateBar({
           setHoverPercent(Math.round(pct));
         }}
         onTouchEnd={() => setHoverPercent(null)}
-        className="relative h-2 w-full cursor-pointer overflow-visible rounded-full bg-white/30 outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-ink-900)]"
+        className="relative h-2 w-full cursor-pointer overflow-visible rounded-full bg-[var(--color-ink-100)] outline-none focus-visible:ring-2 focus-visible:ring-[var(--color-ink-900)]/30 focus-visible:ring-offset-2 focus-visible:ring-offset-white"
       >
-        {/* fill bar (최저가 percent% width) — 룰 7 (단계 5-4-2-fix-4): 1.6초 cubic ease-out */}
+        {/* fill bar — 룰 30 라이트 토큰 (white → ink-900). 룰 7 motion 본질 보존 */}
         <motion.div
-          className="absolute inset-y-0 left-0 origin-left rounded-full bg-white"
+          className="absolute inset-y-0 left-0 origin-left rounded-full bg-[var(--color-ink-900)]"
           initial={{ scaleX: 0 }}
           animate={inView ? { scaleX: 1 } : { scaleX: 0 }}
           transition={{
@@ -94,27 +94,27 @@ export function HoverableDropRateBar({
           }}
           style={{ width: `${percent}%` }}
         />
-        {/* 70% vertical mark — fill bar 끝 위치 (1.6초 후 reveal) */}
+        {/* 70% 마크 — 룰 30 라이트 토큰 (white/80 → ink-900) */}
         <motion.span
           aria-hidden="true"
-          className="absolute -top-1 -bottom-1 w-px bg-white/80"
+          className="absolute -top-1 -bottom-1 w-px bg-[var(--color-ink-900)]"
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ delay: 1.8, duration: 0.3 }}
           style={{ left: `${percent}%` }}
         />
-        {/* hover/keyboard marker — 사용자 능동 인터랙션 */}
+        {/* hover/keyboard marker */}
         {hoverPercent !== null || (inView && keyboardPercent !== percent) ? (
           <span
             aria-hidden="true"
-            className="absolute -top-2 -bottom-2 w-px bg-white"
+            className="absolute -top-2 -bottom-2 w-px bg-[var(--color-ink-900)]"
             style={{ left: `${activePercent}%` }}
           />
         ) : null}
-        {/* tooltip (hover 또는 keyboard active 시) */}
+        {/* tooltip */}
         {hoverPercent !== null || keyboardPercent !== percent ? (
           <span
-            className="pointer-events-none absolute bottom-full mb-2 -translate-x-1/2 whitespace-nowrap rounded bg-white px-2 py-1 text-[11px] font-bold tabular-nums text-[var(--color-ink-900)] shadow-md"
+            className="pointer-events-none absolute bottom-full mb-2 -translate-x-1/2 whitespace-nowrap rounded bg-[var(--color-ink-900)] px-2 py-1 text-[11px] font-bold tabular-nums text-white shadow-md"
             style={{ left: `${activePercent}%` }}
           >
             {formatBillion(activePrice)} = 감정가의 {activePercent}%
@@ -122,11 +122,9 @@ export function HoverableDropRateBar({
         ) : null}
       </div>
 
-      {/* 라벨 — 감정가 좌측 + 하락률 우측 (count-up).
-       * 룰 24-D (단계 5-4-2-fix-6): "−X%" 칩 brand-300/70 background (monochrome+1 accent — Stripe 패턴).
-       * Tier 2 body-sm 14 / 600 / brand-300 (focal accent on dark) */}
+      {/* 라벨 — 룰 30 라이트 토큰 (white/70 → ink-700). 룰 24-D brand-300/70 칩 보존 */}
       <motion.div
-        className="mt-2 flex items-baseline justify-between text-[length:var(--text-body-sm)] font-medium tabular-nums text-white/70"
+        className="mt-2 flex items-baseline justify-between text-[length:var(--text-body-sm)] font-medium tabular-nums text-[var(--color-ink-700)]"
         initial={{ opacity: 0 }}
         animate={inView ? { opacity: 1 } : { opacity: 0 }}
         transition={{ delay: 0.6, duration: 0.4 }}
