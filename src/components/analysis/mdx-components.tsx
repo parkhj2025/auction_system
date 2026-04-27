@@ -124,6 +124,8 @@ function buildH2(
                   appraisal={fm.appraisal}
                   minPrice={fm.minPrice}
                   percent={fm.percent}
+                  saleRateRange={resolveSaleRateRange(fm.slug)}
+                  bidCountRange={resolveBidCountRange(fm.slug)}
                 />
               ) : null}
             </>
@@ -364,6 +366,21 @@ export function AnalysisCoverImage({ src, alt }: { src: string; alt: string }) {
 
 function Img() {
   return null;
+}
+
+/**
+ * 단계 5-4-2-fix-3 룰 6: 사건별 매각가율·입찰인수 range hardcoded fallback.
+ * raw-content schema 에 byPeriod 4 기간 부재 (Cowork v2.9 보강 영역).
+ * 본 patch 단일 사건 본질 평가용 hardcoded — 4 사건 확장 시 schema 보강 후 props 전달.
+ */
+function resolveSaleRateRange(slug: string): { min: number; max: number } | undefined {
+  if (slug === "2026타경500459") return { min: 56, max: 67 };
+  return undefined;
+}
+
+function resolveBidCountRange(slug: string): { min: number; max: number } | undefined {
+  if (slug === "2026타경500459") return { min: 2.71, max: 3.33 };
+  return undefined;
 }
 
 /**
