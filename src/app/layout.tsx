@@ -66,6 +66,27 @@ export default async function RootLayout({
 
   return (
     <html lang="ko" className={`${notoSansKr.variable} h-full antialiased`}>
+      <head>
+        {/* 룰 25-B (단계 5-4-2-fix-7): Pretendard Variable preload + jsdelivr CDN.
+         * Safari 한글 폰트 일관성 (Apple SD Gothic Neo fallback 회피).
+         * font-display: swap (Safari fallback 즉시 표시 + Pretendard 로드 후 swap). */}
+        <link
+          rel="preconnect"
+          href="https://cdn.jsdelivr.net"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preload"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard/dist/web/variable/woff2/PretendardVariable.woff2"
+          as="font"
+          type="font/woff2"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@1.3.9/dist/web/variable/pretendardvariable.min.css"
+        />
+      </head>
       {/* 단계 5-2 #4: 모바일 MobileSticky 영역 padding 에 safe-area-inset-bottom 합산 */}
       <body className="flex min-h-full flex-col bg-white pb-[calc(5rem+env(safe-area-inset-bottom))] text-[var(--color-ink-900)] md:pb-0">
         <TopNav user={navUser} />
