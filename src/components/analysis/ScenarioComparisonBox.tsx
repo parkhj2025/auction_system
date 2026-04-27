@@ -101,7 +101,7 @@ export function ScenarioComparisonBox({
   return (
     <div
       ref={ref}
-      className="mt-6 rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] p-5 sm:p-6"
+      className="mt-6 rounded-[var(--radius-md)] border border-[var(--color-ink-200)] bg-white p-5 sm:p-6"
     >
       <div className="flex items-baseline justify-between">
         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">
@@ -204,7 +204,7 @@ export function ScenarioComparisonBox({
                 const isActive = key === activeKey;
                 const widthPct = (Math.abs(stat.selfCapital) / maxCapital) * 100;
                 return (
-                  <td key={key} className="px-2 py-3 align-top">
+                  <td key={key} className={`px-2 py-3 align-top transition-colors ${isActive ? "bg-[var(--color-ink-100)]" : ""}`}>
                     <div
                       className={`text-sm tabular-nums ${
                         isActive
@@ -249,7 +249,7 @@ export function ScenarioComparisonBox({
                 const isActive = key === activeKey;
                 const offset = (stat.profit / maxProfitAbs) * 50; // -50% ~ +50%
                 return (
-                  <td key={key} className="px-2 py-3 align-top">
+                  <td key={key} className={`px-2 py-3 align-top transition-colors ${isActive ? "bg-[var(--color-ink-100)]" : ""}`}>
                     <div
                       className={`text-sm tabular-nums ${
                         isActive
@@ -304,7 +304,7 @@ export function ScenarioComparisonBox({
                 const stat = scenarios[key]!;
                 const isActive = key === activeKey;
                 return (
-                  <td key={key} className="px-2 py-3 align-top">
+                  <td key={key} className={`px-2 py-3 align-top transition-colors ${isActive ? "bg-[var(--color-ink-100)]" : ""}`}>
                     <span
                       className={`text-sm tabular-nums ${
                         isActive
@@ -332,7 +332,7 @@ export function ScenarioComparisonBox({
                 const stat = scenarios[key]!;
                 const isActive = key === activeKey;
                 return (
-                  <td key={key} className="px-2 py-3 align-top">
+                  <td key={key} className={`px-2 py-3 align-top transition-colors ${isActive ? "bg-[var(--color-ink-100)]" : ""}`}>
                     <span
                       className={`inline-flex items-center rounded-[var(--radius-xs)] px-2 py-0.5 text-[11px] font-bold ${resolveRiskClass(stat.riskLevel, isActive, !!activeKey)}`}
                     >
