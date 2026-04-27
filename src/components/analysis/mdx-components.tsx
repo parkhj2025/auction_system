@@ -406,45 +406,21 @@ function parseScenarioKey(title: string): string | null {
   return m ? m[1] : null;
 }
 
-/** 시나리오 카드 색상·아이콘 매핑 (단계 4-1 결정) */
-const SCENARIO_THEME: Record<
-  string,
-  {
-    icon: typeof Home;
-    border: string;
-    bg: string;
-    chip: string;
-    iconColor: string;
-  }
-> = {
-  A: {
-    icon: Home,
-    border: "border-l-blue-500",
-    bg: "bg-blue-50/40",
-    chip: "bg-blue-100 text-blue-700",
-    iconColor: "text-blue-600",
-  },
-  B: {
-    icon: TrendingUp,
-    border: "border-l-orange-500",
-    bg: "bg-orange-50/40",
-    chip: "bg-orange-100 text-orange-700",
-    iconColor: "text-orange-600",
-  },
-  "C-1": {
-    icon: Users,
-    border: "border-l-purple-500",
-    bg: "bg-purple-50/40",
-    chip: "bg-purple-100 text-purple-700",
-    iconColor: "text-purple-600",
-  },
-  "C-2": {
-    icon: RefreshCw,
-    border: "border-l-green-500",
-    bg: "bg-green-50/40",
-    chip: "bg-green-100 text-green-700",
-    iconColor: "text-green-600",
-  },
+/** 단계 5-2 #1: 시나리오 카드 — 색상 의존 폐기 (CLAUDE.md §13 절대 규칙 준수).
+ *  4 카드 모두 동일 무채색. 시나리오 구분은 아이콘 + 본문 헤더 텍스트.
+ *  disabled 카드 (적용 불가) 만 별도 회색 + opacity 표현 유지. */
+const SCENARIO_ICONS: Record<string, typeof Home> = {
+  A: Home,
+  B: TrendingUp,
+  "C-1": Users,
+  "C-2": RefreshCw,
+};
+
+const SCENARIO_BASE_THEME = {
+  border: "border-l-[var(--color-brand-600)]",
+  bg: "bg-[var(--color-surface)]",
+  chip: "bg-[var(--color-surface-muted)] text-[var(--color-ink-700)]",
+  iconColor: "text-[var(--color-brand-600)]",
 };
 
 const DISABLED_THEME = {
@@ -475,12 +451,12 @@ function ScenarioCard({
   const [name, summary] = splitScenarioTitle(title ?? "");
   const key = parseScenarioKey(title ?? "") ?? "";
   const disabled = detectScenarioDisabled(title ?? "", children);
-  const theme = disabled ? DISABLED_THEME : SCENARIO_THEME[key] ?? null;
-  const Icon = theme?.icon ?? Home;
-  const borderCls = theme?.border ?? "border-l-brand-600";
-  const bgCls = theme?.bg ?? "bg-white";
-  const chipCls = theme?.chip ?? "bg-[var(--color-surface-muted)] text-[var(--color-ink-700)]";
-  const iconColorCls = theme?.iconColor ?? "text-brand-600";
+  // 단계 5-2 #1: disabled 카드만 별도 theme. 일반 카드는 무채색 base + 키별 아이콘.
+  const Icon = disabled ? DISABLED_THEME.icon : SCENARIO_ICONS[key] ?? Home;
+  const borderCls = disabled ? DISABLED_THEME.border : SCENARIO_BASE_THEME.border;
+  const bgCls = disabled ? DISABLED_THEME.bg : SCENARIO_BASE_THEME.bg;
+  const chipCls = disabled ? DISABLED_THEME.chip : SCENARIO_BASE_THEME.chip;
+  const iconColorCls = disabled ? DISABLED_THEME.iconColor : SCENARIO_BASE_THEME.iconColor;
 
   return (
     <div

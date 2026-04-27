@@ -70,7 +70,7 @@ export function FeeCalculator({
           </strong>
           은 낙찰된 경우에만 청구됩니다. 패찰 시에는 기본 수수료만 받고{" "}
           <strong className="text-[var(--color-ink-900)]">
-            보증금은 전액 반환
+            보증금은 당일 즉시 반환
           </strong>
           됩니다.
         </p>

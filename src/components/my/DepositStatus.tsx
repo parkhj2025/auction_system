@@ -112,7 +112,7 @@ export function DepositStatus({ order }: { order: OrderRow }) {
 
       <p className="mt-4 text-xs leading-5 text-[var(--color-ink-500)]">
         <strong className="text-[var(--color-ink-900)]">
-          패찰 시 보증금은 전액 반환
+          패찰 시 보증금은 당일 즉시 반환
         </strong>
         됩니다. 낙찰 시 법원 납부 후 잔액 정산.
       </p>

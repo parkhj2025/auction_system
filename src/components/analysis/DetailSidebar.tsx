@@ -81,7 +81,7 @@ export function DetailSidebar({ fm }: { fm: AnalysisFrontmatter }) {
             </Link>
             <p className="pt-1 text-center text-[11px] text-[var(--color-ink-500)] tabular-nums">
               얼리버드 {(FEES.earlybird / 10_000).toLocaleString("ko-KR")}만원부터 ·
-              패찰 시 보증금 전액 반환
+              패찰 시 보증금 당일 즉시 반환
             </p>
           </div>
         </div>

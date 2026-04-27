@@ -185,7 +185,7 @@ export default function AboutPage() {
               준비된 대리인에게 맡기세요
             </h2>
             <p className="mt-3 text-sm leading-6 text-brand-100 sm:text-base">
-              패찰 시 보증금은 전액 반환됩니다. 결과와 무관하게 투명합니다.
+              패찰 시 보증금은 당일 즉시 반환됩니다. 결과와 무관하게 투명합니다.
             </p>
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">

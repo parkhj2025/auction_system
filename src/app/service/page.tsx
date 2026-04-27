@@ -70,7 +70,7 @@ const SOP = [
     id: 5,
     icon: ShieldCheck,
     title: "결과 통보 · 정산",
-    body: "입찰 종료 직후 낙찰/패찰 결과를 카카오톡으로 통보합니다. 패찰 시 보증금은 당일 또는 익일 전액 반환됩니다.",
+    body: "입찰 종료 직후 낙찰/패찰 결과를 카카오톡으로 통보합니다. 패찰 시 보증금은 당일 즉시 반환됩니다.",
     meta: "D-Day 오후",
   },
 ] as const;
@@ -256,7 +256,7 @@ export default function ServicePage() {
               +{formatKoreanWon(FEES.successBonus)}
             </strong>
             는 낙찰된 경우에만 청구됩니다. 패찰 시 보증금은{" "}
-            <strong className="text-[var(--color-ink-900)]">전액 반환</strong>
+            <strong className="text-[var(--color-ink-900)]">당일 즉시 반환</strong>
             됩니다.
           </p>
           <div className="mt-8">

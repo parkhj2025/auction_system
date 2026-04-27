@@ -110,6 +110,16 @@
      Tailwind v4 --text-* namespace는 utility class로 직접 매핑됨
      예: text-display / text-h1 / text-body / text-caption
      line-height·font-weight는 컴포넌트 측에서 leading-* / font-* utility로 조합 */
+  /* 단계 5-2 #5: type scale 의미 단위별 매핑 명문화.
+   * Hero (페이지 최상단) → display 사용
+   * Section H2 (## 01·02·03 ...) → h2 사용
+   * Sub H3 (### 등기부 요약 ...) → h3 사용
+   * 본문 → body / body-sm
+   * 카드 제목 → h4
+   * 라벨·태그·메타 → caption
+   * 숫자 강조 일반 → numeric (24px)
+   * 숫자 dominant (Hero 최저가) → numeric-dominant (48px)
+   * 숫자 supporting (Hero 보조 stat) → numeric-supporting (20px) */
   --text-display: 3rem;       /* 48px — 페이지 대형 헤더 */
   --text-h1: 2.25rem;         /* 36px — 페이지 H1 */
   --text-h2: 1.875rem;        /* 30px — 섹션 H2 */
@@ -117,8 +127,10 @@
   --text-h4: 1.25rem;         /* 20px — 카드 제목 */
   --text-body: 1rem;          /* 16px — 본문 (모바일 최소 16px 권장) */
   --text-body-sm: 0.875rem;   /* 14px — 보조 본문 */
-  --text-caption: 0.75rem;    /* 12px — 캡션·메타 */
-  --text-numeric: 1.5rem;     /* 24px — 숫자 강조(가격) */
+  --text-caption: 0.75rem;    /* 12px — 캡션·메타·태그 */
+  --text-numeric: 1.5rem;     /* 24px — 숫자 강조 일반 */
+  --text-numeric-dominant: 3rem;     /* 48px — Hero stat dominant (최저가) */
+  --text-numeric-supporting: 1.25rem; /* 20px — Hero stat supporting */
 
   /* ─── 6. 모션 토큰 (단계 2 신규)
      Tailwind v4 --ease-* namespace는 ease-* utility에 매핑됨
@@ -183,11 +195,24 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* 포커스 링: WCAG 가시성 확보 */
-:where(a, button, input, textarea, select, summary):focus-visible {
+/* 단계 5-2 #3: focus-visible 룰 강화.
+ * CLAUDE.md §10: "커스텀 focus ring (box-shadow 0 0 0 3px rgba(37,99,235,0.3))" 명시.
+ * outline + box-shadow 이중 적용으로 시각 가시성 확보 (Windows 고대비 모드 대응). */
+:where(a, button, input, textarea, select, summary, [role="button"], [tabindex]):focus-visible {
   outline: 2px solid var(--color-brand-600);
   outline-offset: 2px;
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.3);
   border-radius: var(--radius-xs);
+}
+
+/* 단계 5-2 #4: safe-area-inset 모바일 노치·홈 인디케이터 영역 안전 여백.
+ * iOS Safari + Android Chrome (env() 지원).
+ * MobileSticky 영역은 body padding-bottom 으로 처리 (layout.tsx 측). */
+@supports (padding: env(safe-area-inset-top)) {
+  body {
+    padding-left: env(safe-area-inset-left);
+    padding-right: env(safe-area-inset-right);
+  }
 }
 
 /* prefers-reduced-motion 대응: 모션 토큰을 0에 가깝게 */

@@ -38,8 +38,7 @@ export function ApplyCTA({ fm }: { fm: AnalysisFrontmatter }) {
         </h2>
         <p className="relative mt-4 max-w-2xl text-sm leading-6 text-brand-100 sm:text-base">
           사건번호 <span className="font-bold text-white tabular-nums">{fm.caseNumber}</span>{" "}
-          정보를 자동으로 불러와 신청 페이지로 이동합니다. 패찰 시 보증금은 전액
-          반환됩니다.
+          정보를 자동으로 불러와 신청 페이지로 이동합니다. 패찰 시 보증금은 당일 즉시 반환됩니다.
         </p>
 
         <ul className="relative mt-5 flex flex-wrap gap-x-5 gap-y-2 text-xs text-brand-100">
@@ -93,7 +92,7 @@ export function ApplyCTA({ fm }: { fm: AnalysisFrontmatter }) {
               패찰 시
             </p>
             <p className="mt-1 text-sm font-bold text-white">
-              보증금 전액 반환
+              보증금 당일 즉시 반환
             </p>
           </div>
         </div>

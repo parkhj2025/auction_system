@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Noto_Sans_KR } from "next/font/google";
 import "./globals.css";
 import { TopNav } from "@/components/layout/TopNav";
@@ -24,7 +24,14 @@ export const metadata: Metadata = {
     template: `%s | ${BRAND_NAME}`,
   },
   description:
-    "법원 안 가는 부동산 경매 입찰 대리. 얼리버드 5만원, 패찰 시 보증금 전액 반환. 공인중개사·서울보증보험 가입. 현재 인천지방법원 서비스 중이며, 서비스 지역은 확대됩니다.",
+    "법원 안 가는 부동산 경매 입찰 대리. 얼리버드 5만원, 패찰 시 보증금 당일 즉시 반환. 공인중개사·서울보증보험 가입. 현재 인천지방법원 서비스 중이며, 서비스 지역은 확대됩니다.",
+};
+
+/* 단계 5-2 #4: viewport-fit cover — iOS Safari 노치 디바이스에서 env(safe-area-inset-*) 활성화 */
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
 };
 
 async function getUserForNav(): Promise<UserMenuProps | null> {
@@ -59,7 +66,8 @@ export default async function RootLayout({
 
   return (
     <html lang="ko" className={`${notoSansKr.variable} h-full antialiased`}>
-      <body className="flex min-h-full flex-col bg-white pb-20 text-[var(--color-ink-900)] md:pb-0">
+      {/* 단계 5-2 #4: 모바일 MobileSticky 영역 padding 에 safe-area-inset-bottom 합산 */}
+      <body className="flex min-h-full flex-col bg-white pb-[calc(5rem+env(safe-area-inset-bottom))] text-[var(--color-ink-900)] md:pb-0">
         <TopNav user={navUser} />
         <div className="flex flex-1 flex-col">{children}</div>
         <Footer />

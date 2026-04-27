@@ -33,53 +33,60 @@ export function ScenarioCardsBoard({ inv }: { inv: InvestmentMeta }) {
     <>
       <div className="mt-6 grid gap-3 sm:grid-cols-2">
         {visible.map((c) => {
-          const theme = SCENARIO_THEME[c.key] ?? SCENARIO_THEME.A;
-          const Icon = theme.icon;
+          const Icon = SCENARIO_ICON[c.key] ?? Home;
           return (
             <button
               type="button"
               key={c.key}
               onClick={() => setOpenKey(c.key)}
               aria-label={`시나리오 ${c.key} ${c.name} 전체 표 보기`}
-              className={`group rounded-[var(--radius-md)] border border-l-4 border-[var(--color-border)] p-4 text-left transition duration-150 ease-out hover:shadow-[var(--shadow-card)] sm:p-5 ${theme.cardCls}`}
+              className="group flex gap-4 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface)] p-4 text-left transition duration-150 ease-out hover:border-[var(--color-ink-300)] hover:shadow-[var(--shadow-card)] sm:p-5"
             >
-              <div className="flex items-center gap-2">
+              {/* 좌측 대형 번호 라벨 — 시나리오 식별의 dominant 시각 요소 (색상 의존 0) */}
+              <div className="flex shrink-0 flex-col items-center pt-0.5">
                 <span
-                  className={`inline-flex h-8 w-8 items-center justify-center rounded-full bg-white ${theme.iconCls}`}
-                  aria-hidden="true"
+                  className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]"
                 >
-                  <Icon size={16} />
+                  시나리오
                 </span>
-                <p
-                  className={`text-[10px] font-bold uppercase tracking-[0.18em] ${theme.labelCls}`}
-                >
-                  시나리오 {c.key}
+                <span className="mt-1 font-black tabular-nums text-[var(--color-ink-900)] text-[1.75rem] leading-none sm:text-[2rem]">
+                  {c.key}
+                </span>
+              </div>
+              <div className="min-w-0 flex-1">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="inline-flex h-7 w-7 items-center justify-center rounded-full bg-[var(--color-brand-50)] text-[var(--color-brand-600)]"
+                    aria-hidden="true"
+                  >
+                    <Icon size={14} />
+                  </span>
+                  <p className="text-base font-black tracking-tight text-[var(--color-ink-900)] sm:text-lg">
+                    {c.name}
+                  </p>
+                </div>
+                {c.headline ? (
+                  <p className="mt-1 text-xs leading-5 text-[var(--color-ink-500)]">
+                    {c.headline}
+                  </p>
+                ) : null}
+                <dl className="mt-3 space-y-1.5">
+                  {c.rows.slice(0, 2).map((r, i) => (
+                    <div
+                      key={i}
+                      className="flex items-baseline justify-between gap-3 text-sm"
+                    >
+                      <dt className="text-[var(--color-ink-500)]">{r.label}</dt>
+                      <dd className="font-bold tabular-nums text-[var(--color-ink-900)]">
+                        {r.value}
+                      </dd>
+                    </div>
+                  ))}
+                </dl>
+                <p className="mt-3 text-[11px] font-bold text-[var(--color-brand-600)] group-hover:text-[var(--color-brand-700)]">
+                  전체 표 보기 →
                 </p>
               </div>
-              <p className="mt-2 text-base font-black tracking-tight text-[var(--color-ink-900)] sm:text-lg">
-                {c.name}
-              </p>
-              {c.headline ? (
-                <p className="mt-1 text-xs leading-5 text-[var(--color-ink-500)]">
-                  {c.headline}
-                </p>
-              ) : null}
-              <dl className="mt-3 space-y-1.5">
-                {c.rows.slice(0, 2).map((r, i) => (
-                  <div
-                    key={i}
-                    className="flex items-baseline justify-between gap-3 text-sm"
-                  >
-                    <dt className="text-[var(--color-ink-500)]">{r.label}</dt>
-                    <dd className="font-bold tabular-nums text-[var(--color-ink-900)]">
-                      {r.value}
-                    </dd>
-                  </div>
-                ))}
-              </dl>
-              <p className="mt-3 text-[11px] font-bold text-[var(--color-brand-600)] group-hover:text-[var(--color-brand-700)]">
-                전체 표 보기 →
-              </p>
             </button>
           );
         })}
@@ -129,40 +136,17 @@ interface ScenarioCard {
   rows: Array<{ label: string; value: string }>;
 }
 
-/** 단계 4-1: 시나리오 종류별 고정 색상·아이콘 매핑 (ScenarioCard·mdx-components 공통) */
-const SCENARIO_THEME: Record<
-  string,
-  {
-    icon: typeof Home;
-    cardCls: string;
-    labelCls: string;
-    iconCls: string;
-  }
-> = {
-  A: {
-    icon: Home,
-    cardCls: "border-l-blue-500 bg-blue-50/40",
-    labelCls: "text-blue-700",
-    iconCls: "text-blue-600",
-  },
-  B: {
-    icon: TrendingUp,
-    cardCls: "border-l-orange-500 bg-orange-50/40",
-    labelCls: "text-orange-700",
-    iconCls: "text-orange-600",
-  },
-  "C-1": {
-    icon: Users,
-    cardCls: "border-l-purple-500 bg-purple-50/40",
-    labelCls: "text-purple-700",
-    iconCls: "text-purple-600",
-  },
-  "C-2": {
-    icon: RefreshCw,
-    cardCls: "border-l-green-500 bg-green-50/40",
-    labelCls: "text-green-700",
-    iconCls: "text-green-600",
-  },
+/** 단계 5-2 #1: 시나리오 종류별 아이콘 매핑 (색상 의존 폐기, 무채색 + 단일 brand 액센트).
+ *  근거 — CLAUDE.md §13 절대 규칙 ("오렌지 금지 + 3색 이상 강조 금지").
+ *  근거 — frontend-design 스킬: "dominant + sharp accents" + "cohesive aesthetic".
+ *  근거 — ui-ux-pro-max: visual-hierarchy ("size, spacing, contrast — not color alone").
+ *  4 카드 모두 동일 무채색 디자인. 시나리오 구분은 좌측 대형 번호 + 아이콘 단일 brand-600.
+ *  ScenarioCard wrap (mdx-components) 측도 동일 정책. */
+const SCENARIO_ICON: Record<string, typeof Home> = {
+  A: Home,
+  B: TrendingUp,
+  "C-1": Users,
+  "C-2": RefreshCw,
 };
 
 function asMaybeNumber(v: unknown): number | null {

@@ -146,7 +146,7 @@ export function HeroSearch() {
           부터
         </h1>
         <p className="mt-4 max-w-xl text-brand-100">
-          공인중개사·서울보증보험 가입. 패찰 시 보증금 전액 반환.
+          공인중개사·서울보증보험 가입. 패찰 시 보증금 당일 즉시 반환.
         </p>
 
         <form

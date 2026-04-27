@@ -6,14 +6,14 @@ import { FEES, COMPANY } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "환불 정책",
-  description: `${COMPANY.name} 수수료 환불 및 입찰 보증금 반환 정책. 패찰 시 보증금은 전액 반환됩니다.`,
+  description: `${COMPANY.name} 수수료 환불 및 입찰 보증금 반환 정책. 패찰 시 보증금은 당일 즉시 반환됩니다.`,
 };
 
 export default function RefundPage() {
   return (
     <LegalLayout
       title="환불 정책"
-      intro={`${COMPANY.name}의 수수료 환불 규정과 입찰 보증금 반환 원칙을 안내합니다. 패찰 시 보증금은 전액 반환되며, 결과와 무관하게 투명하게 운영됩니다.`}
+      intro={`${COMPANY.name}의 수수료 환불 규정과 입찰 보증금 반환 원칙을 안내합니다. 패찰 시 보증금은 당일 즉시 반환되며, 결과와 무관하게 투명하게 운영됩니다.`}
       effectiveDate="2026-04-14"
       lastUpdated="2026-04-14"
     >
@@ -81,7 +81,7 @@ export default function RefundPage() {
                   50% 환불
                 </td>
                 <td className="border-b border-[var(--color-border)] px-4 py-3 align-top font-bold text-[var(--color-ink-900)]">
-                  전액 반환
+                  당일 즉시 반환
                 </td>
               </tr>
               <tr>
@@ -92,7 +92,7 @@ export default function RefundPage() {
                   환불 불가
                 </td>
                 <td className="border-b border-[var(--color-border)] px-4 py-3 align-top font-bold text-[var(--color-ink-900)]">
-                  전액 반환
+                  당일 즉시 반환
                 </td>
               </tr>
               <tr>
@@ -103,7 +103,7 @@ export default function RefundPage() {
                   전액 환불
                 </td>
                 <td className="px-4 py-3 align-top font-bold text-[var(--color-ink-900)]">
-                  전액 반환
+                  당일 즉시 반환
                 </td>
               </tr>
             </tbody>
@@ -126,7 +126,7 @@ export default function RefundPage() {
             <strong className="text-[var(--color-ink-900)]">
               보증금 전액이 반환
             </strong>
-            됩니다. 영업일 기준 당일 또는 익일 처리됩니다.
+            됩니다. 영업일 기준 당일 즉시 처리됩니다.
           </li>
           <li>
             <strong className="font-black text-[var(--color-ink-900)]">
@@ -139,7 +139,7 @@ export default function RefundPage() {
             <strong className="font-black text-[var(--color-ink-900)]">
               매각기일 변경·취하
             </strong>
-            : 법원 사유로 입찰이 진행되지 않은 경우 보증금은 전액 반환되며,
+            : 법원 사유로 입찰이 진행되지 않은 경우 보증금은 당일 즉시 반환되며,
             수수료는 다음 회차로 이월 또는 전액 환불 중 이용자가 선택할 수
             있습니다.
           </li>

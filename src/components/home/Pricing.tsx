@@ -78,7 +78,7 @@ export function Pricing() {
           </h2>
           <p className="mt-3 text-base leading-7 text-[var(--color-ink-500)]">
             기본 수수료는 선납이지만, 패찰 시 보증금은{" "}
-            <strong className="text-[var(--color-ink-900)]">전액 반환</strong>
+            <strong className="text-[var(--color-ink-900)]">당일 즉시 반환</strong>
             됩니다. 낙찰 성공보수는 낙찰된 경우에만 청구합니다.
           </p>
         </div>
@@ -140,7 +140,7 @@ export function Pricing() {
           ))}
         </div>
 
-        {/* 성공보수 + 전액 반환 강조 배너 */}
+        {/* 성공보수 + 당일 즉시 반환 강조 배너 */}
         <div className="mt-10 grid gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 sm:grid-cols-[1fr_auto] sm:items-center sm:gap-8">
           <div className="flex items-start gap-4">
             <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-brand-50 text-brand-600">
@@ -157,7 +157,7 @@ export function Pricing() {
               <p className="mt-1 text-sm leading-6 text-[var(--color-ink-500)]">
                 패찰 시에는 기본 수수료만 받고,{" "}
                 <strong className="text-[var(--color-ink-900)]">
-                  입찰 보증금은 전액 반환
+                  입찰 보증금은 당일 즉시 반환
                 </strong>
                 됩니다. 결과와 무관하게 청구되는 숨은 비용은 없습니다.
               </p>

@@ -81,30 +81,37 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
           </p>
         ) : null}
 
-        {/* Key numbers — 4-cell stat grid */}
-        <div className="mt-9 grid grid-cols-2 gap-px overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-border)] lg:grid-cols-4">
-          <Stat
-            label="감정가"
-            value={fm.appraisalDisplay ?? formatKoreanWon(fm.appraisal)}
-            sub="기준가"
-          />
-          <Stat
+        {/* 단계 5-2 #2: Hero stat — dominant + supporting 위계.
+         *  · dominant: {round}차 최저가 (Hero 의 핵심 결정 정보)
+         *    - text-numeric-dominant (48px)
+         *    - 감정가 대비 하락률 (computed) 표시
+         *  · supporting: 감정가 / 입찰보증금 / 입찰기일 (3-cell)
+         *  근거: frontend-design "dominant + sharp accents" + ui-ux-pro-max "primary-action" + visual-hierarchy. */}
+        <div className="mt-9 space-y-px overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-border)]">
+          <DominantStat
             label={`${fm.round}차 최저가`}
             value={fm.minPriceDisplay ?? formatKoreanWon(fm.minPrice)}
-            sub={`감정가의 ${fm.percent}%`}
-            accent
+            percentOfAppraisal={fm.percent}
+            dropRate={computeDropRate(fm.appraisal, fm.minPrice)}
           />
-          <Stat
-            label="입찰보증금"
-            value={formatKoreanWon(depositAmount)}
-            sub="최저가의 10% (기본 가정)"
-          />
-          <Stat
-            label="입찰기일"
-            value={fm.bidDate}
-            sub={`${fm.bidTime ?? "10:00"} · ${formatDay(fm.bidDate)}`}
-            icon={<Clock size={13} aria-hidden="true" />}
-          />
+          <div className="grid grid-cols-3 gap-px bg-[var(--color-border)]">
+            <Stat
+              label="감정가"
+              value={fm.appraisalDisplay ?? formatKoreanWon(fm.appraisal)}
+              sub="기준가"
+            />
+            <Stat
+              label="입찰보증금"
+              value={formatKoreanWon(depositAmount)}
+              sub="최저가의 10%"
+            />
+            <Stat
+              label="입찰기일"
+              value={fm.bidDate}
+              sub={`${fm.bidTime ?? "10:00"} · ${formatDay(fm.bidDate)}`}
+              icon={<Clock size={13} aria-hidden="true" />}
+            />
+          </div>
         </div>
 
         {/* 갤러리 strip — Hero 본문 하부 가로 4열 */}
@@ -117,43 +124,63 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
   );
 }
 
+/** 단계 5-2 #2: Hero dominant stat — 최저가 + 감정가 대비 하락률.
+ *  text-numeric-dominant (48px) + brand-600 fill 로 시각 무게 1순위. */
+function DominantStat({
+  label,
+  value,
+  percentOfAppraisal,
+  dropRate,
+}: {
+  label: string;
+  value: string;
+  percentOfAppraisal: number;
+  dropRate: number;
+}) {
+  return (
+    <div className="flex flex-col gap-2 bg-[var(--color-brand-600)] p-6 text-white sm:p-8">
+      <p className="text-[11px] font-bold uppercase tracking-widest text-white/80">
+        {label}
+      </p>
+      <div className="flex flex-wrap items-baseline gap-x-4 gap-y-1">
+        <p className="text-[2.25rem] font-black leading-none tabular-nums tracking-tight sm:text-[3rem]">
+          {value}
+        </p>
+        {dropRate > 0 ? (
+          <p className="flex items-baseline gap-2 text-sm font-medium text-white/85 sm:text-base">
+            <span className="tabular-nums">감정가의 {percentOfAppraisal}%</span>
+            <span aria-hidden="true">·</span>
+            <span className="rounded-[var(--radius-xs)] bg-white/15 px-2 py-0.5 font-bold tabular-nums">
+              −{dropRate}%
+            </span>
+          </p>
+        ) : null}
+      </div>
+    </div>
+  );
+}
+
 function Stat({
   label,
   value,
   sub,
-  accent,
   icon,
 }: {
   label: string;
   value: string;
   sub: string;
-  accent?: boolean;
   icon?: ReactNode;
 }) {
   return (
-    <div
-      className={`flex flex-col gap-1 p-5 ${
-        accent
-          ? "bg-[var(--color-brand-600)] text-white"
-          : "bg-white text-[var(--color-ink-900)]"
-      }`}
-    >
-      <p
-        className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest ${
-          accent ? "text-white/80" : "text-[var(--color-ink-500)]"
-        }`}
-      >
+    <div className="flex flex-col gap-1 bg-white p-4 text-[var(--color-ink-900)] sm:p-5">
+      <p className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest text-[var(--color-ink-500)]">
         {icon}
         {label}
       </p>
-      <p className="mt-1 text-xl font-black leading-tight tabular-nums sm:text-2xl">
+      <p className="mt-1 text-base font-black leading-tight tabular-nums sm:text-lg">
         {value}
       </p>
-      <p
-        className={`text-[11px] font-medium tabular-nums ${
-          accent ? "text-white/75" : "text-[var(--color-ink-500)]"
-        }`}
-      >
+      <p className="text-[11px] font-medium tabular-nums text-[var(--color-ink-500)]">
         {sub}
       </p>
     </div>
@@ -162,6 +189,14 @@ function Stat({
 
 function computeDeposit(minPrice: number): number {
   return Math.round(minPrice * 0.1);
+}
+
+/** 단계 5-2 #2: 감정가 대비 최저가 하락률 % (정수 반올림).
+ *  example: appraisal=178000000, minPrice=124600000 → 30 (= -30%) */
+function computeDropRate(appraisal: number, minPrice: number): number {
+  if (!appraisal || !minPrice) return 0;
+  const rate = ((appraisal - minPrice) / appraisal) * 100;
+  return Math.round(rate);
 }
 
 function formatDay(yyyyMmDd: string): string {

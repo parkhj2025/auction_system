@@ -11,7 +11,7 @@ const BADGES = [
 /**
  * 홈 최하단 마무리 CTA.
  * - 어두운 배경 + 신뢰 뱃지 3개 + 헤드라인 + 보조 카피 + CTA 버튼 2개
- * - "패찰 시 보증금은 전액 반환됩니다" 필수 포함 (CLAUDE.md 규칙)
+ * - "패찰 시 보증금은 당일 즉시 반환됩니다" 필수 포함 (CLAUDE.md 규칙)
  */
 export function TrustCTA() {
   return (
@@ -46,7 +46,7 @@ export function TrustCTA() {
         </h2>
         <p className="mt-5 max-w-2xl text-base leading-7 text-brand-100 sm:text-lg">
           물건은 찾았는데 평일에 시간 내기 어려운 분들을 위해, 경매 입찰 대리
-          서비스를 운영하고 있습니다. 패찰 시 보증금은 전액 반환됩니다.
+          서비스를 운영하고 있습니다. 패찰 시 보증금은 당일 즉시 반환됩니다.
         </p>
 
         <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
