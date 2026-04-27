@@ -35,7 +35,8 @@ export function HoverableDropRateBar({
   // once: true 사유: count-up 숫자 카운트 + fill bar line draw 1회 진행 본질 (룰 1 예외)
   const inView = useInView(ref, { once: true, amount: 0.4 });
   const dropRate = computeDropRate(appraisal, minPrice);
-  const animatedDrop = useCountUp(dropRate, inView, 600, 600);
+  // 룰 7 (단계 5-4-2-fix-4): count-up duration 1600ms (fill bar 와 동기화)
+  const animatedDrop = useCountUp(dropRate, inView, 1600, 200);
 
   // 호버 marker 상태 (사용자 능동 인터랙션 — Show-and-Play)
   const [hoverPercent, setHoverPercent] = useState<number | null>(null);
@@ -81,25 +82,25 @@ export function HoverableDropRateBar({
         onTouchEnd={() => setHoverPercent(null)}
         className="relative h-2 w-full cursor-pointer overflow-visible rounded-full bg-white/30 outline-none focus-visible:ring-2 focus-visible:ring-white/60 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--color-ink-900)]"
       >
-        {/* fill bar (최저가 percent% width) — motion 으로 width animate */}
+        {/* fill bar (최저가 percent% width) — 룰 7 (단계 5-4-2-fix-4): 1.6초 cubic ease-out */}
         <motion.div
           className="absolute inset-y-0 left-0 origin-left rounded-full bg-white"
           initial={{ scaleX: 0 }}
           animate={inView ? { scaleX: 1 } : { scaleX: 0 }}
           transition={{
-            duration: 0.8,
+            duration: 1.6,
             delay: 0.2,
             ease: [0.16, 1, 0.3, 1],
           }}
           style={{ width: `${percent}%` }}
         />
-        {/* 70% vertical mark — fill bar 끝 위치 */}
+        {/* 70% vertical mark — fill bar 끝 위치 (1.6초 후 reveal) */}
         <motion.span
           aria-hidden="true"
           className="absolute -top-1 -bottom-1 w-px bg-white/80"
           initial={{ opacity: 0 }}
           animate={inView ? { opacity: 1 } : { opacity: 0 }}
-          transition={{ delay: 1.0, duration: 0.3 }}
+          transition={{ delay: 1.8, duration: 0.3 }}
           style={{ left: `${percent}%` }}
         />
         {/* hover/keyboard marker — 사용자 능동 인터랙션 */}
