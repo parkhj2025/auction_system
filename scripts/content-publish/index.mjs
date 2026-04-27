@@ -140,13 +140,26 @@ slug = raw-content 디렉토리명 그대로 (단계 3-5-fix). 분류 부호 가
 }
 
 /* ─── §2-2: raw-content 하위 사건 디렉토리 스캔 (단계 3-5-fix) ─── */
+/* 단계 4-2-fix-6: raw-content/완성/ 하위 사건은 --all 모드에서 자동 제외.
+ *  PASS 시연 완료 후 형준님 수동 git mv 로 이동된 사건들의 재발행 차단.
+ *  반환: { cases: string[], skippedCompleted: number } */
 function scanCaseDirs() {
-  if (!fs.existsSync(RAW_ROOT)) return [];
-  return fs
-    .readdirSync(RAW_ROOT, { withFileTypes: true })
-    .filter((e) => e.isDirectory() && !e.name.startsWith("."))
+  if (!fs.existsSync(RAW_ROOT)) return { cases: [], skippedCompleted: 0 };
+  const entries = fs.readdirSync(RAW_ROOT, { withFileTypes: true });
+  const cases = entries
+    .filter((e) => e.isDirectory() && !e.name.startsWith(".") && e.name !== "완성")
     .map((e) => e.name)
     .sort();
+  // raw-content/완성/ 안 사건 카운트 (단순 정보 노출용)
+  let skippedCompleted = 0;
+  const completedDir = path.join(RAW_ROOT, "완성");
+  if (fs.existsSync(completedDir)) {
+    skippedCompleted = fs
+      .readdirSync(completedDir, { withFileTypes: true })
+      .filter((e) => e.isDirectory() && !e.name.startsWith("."))
+      .length;
+  }
+  return { cases, skippedCompleted };
 }
 
 /* ─── §1: 입력 검증 (v3.3 — pdf_text·images/photos 선택) ─── */
@@ -683,6 +696,10 @@ const POST_FM_OVERLAY_FIELDS = new Set([
   "coverImage",
   "publishedAt",
   "region",
+  // 단계 4-2-fix-6: Cowork v2.8 의도 충실 명시. exclusiveArea 는 alias 매핑으로
+  // areaM2 로 변환된 후 매칭되므로 동작 영향 0이나, 화이트리스트에 raw 키를
+  // 명시적으로 노출해 v2.8 산출물과의 정합성 자가 보고를 명확히 함.
+  "exclusiveArea",
 ]);
 
 /* post.md frontmatter (raw key) → AnalysisFrontmatter 스키마 키 alias 매핑.
@@ -742,6 +759,9 @@ const REQUIRED_FRONTMATTER_FIELDS = [
   "bidDate",
   "appraisal",
   "minPrice",
+  // 단계 4-2-fix-6: Cowork v2.8 동기화. exclusiveArea (post.md frontmatter 키)
+  // → areaM2 (AnalysisFrontmatter 스키마, alias 매핑 후) 검증.
+  "areaM2",
 ];
 
 function findEmptyRequiredFields(fm) {
@@ -1022,10 +1042,19 @@ function buildPublishedMeta(meta, photosMeta, slug) {
  * 일괄 모드(--all)에서는 process.exit 호출 0 — main dispatcher 가 결과 종합 후 종료.
  */
 async function publishOne(caseNumber, args) {
-  const rawDir = path.join(RAW_ROOT, caseNumber);
+  // 단계 4-2-fix-6: raw-content/{N}/ → 부재 시 raw-content/완성/{N}/ fallback
+  let rawDir = path.join(RAW_ROOT, caseNumber);
   if (!fs.existsSync(rawDir)) {
-    console.error(`  ✗ raw-content/${caseNumber}/ 폴더 없음`);
-    return { status: "fail-input", code: 1, slug: caseNumber };
+    const completedDir = path.join(RAW_ROOT, "완성", caseNumber);
+    if (fs.existsSync(completedDir)) {
+      rawDir = completedDir;
+      console.log(`  · 완성 폴더에서 발견: ${path.relative(REPO_ROOT, rawDir)}`);
+    } else {
+      console.error(
+        `  ✗ raw-content/${caseNumber}/ 와 raw-content/완성/${caseNumber}/ 모두 부재`
+      );
+      return { status: "fail-input", code: 1, slug: caseNumber };
+    }
   }
   console.log(`[1] 입력 검증: ${path.relative(REPO_ROOT, rawDir)}`);
   const v = validateInput(rawDir);
@@ -1375,14 +1404,21 @@ async function main() {
   const args = parseArgs(process.argv);
 
   // --all 모드 — raw-content/ 하위 사건 디렉토리 전체 일괄 publish
+  // 단계 4-2-fix-6: raw-content/완성/ 하위는 자동 제외 (PASS 시연 완료 사건)
   if (args.all) {
-    const cases = scanCaseDirs();
+    const { cases, skippedCompleted } = scanCaseDirs();
     if (cases.length === 0) {
       console.error("raw-content/ 하위에 사건 디렉토리가 없습니다.");
+      if (skippedCompleted > 0) {
+        console.error(
+          `(완성 폴더 안 ${skippedCompleted}건 스킵 — 단일 사건 publish 로 처리하세요)`
+        );
+      }
       process.exit(1);
     }
+    const skipNote = skippedCompleted > 0 ? ` / 완성 폴더 ${skippedCompleted}건 스킵` : "";
     console.log(
-      `=== --all 모드: ${cases.length}건 발견 — ${cases.join(", ")} ===\n`
+      `=== --all 모드: ${cases.length}건 발견${skipNote} — ${cases.join(", ")} ===\n`
     );
     const results = [];
     for (const c of cases) {
