@@ -18,6 +18,7 @@
  */
 import { motion, useInView } from "motion/react";
 import { useRef, useState, useMemo } from "react";
+import { TrendingUp, TrendingDown, Minus } from "lucide-react";
 import type { InvestmentMeta, ScenarioFields } from "@/types/content";
 import { formatKoreanWon } from "@/lib/utils";
 
@@ -251,8 +252,9 @@ export function ScenarioComparisonBox({
                 const offset = (stat.profit / maxProfitAbs) * 50; // -50% ~ +50%
                 return (
                   <td key={key} className={`px-2 py-3 align-top transition-colors ${isActive ? "bg-[var(--color-ink-100)]" : ""}`}>
+                    {/* 룰 21-C 시각 강조: 화살표 (TrendingUp/Down) + 수치 */}
                     <div
-                      className={`text-sm tabular-nums ${
+                      className={`flex items-center gap-1 text-sm tabular-nums ${
                         isActive
                           ? "font-black text-[var(--color-ink-900)]"
                           : activeKey
@@ -260,9 +262,18 @@ export function ScenarioComparisonBox({
                             : "font-bold text-[var(--color-ink-700)]"
                       }`}
                     >
-                      {stat.profit === 0
-                        ? "—"
-                        : `${stat.profit < 0 ? "−" : "+"}${formatKoreanWon(Math.abs(stat.profit))}`}
+                      {stat.profit > 0 ? (
+                        <TrendingUp size={14} aria-hidden="true" className="shrink-0" />
+                      ) : stat.profit < 0 ? (
+                        <TrendingDown size={14} aria-hidden="true" className="shrink-0" />
+                      ) : (
+                        <Minus size={14} aria-hidden="true" className="shrink-0" />
+                      )}
+                      <span>
+                        {stat.profit === 0
+                          ? "—"
+                          : `${stat.profit < 0 ? "−" : "+"}${formatKoreanWon(Math.abs(stat.profit))}`}
+                      </span>
                     </div>
                     {/* 점 위치 라인 (좌 손실 ← 0 → 우 수익) */}
                     <div className="relative mt-1.5 h-2 w-full">
@@ -304,6 +315,7 @@ export function ScenarioComparisonBox({
               {visible.map((key) => {
                 const stat = scenarios[key]!;
                 const isActive = key === activeKey;
+                const yearsCapped = Math.min(stat.holdingYears ?? 0, 5);
                 return (
                   <td key={key} className={`px-2 py-3 align-top transition-colors ${isActive ? "bg-[var(--color-ink-100)]" : ""}`}>
                     <span
@@ -317,6 +329,24 @@ export function ScenarioComparisonBox({
                     >
                       {stat.holdingYears != null ? `${stat.holdingYears}년` : "—"}
                     </span>
+                    {/* 룰 21-C 시각 강조: 가로 timeline (1년~5년) — 5 dots */}
+                    <div className="mt-1.5 flex items-center gap-1">
+                      {Array.from({ length: 5 }, (_, i) => (
+                        <span
+                          key={i}
+                          aria-hidden="true"
+                          className={`h-1.5 flex-1 rounded-full ${
+                            i < yearsCapped
+                              ? isActive
+                                ? "bg-[var(--color-ink-900)]"
+                                : activeKey
+                                  ? "bg-[var(--color-ink-300)]"
+                                  : "bg-[var(--color-ink-700)]"
+                              : "bg-[var(--color-ink-100)]"
+                          }`}
+                        />
+                      ))}
+                    </div>
                   </td>
                 );
               })}
@@ -332,6 +362,7 @@ export function ScenarioComparisonBox({
               {visible.map((key) => {
                 const stat = scenarios[key]!;
                 const isActive = key === activeKey;
+                const riskLevel = resolveRiskNumeric(stat.riskLevel); // 1·2·3
                 return (
                   <td key={key} className={`px-2 py-3 align-top transition-colors ${isActive ? "bg-[var(--color-ink-100)]" : ""}`}>
                     <span
@@ -339,6 +370,24 @@ export function ScenarioComparisonBox({
                     >
                       {resolveRiskLabel(stat.riskLevel)}
                     </span>
+                    {/* 룰 21-C 시각 강조: dot indicator (낮음 1·중간 2·높음 3) */}
+                    <div className="mt-1.5 flex items-center gap-1">
+                      {Array.from({ length: 3 }, (_, i) => (
+                        <span
+                          key={i}
+                          aria-hidden="true"
+                          className={`h-1.5 w-1.5 rounded-full ${
+                            i < riskLevel
+                              ? isActive
+                                ? "bg-[var(--color-ink-900)]"
+                                : activeKey
+                                  ? "bg-[var(--color-ink-300)]"
+                                  : "bg-[var(--color-ink-700)]"
+                              : "bg-[var(--color-ink-100)]"
+                          }`}
+                        />
+                      ))}
+                    </div>
                   </td>
                 );
               })}
@@ -442,6 +491,18 @@ function buildScenarioStat(
 function asNumber(v: unknown): number | null {
   if (typeof v === "number" && Number.isFinite(v)) return v;
   return null;
+}
+
+function resolveRiskNumeric(level: string): number {
+  switch (level) {
+    case "low":
+      return 1;
+    case "high":
+      return 3;
+    case "mid":
+    default:
+      return 2;
+  }
 }
 
 function resolveRiskLabel(level: string): string {

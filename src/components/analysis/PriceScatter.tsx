@@ -34,7 +34,7 @@
  * 모바일 노출 의무 보존 (룰 2/10): hidden sm:block 금지, mobile 100% width.
  */
 import { motion, useInView } from "motion/react";
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { ArrowDown } from "lucide-react";
 import type { MarketMeta, BiddingHistoryEntry } from "@/types/content";
 import { formatKoreanWon } from "@/lib/utils";
@@ -80,12 +80,7 @@ export function PriceScatter({
     ? Math.round(((startPrice - currentPrice) / startPrice) * 100)
     : 0;
 
-  // 슬라이더
-  const [userPriceWon, setUserPriceWon] = useState<number>(currentPrice);
-  const userVsAppraisal = Math.round(((appraisal - userPriceWon) / appraisal) * 100);
-  const userVsSaleAvg =
-    saleAvg > 0 ? Math.round(((saleAvg - userPriceWon) / saleAvg) * 100) : 0;
-  const userBarSign = userVsSaleAvg > 0 ? "−" : "+";
+  // 룰 20-A: horizontal slider 폐기 — userPriceWon 등 state 제거
 
   // count-up
   const animatedDropAppraisal = useCountUp(
@@ -98,7 +93,7 @@ export function PriceScatter({
   return (
     <div
       ref={ref}
-      className="rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] p-6 sm:p-8"
+      className="rounded-[var(--radius-md)] border border-[var(--color-ink-200)] bg-white p-6 sm:p-8"
     >
       <div className="flex items-baseline justify-between">
         <p className="text-[length:var(--text-caption)] font-semibold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">
@@ -203,59 +198,8 @@ export function PriceScatter({
         </motion.div>
       ) : null}
 
-      {/* 입찰가 horizontal slider (Show-and-Play) */}
-      <motion.div
-        className="mt-6 origin-left rounded-[var(--radius-sm)] bg-white p-4 shadow-[var(--shadow-subtle)]"
-        initial={{ opacity: 0, x: -16 }}
-        animate={inView ? { opacity: 1, x: 0 } : { opacity: 0, x: -16 }}
-        transition={{ delay: 1.8, duration: 0.4 }}
-      >
-        <div className="flex flex-wrap items-baseline justify-between gap-2">
-          <label
-            htmlFor="user-price-slider"
-            className="text-[length:var(--text-caption)] font-semibold uppercase tracking-[0.18em] text-[var(--color-ink-700)]"
-          >
-            내 입찰가 시뮬레이션
-          </label>
-          <span className="rounded-[var(--radius-xs)] bg-[var(--color-brand-900)] px-2 py-0.5 text-[length:var(--text-caption)] font-black tabular-nums text-white">
-            {formatKoreanWon(userPriceWon)}
-          </span>
-        </div>
-        <input
-          id="user-price-slider"
-          type="range"
-          min={minPrice}
-          max={appraisal}
-          step={1_000_000}
-          value={userPriceWon}
-          onChange={(e) => setUserPriceWon(Number(e.target.value))}
-          aria-valuemin={minPrice}
-          aria-valuemax={appraisal}
-          aria-valuenow={userPriceWon}
-          aria-valuetext={`${formatKoreanWon(userPriceWon)}, 감정가 대비 ${userVsAppraisal > 0 ? "−" : "+"}${Math.abs(userVsAppraisal)}%, 시세 평균 대비 ${userBarSign}${Math.abs(userVsSaleAvg)}%`}
-          className="mt-3 w-full accent-[var(--color-brand-900)]"
-        />
-        <div className="mt-3 flex items-baseline justify-between text-[length:var(--text-caption)] tabular-nums text-[var(--color-ink-500)]">
-          <span>최저가 {formatKoreanWon(minPrice)}</span>
-          <span>감정가 {formatKoreanWon(appraisal)}</span>
-        </div>
-        <p className="mt-3 text-[length:var(--text-body-sm)] leading-6 tabular-nums text-[var(--color-ink-700)]">
-          감정가 대비{" "}
-          <span className="font-black text-[var(--color-ink-900)]">
-            {userVsAppraisal > 0 ? "−" : "+"}
-            {Math.abs(userVsAppraisal)}%
-          </span>
-          {saleAvg > 0 ? (
-            <>
-              {" · 시세평균 대비 "}
-              <span className="font-black text-[var(--color-brand-900)]">
-                {userBarSign}
-                {Math.abs(userVsSaleAvg)}%
-              </span>
-            </>
-          ) : null}
-        </p>
-      </motion.div>
+      {/* 룰 20-A (단계 5-4-2-fix-6): 입찰가 horizontal slider 영역 폐기.
+       * step-down 시각화 + 시세 평균 보조 텍스트 본질만 보존 (형준님 평가 영역). */}
     </div>
   );
 }

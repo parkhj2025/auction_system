@@ -142,7 +142,7 @@ export function ScenarioCarousel({
               animate={{ opacity: 1, x: 0 }}
               exit={{ opacity: 0, x: -24 }}
               transition={{ duration: 0.35, ease: [0.16, 1, 0.3, 1] }}
-              className="bg-[var(--color-surface-muted)] p-6 sm:p-8"
+              className="rounded-[var(--radius-md)] border border-[var(--color-ink-200)] bg-white p-6 sm:p-8"
               aria-live="polite"
               aria-roledescription="slide"
               aria-label={`시나리오 ${safeKey}, ${currentIdx + 1} of ${visible.length}`}
