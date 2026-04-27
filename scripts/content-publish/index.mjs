@@ -1220,8 +1220,28 @@ async function publishOne(caseNumber, args) {
     console.error(`\n=== 최종 frontmatter 검증 FAIL ===`);
     console.error(`${caseNumber} — ${missingRequired.join(" / ")} 필드 빈 값 잔존`);
     console.error(`원인: post.md frontmatter 부재 + Gemini supervisor 보강 실패 + meta.json 보강 실패`);
-    console.error(`해결: Cowork 산출 재실행 또는 raw-content/${caseNumber}/post.md frontmatter·meta.json 직접 수정\n`);
-    return { status: "fail-required", code: 1, slug, missingRequired };
+    console.error(`해결: Cowork 산출 재실행 또는 raw-content/${caseNumber}/post.md frontmatter·meta.json 직접 수정`);
+
+    // 단계 4-2-fix-4: stale 산출물 자동 삭제로 빌드 차단.
+    // 이전 publish 의 산출물이 잔존하면 빌드에 stale 데이터 포함되는 위험.
+    let staleDeleted = 0;
+    const metaOutPath = path.join(OUT_DIR, `${slug}.meta.json`);
+    for (const stale of [outPath, metaOutPath]) {
+      if (fs.existsSync(stale)) {
+        try {
+          fs.unlinkSync(stale);
+          staleDeleted++;
+        } catch (e) {
+          console.error(`  ⚠ stale 삭제 실패: ${path.relative(REPO_ROOT, stale)} (${e.message})`);
+        }
+      }
+    }
+    if (staleDeleted > 0) {
+      console.error(`  · stale 산출물 ${staleDeleted}건 삭제 완료 (빌드 차단)\n`);
+    } else {
+      console.error("");
+    }
+    return { status: "fail-required", code: 1, slug, missingRequired, staleDeleted };
   }
 
   const mdxContent = serializeMdx(frontmatter, body);
