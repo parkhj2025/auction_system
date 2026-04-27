@@ -1,0 +1,451 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Hero 옵션 (b) — Stripe Press editorial paper</title>
+<link rel="preconnect" href="https://cdn.jsdelivr.net" crossorigin />
+<link
+  rel="stylesheet"
+  href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@1.3.9/dist/web/variable/pretendardvariable.min.css"
+/>
+<style>
+  :root {
+    --color-brand-300: #93c5fd;
+    --color-ink-950: #020617;
+    --color-ink-900: #0f172a;
+    --color-ink-700: #334155;
+    --color-ink-500: #64748b;
+    --color-ink-300: #cbd5e1;
+    --color-ink-200: #e2e8f0;
+    --color-ink-100: #f1f5f9;
+    --color-ink-50: #f8fafc;
+    --color-surface: #ffffff;
+    --color-surface-muted: #f8fafc;
+    --color-border: #e2e8f0;
+
+    /* 옵션 (b) 신규 토큰 — Stripe Press 베이지·아이보리 */
+    --color-paper: #faf7f0;
+    --color-paper-border: #d4c9b0;
+
+    --radius-md: 10px;
+
+    --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04),
+      0 4px 12px rgba(15, 23, 42, 0.04);
+
+    --font-sans: "Pretendard Variable", Pretendard, "Apple SD Gothic Neo",
+      "Noto Sans KR", -apple-system, BlinkMacSystemFont, sans-serif;
+
+    --text-h2: 2rem;
+    --text-h3: 1.5rem;
+    --text-body-lg: 1.125rem;
+    --text-body: 1rem;
+    --text-body-sm: 0.875rem;
+    --text-caption: 0.75rem;
+
+    --lh-tight: 1.05;
+    --lh-snug: 1.15;
+    --lh-normal: 1.3;
+    --lh-relaxed: 1.6;
+  }
+
+  * { box-sizing: border-box; }
+  html, body {
+    margin: 0; padding: 0;
+    background: var(--color-ink-100);
+    font-family: var(--font-sans);
+    color: var(--color-ink-900);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    text-rendering: optimizeLegibility;
+  }
+  .tabular-nums { font-variant-numeric: tabular-nums; font-feature-settings: "tnum" 1; }
+
+  .mockup-header {
+    background: var(--color-ink-900);
+    color: white;
+    padding: 16px 24px;
+    font-size: 14px;
+  }
+  .mockup-header strong { font-weight: 700; }
+  .mockup-header span { color: rgba(255,255,255,0.7); margin-left: 12px; font-size: 12px; }
+
+  .viewport-grid {
+    display: grid;
+    grid-template-columns: 1fr 400px;
+    gap: 24px;
+    padding: 24px;
+    align-items: start;
+  }
+  @media (max-width: 1280px) {
+    .viewport-grid { grid-template-columns: 1fr; }
+  }
+  .viewport {
+    background: var(--color-surface);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-card);
+  }
+  .viewport-label {
+    background: var(--color-ink-50);
+    padding: 8px 16px;
+    font-size: 12px;
+    color: var(--color-ink-500);
+    font-weight: 600;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    border-bottom: 1px solid var(--color-border);
+  }
+  .desktop-frame { width: 100%; min-width: 0; }
+  .mobile-frame { width: 375px; }
+
+  .hero-page { background: var(--color-surface-muted); padding: 32px; }
+  .hero-page-mobile { padding: 16px; }
+
+  .breadcrumbs { font-size: var(--text-caption); color: var(--color-ink-500); margin-bottom: 12px; }
+  .breadcrumbs a { color: var(--color-ink-700); text-decoration: none; }
+  .breadcrumbs span { color: var(--color-ink-500); margin: 0 4px; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 24px; }
+  .chip {
+    display: inline-flex; height: 24px; align-items: center;
+    border-radius: 4px; background: var(--color-ink-100);
+    padding: 0 8px; font-size: 11px; font-weight: 500; color: var(--color-ink-700);
+  }
+
+  /* === 옵션 (b) Hero 카드 — bg-paper === */
+  .hero-card {
+    background: var(--color-paper);
+    border: 1px solid var(--color-paper-border);
+    border-radius: var(--radius-md);
+    padding: 32px;
+  }
+  .hero-card-mobile { padding: 24px; }
+
+  .hero-cluster { display: flex; gap: 24px; align-items: flex-start; }
+  .hero-cluster-mobile { flex-direction: column; gap: 16px; }
+  .hero-thumb {
+    width: 56px; height: 56px; flex-shrink: 0;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #94a3b8 0%, #64748b 100%);
+    border: 2px solid var(--color-paper-border);
+  }
+  .hero-thumb-mobile { width: 48px; height: 48px; }
+  .hero-stack { flex: 1; min-width: 0; }
+
+  .hero-title {
+    font-size: var(--text-h2); font-weight: 700;
+    line-height: var(--lh-snug); color: var(--color-ink-900);
+    margin: 0; letter-spacing: -0.01em;
+  }
+  .hero-title-mobile { font-size: var(--text-h3); }
+  .hero-subtitle {
+    font-size: var(--text-body-sm); font-weight: 400;
+    color: var(--color-ink-500); margin: 4px 0 0;
+    line-height: var(--lh-normal);
+  }
+  .hero-subtitle strong { font-weight: 500; color: var(--color-ink-700); }
+
+  .hero-price-section { margin-top: 24px; }
+  .price-label {
+    font-size: var(--text-caption); font-weight: 500;
+    letter-spacing: 0.18em; color: var(--color-ink-500);
+    text-transform: uppercase; margin: 0;
+  }
+  .price-row { display: flex; flex-wrap: wrap; align-items: baseline; gap: 12px; margin-top: 8px; }
+  .price-value {
+    font-size: var(--text-h2); font-weight: 900;
+    color: var(--color-ink-900); line-height: var(--lh-tight);
+    margin: 0; letter-spacing: -0.02em;
+  }
+  .price-value-mobile { font-size: var(--text-h3); }
+  .price-percent { font-size: var(--text-body-lg); font-weight: 500; color: var(--color-ink-700); margin: 0; }
+  .price-percent-mobile { font-size: var(--text-body); }
+  .price-chip {
+    display: inline-flex; align-items: center;
+    background: rgba(147, 197, 253, 0.7);
+    border-radius: 4px; padding: 2px 8px;
+    font-size: var(--text-body-sm); font-weight: 600; color: var(--color-ink-900);
+  }
+
+  .progress-bar-wrapper {
+    margin-top: 20px; height: 8px;
+    background: var(--color-ink-100); border-radius: 9999px;
+    position: relative;
+  }
+  .progress-bar-fill { height: 100%; width: 70%; background: var(--color-ink-700); border-radius: 9999px; }
+  .progress-bar-mark { position: absolute; left: 70%; top: -4px; bottom: -4px; width: 1px; background: var(--color-ink-900); }
+  .progress-bar-labels { display: flex; justify-content: space-between; margin-top: 12px; font-size: var(--text-body-sm); font-weight: 500; color: var(--color-ink-500); }
+
+  .hero-divider { margin: 24px 0; border-top: 1px solid var(--color-paper-border); }
+  .hero-lead {
+    font-size: var(--text-body-lg); line-height: var(--lh-relaxed);
+    color: var(--color-ink-700); margin: 0;
+  }
+  .hero-lead-mobile { font-size: var(--text-body); }
+
+  .stat-grid {
+    display: grid; grid-template-columns: repeat(3, 1fr);
+    gap: 1px; background: var(--color-paper-border);
+    border-top: 1px solid var(--color-paper-border);
+    margin-top: 24px; padding-top: 1px;
+  }
+  .stat-grid-mobile { grid-template-columns: 1fr; }
+  .stat-cell { background: var(--color-paper); padding: 16px; }
+  .stat-label {
+    font-size: var(--text-caption); font-weight: 500;
+    letter-spacing: 0.05em; color: var(--color-ink-500);
+    text-transform: uppercase; margin: 0;
+  }
+  .stat-value {
+    font-size: var(--text-body-lg); font-weight: 600;
+    color: var(--color-ink-900); line-height: var(--lh-tight); margin: 4px 0 0;
+  }
+  .stat-sub {
+    font-size: var(--text-caption); font-weight: 500;
+    color: var(--color-ink-500); margin: 4px 0 0;
+  }
+
+  .gallery { margin-top: 28px; display: flex; gap: 12px; overflow-x: auto; }
+  .gallery-item {
+    width: 240px; height: 180px; flex-shrink: 0;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, #cbd5e1 0%, #94a3b8 100%);
+  }
+  .gallery-item-mobile { width: 144px; height: 120px; }
+
+  /* 본문 비교 — 옵션 (b) 는 본문 흰 그대로 (Hero 만 페이퍼 차이) */
+  .body-comparison {
+    margin-top: 40px; padding: 32px;
+    background: var(--color-surface);
+    border: 1px solid var(--color-ink-200);
+    border-radius: var(--radius-md);
+  }
+  .body-comparison h3 {
+    font-size: var(--text-caption); font-weight: 600;
+    letter-spacing: 0.18em; color: var(--color-ink-500);
+    text-transform: uppercase; margin: 0 0 20px;
+  }
+  .body-table { width: 100%; border-collapse: collapse; font-size: var(--text-body-sm); color: var(--color-ink-700); }
+  .body-table th { text-align: left; padding: 8px 12px; border-bottom: 1px solid var(--color-ink-200); font-size: var(--text-caption); font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--color-ink-700); }
+  .body-table td { padding: 12px; border-bottom: 1px solid var(--color-ink-200); }
+  .body-table .num { text-align: right; font-weight: 500; color: var(--color-ink-900); }
+  .body-table .active { background: var(--color-ink-100); }
+
+  .caption {
+    background: var(--color-paper);
+    border: 1px solid var(--color-paper-border);
+    border-radius: 6px; padding: 16px; margin: 24px;
+    font-size: var(--text-body-sm); color: var(--color-ink-700);
+    line-height: var(--lh-relaxed);
+  }
+  .caption strong { color: var(--color-ink-900); }
+</style>
+</head>
+<body>
+  <div class="mockup-header">
+    <strong>옵션 (b) — Stripe Press editorial paper</strong>
+    <span>영감: Stripe Press 편집 톤 — 부드러운 베이지·아이보리, quiet luxury</span>
+  </div>
+
+  <div class="caption">
+    <strong>본문 톤앤매너 계승 정합:</strong> bg-paper (#FAF7F0 베이지) + border-ink-300 + rounded-md + ink tier. 본문 흰과 미세 차이로 Hero 영역 식별 신호. 신규 토큰 <code>--color-paper</code> 도입 (Phase 8 일부 선행).
+  </div>
+
+  <div class="viewport-grid">
+    <div class="viewport desktop-frame">
+      <div class="viewport-label">Desktop · 1280px</div>
+      <div class="hero-page">
+        <nav class="breadcrumbs">
+          <a href="#">홈</a><span>›</span><a href="#">물건분석</a><span>›</span>인천 · 오피스텔
+        </nav>
+        <div class="chips">
+          <span class="chip">경매</span>
+          <span class="chip">인천경매</span>
+          <span class="chip">중구경매</span>
+          <span class="chip">HUG 말소동의</span>
+          <span class="chip">대항력 임차인</span>
+        </div>
+
+        <div class="hero-card">
+          <div class="hero-cluster">
+            <div class="hero-thumb"></div>
+            <div class="hero-stack">
+              <h1 class="hero-title">보증금 1.88억 인수 오피스텔, HUG 말소동의로 1.25억 진입선</h1>
+              <p class="hero-subtitle">
+                <strong>인천지방법원 19계</strong> · 사건 <span class="tabular-nums">2026타경500459</span> · 인천 중구 신흥동3가
+              </p>
+
+              <div class="hero-price-section">
+                <p class="price-label">2차 최저가</p>
+                <div class="price-row">
+                  <p class="price-value tabular-nums">1억 2,460만원</p>
+                  <p class="price-percent">감정가의 <span class="tabular-nums">70%</span></p>
+                  <span class="price-chip tabular-nums">−30%</span>
+                </div>
+                <div class="progress-bar-wrapper">
+                  <div class="progress-bar-fill"></div>
+                  <div class="progress-bar-mark"></div>
+                </div>
+                <div class="progress-bar-labels">
+                  <span>0%</span>
+                  <span>감정가 1.78억</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-divider"></div>
+
+          <p class="hero-lead">
+            하모니 오피스텔 402호 2차 매각. 최저가 1억 2,460만원 (감정가 70%). 임차보증금 1억 8,800만원 인수 구조이나 주택도시보증공사가 말소동의 확약서를 제출. 외국인 임차인 점유 변수가 명도 단계의 검토 포인트.
+          </p>
+
+          <div class="stat-grid">
+            <div class="stat-cell">
+              <p class="stat-label">감정가</p>
+              <p class="stat-value tabular-nums">1억 7,800만원</p>
+              <p class="stat-sub">기준가</p>
+            </div>
+            <div class="stat-cell">
+              <p class="stat-label">입찰보증금</p>
+              <p class="stat-value tabular-nums">1,246만원</p>
+              <p class="stat-sub">최저가의 10%</p>
+            </div>
+            <div class="stat-cell">
+              <p class="stat-label">입찰기일</p>
+              <p class="stat-value tabular-nums">2026-05-29</p>
+              <p class="stat-sub">10:00 · 금요일</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="gallery">
+          <div class="gallery-item"></div>
+          <div class="gallery-item"></div>
+          <div class="gallery-item"></div>
+          <div class="gallery-item"></div>
+          <div class="gallery-item"></div>
+        </div>
+
+        <div class="body-comparison">
+          <h3>본문 — 시나리오 비교 (ScenarioComparisonBox 모방)</h3>
+          <table class="body-table">
+            <thead>
+              <tr>
+                <th>차원</th>
+                <th>A 실거주</th>
+                <th>B 1년 매도</th>
+                <th>C-1 갭투자</th>
+                <th>C-2 월세</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <th>자기자본</th>
+                <td class="num">1.78억</td>
+                <td class="num active">1.78억</td>
+                <td class="num">0.4억</td>
+                <td class="num">1.0억</td>
+              </tr>
+              <tr>
+                <th>예상 수익</th>
+                <td class="num">—</td>
+                <td class="num active">+0.5억</td>
+                <td class="num">+0.7억</td>
+                <td class="num">+0.4억</td>
+              </tr>
+              <tr>
+                <th>보유 기간</th>
+                <td class="num">5년</td>
+                <td class="num active">1년</td>
+                <td class="num">3년</td>
+                <td class="num">5년</td>
+              </tr>
+              <tr>
+                <th>리스크</th>
+                <td class="num">낮음</td>
+                <td class="num active">높음</td>
+                <td class="num">중간</td>
+                <td class="num">중간</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <div class="viewport mobile-frame">
+      <div class="viewport-label">Mobile · 375px</div>
+      <div class="hero-page hero-page-mobile">
+        <nav class="breadcrumbs">
+          <a href="#">홈</a><span>›</span>인천 · 오피스텔
+        </nav>
+        <div class="chips">
+          <span class="chip">경매</span>
+          <span class="chip">HUG 말소동의</span>
+        </div>
+
+        <div class="hero-card hero-card-mobile">
+          <div class="hero-cluster hero-cluster-mobile">
+            <div class="hero-thumb hero-thumb-mobile"></div>
+            <div class="hero-stack">
+              <h1 class="hero-title hero-title-mobile">보증금 1.88억 인수 오피스텔, HUG 말소동의로 1.25억 진입선</h1>
+              <p class="hero-subtitle">
+                <strong>인천지방법원 19계</strong> · 2026타경500459
+              </p>
+
+              <div class="hero-price-section">
+                <p class="price-label">2차 최저가</p>
+                <div class="price-row">
+                  <p class="price-value price-value-mobile tabular-nums">1.246억</p>
+                  <p class="price-percent price-percent-mobile">감정가 70%</p>
+                  <span class="price-chip tabular-nums">−30%</span>
+                </div>
+                <div class="progress-bar-wrapper">
+                  <div class="progress-bar-fill"></div>
+                  <div class="progress-bar-mark"></div>
+                </div>
+                <div class="progress-bar-labels">
+                  <span>0</span>
+                  <span>1.78억</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="hero-divider"></div>
+
+          <p class="hero-lead hero-lead-mobile">
+            하모니 오피스텔 402호. 최저가 1.246억. 보증금 1.88억 인수이나 HUG 말소동의 확약서 제출.
+          </p>
+
+          <div class="stat-grid stat-grid-mobile">
+            <div class="stat-cell">
+              <p class="stat-label">감정가</p>
+              <p class="stat-value tabular-nums">1.78억</p>
+              <p class="stat-sub">기준가</p>
+            </div>
+            <div class="stat-cell">
+              <p class="stat-label">입찰보증금</p>
+              <p class="stat-value tabular-nums">1,246만원</p>
+              <p class="stat-sub">최저가의 10%</p>
+            </div>
+            <div class="stat-cell">
+              <p class="stat-label">입찰기일</p>
+              <p class="stat-value tabular-nums">2026-05-29</p>
+              <p class="stat-sub">10:00 · 금요일</p>
+            </div>
+          </div>
+        </div>
+
+        <div class="gallery">
+          <div class="gallery-item gallery-item-mobile"></div>
+          <div class="gallery-item gallery-item-mobile"></div>
+          <div class="gallery-item gallery-item-mobile"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</body>
+</html>
