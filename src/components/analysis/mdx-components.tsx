@@ -250,23 +250,24 @@ function Th({ children, ...rest }: ComponentPropsWithoutRef<"th">) {
 
 function thHeaderClass(text: string): string {
   if (/^(채권금액|보증금|최저가|감정가|평균|매도가|매각가|낙찰가|취득세|법무사|예상|건수|입찰인수|매각가율|비율)/.test(text)) {
-    return "text-right whitespace-nowrap";
+    return "md:text-right md:whitespace-nowrap";
   }
   if (/^(회차|매각기일|접수일|대항력|기간|결과|소멸\s*여부|구분)$/.test(text)) {
-    return "text-center whitespace-nowrap";
+    return "md:text-center md:whitespace-nowrap";
   }
-  return "text-left";
+  return "md:text-left";
 }
 
 function Td({ children, ...rest }: ComponentPropsWithoutRef<"td">) {
   const text = extractText(children).trim();
   const align = detectTdAlign(text);
   const isNumber = align.kind === "number";
+  // 룰 17 mobile card stack: block + 좌측 정렬 / desktop: table-cell + 의미 정렬
   return (
     <td
-      className={`border-b border-[var(--color-border)] px-4 py-3 align-top text-[length:var(--text-body-sm)] leading-6 ${
+      className={`block border-b-0 px-0 py-1 align-top text-[length:var(--text-body-sm)] leading-6 first:mt-0 md:table-cell md:border-b md:border-[var(--color-border)] md:px-4 md:py-3 ${
         isNumber
-          ? "font-medium text-[var(--color-ink-900)]"
+          ? "font-medium tabular-nums text-[var(--color-ink-900)]"
           : "text-[var(--color-ink-700)]"
       } ${align.cls}`}
       {...rest}
@@ -278,28 +279,28 @@ function Td({ children, ...rest }: ComponentPropsWithoutRef<"td">) {
 
 function detectTdAlign(text: string): { kind: "text" | "number" | "tag"; cls: string } {
   if (!text) return { kind: "text", cls: "" };
-  // 회차 ("1차"·"2차") → center
+  // 회차 ("1차"·"2차") → center (desktop only)
   if (/^\d+차$/.test(text)) {
-    return { kind: "tag", cls: "text-center whitespace-nowrap font-medium" };
+    return { kind: "tag", cls: "md:text-center md:whitespace-nowrap font-medium" };
   }
   // 날짜 (yyyy-mm-dd) → center
   if (/^\d{4}-\d{2}(-\d{2})?$/.test(text)) {
-    return { kind: "tag", cls: "text-center whitespace-nowrap tabular-nums" };
+    return { kind: "tag", cls: "md:text-center md:whitespace-nowrap tabular-nums" };
   }
-  // % 비율 → right
+  // % 비율 → right (desktop only)
   if (/^[\d.,]+\s*%$/.test(text)) {
-    return { kind: "number", cls: "text-right tabular-nums whitespace-nowrap" };
+    return { kind: "number", cls: "md:text-right tabular-nums md:whitespace-nowrap" };
   }
-  // 가격 (원·만원·억) → right
+  // 가격 (원·만원·억) → right (desktop only)
   if (
     /^[\d,.\s]+(원|만원?|억(?:\s*[\d,]+만(?:원)?)?)$/.test(text) ||
     /^\d+억(\s*[\d,]+만(?:원)?)?$/.test(text)
   ) {
-    return { kind: "number", cls: "text-right tabular-nums whitespace-nowrap" };
+    return { kind: "number", cls: "md:text-right tabular-nums md:whitespace-nowrap" };
   }
   // 건수·명·평·㎡·회 → right
   if (/^[\d.,]+\s*(건|명|평|㎡|회|개)$/.test(text)) {
-    return { kind: "number", cls: "text-right tabular-nums whitespace-nowrap" };
+    return { kind: "number", cls: "md:text-right tabular-nums md:whitespace-nowrap" };
   }
   // 결과·태그 → center
   if (
@@ -307,7 +308,7 @@ function detectTdAlign(text: string): { kind: "text" | "number" | "tag"; cls: st
       text
     )
   ) {
-    return { kind: "tag", cls: "text-center whitespace-nowrap" };
+    return { kind: "tag", cls: "md:text-center md:whitespace-nowrap" };
   }
   return { kind: "text", cls: "" };
 }

@@ -116,12 +116,13 @@ export function ScenarioComparisonBox({
         </p>
       </div>
 
-      {/* 컴팩트 비교 표 */}
-      <div className="mt-5 overflow-x-auto">
-        <table
-          className="w-full min-w-[480px] border-collapse text-left"
-          aria-label="시나리오 4종 비교"
-        >
+      {/* 컴팩트 비교 표 — 룰 17-D mobile horizontal scroll + edge gradient + scroll cue */}
+      <div className="relative mt-5">
+        <div className="overflow-x-auto pb-2">
+          <table
+            className="w-full min-w-[600px] border-collapse text-left"
+            aria-label="시나리오 4종 비교"
+          >
           {/* 헤더 (4 컬럼 = 시나리오) */}
           <thead>
             <tr>
@@ -342,8 +343,17 @@ export function ScenarioComparisonBox({
                 );
               })}
             </tr>
-          </tbody>
-        </table>
+            </tbody>
+          </table>
+        </div>
+        {/* 룰 17-D — edge gradient + scroll cue (mobile only) */}
+        <div
+          aria-hidden="true"
+          className="pointer-events-none absolute right-0 top-0 bottom-2 w-12 bg-gradient-to-l from-white to-transparent md:hidden"
+        />
+        <p className="mt-1 text-right text-[length:var(--text-caption)] text-[var(--color-ink-500)] md:hidden">
+          ← 가로 스크롤 →
+        </p>
       </div>
 
       {/* 활성 시나리오 summary */}

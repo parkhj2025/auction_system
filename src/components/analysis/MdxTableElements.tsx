@@ -1,22 +1,24 @@
 "use client";
 
 /**
- * 단계 5-4-2-fix-3 룰 4 — mdx 표 클라이언트 요소 (CSS nth-child stagger 패턴).
+ * 단계 5-4-2-fix-5 룰 17 — mdx 표 mobile card stack 패턴.
  *
- * mdx-components.tsx 가 server component 이므로 motion / useInView / context 활용 위해
- * Table / Thead / Tr 만 별도 client 모듈로 분리.
+ * 외부 영감: UXmatters·Hoverify·Bootcamp Card stack 표준.
  *
- * 시각 위계 (단계 5-4-2-fix-2 룰 유지):
- *  - 진행 회차 / 말소기준 → bg-ink-50 + font-bold + text-ink-900 (strong)
- *  - 인수 → bg-ink-100 + font-bold (강조)
- *  - 유찰 / 매각 / 미납 (과거) → opacity-60 + text-ink-500 (weak)
- *  - hover → bg-ink-50 transition-colors duration-200
+ * Mobile (< 768px):
+ *  - Table: block (table 폐기)
+ *  - Thead: hidden (sr-only 보존)
+ *  - Tr: card layout (border + rounded + padding + mb-3)
+ *  - Td: block + 한 줄씩 표시
  *
- * 스크롤 reveal (룰 4 + 룰 1 once: false):
- *  - MdxTable 자체 useInView (once: false)
- *  - 진입 시 .mdx-table-revealed 클래스 토글 → CSS nth-child stagger 발동
- *  - tbody tr 들이 80~120ms 간격으로 fade-in (07 체크포인트 패턴 동등)
- *  - 위·아래 스크롤 재실행 — viewport 밖 → 들어옴 시 stagger 재발동
+ * Desktop (>= 768px):
+ *  - Table: 정상 table 형식
+ *  - Thead: 정상 표 헤더
+ *  - Tr: table-row
+ *  - Td: table-cell
+ *
+ * 룰 4 보존 — CSS nth-child stagger (globals.css `.mdx-table-revealed tbody tr:nth-child(N)`).
+ * 룰 1 once: false — viewport 재진입 시 stagger 재발동.
  */
 
 import type { ComponentPropsWithoutRef, ReactNode } from "react";
@@ -44,7 +46,6 @@ export function MdxTable({
   ...rest
 }: ComponentPropsWithoutRef<"table">) {
   const ref = useRef<HTMLDivElement>(null);
-  // 룰 1 (단계 5-4-2-fix-3): once: false — 위·아래 스크롤 시 stagger 재실행
   const isInView = useInView(ref, { once: false, amount: 0.2 });
   return (
     <div
@@ -52,7 +53,7 @@ export function MdxTable({
       className={`mt-6 overflow-x-auto mdx-table-wrapper ${isInView ? "mdx-table-revealed" : ""}`}
     >
       <table
-        className="w-full min-w-[36rem] border-collapse text-sm tabular-nums"
+        className="block w-full border-collapse md:table md:min-w-[36rem] md:text-[length:var(--text-body-sm)] md:tabular-nums"
         {...rest}
       >
         {children}
@@ -66,7 +67,10 @@ export function MdxThead({
   ...rest
 }: ComponentPropsWithoutRef<"thead">) {
   return (
-    <thead className="bg-[var(--color-surface-muted)]" {...rest}>
+    <thead
+      className="hidden bg-[var(--color-surface-muted)] md:table-header-group"
+      {...rest}
+    >
       {children}
     </thead>
   );
@@ -108,14 +112,18 @@ function detectRowToneClass(text: string): {
   return { bgCls: "", weightCls: "", textCls: "" };
 }
 
+/**
+ * 룰 17-A 카드 stack 패턴 — Tr mobile = card, desktop = table-row.
+ * mobile: block + border + rounded + p-4 + mb-3 (각 row 가 카드)
+ * desktop: table-row (정상 표)
+ */
 export function MdxTr({
   children,
   ...rest
 }: ComponentPropsWithoutRef<"tr">) {
   const text = extractText(children);
   const tone = detectRowToneClass(text);
-  const cls = `${tone.bgCls} ${tone.weightCls} ${tone.textCls} transition-colors duration-200 hover:bg-[var(--color-ink-50)]`;
-  // 룰 4 — motion.tr 폐기. CSS nth-child stagger (globals.css `.mdx-table-revealed tbody tr:nth-child(N)`) 활용.
+  const cls = `block rounded-[var(--radius-md)] border border-[var(--color-border)] mb-3 p-4 last:mb-0 md:table-row md:rounded-none md:border-x-0 md:border-t-0 md:border-b md:p-0 md:mb-0 ${tone.bgCls} ${tone.weightCls} ${tone.textCls} transition-colors duration-200 hover:bg-[var(--color-ink-50)]`;
   return (
     <tr className={cls} {...rest}>
       {children}
