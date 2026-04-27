@@ -13,7 +13,7 @@ import { Section07Opinion } from "./sections/Section07Opinion";
 import { TimelineSection } from "./TimelineSection";
 import { RightsAnalysisSection } from "./RightsAnalysisSection";
 import { MarketCompareCard } from "./MarketCompareCard";
-import { ScenarioComparisonBox } from "./ScenarioComparisonBox";
+import { InvestmentInteractive } from "./InvestmentInteractive";
 import { SaleAreaSummary } from "./SaleAreaSummary";
 import { PropertyOverviewCard } from "./PropertyOverviewCard";
 
@@ -105,7 +105,7 @@ function buildH2(
             <>
               <Section05Investment title={title} />
               {meta?.investment ? (
-                <ScenarioComparisonBox
+                <InvestmentInteractive
                   investment={meta.investment}
                   appraisal={fm.appraisal}
                   minPrice={fm.minPrice}

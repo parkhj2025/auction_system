@@ -21,14 +21,18 @@ import { useRef, useState, useMemo } from "react";
 import type { InvestmentMeta, ScenarioFields } from "@/types/content";
 import { formatKoreanWon } from "@/lib/utils";
 
+const SCENARIO_KEYS = ["A", "B", "C-1", "C-2"] as const;
+type ScenarioKey = (typeof SCENARIO_KEYS)[number];
+
 interface ScenarioComparisonBoxProps {
   investment: InvestmentMeta;
   appraisal: number;
   minPrice: number;
+  biddingPercent?: number;
+  onBiddingPercentChange?: (v: number) => void;
+  activeKey?: ScenarioKey | null;
+  onActiveKeyChange?: (v: ScenarioKey | null) => void;
 }
-
-const SCENARIO_KEYS = ["A", "B", "C-1", "C-2"] as const;
-type ScenarioKey = (typeof SCENARIO_KEYS)[number];
 
 const SCENARIO_DEFAULT_LABELS: Record<ScenarioKey, string> = {
   A: "실거주",
@@ -50,11 +54,26 @@ export function ScenarioComparisonBox({
   investment,
   appraisal,
   minPrice,
+  biddingPercent: biddingPercentProp,
+  onBiddingPercentChange,
+  activeKey: activeKeyProp,
+  onActiveKeyChange,
 }: ScenarioComparisonBoxProps) {
   const ref = useRef<HTMLDivElement>(null);
   const inView = useInView(ref, { once: true, amount: 0.2 });
-  const [activeKey, setActiveKey] = useState<ScenarioKey | null>(null);
-  const [biddingPercent, setBiddingPercent] = useState<number>(0);
+  const [internalActiveKey, setInternalActiveKey] = useState<ScenarioKey | null>(null);
+  const [internalBiddingPercent, setInternalBiddingPercent] = useState<number>(0);
+  const activeKey = activeKeyProp !== undefined ? activeKeyProp : internalActiveKey;
+  const setActiveKey = (v: ScenarioKey | null) => {
+    if (onActiveKeyChange) onActiveKeyChange(v);
+    else setInternalActiveKey(v);
+  };
+  const biddingPercent =
+    biddingPercentProp !== undefined ? biddingPercentProp : internalBiddingPercent;
+  const setBiddingPercent = (v: number) => {
+    if (onBiddingPercentChange) onBiddingPercentChange(v);
+    else setInternalBiddingPercent(v);
+  };
   const userBidPrice = Math.round(
     minPrice + (biddingPercent / 100) * (appraisal - minPrice)
   );
