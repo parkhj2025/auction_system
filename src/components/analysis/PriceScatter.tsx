@@ -179,7 +179,7 @@ export function PriceScatter({
         </motion.div>
       </div>
 
-      {/* 시세평균 보조 텍스트 (대표성 한계 명시) — 막대 표현 X */}
+      {/* 시세평균 보조 텍스트 — 막대 표현 X */}
       {saleAvg > 0 && saleCount > 0 ? (
         <motion.div
           className="mt-8 border-t border-[var(--color-border)] pt-4"
@@ -193,7 +193,7 @@ export function PriceScatter({
             <span className="font-bold tabular-nums text-[var(--color-ink-900)]">
               {formatKoreanWon(saleAvg)}
             </span>
-            . <span className="text-[var(--color-ink-500)]">표본 평균이며 본 단지 직접 비교는 아닙니다 (시세 대표성 한계).</span>
+            .
           </p>
         </motion.div>
       ) : null}
