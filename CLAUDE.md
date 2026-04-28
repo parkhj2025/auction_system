@@ -538,6 +538,18 @@ Phase 2 (목표)
 - **날짜·시간**: 서버 사이드 날짜/시간 생성 시 반드시 `src/lib/datetime.ts` 유틸 사용. `new Date().toISOString()` 직접 호출 금지. 모든 날짜 처리는 Asia/Seoul 기준. (Vercel 서버는 UTC라 한국 새벽 0~9시 KST 시각이 전날로 기록되는 버그 발생)
 - **PDF 생성 검증 (서버 PDFKit 단일 소스)**: 위임장 PDF 생성 코드(`src/lib/pdf/delegation.ts`) 수정 시 **서버 PDFKit 스모크 PASS 후 커밋**. 절차: `pnpm dlx tsx scripts/gen-sample-delegation.ts` 실행 → `node scripts/verify-pdf-text.mjs` 1페이지 + 한글 + 도메인 키워드 검증. 클라이언트 PDF 생성은 폐기됨 (Phase 6.5-POST-FIX, 2026-04-19) — 미리보기는 `/api/preview-delegation` 서버 호출로 일원화.
 
+#### 룰 33 — Web Interface Guidelines Group 2 의무 (단계 5-4-2-fix-10 신설)
+
+본질: a11y / Anti-pattern 의무 영역. Web Interface Guidelines (Vercel) Group 2 8 항목 통합 명문화. 룰 1~32 본질 합치.
+
+1. **focus-visible 보상 의무**: 모든 interactive element (button / a / input / role="button" / tabIndex) = `focus-visible:ring-*` 또는 `focus-visible:border-* + bg + shadow` 또는 `focus-visible:before:outline` 보상 명시. `outline: none` / `outline-none` 단독 영역 0 (focus-visible 보상 누락 = 즉시 위반).
+2. **icon-only button aria-label 의무**: children = `<svg>` / lucide / `<span>` icon 단독 영역 = `aria-label` (한국어) 명시 의무. decorative icon 영역 = `aria-hidden="true"` 명시.
+3. **semantic HTML 영역**: action = `<button>`, navigation = `<a>` / `<Link>`, decorative = `<div>` / `<span>`. div / span / li / article onClick 영역 = `<button>` 변경 또는 `role="button" + tabIndex={0} + onKeyDown (Enter/Space)` 보강 의무.
+4. **시각 신호 ↔ 액션 정합 (단계 5-4-2-fix-10 결정 10)**: `tabIndex={0}` / `cursor-pointer` / `whileFocus` / `focus-visible:*` 시각 신호 영역 = 실제 onClick / onKeyDown 액션 영역과 정합 의무. 액션 영역 0 시 시각 신호 영역 0 (사용자 혼동 회피). 단순 정보 카드 영역 = `whileHover` 호버 강조만 보존.
+5. **heading hierarchy h1 ~ h6 skip 0 의무**: h2 → h4 / h1 → h3 등 skip 영역 0. mdx 본문 H1() return null 영역 보존 (DetailHero h1 단일성).
+6. **`<img>` width / height 의무**: Next/Image 일관 사용 (자동 width/height + LCP 최적화). raw `<img>` 직접 사용 영역 0.
+7. **`transition: all` / `transition-all` 영역 0**: `transition-{property}` 명시 의무 (`transition-colors` / `transition-transform` / `transition-opacity`). shadcn ui 영역 (라이브러리 기본 spec) = 본 룰 영역 외 (fork maintenance 비용 ↑).
+
 ### 작업 경계 (Claude Code vs Claude Cowork)
 
 **Claude Code 범위**: 자사 웹사이트 코드베이스(`c:\Users\User\Desktop\website\`) 내부의 UI·라우트·API·스키마·결제 흐름·전환 경로·빌드·배포 파이프라인. Cowork가 산출한 콘텐츠 결과물(HTML/이미지/메타데이터 패키지)을 수신하여 **웹페이지로 변환·발행**하는 파이프라인 담당.
