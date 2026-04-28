@@ -14,7 +14,8 @@ import { TrustBlock } from "@/components/analysis/TrustBlock";
 import { ApplyCTA } from "@/components/analysis/ApplyCTA";
 import { RelatedCards } from "@/components/analysis/RelatedCards";
 import { ContentComplianceNotice } from "@/components/analysis/ContentComplianceNotice";
-// PhotoGalleryStrip — 룰 15-D 폐기 (Hero HeroGallery 가 전체 사진 grid + Lightbox 일원화)
+// PhotoGalleryStrip — 룰 15-D 폐기 / HeroGallery — 단계 5-4-3 룰 18 갱신 폐기.
+// 사진 영역 = DetailHero 안 통합 (옵션 C Asymmetric 큰 1장 + thumbs row + Lightbox 직접 호출)
 import { buildAnalysisMdxComponents } from "@/components/analysis/mdx-components";
 import { GatingWrapper } from "@/components/analysis/GatingWrapper";
 import { remarkAnalysisBlocks } from "@/lib/remark/analysis-blocks";
@@ -132,7 +133,7 @@ export default async function AnalysisDetailPage({
             <ContentComplianceNotice />
 
             {/* 룰 15-D (단계 5-4-2-fix-5): 페이지 맨 아래 별도 사진 grid 폐기.
-             * Hero 영역의 HeroGallery 가 전체 사진 grid + Lightbox 일원화. */}
+             * 룰 18 (단계 5-4-3): Hero 카드 안 사진 통합 (옵션 C Asymmetric 큰 1장 + thumbs + Lightbox 직접 호출). */}
 
             <TrustBlock />
             <ApplyCTA fm={fm} />
