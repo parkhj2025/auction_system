@@ -6,16 +6,16 @@
     "count": 2,
     "items": [
       {
-        "category": "consistency",
-        "before": "실투자금 약 5,347만원",
-        "after": "실투자금 약 4,847만원",
-        "reason": "시나리오 C-1 산문의 실투자금 수치가 표의 계산값(1억 3,347만 - 8,500만 = 4,847만)과 불일치하여 표의 진실값으로 정합성 통일"
+        "category": "missing_data",
+        "before": "\"areaPyeong\": 0",
+        "after": "\"areaPyeong\": 12.27",
+        "reason": "frontmatter의 빈 필드(areaPyeong)를 본문 데이터에 맞게 보강"
       },
       {
-        "category": "missing_data",
-        "before": "areaPyeong: 0",
-        "after": "areaPyeong: 12.27",
-        "reason": "frontmatter의 빈 필드(0)를 본문의 건물 면적(12.27평)을 바탕으로 보강"
+        "category": "consistency",
+        "before": "실투자금 약 5,347만원 (인근 전세 평균 8,500만원 가정, 확약서 유효).",
+        "after": "실투자금 약 4,847만원 (인근 전세 평균 8,500만원 가정, 확약서 유효).",
+        "reason": "시나리오 C-1 산문과 표의 실투자금 수치 불일치(표 우선 원칙 적용)"
       }
     ]
   }
