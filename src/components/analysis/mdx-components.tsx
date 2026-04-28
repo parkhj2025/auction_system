@@ -17,6 +17,7 @@ import { SaleAreaSummary } from "./SaleAreaSummary";
 import { CheckpointList as CheckpointListClient } from "./CheckpointList";
 import { MdxP, MdxUl, MdxOl } from "./MdxBodyElements";
 import { PropertyOverviewCard } from "./PropertyOverviewCard";
+import { ScenarioComparisonHighlight } from "./ScenarioComparisonHighlight";
 
 /**
  * next-mdx-remote components 오버라이드.
@@ -386,7 +387,8 @@ function resolveBidCountRange(slug: string): { min: number; max: number } | unde
 
 /**
  * 단계 5-4-2-fix-3 룰 3 (Q2 (가)): ScenarioCard mdx override 비활성.
- * mdx 본문 4 시나리오 카드 영역 미렌더 — ScenarioCarousel 한 축 통합으로 일원화.
+ * mdx 본문 4 시나리오 카드 영역 미렌더 — 단계 5-4-2-fix-9 ScenarioCarousel 폐기 후
+ * ScenarioComparisonBox 한 축으로 일원화.
  * 기존 단계 5-2/4-1 ScenarioCard 디테일 (parseScenarioKey·SCENARIO_ICONS·SCENARIO_BASE_THEME·
  * DISABLED_THEME·detectScenarioDisabled·splitScenarioTitle) 일괄 폐기.
  */
@@ -476,5 +478,6 @@ export function buildAnalysisMdxComponents(
     ConclusionCallout,
     CheckpointList: CheckpointListClient,
     PropertyOverviewCard: PropertyOverviewCardEnhanced,
+    ScenarioComparisonHighlight,
   };
 }
