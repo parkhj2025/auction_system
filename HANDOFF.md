@@ -1,14 +1,176 @@
 # 경매퀵 웹사이트 핸드오프 문서
 
 > **용도**: 다음 Claude Code 세션이 이 문서 하나만 읽고도 작업을 이어갈 수 있도록 현재 상태를 정리한다.
-> **최종 업데이트**: 2026-04-21 (Phase 6.8 Pause 선언 + 로드맵 재정렬)
-> **현재 빌드 상태**: **Phase 6.7.6 완료 + Phase 6.8 1단계 완료 → Pause (2단계는 Phase 9로 이월)**, 프로덕션 배포 중
-> **다음 세션 진입**: Phase 7 (축 2 콘텐츠 웹 반영 파이프라인)
-> **함께 읽을 문서**: `CLAUDE.md` (원칙·컴플라이언스 + §17 로드맵 + Lessons [A]~[D]), `BUILD_GUIDE.md` (구조·토큰), `docs/roadmap.md` (Phase 7~10 + v2 상세), `docs/v2-package-spec.md` (v2 업그레이드 스펙)
+> **최종 업데이트**: 2026-04-28 (단계 5-4-2-fix-8 Hero 영역 본문 톤앤매너 계승 production 시연 대기)
+> **현재 빌드 상태**: **Phase 7 시각화 본질 마무리 진행 중** — 단계 5-4-2-fix-8 (Hero 옵션 a Linear monochrome) push 완료, 형준님 평가 대기
+> **다음 세션 진입**: 형준님 시연 평가 피드백으로 시작 (PASS → 4 사건 확장 + 단계 5-4-3 마무리 / FAIL → 단계 5-4-2-fix-9 보강)
+> **함께 읽을 문서**: `CLAUDE.md` (원칙·컴플라이언스 + §17 로드맵 + Lessons [A]~[D]), `BUILD_GUIDE.md` (구조·토큰), `docs/roadmap.md` (Phase 7~10 + v2 상세), `docs/phase-7-hero-design-plan.md` (Hero v2 plan + Code 추천 + Q24~Q29), `docs/phase-7-hero-mockups/option-{a,b,c}.html` (시각 mockup 3종)
 
 ---
 
-## ⚡ 2026-04-21 핫 스냅샷 — 다음 세션 시작 시 여기부터 읽기
+## ⚡ 2026-04-28 핫 스냅샷 — 다음 세션 시작 시 여기부터 읽기
+
+### 지금 어디인가
+
+**Phase 7 시각화 본질 마무리 단계 5-4-2-fix-8 production 시연 대기**. 의미:
+
+- **단계 5-4-2 ~ 5-4-2-fix-8 (2026-04-26 ~ 04-28)**: Phase 7 시각화 본질 누적 작업 — 분석 페이지 (`/analysis/[slug]`) 의 7 영역 (Hero + 02 입찰 경과 ~ 07 종합 의견) 디자인 시스템 구축. 누적 룰 1 ~ 30 + 룰 24·26 갱신.
+- **단계 5-4-2-fix-7 시연 결과** (commit `4e7739d`): 본문 (02~07) "굉장히 정돈" 평가 + Hero "촌스러움" 평가 (본문 톤앤매너와 단절).
+- **plan v2 산출** (commit `cff761b`): `docs/phase-7-hero-design-plan.md` + `docs/phase-7-hero-mockups/option-{a,b,c}.html` 3종. 옵션 (a) Linear monochrome 라이트 통일 Code 추천 + 형준님 채택.
+- **단계 5-4-2-fix-8** (commit `70de25b`, 2026-04-28): 룰 27·28·29·30 신규 + 룰 24·26 갱신. DarkInfoCluster 폐기 → 단일 흰 카드 통합. HoverableDropRateBar 색 토큰 white tier → ink tier 전환 (룰 7 motion 본질 100% 보존).
+- **production 배포 완료**: https://auctionsystem-green.vercel.app/analysis/2026타경500459
+
+### 다음 세션 즉시 진입 트리거
+
+**형준님이 단계 5-4-2-fix-8 시연 결과 피드백으로 시작 예정.**
+
+평가 시점 = "이거 진짜 다르네" 도달 여부 = 유일 PASS / FAIL 게이트.
+
+| 결과 | 다음 단계 |
+|---|---|
+| **PASS** | 4 사건 확장 (3 archive 사건 raw-content 복귀) + 단계 5-4-3 마무리 (잔여 약점 영역 — 룰 19-C column priority hide·룰 21-B 본문 순서 swap·Lightbox·표 진입 모션) → Phase 7 본질 마무리 → Phase 8 진입 |
+| **FAIL** | 단계 5-4-2-fix-9 보강 patch 또는 옵션 재선택 (옵션 b·c·d 검토) |
+
+### 단계 5-4-2-fix-8 핵심 산출 (commit `70de25b`)
+
+**룰 27 — Hero 라이트 통일**:
+- DarkInfoCluster (`bg-ink-900` 다크박스) **폐기** (코드 사용 0건)
+- 단일 흰 카드: `bg-white border border-ink-200 rounded-md p-6 sm:p-8`
+- 본문 5/8 카드 패턴 (TimelineSection·PriceScatter·ScenarioCarousel·ScenarioComparisonBox·RightsAnalysisSection) 직접 흡수
+
+**룰 28 — Visual Weight Triangle (TYPZA)**:
+- 사건 제목: `text-h2` 32 / 700 / ink-900 (Q25)
+- 가격 수치: `text-h2` 32 / 900 (black) / ink-900 / tabular-nums
+- "−30%" 칩: `bg-brand-300/70` + ink-900 / 600 (룰 24-D 1 accent only)
+- caption 라벨: `text-caption` / 500 / letter-0.18em / ink-500 uppercase
+- Lead: `text-body` (16) → `text-body-lg` (18 lg+) / 400 / ink-700
+- 서브타이틀: `text-body-sm` / 400 / ink-500
+- stat-grid 라벨: `text-caption` / 500 / letter-0.05em / ink-500
+- stat-grid 수치: `text-body-lg` / 600 / ink-900 / tabular-nums
+
+**룰 29 — 카드 내부 구조**: 헤더 (원형 + 제목 + 서브) → 가격 영역 (라벨·수치·칩·progress bar) → border-t + Lead → border-t + stat-grid 3-col
+
+**룰 30 — HoverableDropRateBar 색 토큰 전환** (룰 7 motion 본질 100% 보존):
+- fill bar 채워진: white → ink-900 / 빈: white/30 → ink-100
+- 70% 마크: white/80 → ink-900
+- tooltip: bg-white → bg-ink-900 / text-ink-900 → text-white
+- 라벨: white/70 → ink-700
+- "−X%" 칩: brand-300/70 + ink-900 (보존)
+
+**Q24~Q29 결정 적용**: Q24 옵션 a / Q25 weight 700 / Q26 lead 카드 안 / Q26-1 row tone 평탄 / Q26-2 stagger 미적용 / Q27 mobile 3-col 유지
+
+### Phase 7 누적 룰 (1 ~ 30)
+
+| 룰 영역 | 본질 | 단계 |
+|---|---|---|
+| 룰 1·22 | 모션 표준 once: false + duration 200/400/600ms + cubic-bezier(0.16,1,0.3,1) | fix-3·fix-6 |
+| 룰 2·10·16·20 | 04 시세 비교 본질 (step-down + 시세 평균 보조 텍스트, horizontal slider 폐기) | fix-3·fix-4·fix-5·fix-6 |
+| 룰 3·6·12·21 | 05 시뮬레이션 (ScenarioCarousel + ScenarioComparisonBox + InvestmentInteractive 단일 source state, 셀 시각 강조 TrendingUp/dot indicator) | fix-3·fix-4·fix-5·fix-6 |
+| 룰 4·17·19 | mdx 표 mobile 폰트·패딩 축소 + CSS nth-child stagger | fix-3·fix-5·fix-6 |
+| 룰 5 | 자가 인지 의무 (자체 점수·등급·"PASS" 선언 0 + 본질 미달 시 형준님 보고 0 → 재작성) | 누적 |
+| 룰 6 | 06 SaleAreaSummary Bullet chart (Stephen Few 패턴) | fix-3 |
+| 룰 7·24·26 | Hero 영역 (DropRateBar 1.6초 + 사진 carousel + 통합 정보 꾸러미) | fix-2·fix-4·fix-5·fix-6·fix-7·fix-8 |
+| 룰 8·15·18 | Hero 사진 (carousel + Lightbox + hotfix 1/4 축소) | fix-4·fix-5·fix-6·hotfix |
+| 룰 9 | 02 STEP timeline | fix-4 |
+| 룰 11 | 표 정렬 글로벌 (텍스트 left / 숫자 right tabular-nums / 결과 center) | fix-2 |
+| 룰 13 | mdx P/Ul/Ol fade-in stagger | fix-4 |
+| 룰 14 | Typography Scale (Major Third 1.25 + 4pt grid + mobile auto-switch) | fix-4 |
+| 룰 14-D | 카드 padding 32/24 + section gap 128/80 | fix-5·fix-6 |
+| 룰 23 | Safari 일관성 (font-smoothing + Apple SD Gothic Neo fallback + browserslist) | fix-6 |
+| 룰 25 | Pretendard CDN preload + stylesheet (jsdelivr 1.3.9) | fix-7 |
+| 룰 27·28·29·30 | Hero 영역 본문 톤앤매너 계승 (라이트 통일 + Visual Weight Triangle + 카드 구조 + progress bar 토큰 전환) | **fix-8** |
+
+### 단계 5-4-2-fix-8 약점·한계 정직 명시
+
+1. **Hero 강조 약화 가능성** — 본문과 동일 bg-white 톤. typography weight 차등 (700/900) + brand-300/70 칩 + 카드 fade-in 600ms 으로 보강. 형준님 시연 평가 영역 (강조 약하다 판단 시 weight 800 또는 색·gap 보강 추가 patch)
+2. **macOS Safari 17+ / iOS Safari 17+ 실측 시연 미진행** — Code 영역 외. 룰 25 (Pretendard CDN) + 룰 23 (base reset) 적용 보존. 형준님 시연 영역
+3. **Lead summary stagger reveal 미적용** — Q26-2 결정 (룰 7 fill bar 충돌 회피). lead = 카드 fade-in 600ms 안 정적
+4. **Phase 분할 단일 commit 통합** — Phase 1 토큰 검증 (no-op skip) + Phase 2·3·4 단일 commit `70de25b` 통합 + Phase 5 검증·보고 별도. 코드 일관성 우선 (다크박스 폐기 → 라이트 색 적용 → 모션 추가가 단일 변경 흐름)
+5. **stat-grid 모바일 3-col 좁음 가능성** — Q27 결정 (3-col 유지). 375px viewport에서 압축. 시연 평가 시 좁다 판단되면 single column stack 추가 patch 영역
+6. **a11y h1 위치 이동** — 다크박스 안 → 흰 카드 안. 의미 마크업 h1 + `aria-labelledby="detail-title"` 보존. SEO meta 영향 0
+
+### 작업 영역 분리 (절대 위반 금지) — 누적 보존
+
+- Cowork = voice·어휘·표현 (v2.7.1 동결)
+- publish CLI 변경 0
+- mdx body·meta·raw-content 변경 0
+- 본문 영역 (02~07) 9 컴포넌트 변경 0:
+  - TimelineSection·MdxTableElements·PriceScatter·ScenarioCarousel·ScenarioComparisonBox·SaleAreaSummary·CheckpointList·MdxBodyElements·RightsAnalysisSection
+- 단계 5-4-2-fix-7 진전 영역 (룰 18·25·26) 본질 보존 — 색·구조만 정정 (룰 27·28·29·30 신규)
+- 신규 라이브러리 추가 0 (motion 외)
+- 신규 globals.css 토큰 추가 0 (옵션 a 기존 토큰 활용)
+- brand-600 부활 0 (모노톤 강제)
+- 자체 점수·등급·"PASS" 선언 0 (룰 5)
+
+### Production 시연 영역
+
+**시연 URL**: https://auctionsystem-green.vercel.app/analysis/2026%ED%83%80%EA%B2%BD500459
+
+**시연 항목**:
+- desktop (1280px+) — 흰 카드 통합 layout (헤더 + 가격 + lead + stat-grid)
+- mobile (< 640px) — 카드 vertical stack + h3 24px (auto-switch) + stat-grid 3-col 유지
+- tablet (768px) — md+ 영역
+- macOS Safari 17+ / iOS Safari 17+ — 룰 25 Pretendard + 룰 23 base reset (형준님 영역)
+- prefers-reduced-motion — globals.css 글로벌 룰
+- 키보드 — HoverableDropRateBar role="slider" + ←→ 보존
+
+**4 사건 production HTTP**:
+- /analysis/2026타경500459 → 200 (시연 대상)
+- /analysis/2026타경540431 → 404 (archive)
+- /analysis/2024타경540431 → 404 (archive)
+- /analysis/2024타경580569 → 404 (archive)
+
+### 회귀 검증 (commit 70de25b)
+
+| 항목 | 결과 |
+|---|---|
+| typecheck / lint / build | 0 에러 (41 routes) |
+| `grep "brand-600"` (globals.css 외) | 0건 |
+| `grep "DarkInfoCluster()"` 코드 사용 | 0건 (폐기 검증) |
+| `grep "bg-ink-900"` DetailHero 코드 사용 | 0건 (코멘트만) |
+| `grep "rounded-xl"` DetailHero | 0건 (rounded-md 통일) |
+| `grep "bg-brand-300"` 사용처 | 1건 (HoverableDropRateBar "−X%" 칩, 룰 24-D 1 accent) |
+| `grep "once: true"` (예외 사유 주석) | 2건 (HoverableDropRateBar count-up + DetailHero 카드 진입) |
+| 본문 영역 (02~07) 변경 | 0건 |
+| 단계 5-4-2-fix-7 진전 영역 (룰 18·22·23·24·25·26) | 보존 |
+
+### 다음 세션 진입 시 형준님 입력 예시 (예상)
+
+**(PASS 시 — 본질 도달)**:
+> "단계 5-4-2-fix-8 본질 통과. Hero 본문 톤앤매너 계승 ✓. 다음 = 4 사건 확장 (3 archive 사건 raw-content 복귀) 또는 단계 5-4-3 잔여 약점 영역 진행 결정."
+
+**(FAIL 시 — 본질 미달)**:
+> "단계 5-4-2-fix-8 시연 본질 미달 [구체 영역]. 단계 5-4-2-fix-9 보강 패치 지시문 작성 필요."
+
+또는 부분 PASS:
+> "[X] 영역은 좋음 / [Y] 영역 보강 필요. 정교 튠 [dimension] 적용."
+
+### 참고 문서
+
+- `docs/phase-7-hero-design-plan.md` — Hero plan v2 (Phase 1 본문 분석 / Phase 2 외부 영감 / Phase 3 옵션 (a)·(b)·(c) detail / Phase 4 Code 추천 + 정교 튠 dimension 7 row + Q24~Q29)
+- `docs/phase-7-hero-mockups/option-{a,b,c}.html` — 시각 mockup 3종 (Pretendard CDN + 본 사건 500459 실데이터 + desktop 1280px + mobile 375px + 본문 비교 영역)
+- `docs/phase-7-case-study-500459.md` — 단계 5-3 v3 case study (Apple/Stripe/Linear/Pudding/NYT/Bloomberg 5-step 분석 + 9 영역 매핑)
+- `docs/phase-7-design-spec-500459.md` — 단계 5-3 v3 design spec (9 영역 4-step 구조)
+
+### Phase 7 단계 5-4-2 누적 commit 시퀀스 (참고)
+
+| 단계 | Commit | 영역 |
+|---|---|---|
+| 5-4-2 | `9a88b8d` | P0 5건 + Cowork 데이터 보강 + Motion 도입 |
+| 5-4-2-fix | `9a2a9fa` `cef4c7d` `e426aa0` | 모노톤 강제 + 02 시각 위계 + 03 단순화 + 04·05·06 재구성 |
+| 5-4-2-fix-2 | `68bf3f6` `91c7f73` `89b4459` `cc48525` | 03 hover + 02 Tr 위계 + 04 세로 막대 + 05 ScenarioCarousel + 06 spring + 07 reveal |
+| 5-4-2-fix-3 | `2613ede` `4ef2cef` `fed457d` `43fa6c1` | 모션 once: false + 03 표 stagger + 04 세로 4 막대 + 05 디테일 폐기 + 06 Bullet chart |
+| 5-4-2-fix-4 | `e3ca466` `9c85af5` `420d5ed` `3e0d197` `f543984` | Typography Scale + mdx reveal + 표 정렬 + Hero typography + 04 v2 + 05 carousel 통일 |
+| 5-4-2-fix-5 | `a225b41` `71b92a7` `8d7c591` `91db643` | 14-D 강화 + 표 mobile card stack + Hero 사진 v2 + 04 step-down |
+| 5-4-2-fix-6 | `1d609e3` `2232342` `bf551dc` `ecc6e61` `2a3ec3b` `7816ea8` `bd5d1fb` | Safari 일관성 + Hero typography 재정의 + 카드 padding + 표 mobile v2 + Hero carousel + 04·05 시각 정정 + 모션 |
+| 5-4-2-fix-7 | `eb38413` `a077f2f` `4e7739d` | Pretendard CDN + Hero 영역 통합 + 텍스트 비율 축소 |
+| 5-4-2-fix-7-hotfix | `e099ce6` | HeroGallery 1/4 축소 |
+| docs (plan v2) | `cff761b` | Hero design plan + mockup 3종 |
+| **5-4-2-fix-8** | **`70de25b`** | **Hero 영역 본문 톤앤매너 계승 (옵션 a Linear monochrome) — 시연 대기** |
+
+---
+
+## ⚡ 2026-04-21 핫 스냅샷 — 참고용 (상위 스냅샷으로 대체됨)
 
 ### 지금 어디인가
 
