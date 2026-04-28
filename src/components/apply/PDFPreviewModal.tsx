@@ -143,7 +143,7 @@ export function PDFPreviewModal({
         <div className="flex items-center gap-2 border-b border-[var(--color-border)] px-6 py-4">
           <h2
             id="pdf-preview-title"
-            className="text-base font-black text-[var(--color-ink-900)]"
+            className="text-[length:var(--text-body)] font-black text-[var(--color-ink-900)]"
           >
             위임장 내용 확인
           </h2>

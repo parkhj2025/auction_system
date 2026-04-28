@@ -122,7 +122,7 @@ export function PhoneVerifyModal({
         <div className="flex items-center justify-between border-b border-[var(--color-border)] px-6 py-4">
           <h2
             id="phone-verify-title"
-            className="flex items-center gap-2 text-base font-black text-[var(--color-ink-900)]"
+            className="flex items-center gap-2 text-[length:var(--text-body)] font-black text-[var(--color-ink-900)]"
           >
             <ShieldCheck size={18} aria-hidden="true" className="text-[var(--color-ink-900)]" />
             휴대폰 본인인증

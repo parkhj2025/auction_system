@@ -14,7 +14,7 @@ export default function MyLayout({
         <div className="mx-auto w-full max-w-5xl px-4 pt-10 pb-6 sm:px-6 sm:pt-14">
           <nav
             aria-label="Breadcrumb"
-            className="flex items-center gap-1 text-xs font-medium text-[var(--color-ink-500)]"
+            className="flex items-center gap-1 text-xs font-semibold text-[var(--color-ink-500)]"
           >
             <Link href="/" className="hover:text-[var(--color-ink-900)]">
               홈

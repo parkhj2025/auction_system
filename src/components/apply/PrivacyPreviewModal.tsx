@@ -50,7 +50,7 @@ export function PrivacyPreviewModal({ isOpen, onClose }: Props) {
         <div className="flex items-center justify-between border-b border-[var(--color-border)] px-6 py-4">
           <h2
             id="privacy-preview-title"
-            className="text-base font-black text-[var(--color-ink-900)]"
+            className="text-[length:var(--text-body)] font-black text-[var(--color-ink-900)]"
           >
             개인정보처리방침
           </h2>

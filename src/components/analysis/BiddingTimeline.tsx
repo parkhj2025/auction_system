@@ -58,7 +58,7 @@ export function BiddingTimeline({
               />
               <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <span
-                  className={`text-base tabular-nums transition-colors ${
+                  className={`text-[length:var(--text-body)] tabular-nums transition-colors ${
                     isCurrent
                       ? "font-black text-[var(--color-ink-900)]"
                       : "font-bold text-[var(--color-ink-500)] opacity-60"
@@ -149,21 +149,21 @@ function resolveTone(
     return {
       label: "매각",
       dotCls: "bg-[var(--color-ink-300)]",
-      chipCls: "font-medium text-[var(--color-ink-500)]",
+      chipCls: "font-semibold text-[var(--color-ink-500)]",
     };
   }
   if (r.includes("미납")) {
     return {
       label: "미납",
       dotCls: "bg-white ring-2 ring-[var(--color-ink-300)]",
-      chipCls: "font-medium text-[var(--color-ink-500)]",
+      chipCls: "font-semibold text-[var(--color-ink-500)]",
     };
   }
   if (r.includes("유찰")) {
     return {
       label: "유찰",
       dotCls: "bg-white ring-2 ring-[var(--color-ink-300)]",
-      chipCls: "font-medium text-[var(--color-ink-500)]",
+      chipCls: "font-semibold text-[var(--color-ink-500)]",
     };
   }
   if (weight === "current") {

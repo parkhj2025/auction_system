@@ -103,7 +103,7 @@ export function RightsAnalysisSection({ rights }: { rights: RightsMeta }) {
             <span className="text-xs font-black uppercase tracking-[0.18em] tabular-nums text-[var(--color-ink-500)]">
               Step {String(idx + 1).padStart(2, "0")}
             </span>
-            <h3 className="text-base font-black tracking-tight text-[var(--color-ink-900)]">
+            <h3 className="text-[length:var(--text-body)] font-black tracking-tight text-[var(--color-ink-900)]">
               {step.title}
             </h3>
           </div>

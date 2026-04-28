@@ -100,7 +100,7 @@ export function GatingWrapper({
         <div className="mt-6 flex flex-col items-center gap-3">
           <Link
             href={loginHref}
-            className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-8 text-base font-black text-white shadow-[var(--shadow-card)] transition hover:bg-black"
+            className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-8 text-[length:var(--text-body)] font-black text-white shadow-[var(--shadow-card)] transition hover:bg-black"
           >
             Google로 로그인
           </Link>

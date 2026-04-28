@@ -144,7 +144,7 @@ function StepCard({
           {entry.minimum != null ? formatKoreanWon(entry.minimum) : "—"}
           {entry.rate != null ? (
             <span
-              className={`ml-2 text-[length:var(--text-body-sm)] font-medium ${
+              className={`ml-2 text-[length:var(--text-body-sm)] font-semibold ${
                 isCurrent
                   ? "text-[var(--color-ink-700)]"
                   : "text-[var(--color-ink-500)]"

@@ -41,7 +41,7 @@ export async function PostLayout({
         <div className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
           <nav
             aria-label="Breadcrumb"
-            className="flex items-center gap-1 text-xs font-medium text-[var(--color-ink-500)]"
+            className="flex items-center gap-1 text-xs font-semibold text-[var(--color-ink-500)]"
           >
             <Link href="/" className="hover:text-[var(--color-ink-900)]">
               홈
@@ -62,7 +62,7 @@ export async function PostLayout({
             {title}
           </h1>
           {subtitle && (
-            <p className="mt-4 text-base leading-7 text-[var(--color-ink-500)] sm:text-lg sm:leading-8">
+            <p className="mt-4 text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)] sm:text-lg sm:leading-8">
               {subtitle}
             </p>
           )}

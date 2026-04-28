@@ -18,7 +18,7 @@ export function ApplyCTA({ fm }: { fm: AnalysisFrontmatter }) {
   return (
     <section
       aria-labelledby="apply-cta-heading"
-      className="mt-10 overflow-hidden rounded-[var(--radius-2xl)] bg-[var(--color-brand-950)] text-white"
+      className="mt-10 overflow-hidden rounded-[var(--radius-2xl)] bg-[var(--color-ink-950)] text-white"
     >
       <div className="relative px-6 py-10 sm:px-10 sm:py-12">
         <div
@@ -36,7 +36,7 @@ export function ApplyCTA({ fm }: { fm: AnalysisFrontmatter }) {
           분석은 끝났습니다.
           <br className="sm:hidden" /> 법원은 저희가 갑니다.
         </h2>
-        <p className="relative mt-4 max-w-2xl text-sm leading-6 text-white/85 sm:text-base">
+        <p className="relative mt-4 max-w-2xl text-sm leading-6 text-white/85 sm:text-[length:var(--text-body)]">
           사건번호 <span className="font-bold text-white tabular-nums">{fm.caseNumber}</span>{" "}
           정보를 자동으로 불러와 신청 페이지로 이동합니다. 패찰 시 보증금은 당일 즉시 반환됩니다.
         </p>
@@ -55,7 +55,7 @@ export function ApplyCTA({ fm }: { fm: AnalysisFrontmatter }) {
         <div className="relative mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
           <Link
             href={applyHref}
-            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-white px-6 text-base font-black tracking-tight text-[var(--color-ink-900)] shadow-[var(--shadow-lift)] transition duration-150 ease-out hover:bg-[var(--color-ink-50)]"
+            className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-white px-6 text-[length:var(--text-body)] font-black tracking-tight text-[var(--color-ink-900)] shadow-[var(--shadow-lift)] transition duration-150 ease-out hover:bg-[var(--color-ink-50)]"
           >
             이 물건 입찰 대리 신청
             <ArrowRight size={18} aria-hidden="true" />

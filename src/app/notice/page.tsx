@@ -20,7 +20,7 @@ export default async function NoticeListPage() {
         <div className="mx-auto w-full max-w-4xl px-4 py-14 sm:px-6 sm:py-16">
           <nav
             aria-label="Breadcrumb"
-            className="flex items-center gap-1 text-xs font-medium text-[var(--color-ink-500)]"
+            className="flex items-center gap-1 text-xs font-semibold text-[var(--color-ink-500)]"
           >
             <Link href="/" className="hover:text-[var(--color-ink-900)]">
               홈
@@ -34,7 +34,7 @@ export default async function NoticeListPage() {
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
             {BRAND_NAME} 공식 공지
           </h1>
-          <p className="mt-3 text-base leading-7 text-[var(--color-ink-500)]">
+          <p className="mt-3 text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
             서비스 변경, 수수료 정책, 지역 확대 등 중요한 사항을 안내합니다.
           </p>
         </div>
@@ -57,13 +57,13 @@ export default async function NoticeListPage() {
                     className="flex items-center gap-4 px-6 py-5 transition hover:bg-[var(--color-surface-muted)]"
                   >
                     <div className="flex-1">
-                      <p className="text-base font-bold text-[var(--color-ink-900)] group-hover:text-black">
+                      <p className="text-[length:var(--text-body)] font-bold text-[var(--color-ink-900)] group-hover:text-black">
                         {fm.title}
                       </p>
                     </div>
                     <time
                       dateTime={fm.publishedAt}
-                      className="text-xs font-medium tabular-nums text-[var(--color-ink-500)]"
+                      className="text-xs font-semibold tabular-nums text-[var(--color-ink-500)]"
                     >
                       {formatKoreanDate(fm.publishedAt)}
                     </time>

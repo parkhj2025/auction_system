@@ -104,7 +104,7 @@ export function DetailSidebar({ fm }: { fm: AnalysisFrontmatter }) {
                   <span className="text-[11px] font-black tabular-nums text-[var(--color-ink-500)] group-hover:text-[var(--color-ink-900)]">
                     {s.label}
                   </span>
-                  <span className="font-medium">{s.title}</span>
+                  <span className="font-semibold">{s.title}</span>
                 </a>
               </li>
             ))}
@@ -128,7 +128,7 @@ export function DetailSidebar({ fm }: { fm: AnalysisFrontmatter }) {
 function MiniStat({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex items-baseline justify-between gap-3">
-      <span className="text-[11px] font-medium text-[var(--color-ink-500)]">
+      <span className="text-[11px] font-semibold text-[var(--color-ink-500)]">
         {label}
       </span>
       <span className="text-sm font-bold tabular-nums text-[var(--color-ink-900)]">

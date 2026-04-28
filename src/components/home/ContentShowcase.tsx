@@ -61,7 +61,7 @@ export function ContentShowcase() {
                     <span className="inline-flex h-5 items-center rounded-full bg-[var(--color-ink-100)] px-2 text-[10px] font-bold uppercase tracking-wider text-[var(--color-ink-700)]">
                       경매가이드
                     </span>
-                    <span className="text-[11px] font-medium text-[var(--color-ink-500)]">
+                    <span className="text-[11px] font-semibold text-[var(--color-ink-500)]">
                       {DIFFICULTY_LABEL[g.frontmatter.difficulty]}
                     </span>
                   </div>
@@ -73,7 +73,7 @@ export function ContentShowcase() {
                       {g.frontmatter.subtitle}
                     </p>
                   )}
-                  <p className="mt-3 text-[11px] font-medium text-[var(--color-ink-500)]">
+                  <p className="mt-3 text-[11px] font-semibold text-[var(--color-ink-500)]">
                     {formatKoreanDate(g.frontmatter.publishedAt)}
                   </p>
                 </div>
@@ -101,7 +101,7 @@ export function ContentShowcase() {
                 )}
               </div>
               <div className="mt-8 flex items-center justify-between">
-                <span className="text-xs font-medium text-white/70">
+                <span className="text-xs font-semibold text-white/70">
                   {formatKoreanDate(news.frontmatter.publishedAt)}
                 </span>
                 <span className="inline-flex items-center gap-1 text-sm font-bold">

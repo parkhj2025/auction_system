@@ -14,7 +14,7 @@ export function EmptyState({
 }) {
   return (
     <div className="mt-10 rounded-[var(--radius-xl)] border border-dashed border-[var(--color-border)] bg-[var(--color-surface-muted)] px-6 py-16 text-center">
-      <p className="text-base font-black text-[var(--color-ink-900)]">{title}</p>
+      <p className="text-[length:var(--text-body)] font-black text-[var(--color-ink-900)]">{title}</p>
       <p className="mt-2 text-sm text-[var(--color-ink-500)]">{description}</p>
       {ctaHref && (
         <Link

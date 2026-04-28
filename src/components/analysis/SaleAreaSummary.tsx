@@ -80,7 +80,7 @@ export function SaleAreaSummary({
         <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">
           매각가율 분포
         </p>
-        <p className="text-[10px] font-medium tabular-nums text-[var(--color-ink-500)] sm:text-[11px]">
+        <p className="text-[10px] font-semibold tabular-nums text-[var(--color-ink-500)] sm:text-[11px]">
           최근 1~12개월{" "}
           <span className="font-black text-[var(--color-ink-900)]">
             {saleCount}건
@@ -165,7 +165,7 @@ export function SaleAreaSummary({
           animate={inView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.4, delay: 1.4 }}
         >
-          <p className="absolute -top-5 left-1 whitespace-nowrap text-[10px] font-medium tabular-nums text-[var(--color-ink-500)]">
+          <p className="absolute -top-5 left-1 whitespace-nowrap text-[10px] font-semibold tabular-nums text-[var(--color-ink-500)]">
             감정가 100%
           </p>
         </motion.div>
@@ -177,7 +177,7 @@ export function SaleAreaSummary({
           animate={inView ? { opacity: 1 } : { opacity: 0 }}
           transition={{ duration: 0.4, delay: 0.7 }}
         >
-          <p className="text-[9px] font-medium tabular-nums text-[var(--color-ink-500)]">
+          <p className="text-[9px] font-semibold tabular-nums text-[var(--color-ink-500)]">
             0%
           </p>
         </motion.div>
@@ -194,7 +194,7 @@ export function SaleAreaSummary({
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">
             평균 매각가율
           </p>
-          <p className="mt-1 text-base font-black tabular-nums text-[var(--color-ink-900)]">
+          <p className="mt-1 text-[length:var(--text-body)] font-black tabular-nums text-[var(--color-ink-900)]">
             {rateMin}~{rateMax}%
           </p>
           <p className="mt-0.5 text-[11px] tabular-nums text-[var(--color-ink-500)]">
@@ -210,7 +210,7 @@ export function SaleAreaSummary({
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-900)]">
             본 물건 진입가
           </p>
-          <p className="mt-1 text-base font-black tabular-nums text-[var(--color-ink-900)]">
+          <p className="mt-1 text-[length:var(--text-body)] font-black tabular-nums text-[var(--color-ink-900)]">
             {formatKoreanWon(minPrice)}
           </p>
           <p className="mt-0.5 text-[11px] tabular-nums text-[var(--color-ink-700)]">
@@ -226,7 +226,7 @@ export function SaleAreaSummary({
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">
             평균 입찰인수
           </p>
-          <p className="mt-1 text-base font-black tabular-nums text-[var(--color-ink-900)]">
+          <p className="mt-1 text-[length:var(--text-body)] font-black tabular-nums text-[var(--color-ink-900)]">
             {bidCountRange
               ? `${bidCountRange.min}~${bidCountRange.max}명`
               : "—"}

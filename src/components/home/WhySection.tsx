@@ -83,7 +83,7 @@ export function WhySection() {
           >
             직접 가는 대신, 맡기고 결과만 받으세요
           </h2>
-          <p className="mt-3 text-base leading-7 text-[var(--color-ink-500)]">
+          <p className="mt-3 text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
             경매는 좋은 가격에 부동산을 취득할 수 있는 합리적 시스템입니다.
             물리적 제약만 해결되면, 누구나 참여할 수 있습니다.
           </p>
@@ -134,7 +134,7 @@ export function WhySection() {
                     </div>
                   </td>
                   <td className="bg-[var(--color-ink-50)]/60 px-5 py-4 align-top">
-                    <div className="flex gap-2 font-medium text-[var(--color-ink-900)]">
+                    <div className="flex gap-2 font-semibold text-[var(--color-ink-900)]">
                       <Check
                         size={16}
                         className="mt-0.5 shrink-0 text-[var(--color-ink-900)]"
@@ -187,7 +187,7 @@ export function WhySection() {
                   {r.name.slice(0, 1)}
                 </span>
                 <div className="flex-1">
-                  <p className="text-xs font-medium text-[var(--color-ink-500)]">
+                  <p className="text-xs font-semibold text-[var(--color-ink-500)]">
                     {r.name} · {r.meta}
                   </p>
                   <div className="relative mt-2 rounded-[var(--radius-md)] rounded-tl-none bg-white p-3 text-sm leading-6 text-[var(--color-ink-700)] shadow-[var(--shadow-card)]">

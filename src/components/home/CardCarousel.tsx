@@ -30,7 +30,7 @@ export function CardCarousel() {
             >
               숫자로 판단하는 최신 경매 물건
             </h2>
-            <p className="mt-3 max-w-xl text-base leading-7 text-[var(--color-ink-500)]">
+            <p className="mt-3 max-w-xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
               감정가·최저가·권리관계·시세·수익 시뮬까지. 7섹션 무료 분석을
               읽고 바로 입찰 대리를 신청할 수 있습니다.
             </p>

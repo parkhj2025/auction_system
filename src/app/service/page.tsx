@@ -87,7 +87,7 @@ export default function ServicePage() {
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
             경매 입찰 대리, 하나만 합니다
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--color-ink-500)] sm:text-lg sm:leading-8">
+          <p className="mt-4 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)] sm:text-lg sm:leading-8">
             공인중개사법에 따른 매수신청 대리(입찰 대리) 업무만 수행합니다.
             범위를 좁힌 대신 가격을 낮췄고, 결과와 무관하게 투명하게
             청구합니다.
@@ -172,7 +172,7 @@ export default function ServicePage() {
               return (
                 <li key={step.id} className="flex gap-5">
                   <div className="flex flex-col items-center">
-                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-base font-black text-white">
+                    <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-[length:var(--text-body)] font-black text-white">
                       {step.id}
                     </span>
                     {step.id < SOP.length && (

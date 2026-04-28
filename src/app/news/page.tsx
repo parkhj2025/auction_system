@@ -30,7 +30,7 @@ export default async function NewsListPage() {
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
             시장이 움직이는 방향을 숫자로
           </h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-[var(--color-ink-500)]">
+          <p className="mt-3 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
             주간 낙찰가율, 유형별 경쟁률, 눈에 띄는 낙찰 사례를 정리합니다.
             입찰가를 결정하기 전에 시장 분위기를 먼저 확인하세요.
           </p>
@@ -38,7 +38,7 @@ export default async function NewsListPage() {
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <p className="text-sm font-medium text-[var(--color-ink-500)]">
+        <p className="text-sm font-semibold text-[var(--color-ink-500)]">
           총{" "}
           <strong className="tabular-nums text-[var(--color-ink-900)]">
             {posts.length}

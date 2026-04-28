@@ -57,7 +57,7 @@ export function DelegationPreviewModal({ isOpen, onClose, data }: Props) {
         <div className="flex items-center justify-between border-b border-[var(--color-border)] px-6 py-4">
           <h2
             id="delegation-preview-title"
-            className="text-base font-black text-[var(--color-ink-900)]"
+            className="text-[length:var(--text-body)] font-black text-[var(--color-ink-900)]"
           >
             {formatted.title} 미리보기
           </h2>

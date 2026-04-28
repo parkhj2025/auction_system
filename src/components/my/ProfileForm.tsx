@@ -62,7 +62,7 @@ export function ProfileForm({
         <p className="text-xs font-bold text-[var(--color-ink-500)]">
           로그인 계정
         </p>
-        <p className="mt-1 text-base font-black text-[var(--color-ink-900)]">
+        <p className="mt-1 text-[length:var(--text-body)] font-black text-[var(--color-ink-900)]">
           {displayName}
         </p>
         {email && (
@@ -88,7 +88,7 @@ export function ProfileForm({
           placeholder="010-0000-0000"
           value={phone}
           onChange={(e) => setPhone(formatPhone(e.target.value))}
-          className="h-12 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-base text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]"
+          className="h-12 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-[length:var(--text-body)] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]"
         />
         <p className="mt-2 text-xs leading-5 text-[var(--color-ink-500)]">
           접수 시 기본값으로 사용됩니다. 접수마다 다시 입력할 필요가 없도록

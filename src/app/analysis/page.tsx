@@ -88,7 +88,7 @@ export default async function AnalysisListPage({
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
             숫자로 판단하는 경매 물건
           </h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-[var(--color-ink-500)]">
+          <p className="mt-3 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
             물건 개요부터 권리분석 · 시세비교 · 수익 시뮬레이션 · 매각사례까지.
             7섹션 구조로 모든 분석을 무료로 제공합니다.
           </p>
@@ -170,7 +170,7 @@ export default async function AnalysisListPage({
       {/* 결과 */}
       <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
         <div className="flex items-baseline justify-between">
-          <p className="text-sm font-medium text-[var(--color-ink-500)]">
+          <p className="text-sm font-semibold text-[var(--color-ink-500)]">
             총{" "}
             <strong className="tabular-nums text-[var(--color-ink-900)]">
               {filtered.length}
@@ -189,7 +189,7 @@ export default async function AnalysisListPage({
 
         {filtered.length === 0 ? (
           <div className="mt-10 rounded-[var(--radius-xl)] border border-dashed border-[var(--color-border)] bg-[var(--color-surface-muted)] px-6 py-16 text-center">
-            <p className="text-base font-bold text-[var(--color-ink-900)]">
+            <p className="text-[length:var(--text-body)] font-bold text-[var(--color-ink-900)]">
               조건에 맞는 물건분석이 없습니다
             </p>
             <p className="mt-2 text-sm text-[var(--color-ink-500)]">

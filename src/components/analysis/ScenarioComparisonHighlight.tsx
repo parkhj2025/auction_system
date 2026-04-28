@@ -25,7 +25,7 @@ export function ScenarioComparisonHighlight({ children }: { children?: ReactNode
       transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
       viewport={{ once: true, margin: "-10%" }}
     >
-      <span className="block text-[length:var(--text-caption)] font-medium uppercase tracking-[0.18em] text-[var(--color-ink-500)]">
+      <span className="block text-[length:var(--text-caption)] font-semibold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">
         이 섹션의 정리
       </span>
       {children}

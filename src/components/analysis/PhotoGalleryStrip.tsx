@@ -54,7 +54,7 @@ export function PhotoGalleryStrip({
           <p className="text-[11px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-700)]">
             현장 사진
           </p>
-          <span className="text-xs font-medium tabular-nums text-[var(--color-ink-500)]">
+          <span className="text-xs font-semibold tabular-nums text-[var(--color-ink-500)]">
             {thumbs.length}장
           </span>
         </div>

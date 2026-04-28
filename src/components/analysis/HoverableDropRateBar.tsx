@@ -124,13 +124,13 @@ export function HoverableDropRateBar({
 
       {/* 라벨 — 룰 30 라이트 토큰 (white/70 → ink-700). 룰 24-D brand-300/70 칩 보존 */}
       <motion.div
-        className="mt-2 flex items-baseline justify-between text-[length:var(--text-body-sm)] font-medium tabular-nums text-[var(--color-ink-700)]"
+        className="mt-2 flex items-baseline justify-between text-[length:var(--text-body-sm)] font-semibold tabular-nums text-[var(--color-ink-700)]"
         initial={{ opacity: 0 }}
         animate={inView ? { opacity: 1 } : { opacity: 0 }}
         transition={{ delay: 0.6, duration: 0.4 }}
       >
         <span>감정가 {appraisalLabel ?? formatBillion(appraisal)}</span>
-        <span className="rounded-[var(--radius-xs)] bg-[var(--color-brand-300)]/70 px-2 py-0.5 font-semibold tabular-nums text-[var(--color-ink-900)]">
+        <span className="rounded-[var(--radius-xs)] bg-[var(--color-action)] px-2 py-0.5 font-semibold tabular-nums text-white">
           −{animatedDrop}%
         </span>
       </motion.div>

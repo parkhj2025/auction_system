@@ -39,25 +39,18 @@
 @theme {
   /* ─── 1. 컬러 ──────────────────────────────────────────────────── */
 
-  /* 1-1. 브랜드 블루 11단계 */
-  --color-brand-50:  #eff6ff;
-  --color-brand-100: #dbeafe;
-  --color-brand-200: #bfdbfe;
-  --color-brand-300: #93c5fd;
-  --color-brand-400: #60a5fa;
-  --color-brand-500: #3b82f6;
-  --color-brand-600: #2563eb; /* 메인 */
-  --color-brand-700: #1d4ed8;
-  --color-brand-800: #1e40af;
-  --color-brand-900: #1e3a8a;
-  --color-brand-950: #172554;
+  /* 1-1. Action Blue 단일 토큰 (sub-phase 8.1 — brand-* 11단계 폐기 후 1 accent only 본질 강화).
+   * 룰 24-D 1 accent only 영역 = action 단독.
+   * 사용 영역: DetailHero · HoverableDropRateBar 칩 (drop-rate "−X%" 영역). */
+  --color-action: #0066cc;
 
-  /* 1-2. 중립 ink 9단계 + 표면 (단계 5-4-2-fix 모노톤 강제 시 ink-50/200/950 추가) */
-  --color-ink-950: #020617; /* 다크 섹션 배경 (brand-950 대체) */
+  /* 1-2. 중립 ink 9단계 + 표면.
+   * sub-phase 8.1: 텍스트 영역 ink-300 사용 0 정합 (AA 미달 영역 원천 차단). 보더/decoration/disabled/다이어그램 영역 = 보존 (40+ 사용 영역). */
+  --color-ink-950: #020617; /* 다크 섹션 배경 */
   --color-ink-900: #0f172a; /* 제목 */
   --color-ink-700: #334155; /* 본문 */
   --color-ink-500: #64748b; /* 보조 */
-  --color-ink-300: #cbd5e1; /* 비활성 (텍스트 사용 금지 — AA 미달) */
+  --color-ink-300: #cbd5e1; /* 비활성·보더·decoration·다이어그램 영역 (텍스트 사용 금지 — AA 미달) */
   --color-ink-200: #e2e8f0; /* 약화 보더·구분선 */
   --color-ink-100: #f1f5f9; /* 배경 */
   --color-ink-50:  #f8fafc; /* 약화 배경 (surface-muted 동등) */
@@ -73,13 +66,15 @@
   --color-warning-soft: #fef3c7;  /* 배경용 soft */
   --color-danger: #b91c1c;        /* red-700, on white ≈ 6.0:1 */
   --color-danger-soft: #fee2e2;   /* 배경용 soft */
-  --color-info: #1d4ed8;          /* brand-700, on white ≈ 8.4:1 */
-  --color-info-soft: #eff6ff;     /* brand-50, 배경용 soft */
+  --color-info: #1d4ed8;          /* on white ≈ 8.4:1 */
+  --color-info-soft: #eff6ff;     /* 배경용 soft */
 
-  /* 1-4. accent 3종 — 표현 강조용 (단계 3에서 시맨틱 마이그레이션 검토)
-     컴포넌트 다수 의존 중이라 본 단계에서는 색상 그대로 유지 */
-  --color-accent-yellow: #ffd600;
-  --color-accent-yellow-soft: #fff4b0;
+  /* 1-4. 카카오 토큰 (sub-phase 8.1 신규) — 카카오 브랜드색.
+   * 사용 영역: 카카오톡 채널 버튼 한정 (contact 페이지). */
+  --color-kakao: #fee500;
+
+  /* 1-5. accent 3종 — 표현 강조용.
+   * sub-phase 8.1: accent-yellow / accent-yellow-soft 폐기 (사용 영역 = 카카오 토큰 + ink 톤 전환). */
   --color-accent-red: #dc2626;
   --color-accent-red-soft: #fee2e2;
   --color-accent-green: #16a34a;
@@ -111,8 +106,9 @@
    * Pretendard Variable (loaded) → Noto Sans KR (next/font loaded) → Apple SD Gothic Neo (Safari macOS/iOS 기본 한글) → system-ui (last) */
   --font-sans: "Pretendard Variable", Pretendard, var(--font-noto-kr), "Apple SD Gothic Neo", "Noto Sans KR", -apple-system, BlinkMacSystemFont, ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
 
-  /* ─── 5. 타이포 스케일 (단계 5-4-2-fix-4 룰 14: Major Third 1.25 + 4pt grid).
-   * Base 16px · 비율 1.25 · 4pt 정렬 ·  Linear/Carbon/Material 표준.
+  /* ─── 5. 타이포 스케일 (sub-phase 8.1 — Major Third 1.25 선언 정정).
+   * Base 17px (Apple body 본질 흡수) · 혼합 비율 (display 64 → h1 40 = 1.6 / h1 → h2 = 1.25 / h2 → h3 = 1.33 / h3 → h4 = 1.2 / body-lg 18 → body 17 = 1.06 / body → body-sm 14 = 1.21 / body-sm → caption 12 = 1.17).
+   * 단일 본질 영역 0 — 의미 단위별 영역 정합 본질.
    * 의미 단위별 token (14-B Semantic Role Mapping):
    *  display = Hero 가격 dominant
    *  h1 = 사건 타이틀 (1줄 요약)
@@ -129,7 +125,7 @@
   --text-h3: 1.5rem;          /* 24px — 카드 제목 */
   --text-h4: 1.25rem;         /* 20px — STEP 카드 헤딩 + 서브헤딩 */
   --text-body-lg: 1.125rem;   /* 18px — 본문 강조 */
-  --text-body: 1rem;          /* 16px — 본문 default */
+  --text-body: 1.0625rem;     /* 17px — 본문 default (sub-phase 8.1 Apple body 본질 흡수) */
   --text-body-sm: 0.875rem;   /* 14px — 보조 본문 + 표 td */
   --text-caption: 0.75rem;    /* 12px — 라벨·태그·섹션 라벨 */
   /* 모바일 (<640px) — 룰 14-A mobile token */
@@ -145,6 +141,14 @@
   --lh-snug: 1.15;
   --lh-normal: 1.3;
   --lh-relaxed: 1.6;
+
+  /* Font Weight tier (sub-phase 8.1 신규 — Apple HIG 본질, 5단계 ladder).
+   * "Avoid Ultralight/Thin/Light, opt for Regular/Medium/Semibold/Bold". 500 영역 보존. */
+  --font-weight-light: 300;       /* lead-airy 영역 한정 */
+  --font-weight-regular: 400;
+  --font-weight-medium: 500;      /* 보존 (HIG Medium = action / 버튼 / 네비 본질) */
+  --font-weight-semibold: 600;
+  --font-weight-bold: 700;
 
   /* 룰 14-D 강화 (단계 5-4-2-fix-5) — Vertical Rhythm 4pt grid + 강화.
    * 섹션 간 = 128/80, 카드 padding = 32/24, 카드 간 gap = 32/24, 본문 단락 = 24 */

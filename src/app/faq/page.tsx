@@ -42,11 +42,11 @@ export default function FaqPage() {
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
             신청 전 궁금하신 점을 모았습니다
           </h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-[var(--color-ink-500)]">
+          <p className="mt-3 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
             여기서 답을 찾지 못하신 경우{" "}
             <Link
               href="/contact"
-              className="font-bold text-[var(--color-ink-900)] underline decoration-[var(--color-ink-300)] underline-offset-2 hover:text-black"
+              className="font-bold text-[var(--color-ink-900)] underline decoration-[var(--color-ink-200)] underline-offset-2 hover:text-black"
             >
               문의하기
             </Link>
@@ -100,7 +100,7 @@ export default function FaqPage() {
                       {...(i === 0 && cat.id === "fee" ? { open: true } : {})}
                     >
                       <summary className="flex cursor-pointer list-none items-start justify-between gap-4">
-                        <span className="text-base font-black text-[var(--color-ink-900)]">
+                        <span className="text-[length:var(--text-body)] font-black text-[var(--color-ink-900)]">
                           {it.q}
                         </span>
                         <ChevronDown

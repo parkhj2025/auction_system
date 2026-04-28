@@ -44,7 +44,7 @@ export function TrustCTA() {
         >
           입찰일에 법원 방문이 어려우신가요?
         </h2>
-        <p className="mt-5 max-w-2xl text-base leading-7 text-white/85 sm:text-lg">
+        <p className="mt-5 max-w-2xl text-[length:var(--text-body)] leading-7 text-white/85 sm:text-lg">
           물건은 찾았는데 평일에 시간 내기 어려운 분들을 위해, 경매 입찰 대리
           서비스를 운영하고 있습니다. 패찰 시 보증금은 당일 즉시 반환됩니다.
         </p>
@@ -52,13 +52,13 @@ export function TrustCTA() {
         <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
           <Link
             href={PRIMARY_CTA.href}
-            className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-white px-7 text-base font-bold text-[var(--color-ink-900)] shadow-[var(--shadow-lift)] transition hover:bg-[var(--color-ink-50)]"
+            className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-white px-7 text-[length:var(--text-body)] font-bold text-[var(--color-ink-900)] shadow-[var(--shadow-lift)] transition hover:bg-[var(--color-ink-50)]"
           >
             {PRIMARY_CTA.label}
           </Link>
           <Link
             href="/#pricing"
-            className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] border border-white/25 bg-white/10 px-7 text-base font-bold text-white backdrop-blur transition hover:bg-white/20"
+            className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] border border-white/25 bg-white/10 px-7 text-[length:var(--text-body)] font-bold text-white backdrop-blur transition hover:bg-white/20"
           >
             수수료 안내
           </Link>

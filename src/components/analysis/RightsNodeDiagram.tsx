@@ -198,7 +198,7 @@ function RightsNode({
     >
       <p className="text-[10px] font-bold uppercase tracking-[0.18em]">{label}</p>
       {amount != null ? (
-        <p className="mt-1 text-base font-black tabular-nums">
+        <p className="mt-1 text-[length:var(--text-body)] font-black tabular-nums">
           {formatKoreanWon(amount)}
         </p>
       ) : null}

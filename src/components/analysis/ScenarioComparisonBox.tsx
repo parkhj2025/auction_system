@@ -168,11 +168,11 @@ export function ScenarioComparisonBox({
                           : "text-[var(--color-ink-500)]"
                       }`}
                     >
-                      <div className="text-base font-black tabular-nums">
+                      <div className="text-[length:var(--text-body)] font-black tabular-nums">
                         {key}
                       </div>
                       <div
-                        className={`text-[11px] font-medium ${
+                        className={`text-[11px] font-semibold ${
                           isActive ? "" : "opacity-70"
                         }`}
                       >
@@ -212,7 +212,7 @@ export function ScenarioComparisonBox({
                         isActive
                           ? "font-black text-[var(--color-ink-900)]"
                           : activeKey
-                            ? "font-medium text-[var(--color-ink-500)] opacity-50"
+                            ? "font-semibold text-[var(--color-ink-500)] opacity-50"
                             : "font-bold text-[var(--color-ink-700)]"
                       }`}
                     >
@@ -258,7 +258,7 @@ export function ScenarioComparisonBox({
                         isActive
                           ? "font-black text-[var(--color-ink-900)]"
                           : activeKey
-                            ? "font-medium text-[var(--color-ink-500)] opacity-50"
+                            ? "font-semibold text-[var(--color-ink-500)] opacity-50"
                             : "font-bold text-[var(--color-ink-700)]"
                       }`}
                     >
@@ -323,7 +323,7 @@ export function ScenarioComparisonBox({
                         isActive
                           ? "font-black text-[var(--color-ink-900)]"
                           : activeKey
-                            ? "font-medium text-[var(--color-ink-500)] opacity-50"
+                            ? "font-semibold text-[var(--color-ink-500)] opacity-50"
                             : "font-bold text-[var(--color-ink-700)]"
                       }`}
                     >

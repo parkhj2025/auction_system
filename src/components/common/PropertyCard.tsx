@@ -21,7 +21,7 @@ export function PropertyCard({
       className={`group relative flex h-full flex-col rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)] ${className}`}
     >
       <div className="flex items-center justify-end">
-        <span className="text-[11px] font-medium text-[var(--color-ink-500)]">
+        <span className="text-[11px] font-semibold text-[var(--color-ink-500)]">
           {fm.round}회차 · 감정가의 {fm.percent}%
         </span>
       </div>
@@ -44,7 +44,7 @@ export function PropertyCard({
       <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] p-4 text-xs">
         <div>
           <dt className="text-[var(--color-ink-500)]">최저가</dt>
-          <dd className="mt-0.5 tabular-nums text-base font-black text-[var(--color-accent-red)]">
+          <dd className="mt-0.5 tabular-nums text-[length:var(--text-body)] font-black text-[var(--color-accent-red)]">
             {formatKoreanWon(fm.minPrice)}
           </dd>
         </div>
@@ -56,13 +56,13 @@ export function PropertyCard({
         </div>
         <div>
           <dt className="text-[var(--color-ink-500)]">입찰일</dt>
-          <dd className="mt-0.5 tabular-nums font-medium text-[var(--color-ink-900)]">
+          <dd className="mt-0.5 tabular-nums font-semibold text-[var(--color-ink-900)]">
             {fm.bidDate}
           </dd>
         </div>
         <div>
           <dt className="text-[var(--color-ink-500)]">유형</dt>
-          <dd className="mt-0.5 font-medium text-[var(--color-ink-900)]">
+          <dd className="mt-0.5 font-semibold text-[var(--color-ink-900)]">
             {fm.propertyType} · {fm.areaPyeong}평
           </dd>
         </div>
@@ -73,7 +73,7 @@ export function PropertyCard({
           {fm.tags.slice(0, 3).map((t) => (
             <li
               key={t}
-              className="inline-flex h-6 items-center rounded-full border border-[var(--color-border)] bg-[var(--color-ink-100)] px-2 text-[11px] font-medium text-[var(--color-ink-700)]"
+              className="inline-flex h-6 items-center rounded-full border border-[var(--color-border)] bg-[var(--color-ink-100)] px-2 text-[11px] font-semibold text-[var(--color-ink-700)]"
             >
               {t}
             </li>

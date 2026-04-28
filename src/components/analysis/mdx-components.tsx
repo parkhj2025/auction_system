@@ -199,7 +199,7 @@ function Strong({ children, ...rest }: ComponentPropsWithoutRef<"strong">) {
 function Em({ children, ...rest }: ComponentPropsWithoutRef<"em">) {
   return (
     <em
-      className="font-medium italic text-[var(--color-ink-900)]"
+      className="font-semibold italic text-[var(--color-ink-900)]"
       {...rest}
     >
       {children}
@@ -270,7 +270,7 @@ function Td({ children, ...rest }: ComponentPropsWithoutRef<"td">) {
     <td
       className={`border-b border-[var(--color-border)] px-2 py-2 align-top text-[10px] leading-relaxed md:px-4 md:py-3 md:text-[length:var(--text-body-sm)] md:leading-6 ${
         isNumber
-          ? "font-medium tabular-nums text-[var(--color-ink-900)]"
+          ? "font-semibold tabular-nums text-[var(--color-ink-900)]"
           : "text-[var(--color-ink-700)] break-words"
       } ${align.cls}`}
       {...rest}
@@ -284,7 +284,7 @@ function detectTdAlign(text: string): { kind: "text" | "number" | "tag"; cls: st
   if (!text) return { kind: "text", cls: "" };
   // 회차 ("1차"·"2차") → center (desktop only)
   if (/^\d+차$/.test(text)) {
-    return { kind: "tag", cls: "md:text-center md:whitespace-nowrap font-medium" };
+    return { kind: "tag", cls: "md:text-center md:whitespace-nowrap font-semibold" };
   }
   // 날짜 (yyyy-mm-dd) → center
   if (/^\d{4}-\d{2}(-\d{2})?$/.test(text)) {
@@ -322,7 +322,7 @@ function Blockquote({
 }: ComponentPropsWithoutRef<"blockquote">) {
   return (
     <blockquote
-      className="mt-6 border-l-4 border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/60 px-5 py-4 text-base leading-7 text-[var(--color-ink-700)]"
+      className="mt-6 border-l-4 border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/60 px-5 py-4 text-[length:var(--text-body)] leading-7 text-[var(--color-ink-700)]"
       {...rest}
     >
       {children}
@@ -402,7 +402,7 @@ function ConclusionCallout({ children }: { children?: ReactNode }) {
       <span className="inline-flex items-center rounded-[var(--radius-xs)] bg-[var(--color-ink-900)] px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.18em] text-white">
         결론
       </span>
-      <div className="mt-2 [&>p]:!mt-0 [&>p]:text-[var(--color-ink-900)] [&>p]:font-medium">
+      <div className="mt-2 [&>p]:!mt-0 [&>p]:text-[var(--color-ink-900)] [&>p]:font-semibold">
         {children}
       </div>
     </div>

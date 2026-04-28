@@ -76,7 +76,7 @@ export function Pricing() {
           >
             결과가 아닌 신청 시점으로 가격이 정해집니다
           </h2>
-          <p className="mt-3 text-base leading-7 text-[var(--color-ink-500)]">
+          <p className="mt-3 text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
             기본 수수료는 선납이지만, 패찰 시 보증금은{" "}
             <strong className="text-[var(--color-ink-900)]">당일 즉시 반환</strong>
             됩니다. 낙찰 성공보수는 낙찰된 경우에만 청구합니다.
@@ -147,7 +147,7 @@ export function Pricing() {
               <ShieldCheck size={22} aria-hidden="true" />
             </span>
             <div>
-              <p className="text-base font-bold text-[var(--color-ink-900)]">
+              <p className="text-[length:var(--text-body)] font-bold text-[var(--color-ink-900)]">
                 낙찰 성공보수{" "}
                 <span className="text-[var(--color-ink-900)]">
                   +{feeLabel(FEES.successBonus)}

@@ -261,7 +261,7 @@ export function Step1Property({
               id="step1-court"
               value={data.court}
               onChange={(e) => onChange({ court: e.target.value })}
-              className="h-12 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-ink-900)]"
+              className="h-12 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-3 text-sm font-semibold text-[var(--color-ink-900)]"
             >
               {regionGroups.map((group) => (
                 <optgroup key={group.region} label={group.region}>
@@ -296,7 +296,7 @@ export function Step1Property({
                   }
                 }}
                 onBlur={() => void triggerLookup()}
-                className="h-12 flex-1 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-base tabular-nums text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]"
+                className="h-12 flex-1 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-[length:var(--text-body)] tabular-nums text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]"
               />
               <button
                 type="button"
@@ -497,7 +497,7 @@ export function Step1Property({
                   auctionRound: 1,
                 })
               }
-              className="mt-2 ml-3 text-xs font-medium text-[var(--color-ink-500)] underline underline-offset-2 hover:text-[var(--color-ink-700)]"
+              className="mt-2 ml-3 text-xs font-semibold text-[var(--color-ink-500)] underline underline-offset-2 hover:text-[var(--color-ink-700)]"
             >
               다른 물건 선택
             </button>

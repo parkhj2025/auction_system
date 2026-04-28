@@ -57,7 +57,7 @@ export default async function GuideListPage({
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
             입문부터 실전까지 단계별로
           </h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-[var(--color-ink-500)]">
+          <p className="mt-3 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
             경매의 기본 개념부터 권리분석, 시세 산정, 입찰가 결정, 명도
             절차까지. 난이도에 맞춰 필요한 글을 골라 읽으세요.
           </p>
@@ -81,7 +81,7 @@ export default async function GuideListPage({
                     "inline-flex h-10 min-w-[56px] items-center justify-center rounded-full border px-4 text-sm font-bold transition",
                     isActive
                       ? "border-[var(--color-ink-900)] bg-[var(--color-ink-900)] text-white"
-                      : "border-[var(--color-border)] bg-white text-[var(--color-ink-700)] hover:border-[var(--color-ink-300)] hover:text-black"
+                      : "border-[var(--color-border)] bg-white text-[var(--color-ink-700)] hover:border-[var(--color-ink-200)] hover:text-black"
                   )}
                 >
                   {chip.label}
@@ -93,7 +93,7 @@ export default async function GuideListPage({
       </section>
 
       <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <p className="text-sm font-medium text-[var(--color-ink-500)]">
+        <p className="text-sm font-semibold text-[var(--color-ink-500)]">
           총{" "}
           <strong className="tabular-nums text-[var(--color-ink-900)]">
             {filtered.length}

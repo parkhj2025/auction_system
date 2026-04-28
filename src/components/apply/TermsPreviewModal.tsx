@@ -49,7 +49,7 @@ export function TermsPreviewModal({ isOpen, onClose }: Props) {
         <div className="flex items-center justify-between border-b border-[var(--color-border)] px-6 py-4">
           <h2
             id="terms-preview-title"
-            className="text-base font-black text-[var(--color-ink-900)]"
+            className="text-[length:var(--text-body)] font-black text-[var(--color-ink-900)]"
           >
             서비스 이용약관
           </h2>

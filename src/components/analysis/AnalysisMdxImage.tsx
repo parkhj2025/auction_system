@@ -31,7 +31,7 @@ export function AnalysisMdxImage({
         className={`mt-8 flex aspect-[16/9] w-full items-center justify-center rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-gradient-to-br ${PLACEHOLDER_GRADIENT}`}
       >
         <span className="flex flex-col items-center text-[var(--color-ink-700)]">
-          <span className="max-w-xs px-4 text-center text-sm font-medium text-[var(--color-ink-700)]">
+          <span className="max-w-xs px-4 text-center text-sm font-semibold text-[var(--color-ink-700)]">
             {alt || "이미지 준비 중"}
           </span>
         </span>

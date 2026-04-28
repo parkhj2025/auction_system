@@ -70,7 +70,7 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
         {/* Breadcrumb (Hero 카드 외) */}
         <nav
           aria-label="Breadcrumb"
-          className="flex items-center gap-1 text-[length:var(--text-caption)] font-medium text-[var(--color-ink-500)]"
+          className="flex items-center gap-1 text-[length:var(--text-caption)] font-semibold text-[var(--color-ink-500)]"
         >
           <Link href="/" className="hover:text-[var(--color-ink-900)]">
             홈
@@ -91,7 +91,7 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
             {fm.tags.slice(0, 7).map((t) => (
               <span
                 key={t}
-                className="inline-flex h-6 items-center rounded-[var(--radius-xs)] bg-[var(--color-ink-100)] px-2 text-[length:var(--text-caption)] font-medium text-[var(--color-ink-700)]"
+                className="inline-flex h-6 items-center rounded-[var(--radius-xs)] bg-[var(--color-ink-100)] px-2 text-[length:var(--text-caption)] font-semibold text-[var(--color-ink-700)]"
               >
                 {t}
               </span>
@@ -127,7 +127,7 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
                 </h1>
                 {/* 서브타이틀 — body-sm 14 / 400 / ink-500 */}
                 <p className="mt-3 flex flex-wrap items-center gap-x-2 gap-y-1 text-[length:var(--text-body-sm)] text-[var(--color-ink-500)]">
-                  <span className="font-medium text-[var(--color-ink-700)]">
+                  <span className="font-semibold text-[var(--color-ink-700)]">
                     {fm.court}
                     {fm.courtDivision ? ` ${fm.courtDivision}` : ""}
                   </span>
@@ -140,7 +140,7 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
 
               {/* 가격 영역 (border-t) */}
               <div className="mt-6 border-t border-[var(--color-ink-200)] pt-6">
-                <p className="text-[length:var(--text-caption)] font-medium uppercase tracking-[0.18em] text-[var(--color-ink-500)]">
+                <p className="text-[length:var(--text-caption)] font-semibold uppercase tracking-[0.18em] text-[var(--color-ink-500)]">
                   {fm.round}차 최저가
                 </p>
                 <div className="mt-2 flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -148,8 +148,8 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
                   <p className="text-[28px] font-semibold leading-[var(--lh-tight)] tabular-nums tracking-tight text-[var(--color-ink-900)] sm:text-[32px]">
                     {fm.minPriceDisplay ?? formatKoreanWon(fm.minPrice)}
                   </p>
-                  {/* 룰 24-D 1 accent only — brand-300/70 칩 보존 */}
-                  <span className="rounded-[var(--radius-xs)] bg-[var(--color-brand-300)]/70 px-2 py-0.5 text-[length:var(--text-caption)] font-semibold tabular-nums text-[var(--color-ink-900)]">
+                  {/* 룰 24-D 1 accent only — Action Blue 칩 (sub-phase 8.1: brand-300/70 → action 전환, AA 본질 보존) */}
+                  <span className="rounded-[var(--radius-xs)] bg-[var(--color-action)] px-2 py-0.5 text-[length:var(--text-caption)] font-semibold tabular-nums text-white">
                     감정가의 {fm.percent}%
                   </span>
                 </div>
@@ -304,7 +304,7 @@ function PhotoCluster({
                 />
                 {isLastWithOverflow ? (
                   <span className="absolute inset-0 flex items-center justify-center bg-[var(--color-ink-900)]/50">
-                    <span className="text-[length:var(--text-caption)] font-medium text-[var(--color-ink-50)]">
+                    <span className="text-[length:var(--text-caption)] font-semibold text-[var(--color-ink-50)]">
                       +{overflow}
                     </span>
                   </span>
@@ -332,7 +332,7 @@ function Stat({
   return (
     <div className="flex flex-col gap-1 bg-white p-4 text-[var(--color-ink-900)] sm:p-5">
       {/* 룰 28 — caption 12 / 500 letter-0.05em / ink-500 uppercase */}
-      <dt className="flex items-center gap-1.5 text-[length:var(--text-caption)] font-medium uppercase tracking-[0.05em] text-[var(--color-ink-500)]">
+      <dt className="flex items-center gap-1.5 text-[length:var(--text-caption)] font-semibold uppercase tracking-[0.05em] text-[var(--color-ink-500)]">
         {icon}
         {label}
       </dt>
@@ -341,7 +341,7 @@ function Stat({
         {value}
       </dd>
       {/* 룰 28 — caption 12 / 500 / ink-500 */}
-      <dd className="text-[length:var(--text-caption)] font-medium tabular-nums text-[var(--color-ink-500)]">
+      <dd className="text-[length:var(--text-caption)] font-semibold tabular-nums text-[var(--color-ink-500)]">
         {sub}
       </dd>
     </div>

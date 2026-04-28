@@ -32,7 +32,7 @@ export function ContentCard({
           {eyebrow}
         </span>
         {meta && (
-          <span className="text-[11px] font-medium text-[var(--color-ink-500)]">
+          <span className="text-[11px] font-semibold text-[var(--color-ink-500)]">
             {meta}
           </span>
         )}
@@ -58,7 +58,7 @@ export function ContentCard({
           {tags.slice(0, 4).map((t) => (
             <li
               key={t}
-              className="inline-flex h-6 items-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-2 text-[11px] font-medium text-[var(--color-ink-700)]"
+              className="inline-flex h-6 items-center rounded-full border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-2 text-[11px] font-semibold text-[var(--color-ink-700)]"
             >
               #{t}
             </li>
@@ -67,7 +67,7 @@ export function ContentCard({
       )}
 
       <div className="mt-auto flex items-center justify-between gap-2 pt-6">
-        <p className="text-xs font-medium text-[var(--color-ink-500)] tabular-nums">
+        <p className="text-xs font-semibold text-[var(--color-ink-500)] tabular-nums">
           {formatKoreanDate(date)}
         </p>
         <span

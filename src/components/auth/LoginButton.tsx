@@ -35,7 +35,7 @@ export function LoginButton({ redirect }: { redirect?: string }) {
         type="button"
         onClick={handleLogin}
         disabled={loading}
-        className="flex min-h-12 w-full items-center justify-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-6 py-3 text-base font-bold text-[var(--color-ink-900)] shadow-sm transition hover:bg-[var(--color-ink-100)] disabled:cursor-not-allowed disabled:opacity-60"
+        className="flex min-h-12 w-full items-center justify-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-6 py-3 text-[length:var(--text-body)] font-bold text-[var(--color-ink-900)] shadow-sm transition hover:bg-[var(--color-ink-100)] disabled:cursor-not-allowed disabled:opacity-60"
       >
         <GoogleLogo />
         <span>{loading ? "로그인 진행 중..." : "Google로 계속하기"}</span>

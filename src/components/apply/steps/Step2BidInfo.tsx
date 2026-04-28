@@ -112,7 +112,7 @@ export function Step2BidInfo({
   }
 
   function inputClass(key: string) {
-    return `h-12 w-full rounded-[var(--radius-md)] border bg-white px-4 text-base text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] ${
+    return `h-12 w-full rounded-[var(--radius-md)] border bg-white px-4 text-[length:var(--text-body)] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] ${
       errors[key]
         ? "border-[var(--color-accent-red)]"
         : "border-[var(--color-border)]"

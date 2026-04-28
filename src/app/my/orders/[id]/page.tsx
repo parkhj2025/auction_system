@@ -77,7 +77,7 @@ export default async function OrderDetailPage({
     <section className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
       <nav
         aria-label="Breadcrumb"
-        className="flex items-center gap-1 text-xs font-medium text-[var(--color-ink-500)]"
+        className="flex items-center gap-1 text-xs font-semibold text-[var(--color-ink-500)]"
       >
         <Link href="/my" className="hover:text-[var(--color-ink-900)]">
           마이페이지

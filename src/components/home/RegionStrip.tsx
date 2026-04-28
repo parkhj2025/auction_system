@@ -22,10 +22,10 @@ export function RegionStrip() {
               <span className="inline-flex h-9 items-center gap-1.5 rounded-full bg-[var(--color-ink-900)] px-4 text-sm font-bold text-white">
                 <span
                   aria-hidden="true"
-                  className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent-yellow)]"
+                  className="h-1.5 w-1.5 rounded-full bg-white"
                 />
                 {c.label}
-                <span className="ml-1 text-xs font-medium text-white/85">
+                <span className="ml-1 text-xs font-semibold text-white/85">
                   서비스 중
                 </span>
               </span>
@@ -34,9 +34,9 @@ export function RegionStrip() {
 
           {COURTS_COMING_SOON.map((c) => (
             <li key={c.value}>
-              <span className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-white px-4 text-sm font-medium text-[var(--color-ink-700)]">
+              <span className="inline-flex h-9 items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-white px-4 text-sm font-semibold text-[var(--color-ink-700)]">
                 {c.label}
-                <span className="ml-1 inline-flex h-5 items-center rounded-full bg-[var(--color-accent-yellow-soft)] px-2 text-[10px] font-bold text-[var(--color-ink-900)]">
+                <span className="ml-1 inline-flex h-5 items-center rounded-full bg-[var(--color-ink-100)] px-2 text-[10px] font-bold text-[var(--color-ink-900)]">
                   오픈 예정
                 </span>
               </span>

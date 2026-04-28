@@ -22,7 +22,7 @@ export default function AdminLayout({
           </div>
           <nav
             aria-label="Breadcrumb"
-            className="mt-3 flex items-center gap-1 text-xs font-medium text-[var(--color-ink-500)]"
+            className="mt-3 flex items-center gap-1 text-xs font-semibold text-[var(--color-ink-500)]"
           >
             <Link href="/admin" className="hover:text-[var(--color-ink-900)]">
               대시보드

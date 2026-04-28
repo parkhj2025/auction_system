@@ -61,7 +61,7 @@ export function ScenarioCardsBoard({ inv }: { inv: InvestmentMeta }) {
                   >
                     <Icon size={14} />
                   </span>
-                  <p className="text-base font-black tracking-tight text-[var(--color-ink-900)] sm:text-lg">
+                  <p className="text-[length:var(--text-body)] font-black tracking-tight text-[var(--color-ink-900)] sm:text-lg">
                     {c.name}
                   </p>
                 </div>

@@ -117,7 +117,7 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
                   onClick={() => setOpen(false)}
                   className="flex min-h-12 flex-col justify-center rounded-[var(--radius-md)] px-4 py-2 hover:bg-[var(--color-ink-100)]"
                 >
-                  <span className="text-base font-bold text-[var(--color-ink-900)]">
+                  <span className="text-[length:var(--text-body)] font-bold text-[var(--color-ink-900)]">
                     {item.label}
                   </span>
                   {item.description && (
@@ -132,7 +132,7 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
           <Link
             href={PRIMARY_CTA.href}
             onClick={() => setOpen(false)}
-            className="mt-3 flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-4 text-base font-bold text-white hover:bg-black"
+            className="mt-3 flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-4 text-[length:var(--text-body)] font-bold text-white hover:bg-black"
           >
             {PRIMARY_CTA.label}
           </Link>
@@ -160,7 +160,7 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
             <Link
               href="/login"
               onClick={() => setOpen(false)}
-              className="mt-3 flex min-h-12 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 text-base font-bold text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)]"
+              className="mt-3 flex min-h-12 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] px-4 text-[length:var(--text-body)] font-bold text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)]"
             >
               로그인
             </Link>

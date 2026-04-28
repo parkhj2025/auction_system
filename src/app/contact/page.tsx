@@ -27,7 +27,7 @@ export default function ContactPage() {
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
             어떻게 도와드릴까요
           </h1>
-          <p className="mt-3 max-w-2xl text-base leading-7 text-[var(--color-ink-500)]">
+          <p className="mt-3 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
             서비스 이용 전 궁금한 점, 접수 후 확인·변경 요청 등 모든 문의를
             받습니다. 가장 빠른 경로는 접수 페이지입니다.
           </p>
@@ -87,7 +87,7 @@ export default function ContactPage() {
               href={COMPANY.kakaoChannelUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-accent-yellow)] px-5 text-sm font-black text-[var(--color-ink-900)] hover:brightness-95"
+              className="mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-kakao)] px-5 text-sm font-black text-[var(--color-ink-900)] hover:brightness-95"
             >
               카카오톡 채널 열기
               <ArrowRight size={14} aria-hidden="true" />

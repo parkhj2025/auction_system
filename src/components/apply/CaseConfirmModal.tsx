@@ -152,7 +152,7 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
           />
           <h2
             id="case-confirm-modal-title"
-            className="text-base font-black text-[var(--color-ink-900)]"
+            className="text-[length:var(--text-body)] font-black text-[var(--color-ink-900)]"
           >
             사건 정보 입력
           </h2>

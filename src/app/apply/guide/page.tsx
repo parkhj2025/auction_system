@@ -73,7 +73,7 @@ export default function ApplyGuidePage() {
         <div className="mx-auto w-full max-w-4xl px-4 py-14 sm:px-6 sm:py-16">
           <nav
             aria-label="Breadcrumb"
-            className="flex items-center gap-1 text-xs font-medium text-[var(--color-ink-500)]"
+            className="flex items-center gap-1 text-xs font-semibold text-[var(--color-ink-500)]"
           >
             <Link href="/" className="hover:text-[var(--color-ink-900)]">
               홈
@@ -94,7 +94,7 @@ export default function ApplyGuidePage() {
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
             처음이시라도 5분이면 끝납니다
           </h1>
-          <p className="mt-3 text-base leading-7 text-[var(--color-ink-500)]">
+          <p className="mt-3 text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
             각 단계별로 무엇이 필요한지, 어떤 점을 주의해야 하는지 먼저
             확인하신 후 신청 페이지로 이동하세요.
           </p>
@@ -162,7 +162,7 @@ export default function ApplyGuidePage() {
                 key={item.q}
                 className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-5"
               >
-                <dt className="text-base font-black text-[var(--color-ink-900)]">
+                <dt className="text-[length:var(--text-body)] font-black text-[var(--color-ink-900)]">
                   {item.q}
                 </dt>
                 <dd className="mt-2 text-sm leading-6 text-[var(--color-ink-700)]">

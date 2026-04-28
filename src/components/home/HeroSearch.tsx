@@ -134,13 +134,13 @@ export function HeroSearch() {
       />
 
       <div className="relative mx-auto w-full max-w-6xl px-4 pb-16 pt-16 sm:px-6 sm:pb-20 sm:pt-20">
-        <p className="text-sm font-medium tracking-wide text-white/85">
+        <p className="text-sm font-semibold tracking-wide text-white/85">
           법원 안 가는 부동산 경매 입찰 대리
         </p>
         <h1 className="mt-3 text-4xl font-black leading-[1.15] tracking-tight sm:text-5xl">
           입찰은 맡기고,
           <br className="sm:hidden" /> 얼리버드{" "}
-          <span className="text-[var(--color-accent-yellow)]">
+          <span className="text-white">
             {(FEES.earlybird / 10000).toLocaleString("ko-KR")}만원
           </span>
           부터
@@ -202,7 +202,7 @@ export function HeroSearch() {
                   id="hero-court"
                   value={court}
                   onChange={(e) => setCourt(e.target.value)}
-                  className="h-12 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-3 text-sm font-medium text-[var(--color-ink-900)] sm:w-48"
+                  className="h-12 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-3 text-sm font-semibold text-[var(--color-ink-900)] sm:w-48"
                 >
                   <optgroup label="서비스 중">
                     {COURTS_ACTIVE.map((c) => (
@@ -237,7 +237,7 @@ export function HeroSearch() {
                       if (suggestions.length > 0) setShowDropdown(true);
                     }}
                     onKeyDown={handleKeyDown}
-                    className="h-12 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-base text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]"
+                    className="h-12 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-[length:var(--text-body)] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]"
                   />
 
                   {/* Typeahead 드롭다운 — 결과 있거나 검색 중일 때만 노출.
@@ -263,7 +263,7 @@ export function HeroSearch() {
                               >
                                 <span className="text-sm font-bold text-[var(--color-ink-900)]">
                                   {item.case_number}
-                                  <span className="ml-2 text-xs font-medium text-[var(--color-ink-500)]">
+                                  <span className="ml-2 text-xs font-semibold text-[var(--color-ink-500)]">
                                     {item.court_name}
                                   </span>
                                 </span>
@@ -298,14 +298,14 @@ export function HeroSearch() {
                   placeholder="예: 인천 미추홀구 주안동 · 덕산하이츠"
                   value={keyword}
                   onChange={(e) => setKeyword(e.target.value)}
-                  className="h-12 flex-1 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-base text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]"
+                  className="h-12 flex-1 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-[length:var(--text-body)] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]"
                 />
               </>
             )}
 
             <button
               type="submit"
-              className="flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-6 text-base font-bold text-white shadow-[var(--shadow-card)] transition hover:bg-black"
+              className="flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-6 text-[length:var(--text-body)] font-bold text-white shadow-[var(--shadow-card)] transition hover:bg-black"
             >
               <Search size={18} aria-hidden="true" />
               찾아보기

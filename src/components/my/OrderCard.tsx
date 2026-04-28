@@ -40,7 +40,7 @@ export function OrderCard({ order }: { order: OrderRow }) {
           <p className="mt-2 text-xs font-bold text-[var(--color-ink-700)]">
             {order.court}
           </p>
-          <h3 className="mt-0.5 truncate font-mono text-base font-black tabular-nums text-[var(--color-ink-900)] sm:text-lg">
+          <h3 className="mt-0.5 truncate font-mono text-[length:var(--text-body)] font-black tabular-nums text-[var(--color-ink-900)] sm:text-lg">
             {order.case_number}
           </h3>
         </div>

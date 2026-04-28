@@ -51,7 +51,7 @@ export function FlowSteps() {
           >
             3단계로 끝나는 입찰 대리
           </h2>
-          <p className="mt-3 text-base leading-7 text-[var(--color-ink-500)]">
+          <p className="mt-3 text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
             별도로 법원을 방문하실 필요가 없습니다.
           </p>
         </div>

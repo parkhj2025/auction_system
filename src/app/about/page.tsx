@@ -44,7 +44,7 @@ export default function AboutPage() {
           <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
             법원 안 가고, 경매에 참여할 수 있게
           </h1>
-          <p className="mt-4 max-w-2xl text-base leading-7 text-[var(--color-ink-500)] sm:text-lg sm:leading-8">
+          <p className="mt-4 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)] sm:text-lg sm:leading-8">
             경매는 시세보다 저렴하게 부동산을 취득할 수 있는 합리적인 시스템입니다.
             그런데 입찰일에 법원에 직접 가야 한다는 물리적 제약이 대부분의 참여를
             막습니다. 이 불편을 합리적인 가격으로 해결하는 것이 {BRAND_NAME}의 일입니다.
@@ -154,10 +154,10 @@ export default function AboutPage() {
                 <span className="inline-flex h-10 items-center gap-2 rounded-full bg-[var(--color-ink-900)] px-5 text-sm font-bold text-white">
                   <span
                     aria-hidden="true"
-                    className="h-1.5 w-1.5 rounded-full bg-[var(--color-accent-yellow)]"
+                    className="h-1.5 w-1.5 rounded-full bg-white"
                   />
                   {c.label}
-                  <span className="text-xs font-medium text-white/85">
+                  <span className="text-xs font-semibold text-white/85">
                     서비스 중
                   </span>
                 </span>
@@ -165,9 +165,9 @@ export default function AboutPage() {
             ))}
             {COURTS_COMING_SOON.map((c) => (
               <li key={c.value}>
-                <span className="inline-flex h-10 items-center gap-2 rounded-full border border-[var(--color-border)] bg-white px-5 text-sm font-medium text-[var(--color-ink-700)]">
+                <span className="inline-flex h-10 items-center gap-2 rounded-full border border-[var(--color-border)] bg-white px-5 text-sm font-semibold text-[var(--color-ink-700)]">
                   {c.label}
-                  <span className="inline-flex h-5 items-center rounded-full bg-[var(--color-accent-yellow-soft)] px-2 text-[10px] font-bold text-[var(--color-ink-900)]">
+                  <span className="inline-flex h-5 items-center rounded-full bg-[var(--color-ink-100)] px-2 text-[10px] font-bold text-[var(--color-ink-900)]">
                     오픈 예정
                   </span>
                 </span>
@@ -184,7 +184,7 @@ export default function AboutPage() {
             <h2 className="text-2xl font-black leading-tight tracking-tight sm:text-3xl">
               준비된 대리인에게 맡기세요
             </h2>
-            <p className="mt-3 text-sm leading-6 text-white/85 sm:text-base">
+            <p className="mt-3 text-sm leading-6 text-white/85 sm:text-[length:var(--text-body)]">
               패찰 시 보증금은 당일 즉시 반환됩니다. 결과와 무관하게 투명합니다.
             </p>
           </div>
