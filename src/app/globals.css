@@ -237,6 +237,11 @@
   --sidebar-ring:  oklch(0.708 0 0);
 }
 
+/* 룰 32 (단계 5-4-3): 브라우저 일관성 — Pretendard Variable + font-feature-settings + smoothing.
+ * Chrome / Safari 17+ macOS·iOS / 삼성 / Firefox 폰트·구조 동일성.
+ * font-feature-settings: ss01~ss11 = Pretendard stylistic sets (한글 자형 정합). kern 1 = 커닝.
+ * letter-spacing: -0.02em = 한글 영역 시각 정합 (본문 자연 상속).
+ * text-size-adjust 100% = un-prefix (Firefox·Edge) + -webkit- (Safari·Chrome) 양립. */
 html,
 body {
   background: var(--color-background);
@@ -245,7 +250,10 @@ body {
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
+  font-feature-settings: "ss01", "ss02", "ss03", "ss04", "ss05", "ss06", "ss07", "ss08", "ss09", "ss10", "ss11", "kern" 1;
+  letter-spacing: -0.02em;
   -webkit-text-size-adjust: 100%;
+  text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
 }
 
