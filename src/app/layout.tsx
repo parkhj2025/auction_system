@@ -7,9 +7,10 @@ import { createClient } from "@/lib/supabase/server";
 import type { UserMenuProps } from "@/components/auth/UserMenu";
 import { BRAND_NAME } from "@/lib/constants";
 
-/* Phase 0: 폰트 단일화 (Pretendard Variable / jsdelivr CDN @import in globals.css).
+/* Phase 0.1: 폰트 단일화 (Pretendard Variable / jsdelivr CDN <link rel="stylesheet">).
+ * globals.css @import 방식은 사파리에서 폰트 로드 실패 → <head> link 태그 단일 본질 회복.
  * 기존 Noto Sans KR + JetBrains Mono 패키지 import 폐기.
- * Noto Sans KR fallback 이름은 globals.css --font-sans chain 에 보존 (시스템 설치 시 안전망). */
+ * fallback chain 은 globals.css --font-sans 에 보존 (Apple SD Gothic Neo / Malgun Gothic / system-ui). */
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -70,10 +71,19 @@ export default async function RootLayout({
         />
         <link
           rel="preload"
+          as="style"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
+        />
+        <link
+          rel="preload"
           href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/PretendardVariable.woff2"
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"
+        />
+        <link
+          rel="stylesheet"
+          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
         />
       </head>
       <body className="flex min-h-full flex-col bg-white pb-[calc(5rem+env(safe-area-inset-bottom))] text-[var(--color-ink-900)] md:pb-0">
