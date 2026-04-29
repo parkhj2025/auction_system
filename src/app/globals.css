@@ -1,13 +1,23 @@
-/* Phase 0.2: Pretendard Variable self-host (jsdelivr CDN 폐기).
- * 사파리에서 jsdelivr stylesheet preload+link 4건 모두 로드 실패 → 명조 fallback 회귀.
- * 본질 = public/fonts/PretendardVariable.woff2 단일 자산 + @font-face 정의. CDN 의존 0. */
+/* Phase 0.3: 사파리 폰트 본질 최종 해결 (font-weight 표준화 + format 단일화 + @supports 분기).
+ * Phase 0.2 NG 본질 = font-weight: 45 920 비표준 범위 (사파리 거절) + format("woff2-variations") + format("woff2") fall-through.
+ * 본 변경 = font-weight: 100 900 표준 + format 단일 + variations 미지원 환경 @supports not 분기 fallback. */
 @font-face {
   font-family: "Pretendard Variable";
-  font-weight: 45 920;
+  font-weight: 100 900;
   font-style: normal;
   font-display: swap;
-  src: url("/fonts/PretendardVariable.woff2") format("woff2-variations"),
-       url("/fonts/PretendardVariable.woff2") format("woff2");
+  src: url("/fonts/PretendardVariable.woff2") format("woff2-variations");
+}
+
+/* font-variation-settings 미지원 환경 (구형 브라우저) fallback — 단일 weight 400 본질. */
+@supports not (font-variation-settings: normal) {
+  @font-face {
+    font-family: "Pretendard Variable";
+    font-weight: 400;
+    font-style: normal;
+    font-display: swap;
+    src: url("/fonts/PretendardVariable.woff2") format("woff2");
+  }
 }
 
 @import "tailwindcss";
@@ -344,7 +354,8 @@ html,
 body {
   background: var(--color-background);
   color: var(--color-foreground);
-  font-family: var(--font-sans);
+  /* Phase 0.3: font-family 직접 명시 (Tailwind v4 cascade 우선순위 회귀 방지). var(--font-sans)는 토큰 참조용 보존. */
+  font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
