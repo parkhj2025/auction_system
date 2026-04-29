@@ -70,20 +70,20 @@ export function WhySection() {
   return (
     <section
       aria-labelledby="why-heading"
-      className="bg-[var(--soft-stone)]"
+      className="border-t border-[var(--color-border)] bg-white"
     >
-      <div className="mx-auto w-full max-w-[var(--container-w)] px-4 py-24 sm:px-6 sm:py-32">
+      <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
         <div className="max-w-2xl">
-          <p className="seq text-[var(--deep-green)]">
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-900)]">
             왜 {BRAND_NAME}인가
           </p>
           <h2
             id="why-heading"
-            className="mt-6 text-[length:var(--fs-h1)] font-bold leading-[1.1] tracking-[-0.018em] text-[var(--color-ink-900)]"
+            className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl"
           >
             직접 가는 대신, 맡기고 결과만 받으세요
           </h2>
-          <p className="mt-6 text-[length:var(--fs-lead)] leading-[1.5] text-[var(--color-ink-700)]">
+          <p className="mt-3 text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
             경매는 좋은 가격에 부동산을 취득할 수 있는 합리적 시스템입니다.
             물리적 제약만 해결되면, 누구나 참여할 수 있습니다.
           </p>

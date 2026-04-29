@@ -38,20 +38,20 @@ export function FlowSteps() {
   return (
     <section
       aria-labelledby="flow-heading"
-      className="bg-white"
+      className="border-t border-[var(--color-border)] bg-white"
     >
-      <div className="mx-auto w-full max-w-[var(--container-w)] px-4 py-24 sm:px-6 sm:py-32">
+      <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
         <div className="max-w-2xl">
-          <p className="seq text-[var(--deep-green)]">
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-900)]">
             이용 절차
           </p>
           <h2
             id="flow-heading"
-            className="mt-6 text-[length:var(--fs-h1)] font-bold leading-[1.1] tracking-[-0.018em] text-[var(--color-ink-900)]"
+            className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl"
           >
             3단계로 끝나는 입찰 대리
           </h2>
-          <p className="mt-6 text-[length:var(--fs-lead)] leading-[1.5] text-[var(--color-ink-700)]">
+          <p className="mt-3 text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
             별도로 법원을 방문하실 필요가 없습니다.
           </p>
         </div>
@@ -61,7 +61,7 @@ export function FlowSteps() {
           {STEPS.map((step, i) => (
             <Fragment key={step.n}>
               <li className="flex flex-col">
-                <div className="flex h-12 w-12 items-center justify-center rounded-[var(--r-pill)] bg-[var(--deep-green)] text-lg font-bold text-white">
+                <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-lg font-black text-white">
                   {step.n}
                 </div>
                 <h3 className="mt-6 text-xl font-black tracking-tight text-[var(--color-ink-900)]">
@@ -94,7 +94,7 @@ export function FlowSteps() {
             <li key={step.n} className="flex flex-col">
               <div className="flex gap-5">
                 <div className="flex flex-col items-center">
-                  <div className="flex h-12 w-12 items-center justify-center rounded-[var(--r-pill)] bg-[var(--deep-green)] text-lg font-bold text-white">
+                  <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-lg font-black text-white">
                     {step.n}
                   </div>
                   {i < STEPS.length - 1 && (
