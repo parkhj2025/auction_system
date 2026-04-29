@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Sans_KR } from "next/font/google";
+import { Noto_Sans_KR, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { TopNav } from "@/components/layout/TopNav";
 import { Footer } from "@/components/layout/Footer";
@@ -12,6 +12,15 @@ const notoSansKr = Noto_Sans_KR({
   variable: "--font-noto-kr",
   subsets: ["latin"],
   weight: ["400", "500", "700", "900"],
+  display: "swap",
+});
+
+/* sub-phase 8.2 신규 — JetBrains Mono (mono label / sequence label / number 영역).
+ * 한글 영역 자동 영역 Pretendard fallback (--font-mono chain 본질). */
+const jetbrainsMono = JetBrains_Mono({
+  variable: "--font-jetbrains-mono",
+  subsets: ["latin"],
+  weight: ["400", "500"],
   display: "swap",
 });
 
@@ -65,7 +74,7 @@ export default async function RootLayout({
   const navUser = await getUserForNav();
 
   return (
-    <html lang="ko" className={`${notoSansKr.variable} h-full`}>
+    <html lang="ko" className={`${notoSansKr.variable} ${jetbrainsMono.variable} h-full`}>
       <head>
         {/* 룰 32 (단계 5-4-3): 브라우저 일관성 — Pretendard Variable @v1.3.9 + dynamic-subset.
          * preload URL = woff2/ 디렉토리 제거 + v 접두사 명시.

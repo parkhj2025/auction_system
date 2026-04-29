@@ -39,10 +39,22 @@
 @theme {
   /* ─── 1. 컬러 ──────────────────────────────────────────────────── */
 
-  /* 1-1. Action Blue 단일 토큰 (sub-phase 8.1 — brand-* 11단계 폐기 후 1 accent only 본질 강화).
-   * 룰 24-D 1 accent only 영역 = action 단독.
-   * 사용 영역: DetailHero · HoverableDropRateBar 칩 (drop-rate "−X%" 영역). */
-  --color-action: #0066cc;
+  /* 1-1. Cohere-anchored 디자인 시스템 (sub-phase 8.2 신규).
+   * 메인 accent = Deep Green / 편집 영역 = Coral · Action Blue.
+   * sub-phase 8.1 --color-action (#0066cc) → var(--deep-green) alias 본질 (back-compat). */
+  --deep-green: #003c33;            /* 메인 accent (Cohere 본질) */
+  --deep-green-2: #0a5a4d;          /* hover / 강조 variant */
+  --deep-green-tint: #edfce9;       /* soft 배경 */
+  --deep-green-line: #b8d4cb;       /* 보더 / divider */
+  --coral: #ff7759;                 /* 편집 영역 accent (chip / 강조 한정) */
+  --action-blue: #1863dc;           /* 편집 link / chip 한정 (sub-phase 8.1 #0066cc → 본 토큰 영역 갱신) */
+  --soft-stone: #eeece7;            /* 영역 surface 영역 */
+  --pale-green: #edfce9;            /* deep-green-tint 동등 영역 */
+  --ink-surface: #17171c;           /* 다크 surface (Cohere 본질) */
+  --ink-surface-2: #003c33;         /* 다크 surface 영역 (deep-green 영역) */
+
+  /* 1-1-bis. sub-phase 8.1 alias (back-compat — 기존 컴포넌트 자동 영역 deep-green 영역 흡수). */
+  --color-action: var(--deep-green);
 
   /* 1-2. 중립 ink 9단계 + 표면.
    * sub-phase 8.1: 텍스트 영역 ink-300 사용 0 정합 (AA 미달 영역 원천 차단). 보더/decoration/disabled/다이어그램 영역 = 보존 (40+ 사용 영역). */
@@ -87,24 +99,39 @@
   --color-muted: var(--color-surface-muted);
   --color-muted-foreground: var(--color-ink-500);
 
-  /* ─── 2. 보더 반경 ────────────────────────────────────────────── */
+  /* ─── 2. 보더 반경 (sub-phase 8.2 — Cohere ladder 추가, sub-phase 8.1 영역 보존) ─────── */
   --radius-xs: 4px;
   --radius-sm: 6px;
   --radius-md: 10px;
   --radius-lg: 14px;
   --radius-xl: 20px;
   --radius-2xl: 28px;
+  /* Cohere ladder (sub-phase 8.2 신규) */
+  --r-1: 4px;
+  --r-2: 8px;
+  --r-3: 16px;
+  --r-4: 22px;
+  --r-5: 30px;
+  --r-card: 32px;
+  --r-pill: 9999px;
+  --r-full: 9999px;
 
-  /* ─── 3. 그림자 (4단계로 확장, --shadow-lift는 deprecated) ─────── */
+  /* ─── 3. 그림자 (sub-phase 8.2 — Cohere 3단계 신규, sub-phase 8.1 영역 보존). */
   --shadow-subtle: 0 1px 2px rgba(15, 23, 42, 0.04);
   --shadow-card: 0 1px 2px rgba(15, 23, 42, 0.04), 0 4px 12px rgba(15, 23, 42, 0.04);
   --shadow-elevated: 0 8px 24px rgba(15, 23, 42, 0.08), 0 2px 6px rgba(15, 23, 42, 0.04);
   --shadow-lift: 0 4px 14px rgba(15, 23, 42, 0.08);
+  /* Cohere ladder (sub-phase 8.2 신규 — flat 본질) */
+  --shadow-1: 0 1px 2px rgba(0, 0, 0, 0.04);
+  --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.06);
+  --shadow-3: 0 12px 32px rgba(0, 0, 0, 0.08);
 
   /* ─── 4. 폰트 ────────────────────────────────────────────────── */
   /* 룰 23-B (단계 5-4-2-fix-6): Safari/iOS 한글 fallback chain 강화.
    * Pretendard Variable (loaded) → Noto Sans KR (next/font loaded) → Apple SD Gothic Neo (Safari macOS/iOS 기본 한글) → system-ui (last) */
   --font-sans: "Pretendard Variable", Pretendard, var(--font-noto-kr), "Apple SD Gothic Neo", "Noto Sans KR", -apple-system, BlinkMacSystemFont, ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
+  /* sub-phase 8.2 신규 — JetBrains Mono (mono label / sequence label / number 영역). 한글 영역 자동 영역 Pretendard fallback. */
+  --font-mono: "JetBrains Mono", var(--font-jetbrains-mono), "Pretendard Variable", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 
   /* ─── 5. 타이포 스케일 (sub-phase 8.1 — Major Third 1.25 선언 정정).
    * Base 17px (Apple body 본질 흡수) · 혼합 비율 (display 64 → h1 40 = 1.6 / h1 → h2 = 1.25 / h2 → h3 = 1.33 / h3 → h4 = 1.2 / body-lg 18 → body 17 = 1.06 / body → body-sm 14 = 1.21 / body-sm → caption 12 = 1.17).
@@ -125,9 +152,21 @@
   --text-h3: 1.5rem;          /* 24px — 카드 제목 */
   --text-h4: 1.25rem;         /* 20px — STEP 카드 헤딩 + 서브헤딩 */
   --text-body-lg: 1.125rem;   /* 18px — 본문 강조 */
-  --text-body: 1.0625rem;     /* 17px — 본문 default (sub-phase 8.1 Apple body 본질 흡수) */
+  --text-body: 1rem;          /* 16px — 본문 default (sub-phase 8.2 Cohere body 본질 영역 회귀, lh 1.6) */
   --text-body-sm: 0.875rem;   /* 14px — 보조 본문 + 표 td */
   --text-caption: 0.75rem;    /* 12px — 라벨·태그·섹션 라벨 */
+
+  /* sub-phase 8.2 신규 — Cohere typography ladder (편집 영역 본질). */
+  --fs-display: 4rem;         /* 64px lh 1.0 tr -0.02em — Hero display */
+  --fs-h1: 3rem;              /* 48px tr -0.018em */
+  --fs-h2: 2rem;              /* 32px tr -0.014em */
+  --fs-h3: 1.5rem;            /* 24px */
+  --fs-h4: 1.125rem;          /* 18px */
+  --fs-lead: 1.125rem;        /* 18px lh 1.5 — Cohere lead 본질 */
+  --fs-mono: 0.875rem;        /* 14px tr 0.02em — JetBrains Mono uppercase */
+  --fs-num-xl: 2.75rem;       /* 44px tabular-nums */
+  --fs-num-lg: 1.75rem;       /* 28px tabular-nums */
+  --fs-num-md: 1.25rem;       /* 20px tabular-nums */
   /* 모바일 (<640px) — 룰 14-A mobile token */
   --text-display-mobile: 2.75rem;  /* 44px */
   --text-h1-mobile: 1.75rem;       /* 28px */
@@ -161,6 +200,24 @@
   --gap-table-head: 1rem;       /* 16px */
   --pad-card: 2rem;             /* 32px */
   --pad-card-mobile: 1.5rem;    /* 24px */
+
+  /* Cohere spacing ladder (sub-phase 8.2 신규 — 4pt grid 통일). */
+  --sp-2: 2px;
+  --sp-8: 8px;
+  --sp-12: 12px;
+  --sp-16: 16px;
+  --sp-20: 20px;
+  --sp-24: 24px;
+  --sp-32: 32px;
+  --sp-40: 40px;
+  --sp-48: 48px;
+  --sp-64: 64px;
+  --sp-80: 80px;
+
+  /* Container (sub-phase 8.2 신규 — Cohere 본질). */
+  --container-w: 1180px;
+  --container-w-narrow: 760px;
+  --gutter: 24px;
 
   /* legacy numeric-dominant alias — display 동등 (단계 5-2 호환) */
   --text-numeric: var(--text-h2);
@@ -267,6 +324,27 @@ body {
 [data-numeric="true"] {
   font-variant-numeric: tabular-nums;
   font-feature-settings: "tnum" 1;
+}
+
+/* sub-phase 8.2 신규 — Sequence label class (Cohere 본질 — "01 · 02 · 03..." 영역).
+ * JetBrains Mono 14px uppercase letter-spacing 0.06em.
+ * 본 sub-phase 영역 = class 정의 본질만. 컴포넌트 영역 적용 = sub-phase 8.3 분배 영역. */
+.seq {
+  font-family: var(--font-mono);
+  font-size: var(--fs-mono);
+  font-weight: 500;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  font-feature-settings: "tnum" 1;
+}
+
+/* sub-phase 8.2 신규 — text-wrap balance / pretty 영역 (Cohere 편집 본질).
+ * h1~h4 영역 = balance (헤드 영역 시각 정합), p 영역 = pretty (본문 영역 자연 영역 흐름). */
+h1, h2, h3, h4 {
+  text-wrap: balance;
+}
+p {
+  text-wrap: pretty;
 }
 
 /* 단계 5-2 #3: focus-visible 룰 강화.
