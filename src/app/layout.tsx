@@ -61,7 +61,7 @@ export default async function RootLayout({
   const navUser = await getUserForNav();
 
   return (
-    <html lang="ko" className="h-full">
+    <html lang="ko" className="h-full" suppressHydrationWarning>
       <head>
         <link
           rel="preload"
