@@ -1,10 +1,146 @@
 # 경매퀵 웹사이트 핸드오프 문서
 
-> **용도**: 다음 Claude Code 세션이 이 문서 하나만 읽고도 작업을 이어갈 수 있도록 현재 상태를 정리한다.
-> **최종 업데이트**: 2026-04-28 (단계 5-4-2-fix-8 Hero 영역 본문 톤앤매너 계승 production 시연 대기)
-> **현재 빌드 상태**: **Phase 7 시각화 본질 마무리 진행 중** — 단계 5-4-2-fix-8 (Hero 옵션 a Linear monochrome) push 완료, 형준님 평가 대기
-> **다음 세션 진입**: 형준님 시연 평가 피드백으로 시작 (PASS → 4 사건 확장 + 단계 5-4-3 마무리 / FAIL → 단계 5-4-2-fix-9 보강)
-> **함께 읽을 문서**: `CLAUDE.md` (원칙·컴플라이언스 + §17 로드맵 + Lessons [A]~[D]), `BUILD_GUIDE.md` (구조·토큰), `docs/roadmap.md` (Phase 7~10 + v2 상세), `docs/phase-7-hero-design-plan.md` (Hero v2 plan + Code 추천 + Q24~Q29), `docs/phase-7-hero-mockups/option-{a,b,c}.html` (시각 mockup 3종)
+> **용도**: 다음 세션 (Claude Chat / Opus / Code) 영역 영역 본질 — 본 문서 단일 영역 영역 영역 영역 영역 작업 영역 영역 영역 본질
+> **최종 업데이트**: 2026-04-29 (sub-phase 8.3-quick Cohere 광역 적용 영역 **revert 완료** + 다음 세션 = **완전 혁신** 본질)
+> **현재 빌드 상태**: HEAD = `69b724a` (Revert 'Cohere 광역 적용'). sub-phase 8.1 시각 본질 회복 + sub-phase 8.2 토큰 영역 (deep-green / .seq / JetBrains Mono / fs-* / r-* / sp-* / shadow-1~3) 보존 영역
+> **다음 세션 진입**: **클로드 채팅 (Opus) 영역 시작** → 경쟁사 분석 + 구성 영역 근본 개선 → 시안 산출 → Code 광역 적용 1 cycle (sub-phase 분할 0, mockup cycle 폐기)
+> **함께 읽을 문서**: `CLAUDE.md` (원칙·컴플라이언스 + §13 룰 1~33 + §17 로드맵 + Lessons [A]~[D]), `BUILD_GUIDE.md` (구조·토큰), `DESIGN-READING-GUIDE.md` (코드베이스 진입 가이드, commit a948b10), `docs/roadmap.md` (Phase 7~10 + v2 상세)
+
+---
+
+## 🔥 2026-04-29 핫 스냅샷 — 다음 세션 시작 시 여기부터 읽기
+
+### 지금 어디인가
+
+**sub-phase 8.3-quick Cohere 광역 적용 영역 revert 완료** (commit `69b724a`). Phase 8 Layer A 토대 = sub-phase 8.1 (75b1c84) 시각 본질 + sub-phase 8.2 (d84dd62) 토큰 영역 영역 영역. 다음 세션 본질 = **구성 영역 근본 개선 영역 (완전 혁신)**.
+
+### 형준님 본질 영역 (2026-04-29 인용)
+
+> "경쟁사 대비 떨어지는 전체 웹사이트 품질과 디자인 인터페이스. 구성에 대한 것을 근본적으로 개선한 이후에 세부 문구 수정이나 요소들을 수정하는 방식이 맞다."
+>
+> "다음 대화에서는 완전한 혁신을 위한 논의를 이어갈꺼야."
+>
+> "새로운 세션에서는 클로드채팅의 대화를 통해 시작할게."
+
+### 다음 세션 진입 트리거
+
+**클로드 채팅 (Opus / claude.ai) 영역 시작 → 경쟁사 분석 + 구성 영역 근본 개선 본질 논의**. 시안 영역 산출 후 → Code 광역 적용 1 cycle.
+
+| 영역 | 본질 |
+|---|---|
+| 1. Opus 논의 영역 | 경쟁사 (바토너 / 그 외) 영역 분석 + 본 사이트 구성 영역 근본 영역 약점 영역 식별 + 혁신 방향 본질 |
+| 2. Opus 시안 산출 영역 | mockup HTML 직접 산출 (외부 mockup cycle 폐기) |
+| 3. 형준님 검증 영역 | 시안 검증 + 정정 cycle 또는 확정 |
+| 4. Code 영역 광역 적용 영역 | 시안 확정 후 1 cycle 영역 적용 (sub-phase 분할 0) |
+| 5. 세부 영역 | 문구 / 요소 영역 = 구성 영역 영역 후 영역 본질 (현 시점 영역 0) |
+
+### 본 세션 영역 누적 영역 (2026-04-28 ~ 04-29)
+
+| 단계 | commit | 영역 본질 |
+|---|---|---|
+| 단계 5-4-2-fix-9 | 350b07a | 본문 04·05 영역 정합화 + 룰 31 신설 (raw-content 변경 0 본질). Phase 0 식별 → Phase 1 (시세 대표성 한계 제거) → Phase 2 (ScenarioCarousel 폐기) → Phase 3 (시나리오 비교 요약 시각 강조 wrap, ScenarioComparisonHighlight 신설) |
+| 단계 5-4-2-fix-10 | 9cce56c | Web Interface Guidelines Group 2 정밀 audit + RightsAnalysisSection 시각 신호 제거 (옵션 A) + **룰 33 신설** (focus-visible 보상 / aria-label / semantic HTML / 시각 신호 ↔ 액션 정합 / heading hierarchy / img / transition-all 0) |
+| 단계 5-4-3 | 1d3aeea | DetailHero 옵션 C Asymmetric 재구성 + HeroGallery 폐기 (Lightbox 직접 호출) + **룰 32 신설** (Pretendard Variable + font-feature-settings ss01~ss11 + kern + letter-spacing -0.02em + smoothing) + 룰 18·26·28 갱신. **룰 38 신설** (변조 영역 = Hero + CTA + Liquid Glass 6 한정 / 본문 + 다이어그램 + 텍스트 영역 변조 0 본질) |
+| sub-phase 8.1 | 75b1c84 | Phase 8 Layer A 토대 첫 진입. Action Blue 단일 토큰 (`--color-action: #0066cc`) + 카카오 토큰 신규 + ApplyCTA brand-950 → ink-950 + accent-yellow 폐기 + ink-300 정의 보존 (텍스트 0 정합) + font-weight 5단계 ladder + body 17px (Apple HIG 본질 흡수) + text-base 67건 영역 var 전환 + font-medium 78건 영역별 (보존 6 + 600 전환 72) |
+| docs | a948b10 | DESIGN-READING-GUIDE.md (클로드 디자인용 코드베이스 진입 가이드) |
+| sub-phase 8.2 | d84dd62 | 토큰 layer 갱신 (Cohere-anchored 디자인 시스템 합치). deep-green / coral / soft-stone / pale-green / ink-surface / fs-display / fs-h1 / fs-mono / fs-num-* / r-1~5 / r-card / r-pill / shadow-1~3 / sp-* / container-w / .seq / JetBrains Mono next/font/google. **`--color-action: var(--deep-green)` alias** (back-compat, DetailHero·HoverableDropRateBar 칩 영역 자동 영역 Deep Green 색상 영역 적용). body 17 → 16 영역 회귀 |
+| sub-phase 8.3-quick | b8f78fd | 홈페이지 영역 Cohere 광역 적용 (HeroSearch / RegionStrip / WhySection / FlowSteps / Pricing / TrustCTA 6 컴포넌트). 형준님 검증 = **사업 톤 미스매치 (B2C 서비스 vs B2B 미디어 톤)** → 폐기 결정 |
+| **revert** | **69b724a** | **Revert 'Cohere 광역 적용' — 사업 톤 미스매치로 원복**. b8f78fd 전체 영역 git revert (history 보존). 6 files changed, 55 insertions(+), 44 deletions(-). 외부 mockup cycle 폐기 + Opus 직접 기획 본질 전환 |
+
+### 보존 영역 / 폐기 영역 / revert 영역 정합
+
+| 영역 | 상태 |
+|---|---|
+| **sub-phase 8.1 시각 본질** (75b1c84) | ✅ 회복 영역 (revert 본질) |
+| **sub-phase 8.2 토큰 영역** (d84dd62) | ✅ 보존 영역 — globals.css @theme 영역 = deep-green / coral / soft-stone / pale-green / ink-surface / fs-* / r-* / sp-* / shadow-1~3 / .seq / JetBrains Mono 영역 영역 |
+| **`--color-action: var(--deep-green)` alias** | ⚠️ 보존 영역 — DetailHero 칩 / HoverableDropRateBar 칩 = 여전히 Deep Green (#003c33) 색상 영역 적용. 분석 페이지 (`/analysis/2026타경500459`) 영역 영역 = 칩 영역 Deep Green 영역 시각 본질 영역 |
+| **body 16px** (sub-phase 8.2 영역 영역) | ✅ 보존 영역 — `--text-body: 1rem` (17px → 16px 회귀 영역 영역 영역) |
+| **홈 컴포넌트 영역** (HeroSearch / RegionStrip / WhySection / FlowSteps / Pricing / TrustCTA) | ✅ sub-phase 8.1 본질 회복 영역 (검은 배경 / radius-xl / ink-900 닷 / shadow-card 영역 등) |
+| **Cohere 광역 적용** | ❌ 폐기 영역 (사업 톤 미스매치) |
+| **외부 mockup cycle** | ❌ 폐기 영역 (Opus 직접 기획 본질 전환) |
+| **DESIGN-READING-GUIDE.md** (a948b10) | ✅ 보존 영역 (클로드 디자인 영역 영역 영역 영역 영역 영역) |
+
+### 영구 금기 영역 (절대 변경 0)
+
+| 영역 | 사유 |
+|---|---|
+| `raw-content/` 전체 | Cowork 영역 (룰 31) |
+| `content/analysis/` 전체 | publish CLI 산출물 영역 (변경 시 다음 publish 호출 시 복원) |
+| `scripts/content-publish/` | publish CLI 영역 |
+| 단일 사건 데이터 (2026타경500459) | 검증 케이스 영역 |
+| 다이어그램 7 컴포넌트 (RightsNodeDiagram / TimelineSection / SaleAreaSummary / PriceScatter / HoverableDropRateBar / ScenarioComparisonBox / ScenarioComparisonHighlight) | 룰 24-D Action Blue + ink tier 본질 + 룰 38 변조 0 |
+| 본문 카드 영역 | 룰 27 흰 카드 본질 + 룰 38 변조 0 |
+| 본문 텍스트 / 표 / 리스트 영역 | 룰 14 / 룰 32 본질 + 룰 38 변조 0 |
+| `src/types/content.ts` | frontmatter / meta 스키마 영역 (Cowork 영역 호환) |
+| `src/lib/datetime.ts` | 서버 사이드 날짜 영역 (Asia/Seoul 본질) |
+| `src/lib/pdf/delegation.ts` | 서버 PDFKit 영역 |
+
+### 룰 변조 가능 영역 (룰 38 본질)
+
+**시그니처 영역 6 한정**:
+1. Hero (DetailHero / 홈 Hero / 페이지 Hero)
+2. CTA (ApplyCTA / TrustCTA / MobileSticky / CTA 카드)
+3. TopNav (Liquid Glass 한정, sub-phase 8.7~8.8)
+4. Sub-nav (Liquid Glass 한정)
+5. Modal (Liquid Glass 한정)
+6. Tooltip (Liquid Glass 한정)
+
+**변조 가능 본질**: 비비드 일러스트 / abstract gradient / Liquid Glass / 장식적 motion / 색 영역.
+
+### 다음 세션 본질 영역 (완전 혁신 — 클로드 채팅 영역 영역 영역 영역)
+
+#### Opus 논의 영역 (다음 세션 영역 영역 영역)
+1. **경쟁사 분석 영역**: 바토너 (KDC텍, 2023.07 론칭, 230 대리인, 보증금 누적 2,400억원) + 그 외 영역. 본 사이트 영역 약점 영역 (콘텐츠 마케팅 / 디자인 인터페이스 / 사용자 흐름 / 페이지 구성 영역 영역).
+2. **본 사이트 구성 영역 근본 영역 약점 영역 식별**:
+   - 홈 페이지 8 컴포넌트 영역 흐름 영역 (HeroSearch → RegionStrip → CardCarousel → ContentShowcase → WhySection → FlowSteps → Pricing → TrustCTA) 영역 영역 = 적정 본질 영역 영역?
+   - 분석 페이지 영역 흐름 영역 (DetailHero + 본문 7섹션 + Sidebar + ApplyCTA + RelatedCards) 영역 영역 = 적정 본질 영역?
+   - 페이지 진입 흐름 영역 (홈 → 분석 → 신청) 영역 영역 = 사용자 영역 본질 영역?
+   - 모바일 / 데스크톱 영역 영역 = 적정 본질 영역?
+3. **혁신 방향 본질 영역**:
+   - 사업 톤 (B2C 서비스 본질) 영역 합치 영역 영역 본질
+   - "실용·합리·확실" 본질 영역 강화 본질
+   - 콘텐츠 허브 본질 (제2축) 영역 영역 영역 영역 영역
+   - 입찰 대리 접수 영역 (제1축) 영역 영역 영역 본질
+4. **시안 영역 산출 본질**:
+   - mockup HTML 직접 산출 (외부 mockup cycle 폐기, Opus 직접 기획)
+   - 변조 영역 = Hero + CTA + Liquid Glass 6 한정 (룰 38 본질)
+   - 본문 + 다이어그램 + 텍스트 = 변조 0 보존
+5. **Code 광역 적용 영역**:
+   - 시안 확정 후 1 cycle (sub-phase 분할 0)
+   - sub-phase 8.2 토큰 영역 영역 영역 영역 (deep-green / coral / soft-stone / fs-* / r-* / .seq 등) 영역 활용 본질 영역 영역 = Opus 결정 영역
+   - sub-phase 8.1 시각 본질 영역 영역 = Opus 결정 영역
+
+#### 진행 영역 사항 영역 (다음 세션 영역 진입 즉시 영역)
+
+1. 형준님 영역 = 클로드 채팅 (Opus) 영역 시작
+2. Opus 영역 = 본 핸드오프 영역 + DESIGN-READING-GUIDE.md + CLAUDE.md + BUILD_GUIDE.md 영역 영역 통합 영역 본질
+3. Opus 영역 = 경쟁사 분석 + 구성 영역 근본 개선 영역 논의 시작
+4. Opus 영역 = 시안 산출 (mockup HTML 직접)
+5. 형준님 영역 검증 → Code 광역 적용 영역
+
+#### Code 영역 영역 본질 (적용 cycle 진입 시)
+
+- **광역 적용 1 cycle 본질** (sub-phase 분할 0)
+- 시각 본질 영역 변경 영역 광범위 영역 = revert 위험 영역 본질 영역 → Opus 영역 영역 영역 시안 영역 영역 영역 본질 영역 영역 영역 = 형준님 검증 후 영역 적용 본질
+- 본 단일 commit 영역 = 매우 큼 영역 = git diff 영역 영역 영역 영역 본질 영역 영역
+- 본문 영역 + 다이어그램 영역 + 텍스트 영역 = 영역 변경 0 (룰 38 본질 보존)
+
+### 자가 검증 영역 (현재 영역)
+
+- ✅ HEAD = 69b724a (Revert 'Cohere 광역 적용')
+- ✅ tsc 0 / lint 0 / build Compiled successfully + 23/23 static pages
+- ✅ history 보존 (b8f78fd / d84dd62 / a948b10 / 75b1c84 / 9cce56c / 1d3aeea / 350b07a 영역 영역 영역 영역 본질)
+- ✅ Cowork raw-content / data / meta 변경 0 (룰 31)
+- ✅ publish CLI 변경 0
+- ✅ 다이어그램 7 컴포넌트 변경 0 (룰 38)
+
+---
+
+## 📚 이전 세션 영역 영역 (2026-04-28 단계 5-4-2-fix-8 영역 영역 영역 archive)
+
+> **본 영역 영역 = 이전 세션 영역 영역 영역 본질 영역. 본 세션 영역 영역 누적 영역 = 위 핫 스냅샷 영역 영역.**
+
+---
 
 ---
 
