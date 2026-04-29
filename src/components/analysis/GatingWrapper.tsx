@@ -90,14 +90,14 @@ export function GatingWrapper({
         <span className="inline-flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-ink-50)] text-[var(--color-ink-900)]">
           <Lock size={20} aria-hidden="true" />
         </span>
-        <h3 className="mt-4 text-xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-2xl">
+        <h3 className="mt-4 text-xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-h3">
           전체 분석을 보려면 로그인해주세요
         </h3>
         <p className="mt-3 text-sm leading-6 text-[var(--color-ink-500)]">
           첫 번째 물건분석은 자유롭게 읽으실 수 있습니다.
           <br />두 번째부터는 로그인 후 무제한 열람 가능합니다.
         </p>
-        <div className="mt-6 flex flex-col items-center gap-3">
+        <div className="mt-6 flex flex-col items-center gap-2">
           <Link
             href={loginHref}
             className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-8 text-[length:var(--text-body)] font-black text-white shadow-[var(--shadow-card)] transition hover:bg-black"

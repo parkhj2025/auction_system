@@ -81,11 +81,11 @@ export default async function AnalysisListPage({
     <main className="flex flex-1 flex-col">
       {/* 섹션 헤더 */}
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto w-full max-w-[var(--c-base)] px-5 py-16 sm:px-8 sm:py-20">
           <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-900)]">
             무료 물건분석
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
+          <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
             숫자로 판단하는 경매 물건
           </h1>
           <p className="mt-3 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
@@ -100,8 +100,8 @@ export default async function AnalysisListPage({
         aria-label="물건분석 필터"
         className="sticky top-16 z-20 border-b border-[var(--color-border)] bg-white/95 backdrop-blur"
       >
-        <div className="mx-auto flex w-full max-w-6xl flex-col gap-4 px-4 py-4 sm:px-6 md:flex-row md:items-center md:justify-end">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="mx-auto flex w-full max-w-[var(--c-base)] flex-col gap-4 px-5 py-4 sm:px-8 md:flex-row md:items-center md:justify-end">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-center">
             {/* 검색 */}
             <form
               role="search"
@@ -168,7 +168,7 @@ export default async function AnalysisListPage({
       </section>
 
       {/* 결과 */}
-      <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+      <section className="mx-auto w-full max-w-[var(--c-base)] px-5 py-12 sm:px-8 sm:py-16">
         <div className="flex items-baseline justify-between">
           <p className="text-sm font-semibold text-[var(--color-ink-500)]">
             총{" "}
@@ -203,7 +203,7 @@ export default async function AnalysisListPage({
             </Link>
           </div>
         ) : (
-          <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((p) => (
               <li key={p.frontmatter.slug}>
                 <PropertyCard frontmatter={p.frontmatter} />

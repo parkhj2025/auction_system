@@ -1,3 +1,5 @@
+/* Phase 0: Pretendard Variable jsdelivr CDN (next/font 제거 본질, dynamic-subset 한국어 자동 서브셋). */
+@import url("https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css");
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";
@@ -126,12 +128,11 @@
   --shadow-2: 0 4px 12px rgba(0, 0, 0, 0.06);
   --shadow-3: 0 12px 32px rgba(0, 0, 0, 0.08);
 
-  /* ─── 4. 폰트 ────────────────────────────────────────────────── */
-  /* 룰 23-B (단계 5-4-2-fix-6): Safari/iOS 한글 fallback chain 강화.
-   * Pretendard Variable (loaded) → Noto Sans KR (next/font loaded) → Apple SD Gothic Neo (Safari macOS/iOS 기본 한글) → system-ui (last) */
-  --font-sans: "Pretendard Variable", Pretendard, var(--font-noto-kr), "Apple SD Gothic Neo", "Noto Sans KR", -apple-system, BlinkMacSystemFont, ui-sans-serif, system-ui, "Segoe UI", Roboto, sans-serif;
-  /* sub-phase 8.2 신규 — JetBrains Mono (mono label / sequence label / number 영역). 한글 영역 자동 영역 Pretendard fallback. */
-  --font-mono: "JetBrains Mono", var(--font-jetbrains-mono), "Pretendard Variable", ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+  /* ─── 4. 폰트 (Phase 0 — Pretendard Variable 단일, jsdelivr CDN @import) ─── */
+  /* fallback chain: Pretendard Variable → Noto Sans KR (시스템 설치 시) → Apple SD Gothic Neo (Safari macOS/iOS) → Malgun Gothic (Windows) → system-ui */
+  --font-sans: "Pretendard Variable", Pretendard, "Noto Sans KR", "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  /* mono = 코드/숫자 영역만 시스템 ui-monospace (JetBrains Mono 패키지 폐기). */
+  --font-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
 
   /* ─── 5. 타이포 스케일 (sub-phase 8.1 — Major Third 1.25 선언 정정).
    * Base 17px (Apple body 본질 흡수) · 혼합 비율 (display 64 → h1 40 = 1.6 / h1 → h2 = 1.25 / h2 → h3 = 1.33 / h3 → h4 = 1.2 / body-lg 18 → body 17 = 1.06 / body → body-sm 14 = 1.21 / body-sm → caption 12 = 1.17).
@@ -146,14 +147,16 @@
    *  body = 본문 default
    *  body-sm = 보조 본문 + 표 td
    *  caption = 라벨·태그·섹션 라벨 (01·02·03 숫자) */
-  --text-display: 4rem;       /* 64px — Hero 가격 dominant */
-  --text-h1: 2.5rem;          /* 40px — 사건 타이틀 */
-  --text-h2: 2rem;            /* 32px — 섹션 H2 + 카드 안 핵심 수치 */
-  --text-h3: 1.5rem;          /* 24px — 카드 제목 */
-  --text-h4: 1.25rem;         /* 20px — STEP 카드 헤딩 + 서브헤딩 */
-  --text-body-lg: 1.125rem;   /* 18px — 본문 강조 */
-  --text-body: 1rem;          /* 16px — 본문 default (sub-phase 8.2 Cohere body 본질 영역 회귀, lh 1.6) */
-  --text-body-sm: 0.875rem;   /* 14px — 보조 본문 + 표 td */
+  /* Phase 0 표준 9 토큰 (base 16 / ratio 1.25 / Pretendard Variable 단일). */
+  --text-display: 4.5rem;     /* 72px desktop / 44px mobile — Hero display */
+  --text-h1: 3rem;            /* 48px desktop / 32px mobile — 사건 타이틀 */
+  --text-h2: 2rem;            /* 32px desktop / 24px mobile — 섹션 H2 */
+  --text-h3: 1.5rem;          /* 24px desktop / 20px mobile — 카드 제목 */
+  --text-h4: 1.25rem;         /* 20px desktop / 18px mobile — 서브헤딩 */
+  --text-body-lg: 1.25rem;    /* 20px desktop / 18px mobile — 본문 강조 (lead) */
+  --text-body: 1rem;          /* 16px — 본문 default */
+  --text-body-sm: 0.875rem;   /* 14px — 보조 본문 + 표 td (alias = --text-small) */
+  --text-small: 0.875rem;     /* Phase 0 표준 이름 (--text-body-sm 동등) */
   --text-caption: 0.75rem;    /* 12px — 라벨·태그·섹션 라벨 */
 
   /* sub-phase 8.2 신규 — Cohere typography ladder (편집 영역 본질). */
@@ -167,19 +170,23 @@
   --fs-num-xl: 2.75rem;       /* 44px tabular-nums */
   --fs-num-lg: 1.75rem;       /* 28px tabular-nums */
   --fs-num-md: 1.25rem;       /* 20px tabular-nums */
-  /* 모바일 (<640px) — 룰 14-A mobile token */
+  /* 모바일 (<640px) — Phase 0 표준 자동 전환. */
   --text-display-mobile: 2.75rem;  /* 44px */
-  --text-h1-mobile: 1.75rem;       /* 28px */
+  --text-h1-mobile: 2rem;          /* 32px */
   --text-h2-mobile: 1.5rem;        /* 24px */
   --text-h3-mobile: 1.25rem;       /* 20px */
   --text-h4-mobile: 1.125rem;      /* 18px */
-  --text-body-lg-mobile: 1rem;     /* 16px */
+  --text-body-lg-mobile: 1.125rem; /* 18px */
 
-  /* Line Height tier (룰 14-A) */
-  --lh-tight: 1.05;
-  --lh-snug: 1.15;
-  --lh-normal: 1.3;
-  --lh-relaxed: 1.6;
+  /* Line Height tier (Phase 0 표준 — 9 토큰 매핑). */
+  --lh-tight: 1.05;     /* display */
+  --lh-snug: 1.15;      /* h1 */
+  --lh-h2: 1.2;         /* h2 */
+  --lh-normal: 1.3;     /* h3 */
+  --lh-h4: 1.4;         /* h4 + caption */
+  --lh-small: 1.5;      /* small */
+  --lh-relaxed: 1.6;    /* body-lg */
+  --lh-body: 1.65;      /* body */
 
   /* Font Weight tier (sub-phase 8.1 신규 — Apple HIG 본질, 5단계 ladder).
    * "Avoid Ultralight/Thin/Light, opt for Regular/Medium/Semibold/Bold". 500 영역 보존. */
@@ -201,7 +208,7 @@
   --pad-card: 2rem;             /* 32px */
   --pad-card-mobile: 1.5rem;    /* 24px */
 
-  /* Cohere spacing ladder (sub-phase 8.2 신규 — 4pt grid 통일). */
+  /* Cohere spacing ladder (sub-phase 8.2 — 4pt grid, Phase 0 보존). */
   --sp-2: 2px;
   --sp-8: 8px;
   --sp-12: 12px;
@@ -214,10 +221,30 @@
   --sp-64: 64px;
   --sp-80: 80px;
 
-  /* Container (sub-phase 8.2 신규 — Cohere 본질). */
+  /* Phase 0 Spacing — 8pt grid 단일 본질 (s-1 ~ s-9). */
+  --s-1: 4px;
+  --s-2: 8px;
+  --s-3: 16px;
+  --s-4: 24px;
+  --s-5: 32px;
+  --s-6: 48px;
+  --s-7: 64px;
+  --s-8: 96px;
+  --s-9: 128px;
+
+  /* Container (sub-phase 8.2 — Cohere 본질, Phase 0 보존). */
   --container-w: 1180px;
   --container-w-narrow: 760px;
   --gutter: 24px;
+
+  /* Phase 0 Container — 5단계 표준 본질. */
+  --c-prose: 720px;        /* 긴 본문 (분석 페이지 본문 영역) */
+  --c-narrow: 960px;       /* 좁은 컨테이너 */
+  --c-base: 1200px;        /* 기본 (Home / 콘텐츠 페이지 그리드) */
+  --c-wide: 1280px;        /* 넓은 컨테이너 */
+  --c-full: 1536px;        /* 최대 폭 */
+  --pad-x-mobile: 20px;    /* 모바일 좌우 padding */
+  --pad-x-desktop: 32px;   /* 데스크톱 좌우 padding */
 
   /* legacy numeric-dominant alias — display 동등 (단계 5-2 호환) */
   --text-numeric: var(--text-h2);

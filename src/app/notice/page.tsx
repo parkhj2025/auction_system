@@ -17,7 +17,7 @@ export default async function NoticeListPage() {
   return (
     <main className="flex flex-1 flex-col">
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-4xl px-4 py-14 sm:px-6 sm:py-16">
+        <div className="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8 sm:py-16">
           <nav
             aria-label="Breadcrumb"
             className="flex items-center gap-1 text-xs font-semibold text-[var(--color-ink-500)]"
@@ -31,7 +31,7 @@ export default async function NoticeListPage() {
           <p className="mt-5 text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             공지사항
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
+          <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
             {BRAND_NAME} 공식 공지
           </h1>
           <p className="mt-3 text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
@@ -40,7 +40,7 @@ export default async function NoticeListPage() {
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
+      <section className="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8 sm:py-16">
         {posts.length === 0 ? (
           <EmptyState
             title="아직 공지가 없습니다"

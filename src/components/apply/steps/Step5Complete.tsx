@@ -72,7 +72,7 @@ export function Step5Complete({
         <p className="mt-5 text-xs font-black uppercase tracking-[0.2em] text-[var(--color-ink-900)]">
           접수 완료
         </p>
-        <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+        <h2 className="mt-2 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
           신청이 접수되었습니다
         </h2>
         <p className="mt-3 text-sm leading-6 text-[var(--color-ink-500)]">
@@ -88,12 +88,12 @@ export function Step5Complete({
         <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
           01. 수수료 송금
         </h3>
-        <div className="mt-4 flex flex-col gap-5 sm:flex-row sm:items-end sm:justify-between">
+        <div className="mt-4 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
             <p className="text-xs text-[var(--color-ink-500)]">
               {fee.tierLabel} · 신청 시점 확정
             </p>
-            <p className="mt-1 text-3xl font-black tabular-nums text-[var(--color-ink-900)]">
+            <p className="mt-1 text-h2 font-black tabular-nums text-[var(--color-ink-900)]">
               {formatKoreanWon(fee.baseFee)}
             </p>
           </div>
@@ -113,7 +113,7 @@ export function Step5Complete({
             <p className="text-xs text-[var(--color-ink-500)]">
               감정가의 {depositPercentLabel} · {bidDateLabel}
             </p>
-            <p className="mt-1 text-3xl font-black tabular-nums text-[var(--color-ink-900)]">
+            <p className="mt-1 text-h2 font-black tabular-nums text-[var(--color-ink-900)]">
               {formatKoreanWon(deposit)}
             </p>
             <p className="mt-3 text-xs leading-5 text-[var(--color-ink-500)]">
@@ -141,12 +141,12 @@ export function Step5Complete({
 
         {/* 송금 금액 강조 */}
         <div className="mt-4 rounded-[var(--radius-lg)] border border-[var(--color-ink-900)] bg-white p-5">
-          <div className="flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
+          <div className="flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
             <div>
               <p className="text-xs font-bold text-[var(--color-ink-500)]">
                 총 송금 금액 (수수료{deposit !== null ? " + 보증금" : ""})
               </p>
-              <p className="mt-1 text-3xl font-black tabular-nums text-[var(--color-ink-900)] sm:text-4xl">
+              <p className="mt-1 text-h2 font-black tabular-nums text-[var(--color-ink-900)] sm:text-h1">
                 {formatKoreanWon(totalToSend)}
               </p>
               <p className="mt-1 text-xs text-[var(--color-ink-500)]">
@@ -244,8 +244,8 @@ export function Step5Complete({
         <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
           다음 단계
         </h3>
-        <ol className="mt-4 flex flex-col gap-3 text-sm leading-6 text-[var(--color-ink-700)]">
-          <li className="flex gap-3">
+        <ol className="mt-4 flex flex-col gap-2 text-sm leading-6 text-[var(--color-ink-700)]">
+          <li className="flex gap-2">
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-[11px] font-black text-white">
               1
             </span>
@@ -258,13 +258,13 @@ export function Step5Complete({
               서류·보증금 확인을 안내드립니다.
             </span>
           </li>
-          <li className="flex gap-3">
+          <li className="flex gap-2">
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-[11px] font-black text-white">
               2
             </span>
             <span>입찰일 전일까지 서류 최종 확인 및 보증금 입금 확인.</span>
           </li>
-          <li className="flex gap-3">
+          <li className="flex gap-2">
             <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-[11px] font-black text-white">
               3
             </span>
@@ -275,7 +275,7 @@ export function Step5Complete({
         </ol>
       </section>
 
-      <div className="flex flex-col gap-3 sm:flex-row">
+      <div className="flex flex-col gap-2 sm:flex-row">
         <Link
           href="/analysis"
           className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-900)] hover:bg-[var(--color-ink-100)]"

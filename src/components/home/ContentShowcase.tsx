@@ -23,7 +23,7 @@ export function ContentShowcase() {
       aria-labelledby="content-heading"
       className="border-t border-[var(--color-border)] bg-[var(--color-surface-muted)]"
     >
-      <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
+      <div className="mx-auto w-full max-w-[var(--c-base)] px-4 py-20 sm:px-8 sm:py-24">
         <div className="flex items-end justify-between gap-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-900)]">
@@ -31,7 +31,7 @@ export function ContentShowcase() {
             </p>
             <h2
               id="content-heading"
-              className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl"
+              className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1"
             >
               읽고 나면 판단이 달라집니다
             </h2>
@@ -45,13 +45,13 @@ export function ContentShowcase() {
           </Link>
         </div>
 
-        <div className="mt-10 grid gap-5 lg:grid-cols-3">
-          <div className="flex flex-col gap-5 lg:col-span-2">
+        <div className="mt-10 grid gap-4 lg:grid-cols-3">
+          <div className="flex flex-col gap-4 lg:col-span-2">
             {guides.map((g) => (
               <Link
                 key={g.frontmatter.slug}
                 href={`/guide/${g.frontmatter.slug}`}
-                className="group flex items-start gap-5 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]"
+                className="group flex items-start gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)] transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]"
               >
                 <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-50)] text-[var(--color-ink-900)]">
                   <BookOpen size={22} aria-hidden="true" />
@@ -91,7 +91,7 @@ export function ContentShowcase() {
                   <Newspaper size={12} aria-hidden="true" />
                   경매 인사이트
                 </span>
-                <h3 className="mt-5 text-2xl font-black tracking-tight leading-tight">
+                <h3 className="mt-5 text-h3 font-black tracking-tight leading-tight">
                   {news.frontmatter.title}
                 </h3>
                 {news.frontmatter.subtitle && (

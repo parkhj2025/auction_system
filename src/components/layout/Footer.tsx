@@ -5,8 +5,8 @@ import { COMPANY, COMPLIANCE_ITEMS } from "@/lib/constants";
 export function Footer() {
   return (
     <footer className="mt-24 border-t border-[var(--color-border)] bg-[var(--color-surface-muted)] text-[var(--color-ink-700)]">
-      <div className="mx-auto w-full max-w-6xl px-4 py-14 sm:px-6">
-        <div className="grid gap-10 md:grid-cols-4">
+      <div className="mx-auto w-full max-w-[var(--c-base)] px-4 py-12 sm:px-8">
+        <div className="grid gap-8 md:grid-cols-4">
           <div className="md:col-span-1">
             <div className="flex items-center gap-2">
               <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--color-ink-900)] text-sm font-black text-white">

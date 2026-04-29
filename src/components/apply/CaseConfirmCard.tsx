@@ -48,7 +48,7 @@ export function CaseConfirmCard({ data, onChange, mode }: Props) {
 
   return (
     <section className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-2">
         <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
           {isManual ? "사건 정보 (직접 입력 완료)" : "사건 정보 확인"}
         </h3>
@@ -93,7 +93,7 @@ export function CaseConfirmCard({ data, onChange, mode }: Props) {
 
       {!isManual && (
         // matched 경로: 인라인 체크박스. manual 경로는 모달의 "확인"이 이미 set한 상태이므로 체크박스 불필요.
-        <label className="mt-5 flex cursor-pointer items-start gap-3">
+        <label className="mt-5 flex cursor-pointer items-start gap-2">
           <input
             type="checkbox"
             checked={data.caseConfirmedByUser}

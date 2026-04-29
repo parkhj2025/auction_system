@@ -65,14 +65,14 @@ export function Pricing() {
       aria-labelledby="pricing-heading"
       className="border-t border-[var(--color-border)] bg-[var(--color-surface-muted)]"
     >
-      <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
+      <div className="mx-auto w-full max-w-[var(--c-base)] px-4 py-20 sm:px-8 sm:py-24">
         <div className="max-w-2xl">
           <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-900)]">
             수수료
           </p>
           <h2
             id="pricing-heading"
-            className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl"
+            className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1"
           >
             결과가 아닌 신청 시점으로 가격이 정해집니다
           </h2>
@@ -83,7 +83,7 @@ export function Pricing() {
           </p>
         </div>
 
-        <div className="mt-12 grid gap-5 md:grid-cols-3">
+        <div className="mt-12 grid gap-4 md:grid-cols-3">
           {TIERS.map((tier) => (
             <article
               key={tier.key}
@@ -105,7 +105,7 @@ export function Pricing() {
                   {tier.tag}
                 </p>
                 <p className="mt-6 flex items-baseline gap-1.5 tabular-nums">
-                  <span className="text-5xl font-black text-[var(--color-ink-900)]">
+                  <span className="text-h1 font-black text-[var(--color-ink-900)]">
                     {feeLabel(tier.fee)}
                   </span>
                 </p>

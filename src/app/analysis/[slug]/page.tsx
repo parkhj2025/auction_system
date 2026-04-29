@@ -111,8 +111,8 @@ export default async function AnalysisDetailPage({
 
       <DetailHero fm={fm} />
 
-      <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
-        <div className="grid gap-10 lg:grid-cols-[minmax(0,1fr)_300px]">
+      <section className="mx-auto w-full max-w-[var(--c-base)] px-5 py-12 sm:px-8 sm:py-16">
+        <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_300px]">
           <article className="min-w-0">
             <GatingWrapper slug={slug}>
               <MDXRemote

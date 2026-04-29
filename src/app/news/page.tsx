@@ -23,11 +23,11 @@ export default async function NewsListPage() {
   return (
     <main className="flex flex-1 flex-col">
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto w-full max-w-[var(--c-base)] px-5 py-16 sm:px-8 sm:py-20">
           <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             경매 인사이트
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
+          <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
             시장이 움직이는 방향을 숫자로
           </h1>
           <p className="mt-3 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
@@ -37,7 +37,7 @@ export default async function NewsListPage() {
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+      <section className="mx-auto w-full max-w-[var(--c-base)] px-5 py-12 sm:px-8 sm:py-16">
         <p className="text-sm font-semibold text-[var(--color-ink-500)]">
           총{" "}
           <strong className="tabular-nums text-[var(--color-ink-900)]">
@@ -54,7 +54,7 @@ export default async function NewsListPage() {
             ctaLabel="물건분석 보러가기"
           />
         ) : (
-          <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {posts.map((p) => {
               const fm = p.frontmatter;
               const regionMeta = fm.region

@@ -18,7 +18,7 @@ export function CardCarousel() {
       aria-labelledby="carousel-heading"
       className="border-t border-[var(--color-border)] bg-white"
     >
-      <div className="mx-auto w-full max-w-6xl px-4 pt-20 sm:px-6 sm:pt-24">
+      <div className="mx-auto w-full max-w-[var(--c-base)] px-4 pt-20 sm:px-8 sm:pt-24">
         <div className="flex items-end justify-between gap-4">
           <div>
             <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-900)]">
@@ -26,7 +26,7 @@ export function CardCarousel() {
             </p>
             <h2
               id="carousel-heading"
-              className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl"
+              className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1"
             >
               숫자로 판단하는 최신 경매 물건
             </h2>
@@ -47,12 +47,12 @@ export function CardCarousel() {
 
       <div className="mt-10 pb-20 sm:pb-24">
         <div
-          className="mx-auto w-full max-w-6xl overflow-x-auto scroll-px-4 snap-x snap-mandatory px-4 sm:scroll-px-6 sm:snap-proximity sm:px-6"
+          className="mx-auto w-full max-w-[var(--c-base)] overflow-x-auto scroll-px-4 snap-x snap-mandatory px-4 sm:scroll-px-6 sm:snap-proximity sm:px-8"
           role="region"
           aria-label="물건분석 캐러셀"
           tabIndex={0}
         >
-          <ul className="flex gap-5">
+          <ul className="flex gap-4">
             {posts.map((p) => (
               <li
                 key={p.frontmatter.slug}

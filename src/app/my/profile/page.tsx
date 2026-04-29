@@ -36,7 +36,7 @@ export default async function MyProfilePage() {
   const phone = profile?.phone ?? "";
 
   return (
-    <section className="mx-auto w-full max-w-2xl px-4 py-10 sm:px-6 sm:py-14">
+    <section className="mx-auto w-full max-w-2xl px-5 py-10 sm:px-8 sm:py-12">
       <nav
         aria-label="Breadcrumb"
         className="flex items-center gap-1 text-xs font-semibold text-[var(--color-ink-500)]"
@@ -52,7 +52,7 @@ export default async function MyProfilePage() {
         <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
           Profile
         </p>
-        <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
+        <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
           내 정보
         </h1>
         <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">

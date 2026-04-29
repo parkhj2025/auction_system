@@ -318,7 +318,7 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
   return (
     <>
       <ApplyStepIndicator current={currentStep} completed={completed} />
-      <section className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+      <section className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-8 sm:py-12">
         {showStickyBar && (
           <StickyPropertyBar
             listing={data.matchedListing}

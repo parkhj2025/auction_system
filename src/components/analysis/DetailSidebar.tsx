@@ -30,7 +30,7 @@ export function DetailSidebar({ fm }: { fm: AnalysisFrontmatter }) {
 
   return (
     <aside aria-label="분석 사이드바" className="hidden lg:block">
-      <div className="sticky top-28 flex flex-col gap-5">
+      <div className="sticky top-28 flex flex-col gap-4">
         {/* block 1 + 2: 핵심 수치 + CTA — 단일 카드로 묶음 (정보 위계 통합) */}
         <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white shadow-[var(--shadow-card)]">
           <div className="border-b border-[var(--color-border)] p-5">
@@ -46,7 +46,7 @@ export function DetailSidebar({ fm }: { fm: AnalysisFrontmatter }) {
                 <p className="text-[11px] font-bold text-[var(--color-ink-900)] tabular-nums">
                   {fm.round}차 최저가 · {fm.percent}%
                 </p>
-                <p className="mt-1 text-2xl font-black tabular-nums leading-none text-[var(--color-ink-900)]">
+                <p className="mt-1 text-h3 font-black tabular-nums leading-none text-[var(--color-ink-900)]">
                   {fm.minPriceDisplay ?? formatKoreanWon(fm.minPrice)}
                 </p>
               </div>
@@ -127,7 +127,7 @@ export function DetailSidebar({ fm }: { fm: AnalysisFrontmatter }) {
 
 function MiniStat({ label, value }: { label: string; value: string }) {
   return (
-    <div className="flex items-baseline justify-between gap-3">
+    <div className="flex items-baseline justify-between gap-2">
       <span className="text-[11px] font-semibold text-[var(--color-ink-500)]">
         {label}
       </span>

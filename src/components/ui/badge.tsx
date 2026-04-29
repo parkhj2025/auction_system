@@ -19,6 +19,11 @@ const badgeVariants = cva(
         ghost:
           "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
         link: "text-primary underline-offset-4 hover:underline",
+        /* Phase 0 표준 — Chip 활성/비활성 (필터·상태 칩). */
+        "chip-active":
+          "h-7 rounded-full bg-[var(--color-ink-900)] px-3 text-[13px] font-medium text-white",
+        "chip-inactive":
+          "h-7 rounded-full border border-[var(--color-ink-200)] bg-white px-3 text-[13px] font-medium text-[var(--color-ink-700)] hover:border-[var(--color-ink-900)] hover:text-[var(--color-ink-900)]",
       },
     },
     defaultVariants: {

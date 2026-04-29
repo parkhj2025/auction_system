@@ -50,59 +50,59 @@ export default function RefundPage() {
           <table className="w-full min-w-[32rem] border-separate border-spacing-0 overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] text-sm">
             <thead className="bg-[var(--color-surface-muted)]">
               <tr>
-                <th className="border-b border-[var(--color-border)] px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--color-ink-500)]">
+                <th className="border-b border-[var(--color-border)] px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--color-ink-500)]">
                   취소 시점
                 </th>
-                <th className="border-b border-[var(--color-border)] px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--color-ink-500)]">
+                <th className="border-b border-[var(--color-border)] px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--color-ink-500)]">
                   수수료 환불
                 </th>
-                <th className="border-b border-[var(--color-border)] px-4 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--color-ink-500)]">
+                <th className="border-b border-[var(--color-border)] px-5 py-3 text-left text-xs font-bold uppercase tracking-wider text-[var(--color-ink-500)]">
                   보증금 반환
                 </th>
               </tr>
             </thead>
             <tbody>
               <tr>
-                <td className="border-b border-[var(--color-border)] px-4 py-3 align-top">
+                <td className="border-b border-[var(--color-border)] px-5 py-3 align-top">
                   접수 확정 전 (상담원 확인 연락 이전)
                 </td>
-                <td className="border-b border-[var(--color-border)] px-4 py-3 align-top font-bold text-[var(--color-ink-900)]">
+                <td className="border-b border-[var(--color-border)] px-5 py-3 align-top font-bold text-[var(--color-ink-900)]">
                   수수료 미청구
                 </td>
-                <td className="border-b border-[var(--color-border)] px-4 py-3 align-top">
+                <td className="border-b border-[var(--color-border)] px-5 py-3 align-top">
                   해당 없음
                 </td>
               </tr>
               <tr>
-                <td className="border-b border-[var(--color-border)] px-4 py-3 align-top">
+                <td className="border-b border-[var(--color-border)] px-5 py-3 align-top">
                   접수 확정 후 ~ 입찰일 2일 전
                 </td>
-                <td className="border-b border-[var(--color-border)] px-4 py-3 align-top font-bold text-[var(--color-ink-900)]">
+                <td className="border-b border-[var(--color-border)] px-5 py-3 align-top font-bold text-[var(--color-ink-900)]">
                   50% 환불
                 </td>
-                <td className="border-b border-[var(--color-border)] px-4 py-3 align-top font-bold text-[var(--color-ink-900)]">
+                <td className="border-b border-[var(--color-border)] px-5 py-3 align-top font-bold text-[var(--color-ink-900)]">
                   당일 즉시 반환
                 </td>
               </tr>
               <tr>
-                <td className="border-b border-[var(--color-border)] px-4 py-3 align-top">
+                <td className="border-b border-[var(--color-border)] px-5 py-3 align-top">
                   입찰일 1일 전 ~ 입찰 당일
                 </td>
-                <td className="border-b border-[var(--color-border)] px-4 py-3 align-top">
+                <td className="border-b border-[var(--color-border)] px-5 py-3 align-top">
                   환불 불가
                 </td>
-                <td className="border-b border-[var(--color-border)] px-4 py-3 align-top font-bold text-[var(--color-ink-900)]">
+                <td className="border-b border-[var(--color-border)] px-5 py-3 align-top font-bold text-[var(--color-ink-900)]">
                   당일 즉시 반환
                 </td>
               </tr>
               <tr>
-                <td className="px-4 py-3 align-top">
+                <td className="px-5 py-3 align-top">
                   회사 귀책 사유로 입찰 불가
                 </td>
-                <td className="px-4 py-3 align-top font-bold text-[var(--color-ink-900)]">
+                <td className="px-5 py-3 align-top font-bold text-[var(--color-ink-900)]">
                   전액 환불
                 </td>
-                <td className="px-4 py-3 align-top font-bold text-[var(--color-ink-900)]">
+                <td className="px-5 py-3 align-top font-bold text-[var(--color-ink-900)]">
                   당일 즉시 반환
                 </td>
               </tr>

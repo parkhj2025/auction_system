@@ -37,11 +37,11 @@ export default function AboutPage() {
     <main className="flex flex-1 flex-col">
       {/* Hero */}
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto w-full max-w-4xl px-5 py-16 sm:px-8 sm:py-20">
           <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             대표 소개
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
+          <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
             법원 안 가고, 경매에 참여할 수 있게
           </h1>
           <p className="mt-4 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)] sm:text-lg sm:leading-8">
@@ -53,12 +53,12 @@ export default function AboutPage() {
       </section>
 
       {/* Founder profile */}
-      <section className="mx-auto w-full max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
+      <section className="mx-auto w-full max-w-4xl px-5 py-16 sm:px-8 sm:py-20">
         <div className="flex flex-col gap-8 rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-white p-8 shadow-[var(--shadow-card)] sm:flex-row sm:p-10">
-          <div className="flex shrink-0 flex-col items-center gap-3 sm:w-48">
+          <div className="flex shrink-0 flex-col items-center gap-2 sm:w-48">
             <div
               aria-hidden="true"
-              className="flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-[var(--color-ink-900)] to-[var(--color-ink-700)] text-4xl font-black text-white"
+              className="flex h-32 w-32 items-center justify-center rounded-full bg-gradient-to-br from-[var(--color-ink-900)] to-[var(--color-ink-700)] text-h1 font-black text-white"
             >
               {COMPANY.ceo.slice(0, 1)}
             </div>
@@ -67,7 +67,7 @@ export default function AboutPage() {
             </p>
           </div>
           <div className="flex-1">
-            <h2 className="text-2xl font-black tracking-tight text-[var(--color-ink-900)]">
+            <h2 className="text-h3 font-black tracking-tight text-[var(--color-ink-900)]">
               {COMPANY.ceo}
             </h2>
             <ul className="mt-5 flex flex-col gap-2.5 text-sm leading-6 text-[var(--color-ink-700)]">
@@ -107,14 +107,14 @@ export default function AboutPage() {
 
       {/* Values */}
       <section className="border-t border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto w-full max-w-5xl px-5 py-16 sm:px-8 sm:py-20">
           <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             운영 원칙
           </p>
-          <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+          <h2 className="mt-2 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
             이렇게 일합니다
           </h2>
-          <div className="mt-10 grid gap-5 md:grid-cols-3">
+          <div className="mt-10 grid gap-4 md:grid-cols-3">
             {VALUES.map(({ icon: Icon, title, body }) => (
               <article
                 key={title}
@@ -137,11 +137,11 @@ export default function AboutPage() {
 
       {/* Regions */}
       <section className="border-t border-[var(--color-border)] bg-white">
-        <div className="mx-auto w-full max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto w-full max-w-4xl px-5 py-16 sm:px-8 sm:py-20">
           <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             서비스 지역
           </p>
-          <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+          <h2 className="mt-2 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
             현재 인천에서 시작하고 있습니다
           </h2>
           <p className="mt-3 text-sm leading-6 text-[var(--color-ink-500)]">
@@ -179,16 +179,16 @@ export default function AboutPage() {
 
       {/* CTA */}
       <section className="border-t border-[var(--color-border)] bg-[var(--color-ink-950)] text-white">
-        <div className="mx-auto flex w-full max-w-4xl flex-col items-start gap-6 px-4 py-16 sm:px-6 sm:py-20 md:flex-row md:items-center md:justify-between">
+        <div className="mx-auto flex w-full max-w-4xl flex-col items-start gap-6 px-5 py-16 sm:px-8 sm:py-20 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-2xl font-black leading-tight tracking-tight sm:text-3xl">
+            <h2 className="text-h3 font-black leading-tight tracking-tight sm:text-h2">
               준비된 대리인에게 맡기세요
             </h2>
             <p className="mt-3 text-sm leading-6 text-white/85 sm:text-[length:var(--text-body)]">
               패찰 시 보증금은 당일 즉시 반환됩니다. 결과와 무관하게 투명합니다.
             </p>
           </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <Link
               href="/apply"
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-white px-6 text-sm font-black text-[var(--color-ink-900)] shadow-[var(--shadow-lift)] hover:bg-[var(--color-ink-50)]"

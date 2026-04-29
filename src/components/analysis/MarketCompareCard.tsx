@@ -60,7 +60,7 @@ export function MarketCompareCard({
         history={bidding?.history ?? []}
       />
 
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+      <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
         <CompareCell label="감정가" value={formatKoreanWon(appraisal)} sub="기준가" />
         <CompareCell
           label="시세 평균"
@@ -103,7 +103,7 @@ function CompareCell({
         {label}
       </p>
       <p
-        className={`mt-1.5 text-xl font-black tabular-nums leading-tight sm:text-2xl ${
+        className={`mt-1.5 text-xl font-black tabular-nums leading-tight sm:text-h3 ${
           accent ? "text-[var(--color-ink-900)]" : "text-[var(--color-ink-900)]"
         }`}
       >

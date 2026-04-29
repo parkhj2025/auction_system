@@ -66,7 +66,7 @@ export function DetailHero({ fm }: { fm: AnalysisFrontmatter }) {
       aria-labelledby="detail-title"
       className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]"
     >
-      <div className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+      <div className="mx-auto w-full max-w-[var(--c-base)] px-4 py-10 sm:px-8 sm:py-12">
         {/* Breadcrumb (Hero 카드 외) */}
         <nav
           aria-label="Breadcrumb"

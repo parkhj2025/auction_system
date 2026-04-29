@@ -103,7 +103,7 @@ export function AdminOrdersTable({ orders }: { orders: OrderRow[] }) {
       </div>
 
       {/* 모바일 카드 */}
-      <div className="flex flex-col gap-3 md:hidden">
+      <div className="flex flex-col gap-2 md:hidden">
         {orders.map((o) => {
           const snap = (o.property_snapshot ?? {}) as { bidDate?: string };
           return (

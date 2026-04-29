@@ -11,7 +11,7 @@ export function RegionStrip() {
       aria-label="서비스 지역"
       className="border-b border-[var(--color-border)] bg-white"
     >
-      <div className="mx-auto flex w-full max-w-6xl flex-col gap-3 px-4 py-6 sm:flex-row sm:items-center sm:gap-5 sm:px-6">
+      <div className="mx-auto flex w-full max-w-[var(--c-base)] flex-col gap-2 px-4 py-6 sm:flex-row sm:items-center sm:gap-4 sm:px-8">
         <span className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-500)]">
           서비스 지역
         </span>

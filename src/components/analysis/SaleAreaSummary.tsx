@@ -184,7 +184,7 @@ export function SaleAreaSummary({
       </div>
 
       {/* 카드 3개 재구성 (룰 6) — stagger spring */}
-      <div className="mt-12 grid gap-3 sm:grid-cols-3">
+      <div className="mt-12 grid gap-2 sm:grid-cols-3">
         <motion.div
           initial={{ opacity: 0, y: 12 }}
           animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 12 }}

@@ -182,7 +182,7 @@ export function PDFPreviewModal({
           </p>
         </div>
 
-        <div className="flex items-center justify-between gap-3 border-t border-[var(--color-border)] bg-white px-6 py-4">
+        <div className="flex items-center justify-between gap-2 border-t border-[var(--color-border)] bg-white px-6 py-4">
           <button
             ref={cancelRef}
             type="button"

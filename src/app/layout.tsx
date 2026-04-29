@@ -1,5 +1,4 @@
 import type { Metadata, Viewport } from "next";
-import { Noto_Sans_KR, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { TopNav } from "@/components/layout/TopNav";
 import { Footer } from "@/components/layout/Footer";
@@ -8,21 +7,9 @@ import { createClient } from "@/lib/supabase/server";
 import type { UserMenuProps } from "@/components/auth/UserMenu";
 import { BRAND_NAME } from "@/lib/constants";
 
-const notoSansKr = Noto_Sans_KR({
-  variable: "--font-noto-kr",
-  subsets: ["latin"],
-  weight: ["400", "500", "700", "900"],
-  display: "swap",
-});
-
-/* sub-phase 8.2 신규 — JetBrains Mono (mono label / sequence label / number 영역).
- * 한글 영역 자동 영역 Pretendard fallback (--font-mono chain 본질). */
-const jetbrainsMono = JetBrains_Mono({
-  variable: "--font-jetbrains-mono",
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  display: "swap",
-});
+/* Phase 0: 폰트 단일화 (Pretendard Variable / jsdelivr CDN @import in globals.css).
+ * 기존 Noto Sans KR + JetBrains Mono 패키지 import 폐기.
+ * Noto Sans KR fallback 이름은 globals.css --font-sans chain 에 보존 (시스템 설치 시 안전망). */
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -74,13 +61,8 @@ export default async function RootLayout({
   const navUser = await getUserForNav();
 
   return (
-    <html lang="ko" className={`${notoSansKr.variable} ${jetbrainsMono.variable} h-full`}>
+    <html lang="ko" className="h-full">
       <head>
-        {/* 룰 32 (단계 5-4-3): 브라우저 일관성 — Pretendard Variable @v1.3.9 + dynamic-subset.
-         * preload URL = woff2/ 디렉토리 제거 + v 접두사 명시.
-         * stylesheet URL = pretendardvariable-dynamic-subset (한글 동적 서브셋, bundle 축소).
-         * smoothing / font-feature-settings / letter-spacing = globals.css 단일 source of truth.
-         * Noto Sans KR fallback (--font-noto-kr) 보존 — 한글 영역 안전성. */}
         <link
           rel="preconnect"
           href="https://cdn.jsdelivr.net"
@@ -93,12 +75,7 @@ export default async function RootLayout({
           type="font/woff2"
           crossOrigin="anonymous"
         />
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
-        />
       </head>
-      {/* 단계 5-2 #4: 모바일 MobileSticky 영역 padding 에 safe-area-inset-bottom 합산 */}
       <body className="flex min-h-full flex-col bg-white pb-[calc(5rem+env(safe-area-inset-bottom))] text-[var(--color-ink-900)] md:pb-0">
         <TopNav user={navUser} />
         <div className="flex flex-1 flex-col">{children}</div>

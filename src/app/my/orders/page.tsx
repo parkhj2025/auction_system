@@ -30,12 +30,12 @@ export default async function MyOrdersListPage() {
   const rows = (orders ?? []) as OrderRow[];
 
   return (
-    <section className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
+    <section className="mx-auto w-full max-w-5xl px-5 py-10 sm:px-8 sm:py-12">
       <header>
         <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
           Orders
         </p>
-        <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
+        <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
           전체 접수 내역
         </h1>
         <p className="mt-2 text-sm text-[var(--color-ink-500)]">

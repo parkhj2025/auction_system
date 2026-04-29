@@ -79,7 +79,7 @@ export function BiddingTimeline({
               <div
                 className={`mt-1 tabular-nums transition-colors ${
                   isCurrent
-                    ? "text-2xl font-black text-[var(--color-ink-900)]"
+                    ? "text-h3 font-black text-[var(--color-ink-900)]"
                     : "text-lg font-bold text-[var(--color-ink-500)] opacity-60"
                 }`}
               >

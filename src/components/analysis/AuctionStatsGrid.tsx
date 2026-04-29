@@ -24,7 +24,7 @@ export function AuctionStatsGrid({
   if (!history || history.length === 0) return null;
 
   return (
-    <div className="mt-6 grid grid-cols-2 gap-3 sm:grid-cols-4">
+    <div className="mt-6 grid grid-cols-2 gap-2 sm:grid-cols-4">
       {history.map((entry, i) => (
         <div
           key={i}
@@ -36,7 +36,7 @@ export function AuctionStatsGrid({
           <p className="mt-1 text-xs tabular-nums text-[var(--color-ink-500)]">
             {entry.count}건
           </p>
-          <p className="mt-2 text-2xl font-black tabular-nums leading-tight text-[var(--color-ink-900)]">
+          <p className="mt-2 text-h3 font-black tabular-nums leading-tight text-[var(--color-ink-900)]">
             {entry.rate.toFixed(2)}%
           </p>
           <p className="text-[10px] uppercase tracking-widest text-[var(--color-ink-500)]">

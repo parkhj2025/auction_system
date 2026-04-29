@@ -11,7 +11,7 @@ export default function AdminLayout({
   return (
     <main className="flex flex-1 flex-col bg-[var(--color-surface-muted)]">
       <section className="border-b border-[var(--color-border)] bg-white">
-        <div className="mx-auto w-full max-w-6xl px-4 pt-8 pb-5 sm:px-6 sm:pt-10">
+        <div className="mx-auto w-full max-w-[var(--c-base)] px-4 pt-8 pb-5 sm:px-8 sm:pt-10">
           <div className="flex items-center gap-2">
             <span className="inline-flex h-6 w-6 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-white">
               <Shield size={12} aria-hidden="true" />

@@ -68,7 +68,7 @@ export function StatusChanger({
   }
 
   return (
-    <form onSubmit={handleSubmit} className="flex flex-col gap-3">
+    <form onSubmit={handleSubmit} className="flex flex-col gap-2">
       <div>
         <label
           htmlFor="status-to"

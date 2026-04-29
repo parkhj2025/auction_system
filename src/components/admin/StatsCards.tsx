@@ -27,7 +27,7 @@ export function StatsCards({ stats }: { stats: Stat[] }) {
           <Link
             key={stat.label}
             href={stat.href}
-            className="group flex flex-col gap-3 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-5 shadow-sm transition hover:border-[var(--color-ink-900)] hover:shadow-[var(--shadow-card)]"
+            className="group flex flex-col gap-2 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-5 shadow-sm transition hover:border-[var(--color-ink-900)] hover:shadow-[var(--shadow-card)]"
           >
             <div className="flex items-center justify-between">
               <span
@@ -45,7 +45,7 @@ export function StatsCards({ stats }: { stats: Stat[] }) {
               <p className="text-xs font-bold text-[var(--color-ink-500)]">
                 {stat.label}
               </p>
-              <p className="mt-1 text-3xl font-black tabular-nums text-[var(--color-ink-900)]">
+              <p className="mt-1 text-h2 font-black tabular-nums text-[var(--color-ink-900)]">
                 {stat.value}
                 <span className="ml-0.5 text-sm font-bold text-[var(--color-ink-500)]">
                   건

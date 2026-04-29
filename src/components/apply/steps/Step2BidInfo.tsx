@@ -121,15 +121,15 @@ export function Step2BidInfo({
 
   return (
     <div className="flex flex-col gap-6">
-      <header className="flex flex-col gap-3">
-        <div className="flex items-center justify-between gap-3">
+      <header className="flex flex-col gap-2">
+        <div className="flex items-center justify-between gap-2">
           <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             Step 2
           </p>
           <VerifiedBadge verified={data.verified} verifiedName={data.verifiedName} />
         </div>
         <div>
-          <h2 className="mt-1 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+          <h2 className="mt-1 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
             입찰 정보를 입력해주세요
           </h2>
           <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
@@ -152,7 +152,7 @@ export function Step2BidInfo({
         disabled={inputsDisabled}
         className="grid gap-6 disabled:opacity-60 lg:grid-cols-[1.2fr_1fr]"
       >
-        <div className="flex flex-col gap-5 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">
+        <div className="flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">
           {/* 입찰 금액 */}
           <div>
             <label
@@ -204,7 +204,7 @@ export function Step2BidInfo({
           </div>
 
           {/* 신청인 */}
-          <div className="grid gap-5 sm:grid-cols-2">
+          <div className="grid gap-4 sm:grid-cols-2">
             <div>
               <label
                 htmlFor="applicant-name"
@@ -322,7 +322,7 @@ export function Step2BidInfo({
 
           {/* 재경매 물건 여부 */}
           <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4">
-            <label className="flex cursor-pointer items-start gap-3">
+            <label className="flex cursor-pointer items-start gap-2">
               <input
                 type="checkbox"
                 checked={bid.rebid}
@@ -346,7 +346,7 @@ export function Step2BidInfo({
 
           {/* 공동입찰 */}
           <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4">
-            <label className="flex cursor-pointer items-center gap-3">
+            <label className="flex cursor-pointer items-center gap-2">
               <input
                 type="checkbox"
                 checked={bid.jointBidding}
@@ -419,7 +419,7 @@ export function Step2BidInfo({
         </aside>
       </fieldset>
 
-      <div className="flex items-center justify-between gap-3 pt-2">
+      <div className="flex items-center justify-between gap-2 pt-2">
         <button
           type="button"
           onClick={onBack}

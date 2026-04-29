@@ -94,7 +94,7 @@ export default async function AdminOrderDetailPage({
   const minPrice = (snapshot as { minPrice?: number }).minPrice ?? null;
 
   return (
-    <section className="mx-auto w-full max-w-6xl px-4 py-10 sm:px-6 sm:py-14">
+    <section className="mx-auto w-full max-w-[var(--c-base)] px-5 py-10 sm:px-8 sm:py-12">
       <nav
         aria-label="Breadcrumb"
         className="flex items-center gap-1 text-xs font-semibold text-[var(--color-ink-500)]"
@@ -130,7 +130,7 @@ export default async function AdminOrderDetailPage({
         <p className="mt-3 text-sm font-bold text-[var(--color-ink-700)]">
           {row.court}
         </p>
-        <h1 className="mt-1 font-mono text-2xl font-black tabular-nums tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+        <h1 className="mt-1 font-mono text-h3 font-black tabular-nums tracking-tight text-[var(--color-ink-900)] sm:text-h2">
           {row.case_number}
         </h1>
         <p className="mt-2 text-sm text-[var(--color-ink-500)]">

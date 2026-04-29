@@ -18,7 +18,7 @@ export function RelatedCards({ posts }: { posts: AnalysisPost[] }) {
           </p>
           <h2
             id="related-heading"
-            className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl"
+            className="mt-2 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2"
           >
             관련 물건분석
           </h2>
@@ -31,7 +31,7 @@ export function RelatedCards({ posts }: { posts: AnalysisPost[] }) {
           <ArrowRight size={16} aria-hidden="true" />
         </Link>
       </div>
-      <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+      <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         {posts.map((p) => (
           <li key={p.frontmatter.slug}>
             <PropertyCard frontmatter={p.frontmatter} />

@@ -80,11 +80,11 @@ export default function ServicePage() {
     <main className="flex flex-1 flex-col">
       {/* Hero */}
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto w-full max-w-5xl px-5 py-16 sm:px-8 sm:py-20">
           <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             서비스 안내
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
+          <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
             경매 입찰 대리, 하나만 합니다
           </h1>
           <p className="mt-4 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)] sm:text-lg sm:leading-8">
@@ -96,11 +96,11 @@ export default function ServicePage() {
       </section>
 
       {/* 업무 범위 비교 */}
-      <section className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
+      <section className="mx-auto w-full max-w-5xl px-5 py-16 sm:px-8 sm:py-20">
         <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
           업무 범위
         </p>
-        <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+        <h2 className="mt-2 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
           무엇을 하고 무엇을 하지 않는지 명확히 합니다
         </h2>
         <p className="mt-3 max-w-2xl text-sm leading-6 text-[var(--color-ink-500)]">
@@ -108,7 +108,7 @@ export default function ServicePage() {
           이 경계가 고객과 저희 모두를 보호합니다.
         </p>
 
-        <div className="mt-10 grid gap-5 md:grid-cols-2">
+        <div className="mt-10 grid gap-4 md:grid-cols-2">
           <article className="rounded-[var(--radius-xl)] border border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/50 p-6">
             <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
               우리가 하는 일
@@ -116,7 +116,7 @@ export default function ServicePage() {
             <h3 className="mt-2 text-xl font-black text-[var(--color-ink-900)]">
               매수신청 대리
             </h3>
-            <ul className="mt-5 flex flex-col gap-3 text-sm leading-6 text-[var(--color-ink-700)]">
+            <ul className="mt-5 flex flex-col gap-2 text-sm leading-6 text-[var(--color-ink-700)]">
               {WE_DO.map((item) => (
                 <li key={item} className="flex gap-2">
                   <Check
@@ -137,7 +137,7 @@ export default function ServicePage() {
             <h3 className="mt-2 text-xl font-black text-[var(--color-ink-900)]">
               전문가 영역
             </h3>
-            <ul className="mt-5 flex flex-col gap-3 text-sm leading-6 text-[var(--color-ink-700)]">
+            <ul className="mt-5 flex flex-col gap-2 text-sm leading-6 text-[var(--color-ink-700)]">
               {WE_DONT.map((item) => (
                 <li key={item} className="flex gap-2">
                   <X
@@ -149,7 +149,7 @@ export default function ServicePage() {
                 </li>
               ))}
             </ul>
-            <p className="mt-5 rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] px-4 py-3 text-xs leading-5 text-[var(--color-ink-500)]">
+            <p className="mt-5 rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] px-5 py-3 text-xs leading-5 text-[var(--color-ink-500)]">
               본 콘텐츠에 포함된 모든 분석은 참고 자료이며 투자 권유가 아닙니다.
               투자 판단에 대한 책임은 본인에게 있습니다.
             </p>
@@ -159,18 +159,18 @@ export default function ServicePage() {
 
       {/* SOP */}
       <section className="border-t border-[var(--color-border)] bg-white">
-        <div className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto w-full max-w-5xl px-5 py-16 sm:px-8 sm:py-20">
           <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             진행 절차
           </p>
-          <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+          <h2 className="mt-2 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
             접수부터 정산까지 5단계
           </h2>
           <ol className="mt-12 flex flex-col gap-8">
             {SOP.map((step) => {
               const Icon = step.icon;
               return (
-                <li key={step.id} className="flex gap-5">
+                <li key={step.id} className="flex gap-4">
                   <div className="flex flex-col items-center">
                     <span className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-[length:var(--text-body)] font-black text-white">
                       {step.id}
@@ -183,7 +183,7 @@ export default function ServicePage() {
                     )}
                   </div>
                   <div className="flex-1 pb-4">
-                    <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex flex-wrap items-center gap-2">
                       <h3 className="text-lg font-black text-[var(--color-ink-900)]">
                         <Icon
                           size={16}
@@ -209,14 +209,14 @@ export default function ServicePage() {
 
       {/* 수수료 요약 */}
       <section className="border-t border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto w-full max-w-5xl px-5 py-16 sm:px-8 sm:py-20">
           <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             수수료 체계
           </p>
-          <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+          <h2 className="mt-2 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
             신청 시점으로 확정되는 정찰제
           </h2>
-          <div className="mt-8 grid gap-5 md:grid-cols-3">
+          <div className="mt-8 grid gap-4 md:grid-cols-3">
             {[
               {
                 label: "얼리버드",
@@ -241,7 +241,7 @@ export default function ServicePage() {
                 <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
                   {tier.label}
                 </p>
-                <p className="mt-2 text-3xl font-black tabular-nums text-[var(--color-ink-900)]">
+                <p className="mt-2 text-h2 font-black tabular-nums text-[var(--color-ink-900)]">
                   {formatKoreanWon(tier.fee)}
                 </p>
                 <p className="mt-2 text-xs text-[var(--color-ink-500)]">
@@ -273,11 +273,11 @@ export default function ServicePage() {
 
       {/* 안심 근거 */}
       <section className="border-t border-[var(--color-border)] bg-white">
-        <div className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto w-full max-w-5xl px-5 py-16 sm:px-8 sm:py-20">
           <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             안심 근거
           </p>
-          <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+          <h2 className="mt-2 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
             5가지 안전장치
           </h2>
           <div className="mt-10">
@@ -286,7 +286,7 @@ export default function ServicePage() {
               displayOnly
             />
           </div>
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row">
+          <div className="mt-10 flex flex-col gap-2 sm:flex-row">
             <Link
               href="/apply"
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-black"

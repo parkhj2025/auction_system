@@ -84,7 +84,7 @@ export function FileUpload({
       </p>
 
       {file ? (
-        <div className="flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/70 p-4">
+        <div className="flex items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/70 p-4">
           <FileText
             size={20}
             className="shrink-0 text-[var(--color-ink-900)]"

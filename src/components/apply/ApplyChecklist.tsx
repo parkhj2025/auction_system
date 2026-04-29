@@ -41,7 +41,7 @@ export function ApplyChecklist({
   displayOnly?: boolean;
 }) {
   return (
-    <ul className="flex flex-col gap-3">
+    <ul className="flex flex-col gap-2">
       {CHECKLIST_ITEMS.map((item, i) => {
         const checked = values[i] ?? false;
         const id = `apply-checklist-${i}`;

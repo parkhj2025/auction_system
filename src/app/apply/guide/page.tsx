@@ -70,7 +70,7 @@ export default function ApplyGuidePage() {
   return (
     <main className="flex flex-1 flex-col">
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-4xl px-4 py-14 sm:px-6 sm:py-16">
+        <div className="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8 sm:py-16">
           <nav
             aria-label="Breadcrumb"
             className="flex items-center gap-1 text-xs font-semibold text-[var(--color-ink-500)]"
@@ -91,7 +91,7 @@ export default function ApplyGuidePage() {
           <p className="mt-5 text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             신청 가이드
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
+          <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
             처음이시라도 5분이면 끝납니다
           </h1>
           <p className="mt-3 text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
@@ -101,12 +101,12 @@ export default function ApplyGuidePage() {
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
-        <ol className="flex flex-col gap-10">
+      <section className="mx-auto w-full max-w-4xl px-5 py-16 sm:px-8 sm:py-20">
+        <ol className="flex flex-col gap-8">
           {APPLY_STEPS.map((step, i) => {
             const detail = STEP_DETAILS[step.id];
             return (
-              <li key={step.id} className="flex gap-5">
+              <li key={step.id} className="flex gap-4">
                 <div className="flex flex-col items-center">
                   <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-sm font-black text-white">
                     {i + 1}
@@ -137,7 +137,7 @@ export default function ApplyGuidePage() {
                     ))}
                   </ul>
                   {detail.tip && (
-                    <p className="mt-3 rounded-[var(--radius-md)] bg-[var(--color-ink-50)]/70 px-4 py-3 text-xs leading-5 text-[var(--color-ink-900)]">
+                    <p className="mt-3 rounded-[var(--radius-md)] bg-[var(--color-ink-50)]/70 px-5 py-3 text-xs leading-5 text-[var(--color-ink-900)]">
                       TIP · {detail.tip}
                     </p>
                   )}
@@ -149,11 +149,11 @@ export default function ApplyGuidePage() {
       </section>
 
       <section className="border-t border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto w-full max-w-4xl px-5 py-16 sm:px-8 sm:py-20">
           <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             자주 묻는 질문
           </p>
-          <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+          <h2 className="mt-2 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
             신청 전 궁금하신 3가지
           </h2>
           <dl className="mt-8 flex flex-col gap-4">

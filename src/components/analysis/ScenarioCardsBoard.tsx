@@ -31,7 +31,7 @@ export function ScenarioCardsBoard({ inv }: { inv: InvestmentMeta }) {
 
   return (
     <>
-      <div className="mt-6 grid gap-3 sm:grid-cols-2">
+      <div className="mt-6 grid gap-2 sm:grid-cols-2">
         {visible.map((c) => {
           const Icon = SCENARIO_ICON[c.key] ?? Home;
           return (
@@ -74,7 +74,7 @@ export function ScenarioCardsBoard({ inv }: { inv: InvestmentMeta }) {
                   {c.rows.slice(0, 2).map((r, i) => (
                     <div
                       key={i}
-                      className="flex items-baseline justify-between gap-3 text-sm"
+                      className="flex items-baseline justify-between gap-2 text-sm"
                     >
                       <dt className="text-[var(--color-ink-500)]">{r.label}</dt>
                       <dd className="font-bold tabular-nums text-[var(--color-ink-900)]">
@@ -110,7 +110,7 @@ export function ScenarioCardsBoard({ inv }: { inv: InvestmentMeta }) {
               {opened.rows.map((r, i) => (
                 <div
                   key={i}
-                  className="flex items-baseline justify-between gap-3 px-4 py-3 text-sm"
+                  className="flex items-baseline justify-between gap-2 px-4 py-3 text-sm"
                 >
                   <dt className="text-[var(--color-ink-500)]">{r.label}</dt>
                   <dd className="font-bold tabular-nums text-[var(--color-ink-900)]">

@@ -17,7 +17,7 @@ export function RightsCallout({ rights }: { rights: RightsMeta }) {
   if (!hasBasis && !hasTenants) return null;
 
   return (
-    <div className="mt-6 grid gap-3 sm:grid-cols-2">
+    <div className="mt-6 grid gap-2 sm:grid-cols-2">
       {hasBasis ? (
         <div className="rounded-[var(--radius-md)] border border-l-4 border-[var(--color-border)] border-l-[var(--color-ink-900)] bg-[var(--color-ink-50)] p-4">
           <p className="text-[10px] font-bold uppercase tracking-[0.18em] text-[var(--color-ink-900)]">

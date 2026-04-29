@@ -17,13 +17,13 @@ export function SectionHeader({
   return (
     <header
       id={`section-${num}`}
-      className="mt-20 scroll-mt-24 border-t border-[var(--color-border)] pt-10 first:mt-0 first:border-t-0 first:pt-0 sm:mt-32 sm:pt-12"
+      className="mt-16 scroll-mt-24 first:mt-0 sm:mt-24"
     >
       <div className="flex items-baseline gap-4">
-        <span className="text-[length:var(--text-caption)] font-black uppercase tracking-[0.24em] text-[var(--color-ink-500)] tabular-nums">
+        <span className="text-caption font-black uppercase tracking-[0.24em] text-[var(--color-ink-500)] tabular-nums">
           {num}
         </span>
-        <h2 className="text-[length:var(--text-h2)] font-black tracking-tight leading-[var(--lh-snug)] text-[var(--color-ink-900)]">
+        <h2 className="text-h2 font-black tracking-tight leading-[var(--lh-h2)] text-[var(--color-ink-900)]">
           {title}
         </h2>
       </div>

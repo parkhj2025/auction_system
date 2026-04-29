@@ -99,7 +99,7 @@ export function RightsAnalysisSection({ rights }: { rights: RightsMeta }) {
           whileHover={{ y: -2, transition: { duration: 0.2, ease: "easeOut" } }}
           className="rounded-[var(--radius-xl)] border border-[var(--color-ink-200)] bg-white p-5 transition-colors duration-200 ease-out hover:border-[var(--color-ink-900)] hover:bg-[var(--color-ink-50)] hover:shadow-[var(--shadow-card)]"
         >
-          <div className="flex items-baseline gap-3">
+          <div className="flex items-baseline gap-2">
             <span className="text-xs font-black uppercase tracking-[0.18em] tabular-nums text-[var(--color-ink-500)]">
               Step {String(idx + 1).padStart(2, "0")}
             </span>

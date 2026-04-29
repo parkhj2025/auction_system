@@ -40,7 +40,7 @@ export function DepositStatus({ order }: { order: OrderRow }) {
       <div className="mt-4 flex items-end justify-between gap-4">
         <div>
           <p className="text-xs text-[var(--color-ink-500)]">{rebidLabel}</p>
-          <p className="mt-1 text-3xl font-black tabular-nums text-[var(--color-ink-900)]">
+          <p className="mt-1 text-h2 font-black tabular-nums text-[var(--color-ink-900)]">
             {formatKoreanWon(amount)}
           </p>
         </div>

@@ -57,13 +57,13 @@ export default async function MyDashboardPage() {
   const completed = (completedOrders ?? []) as OrderRow[];
 
   return (
-    <section className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-6 sm:py-14">
-      <header className="flex items-end justify-between gap-3">
+    <section className="mx-auto w-full max-w-5xl px-5 py-10 sm:px-8 sm:py-12">
+      <header className="flex items-end justify-between gap-2">
         <div>
           <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             My Page
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
+          <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
             접수 현황
           </h1>
         </div>

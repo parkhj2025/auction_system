@@ -25,8 +25,8 @@ export function TrustCTA() {
         className="pointer-events-none absolute -bottom-40 -left-40 h-96 w-96 rounded-full bg-black/40 blur-3xl"
       />
 
-      <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center px-4 py-20 text-center sm:px-6 sm:py-24">
-        <ul className="flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+      <div className="relative mx-auto flex w-full max-w-4xl flex-col items-center px-4 py-20 text-center sm:px-8 sm:py-24">
+        <ul className="flex flex-wrap items-center justify-center gap-2 sm:gap-2">
           {BADGES.map(({ icon: Icon, label }) => (
             <li
               key={label}
@@ -40,7 +40,7 @@ export function TrustCTA() {
 
         <h2
           id="trust-heading"
-          className="mt-8 text-3xl font-black leading-tight tracking-tight sm:text-4xl"
+          className="mt-8 text-h2 font-black leading-tight tracking-tight sm:text-h1"
         >
           입찰일에 법원 방문이 어려우신가요?
         </h2>
@@ -49,7 +49,7 @@ export function TrustCTA() {
           서비스를 운영하고 있습니다. 패찰 시 보증금은 당일 즉시 반환됩니다.
         </p>
 
-        <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
+        <div className="mt-10 flex flex-col gap-2 sm:flex-row sm:gap-4">
           <Link
             href={PRIMARY_CTA.href}
             className="inline-flex min-h-12 items-center justify-center rounded-[var(--radius-md)] bg-white px-7 text-[length:var(--text-body)] font-bold text-[var(--color-ink-900)] shadow-[var(--shadow-lift)] transition hover:bg-[var(--color-ink-50)]"

@@ -40,14 +40,14 @@ export function FlowSteps() {
       aria-labelledby="flow-heading"
       className="border-t border-[var(--color-border)] bg-white"
     >
-      <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
+      <div className="mx-auto w-full max-w-[var(--c-base)] px-4 py-20 sm:px-8 sm:py-24">
         <div className="max-w-2xl">
           <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-900)]">
             이용 절차
           </p>
           <h2
             id="flow-heading"
-            className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl"
+            className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1"
           >
             3단계로 끝나는 입찰 대리
           </h2>
@@ -92,7 +92,7 @@ export function FlowSteps() {
         <ol className="mt-12 flex flex-col gap-0 md:hidden">
           {STEPS.map((step, i) => (
             <li key={step.n} className="flex flex-col">
-              <div className="flex gap-5">
+              <div className="flex gap-4">
                 <div className="flex flex-col items-center">
                   <div className="flex h-12 w-12 items-center justify-center rounded-full bg-[var(--color-ink-900)] text-lg font-black text-white">
                     {step.n}

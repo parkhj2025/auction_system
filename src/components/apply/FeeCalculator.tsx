@@ -47,7 +47,7 @@ export function FeeCalculator({
               </span>
             )}
           </div>
-          <p className="mt-1 text-3xl font-black tabular-nums text-[var(--color-ink-900)]">
+          <p className="mt-1 text-h2 font-black tabular-nums text-[var(--color-ink-900)]">
             {formatKoreanWon(fee.baseFee)}
           </p>
           <p className="mt-1 text-xs text-[var(--color-ink-500)]">
@@ -57,7 +57,7 @@ export function FeeCalculator({
       </div>
 
       {/* 성공보수 주석 */}
-      <div className="mt-5 flex items-start gap-3 rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] px-4 py-3 text-xs">
+      <div className="mt-5 flex items-start gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] px-4 py-3 text-xs">
         <Info
           size={14}
           className="mt-0.5 shrink-0 text-[var(--color-ink-500)]"
@@ -79,7 +79,7 @@ export function FeeCalculator({
       {/* 보증금 */}
       {deposit !== null && (
         <div className="mt-5 border-t border-[var(--color-border)] pt-5">
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-2">
             <ShieldCheck
               size={18}
               className="mt-0.5 shrink-0 text-[var(--color-ink-500)]"

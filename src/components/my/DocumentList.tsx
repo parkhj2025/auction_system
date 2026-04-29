@@ -34,11 +34,11 @@ export function DocumentList({ documents }: { documents: DocumentWithUrl[] }) {
       <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
         제출 서류
       </h3>
-      <ul className="mt-4 flex flex-col gap-3">
+      <ul className="mt-4 flex flex-col gap-2">
         {documents.map((doc) => (
           <li
             key={doc.id}
-            className="flex items-center gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-3"
+            className="flex items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-3"
           >
             <FileText
               size={20}

@@ -138,12 +138,12 @@ function buildH2(
           return (
             <h2
               id={`section-${num}`}
-              className="mt-20 flex scroll-mt-24 items-baseline gap-4 border-t border-[var(--color-border)] pt-10 first:mt-0 first:border-t-0 first:pt-0 sm:mt-32 sm:pt-12"
+              className="mt-16 flex scroll-mt-24 items-baseline gap-4 first:mt-0 sm:mt-24"
             >
-              <span className="text-[length:var(--text-caption)] font-black uppercase tracking-[0.24em] text-[var(--color-ink-500)] tabular-nums">
+              <span className="text-caption font-black uppercase tracking-[0.24em] text-[var(--color-ink-500)] tabular-nums">
                 {num}
               </span>
-              <span className="text-[length:var(--text-h2)] font-black tracking-tight leading-[var(--lh-snug)] text-[var(--color-ink-900)]">
+              <span className="text-h2 font-black tracking-tight leading-[var(--lh-h2)] text-[var(--color-ink-900)]">
                 {title}
               </span>
             </h2>
@@ -152,7 +152,7 @@ function buildH2(
     }
     return (
       <h2
-        className="mt-16 scroll-mt-24 text-2xl font-black tracking-tight text-[var(--color-ink-900)] first:mt-0 sm:text-3xl"
+        className="mt-16 scroll-mt-24 text-h3 font-black tracking-tight text-[var(--color-ink-900)] first:mt-0 sm:text-h2"
         {...rest}
       >
         {children}
@@ -398,7 +398,7 @@ function ScenarioCard() {
 
 function ConclusionCallout({ children }: { children?: ReactNode }) {
   return (
-    <div className="mt-6 rounded-r-[var(--radius-md)] border-l-4 border-[var(--color-ink-900)] bg-[var(--color-ink-50)] px-5 py-4 sm:px-6 sm:py-5">
+    <div className="mt-6 rounded-r-[var(--radius-md)] border-l-4 border-[var(--color-ink-900)] bg-[var(--color-ink-50)] px-5 py-4 sm:px-8 sm:py-5">
       <span className="inline-flex items-center rounded-[var(--radius-xs)] bg-[var(--color-ink-900)] px-2 py-0.5 text-[10px] font-black uppercase tracking-[0.18em] text-white">
         결론
       </span>

@@ -432,7 +432,7 @@ export function ScenarioComparisonBox({
             {formatKoreanWon(userBidPrice)}
           </span>
         </div>
-        <div className="mt-3 flex items-center gap-3">
+        <div className="mt-3 flex items-center gap-2">
           <span className="text-[11px] tabular-nums text-[var(--color-ink-500)]">
             최저가
           </span>

@@ -295,7 +295,7 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
             </p>
           </div>
 
-          <label className="flex cursor-pointer items-start gap-3">
+          <label className="flex cursor-pointer items-start gap-2">
             <input
               type="checkbox"
               checked={agreed}
@@ -308,8 +308,8 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
           </label>
         </div>
 
-        <div className="flex flex-col gap-3 border-t border-[var(--color-border)] bg-[var(--color-surface-muted)] px-6 py-4">
-          <div className="flex gap-3">
+        <div className="flex flex-col gap-2 border-t border-[var(--color-border)] bg-[var(--color-surface-muted)] px-6 py-4">
+          <div className="flex gap-2">
             <button
               type="button"
               onClick={onReturn}

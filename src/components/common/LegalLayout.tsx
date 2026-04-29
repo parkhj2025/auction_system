@@ -24,7 +24,7 @@ export function LegalLayout({
   return (
     <main className="flex flex-1 flex-col">
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
+        <div className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-8 sm:py-16">
           <nav
             aria-label="Breadcrumb"
             className="flex items-center gap-1 text-xs font-semibold text-[var(--color-ink-500)]"
@@ -38,7 +38,7 @@ export function LegalLayout({
           <p className="mt-5 text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             법적 고지
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
+          <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
             {title}
           </h1>
           {intro && (
@@ -63,7 +63,7 @@ export function LegalLayout({
             )}
           </dl>
 
-          <div className="mt-8 flex items-start gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 py-4 text-xs leading-5 text-[var(--color-ink-700)]">
+          <div className="mt-8 flex items-start gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 py-4 text-xs leading-5 text-[var(--color-ink-700)]">
             <Info
               size={14}
               className="mt-0.5 shrink-0 text-[var(--color-ink-900)]"
@@ -79,8 +79,8 @@ export function LegalLayout({
         </div>
       </section>
 
-      <article className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
-        <div className="legal-body flex flex-col gap-10 text-[var(--color-ink-700)]">
+      <article className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-8 sm:py-16">
+        <div className="legal-body flex flex-col gap-8 text-[var(--color-ink-700)]">
           {children}
         </div>
 
@@ -119,7 +119,7 @@ export function Article({
     >
       <h2
         id={`article-${number}-heading`}
-        className="flex items-baseline gap-3 border-t border-[var(--color-border)] pt-8 text-xl font-black tracking-tight text-[var(--color-ink-900)] first:border-t-0 first:pt-0"
+        className="flex items-baseline gap-2 border-t border-[var(--color-border)] pt-8 text-xl font-black tracking-tight text-[var(--color-ink-900)] first:border-t-0 first:pt-0"
       >
         <span className="text-xs font-black uppercase tracking-[0.2em] text-[var(--color-ink-900)]">
           {number}

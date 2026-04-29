@@ -32,10 +32,10 @@ export default async function LoginPage({
   }
 
   return (
-    <main className="flex flex-1 items-center justify-center bg-[var(--color-surface-muted)] px-4 py-16 sm:py-24">
+    <main className="flex flex-1 items-center justify-center bg-[var(--color-surface-muted)] px-5 py-16 sm:py-24">
       <div className="w-full max-w-md">
         <div className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-white p-8 shadow-[var(--shadow-card)] sm:p-10">
-          <h1 className="text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+          <h1 className="text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
             로그인
           </h1>
           <p className="mt-3 text-sm leading-6 text-[var(--color-ink-500)]">
@@ -46,7 +46,7 @@ export default async function LoginPage({
 
           {error && (
             <div
-              className="mt-6 rounded-[var(--radius-md)] border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700"
+              className="mt-6 rounded-[var(--radius-md)] border border-red-200 bg-red-50 px-5 py-3 text-sm text-red-700"
               role="alert"
             >
               로그인 중 오류가 발생했습니다. 다시 시도해주세요.

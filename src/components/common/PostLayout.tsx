@@ -38,7 +38,7 @@ export async function PostLayout({
   return (
     <main className="flex flex-1 flex-col">
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
+        <div className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-8 sm:py-16">
           <nav
             aria-label="Breadcrumb"
             className="flex items-center gap-1 text-xs font-semibold text-[var(--color-ink-500)]"
@@ -58,7 +58,7 @@ export async function PostLayout({
           <p className="mt-5 text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             {collectionLabel}
           </p>
-          <h1 className="mt-2 text-3xl font-black leading-tight tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
+          <h1 className="mt-2 text-h2 font-black leading-tight tracking-tight text-[var(--color-ink-900)] sm:text-h1">
             {title}
           </h1>
           {subtitle && (
@@ -90,7 +90,7 @@ export async function PostLayout({
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-6 sm:py-16">
+      <section className="mx-auto w-full max-w-3xl px-4 py-12 sm:px-8 sm:py-16">
         <article className="min-w-0">
           <MDXRemote
             source={body}

@@ -31,7 +31,7 @@ export function ApplyCTA({ fm }: { fm: AnalysisFrontmatter }) {
         </p>
         <h2
           id="apply-cta-heading"
-          className="relative mt-3 max-w-2xl text-2xl font-black leading-snug sm:text-3xl"
+          className="relative mt-3 max-w-2xl text-h3 font-black leading-snug sm:text-h2"
         >
           분석은 끝났습니다.
           <br className="sm:hidden" /> 법원은 저희가 갑니다.
@@ -52,7 +52,7 @@ export function ApplyCTA({ fm }: { fm: AnalysisFrontmatter }) {
           </li>
         </ul>
 
-        <div className="relative mt-7 flex flex-col gap-3 sm:flex-row sm:items-center">
+        <div className="relative mt-7 flex flex-col gap-2 sm:flex-row sm:items-center">
           <Link
             href={applyHref}
             className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-white px-6 text-[length:var(--text-body)] font-black tracking-tight text-[var(--color-ink-900)] shadow-[var(--shadow-lift)] transition duration-150 ease-out hover:bg-[var(--color-ink-50)]"

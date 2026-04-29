@@ -24,7 +24,7 @@ export function MobileSticky() {
       role="region"
       aria-label="빠른 신청"
     >
-      <div className="mx-auto flex w-full max-w-6xl items-center gap-2 px-4 py-3">
+      <div className="mx-auto flex w-full max-w-[var(--c-base)] items-center gap-2 px-4 py-3">
         <Link
           href="/analysis"
           className="flex min-h-12 flex-1 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-3 text-sm font-bold text-[var(--color-ink-900)] hover:bg-[var(--color-ink-100)]"

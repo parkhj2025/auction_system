@@ -137,7 +137,7 @@ function Section({
       <h3 className="text-sm font-bold text-[var(--color-ink-900)]">{label}</h3>
       <dl className="mt-2 divide-y divide-[var(--color-border)] rounded-[var(--radius-sm)] border border-[var(--color-border)]">
         {rows.map((row) => (
-          <div key={row.key} className="flex items-baseline gap-3 px-3 py-2">
+          <div key={row.key} className="flex items-baseline gap-2 px-3 py-2">
             <dt className="w-28 shrink-0 text-xs font-bold text-[var(--color-ink-500)]">
               {row.key}
             </dt>

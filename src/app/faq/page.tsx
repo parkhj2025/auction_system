@@ -35,11 +35,11 @@ export default function FaqPage() {
 
       {/* Hero */}
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto w-full max-w-4xl px-5 py-16 sm:px-8 sm:py-20">
           <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             자주 묻는 질문
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
+          <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
             신청 전 궁금하신 점을 모았습니다
           </h1>
           <p className="mt-3 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
@@ -72,7 +72,7 @@ export default function FaqPage() {
       </section>
 
       {/* Categories */}
-      <section className="mx-auto w-full max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
+      <section className="mx-auto w-full max-w-4xl px-5 py-16 sm:px-8 sm:py-20">
         <div className="flex flex-col gap-16">
           {FAQ_CATEGORIES.map((cat) => (
             <section
@@ -87,12 +87,12 @@ export default function FaqPage() {
                 </p>
                 <h2
                   id={`${cat.id}-heading`}
-                  className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)]"
+                  className="mt-2 text-h3 font-black tracking-tight text-[var(--color-ink-900)]"
                 >
                   {cat.description}
                 </h2>
               </header>
-              <ul className="mt-6 flex flex-col gap-3">
+              <ul className="mt-6 flex flex-col gap-2">
                 {cat.items.map((it, i) => (
                   <li key={it.q}>
                     <details
@@ -123,16 +123,16 @@ export default function FaqPage() {
 
       {/* Bottom CTA */}
       <section className="border-t border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto flex w-full max-w-4xl flex-col items-start gap-6 px-4 py-14 sm:px-6 sm:py-16 md:flex-row md:items-center md:justify-between">
+        <div className="mx-auto flex w-full max-w-4xl flex-col items-start gap-6 px-5 py-12 sm:px-8 sm:py-16 md:flex-row md:items-center md:justify-between">
           <div>
-            <h2 className="text-xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-2xl">
+            <h2 className="text-xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-h3">
               답을 찾으셨나요?
             </h2>
             <p className="mt-2 text-sm text-[var(--color-ink-500)]">
               바로 신청하시거나 추가 문의를 남겨주세요.
             </p>
           </div>
-          <div className="flex flex-col gap-3 sm:flex-row">
+          <div className="flex flex-col gap-2 sm:flex-row">
             <Link
               href="/apply"
               className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-black"

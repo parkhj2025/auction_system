@@ -167,13 +167,13 @@ export function Step4Confirm({
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-2">
           <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             Step 4
           </p>
           <VerifiedBadge verified={data.verified} verifiedName={data.verifiedName} />
         </div>
-        <h2 className="mt-1 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+        <h2 className="mt-1 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
           서명하고 위임에 동의해 주세요
         </h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
@@ -183,7 +183,7 @@ export function Step4Confirm({
       </header>
 
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
-        <section className="flex flex-col gap-5">
+        <section className="flex flex-col gap-4">
           {/* 입력 요약 */}
           <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">
             <h3 className="text-sm font-black text-[var(--color-ink-900)]">
@@ -260,8 +260,8 @@ export function Step4Confirm({
           {/* 3개 동의 + 미리보기 */}
           <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">
             <h3 className="text-sm font-black text-[var(--color-ink-900)]">동의</h3>
-            <ul className="mt-4 flex flex-col gap-3 text-sm leading-6 text-[var(--color-ink-700)]">
-              <li className="flex items-start gap-3">
+            <ul className="mt-4 flex flex-col gap-2 text-sm leading-6 text-[var(--color-ink-700)]">
+              <li className="flex items-start gap-2">
                 <input
                   id="agree-delegation"
                   type="checkbox"
@@ -295,7 +295,7 @@ export function Step4Confirm({
                   </button>
                 </label>
               </li>
-              <li className="flex items-start gap-3">
+              <li className="flex items-start gap-2">
                 <input
                   id="agree-privacy"
                   type="checkbox"
@@ -315,7 +315,7 @@ export function Step4Confirm({
                   </button>
                 </label>
               </li>
-              <li className="flex items-start gap-3">
+              <li className="flex items-start gap-2">
                 <input
                   id="agree-terms"
                   type="checkbox"
@@ -354,7 +354,7 @@ export function Step4Confirm({
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-3 pt-2">
+      <div className="flex items-center justify-between gap-2 pt-2">
         <button
           type="button"
           onClick={onBack}

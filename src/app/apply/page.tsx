@@ -22,7 +22,7 @@ export default function ApplyPage() {
     <main className="flex flex-1 flex-col">
       {/* 섹션 헤더 + 사전 안내 */}
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-5xl px-4 pt-10 pb-8 sm:px-6 sm:pt-14 sm:pb-10">
+        <div className="mx-auto w-full max-w-5xl px-4 pt-10 pb-8 sm:px-8 sm:pt-14 sm:pb-10">
           <nav
             aria-label="Breadcrumb"
             className="flex items-center gap-1 text-xs font-semibold text-[var(--color-ink-500)]"
@@ -37,7 +37,7 @@ export default function ApplyPage() {
           <p className="mt-5 text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             입찰 대리 신청
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
+          <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
             5분이면 끝나는 웹 접수
           </h1>
           <p className="mt-3 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
@@ -77,7 +77,7 @@ export default function ApplyPage() {
 
 function ApplyLoading() {
   return (
-    <section className="mx-auto w-full max-w-5xl px-4 py-16 sm:px-6">
+    <section className="mx-auto w-full max-w-5xl px-5 py-16 sm:px-8">
       <div className="h-10 w-48 animate-pulse rounded-[var(--radius-md)] bg-[var(--color-ink-100)]" />
       <div className="mt-6 h-96 animate-pulse rounded-[var(--radius-xl)] bg-[var(--color-ink-100)]" />
     </section>

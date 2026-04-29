@@ -49,27 +49,21 @@ export default async function GuideListPage({
 
   return (
     <main className="flex flex-1 flex-col">
+      {/* Phase 0 — 3블록 정형화 (헤더 + 필터 inline / 그리드 / Footer CTA). sticky 폐지. */}
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-6xl px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto w-full max-w-[var(--c-base)] px-5 py-16 sm:px-8 sm:py-20">
           <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             경매가이드
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
+          <h1 className="mt-2 text-h1 font-black tracking-tight text-[var(--color-ink-900)]">
             입문부터 실전까지 단계별로
           </h1>
-          <p className="mt-3 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
+          <p className="mt-3 max-w-2xl text-body leading-relaxed text-[var(--color-ink-500)]">
             경매의 기본 개념부터 권리분석, 시세 산정, 입찰가 결정, 명도
             절차까지. 난이도에 맞춰 필요한 글을 골라 읽으세요.
           </p>
-        </div>
-      </section>
 
-      <section
-        aria-label="난이도 필터"
-        className="sticky top-16 z-20 border-b border-[var(--color-border)] bg-white/95 backdrop-blur"
-      >
-        <div className="mx-auto w-full max-w-6xl px-4 py-4 sm:px-6">
-          <nav aria-label="난이도" className="flex flex-wrap gap-2">
+          <nav aria-label="난이도" className="mt-8 flex flex-wrap gap-2">
             {CHIPS.map((chip) => {
               const isActive = active === chip.value;
               return (
@@ -78,10 +72,10 @@ export default async function GuideListPage({
                   href={buildHref(chip.value)}
                   aria-current={isActive ? "page" : undefined}
                   className={cn(
-                    "inline-flex h-10 min-w-[56px] items-center justify-center rounded-full border px-4 text-sm font-bold transition",
+                    "inline-flex h-9 items-center justify-center rounded-full border px-4 text-[13px] font-medium transition-colors",
                     isActive
                       ? "border-[var(--color-ink-900)] bg-[var(--color-ink-900)] text-white"
-                      : "border-[var(--color-border)] bg-white text-[var(--color-ink-700)] hover:border-[var(--color-ink-200)] hover:text-black"
+                      : "border-[var(--color-ink-200)] bg-white text-[var(--color-ink-700)] hover:border-[var(--color-ink-900)] hover:text-[var(--color-ink-900)]"
                   )}
                 >
                   {chip.label}
@@ -92,7 +86,7 @@ export default async function GuideListPage({
         </div>
       </section>
 
-      <section className="mx-auto w-full max-w-6xl px-4 py-12 sm:px-6 sm:py-16">
+      <section className="mx-auto w-full max-w-[var(--c-base)] px-5 py-12 sm:px-8 sm:py-16">
         <p className="text-sm font-semibold text-[var(--color-ink-500)]">
           총{" "}
           <strong className="tabular-nums text-[var(--color-ink-900)]">
@@ -109,7 +103,7 @@ export default async function GuideListPage({
             ctaLabel="전체 가이드 보기"
           />
         ) : (
-          <ul className="mt-8 grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          <ul className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
             {filtered.map((p) => (
               <li key={p.frontmatter.slug}>
                 <ContentCard

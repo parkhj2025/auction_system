@@ -22,13 +22,13 @@ export function Step3Documents({
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <div className="flex items-center justify-between gap-3">
+        <div className="flex items-center justify-between gap-2">
           <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             Step 3
           </p>
           <VerifiedBadge verified={data.verified} verifiedName={data.verifiedName} />
         </div>
-        <h2 className="mt-1 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+        <h2 className="mt-1 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
           서류를 업로드해주세요
         </h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
@@ -37,7 +37,7 @@ export function Step3Documents({
         </p>
       </header>
 
-      <div className="flex items-start gap-3 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-5 py-4 text-sm">
+      <div className="flex items-start gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-5 py-4 text-sm">
         <Info
           size={16}
           className="mt-0.5 shrink-0 text-[var(--color-ink-900)]"
@@ -53,7 +53,7 @@ export function Step3Documents({
         </p>
       </div>
 
-      <div className="grid gap-5 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)] md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)] md:grid-cols-2 lg:grid-cols-3">
         <FileUpload
           label="전자본인서명확인서"
           description="대법원 전자민원센터에서 발급한 PDF 파일을 올려주세요."
@@ -88,7 +88,7 @@ export function Step3Documents({
         저장은 보안이 확보된 내부 저장소에만 이루어집니다.
       </p>
 
-      <div className="flex items-center justify-between gap-3 pt-2">
+      <div className="flex items-center justify-between gap-2 pt-2">
         <button
           type="button"
           onClick={onBack}

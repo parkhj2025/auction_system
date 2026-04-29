@@ -20,11 +20,11 @@ export default function ContactPage() {
     <main className="flex flex-1 flex-col">
       {/* Hero */}
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto w-full max-w-4xl px-5 py-16 sm:px-8 sm:py-20">
           <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             문의하기
           </p>
-          <h1 className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl">
+          <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
             어떻게 도와드릴까요
           </h1>
           <p className="mt-3 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
@@ -35,7 +35,7 @@ export default function ContactPage() {
       </section>
 
       {/* 접수 우선 안내 */}
-      <section className="mx-auto w-full max-w-4xl px-4 pt-10 sm:px-6 sm:pt-14">
+      <section className="mx-auto w-full max-w-4xl px-4 pt-10 sm:px-8 sm:pt-14">
         <div className="flex items-start gap-4 rounded-[var(--radius-xl)] border border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/60 p-6">
           <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] text-white">
             <Info size={18} aria-hidden="true" />
@@ -61,15 +61,15 @@ export default function ContactPage() {
       </section>
 
       {/* 채널 카드 */}
-      <section className="mx-auto w-full max-w-4xl px-4 py-12 sm:px-6 sm:py-16">
+      <section className="mx-auto w-full max-w-4xl px-5 py-12 sm:px-8 sm:py-16">
         <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
           상담 채널
         </p>
-        <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+        <h2 className="mt-2 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
           편하신 방법을 선택해주세요
         </h2>
 
-        <div className="mt-10 grid gap-5 sm:grid-cols-2">
+        <div className="mt-10 grid gap-4 sm:grid-cols-2">
           <article className="flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">
             <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-50)] text-[var(--color-ink-900)]">
               <MessageCircle size={22} aria-hidden="true" />
@@ -119,11 +119,11 @@ export default function ContactPage() {
 
       {/* 회사 정보 */}
       <section className="border-t border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-4xl px-4 py-16 sm:px-6 sm:py-20">
+        <div className="mx-auto w-full max-w-4xl px-5 py-16 sm:px-8 sm:py-20">
           <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             회사 정보
           </p>
-          <h2 className="mt-2 text-2xl font-black tracking-tight text-[var(--color-ink-900)]">
+          <h2 className="mt-2 text-h3 font-black tracking-tight text-[var(--color-ink-900)]">
             {COMPANY.name}
           </h2>
           <dl className="mt-8 grid gap-6 sm:grid-cols-2">

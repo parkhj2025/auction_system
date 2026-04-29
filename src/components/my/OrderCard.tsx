@@ -21,7 +21,7 @@ export function OrderCard({ order }: { order: OrderRow }) {
       href={`/my/orders/${order.id}`}
       className="group relative flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-5 shadow-sm transition hover:border-[var(--color-ink-900)] hover:shadow-[var(--shadow-card)]"
     >
-      <div className="flex items-start justify-between gap-3">
+      <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span

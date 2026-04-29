@@ -16,7 +16,7 @@ export function ApplyStepIndicator({
       aria-label="신청 진행 단계"
       className="border-b border-[var(--color-border)] bg-white"
     >
-      <ol className="mx-auto flex w-full max-w-5xl items-center gap-0 overflow-x-auto px-4 py-5 sm:px-6">
+      <ol className="mx-auto flex w-full max-w-5xl items-center gap-0 overflow-x-auto px-4 py-5 sm:px-8">
         {APPLY_STEPS.map((step, i) => {
           const isCompleted = completed.has(step.id);
           const isCurrent = step.id === current;
@@ -25,9 +25,9 @@ export function ApplyStepIndicator({
           return (
             <li
               key={step.id}
-              className="flex min-w-max flex-1 items-center gap-2 sm:gap-3"
+              className="flex min-w-max flex-1 items-center gap-2 sm:gap-2"
             >
-              <div className="flex items-center gap-2 sm:gap-3">
+              <div className="flex items-center gap-2 sm:gap-2">
                 <span
                   aria-current={isCurrent ? "step" : undefined}
                   className={cn(

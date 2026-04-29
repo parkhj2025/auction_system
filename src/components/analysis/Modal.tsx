@@ -58,7 +58,7 @@ export function Modal({
         onClick={(e) => e.stopPropagation()}
         className={`relative w-full ${widthCls} max-h-[90vh] overflow-y-auto rounded-[var(--radius-xl)] bg-white shadow-[var(--shadow-elevated)]`}
       >
-        <div className="flex items-start justify-between gap-3 border-b border-[var(--color-border)] px-5 py-4 sm:px-6">
+        <div className="flex items-start justify-between gap-2 border-b border-[var(--color-border)] px-5 py-4 sm:px-8">
           {title ? (
             <h2 className="text-lg font-black tracking-tight text-[var(--color-ink-900)] sm:text-xl">
               {title}
@@ -75,7 +75,7 @@ export function Modal({
             <X size={18} aria-hidden="true" />
           </button>
         </div>
-        <div className="px-5 py-5 sm:px-6 sm:py-6">{children}</div>
+        <div className="px-5 py-5 sm:px-8 sm:py-6">{children}</div>
       </div>
     </div>
   );

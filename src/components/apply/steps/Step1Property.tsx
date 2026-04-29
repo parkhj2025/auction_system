@@ -239,7 +239,7 @@ export function Step1Property({
         <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
           Step 1
         </p>
-        <h2 className="mt-1 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-3xl">
+        <h2 className="mt-1 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
           법원과 사건번호를 입력해주세요
         </h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
@@ -249,7 +249,7 @@ export function Step1Property({
       </header>
 
       <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-5 shadow-[var(--shadow-card)]">
-        <div className="grid gap-3 sm:grid-cols-[minmax(0,14rem)_1fr]">
+        <div className="grid gap-2 sm:grid-cols-[minmax(0,14rem)_1fr]">
           <div>
             <label
               htmlFor="step1-court"
@@ -320,7 +320,7 @@ export function Step1Property({
 
       {/* 서비스 불가 지역 안내 (차단 아님) */}
       {isNonServicedCourt && (
-        <div className="flex items-start gap-3 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4">
+        <div className="flex items-start gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4">
           <Info
             size={16}
             className="mt-0.5 shrink-0 text-[var(--color-ink-500)]"
@@ -343,7 +343,7 @@ export function Step1Property({
           role="alert"
           className="rounded-[var(--radius-xl)] border-2 border-[var(--color-accent-red)] bg-red-50 p-5"
         >
-          <div className="flex items-start gap-3">
+          <div className="flex items-start gap-2">
             <AlertCircle
               size={20}
               className="mt-0.5 shrink-0 text-[var(--color-accent-red)]"
@@ -372,7 +372,7 @@ export function Step1Property({
               이 사건에 {listings.length}개 물건이 있습니다. 선택해주세요
             </p>
           </div>
-          <div className="mt-4 grid gap-3">
+          <div className="mt-4 grid gap-2">
             {listings.map((l) => (
               <button
                 key={l.docid}
@@ -594,7 +594,7 @@ export function Step1Property({
         />
       )}
 
-      <div className="flex items-center justify-end gap-3 pt-2">
+      <div className="flex items-center justify-end gap-2 pt-2">
         <button
           type="button"
           onClick={handleNext}

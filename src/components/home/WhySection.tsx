@@ -72,14 +72,14 @@ export function WhySection() {
       aria-labelledby="why-heading"
       className="border-t border-[var(--color-border)] bg-white"
     >
-      <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
+      <div className="mx-auto w-full max-w-[var(--c-base)] px-4 py-20 sm:px-8 sm:py-24">
         <div className="max-w-2xl">
           <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-900)]">
             왜 {BRAND_NAME}인가
           </p>
           <h2
             id="why-heading"
-            className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl"
+            className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1"
           >
             직접 가는 대신, 맡기고 결과만 받으세요
           </h2>
@@ -150,7 +150,7 @@ export function WhySection() {
         </div>
 
         {/* 가치 카드 3 */}
-        <div className="mt-10 grid gap-5 md:grid-cols-3">
+        <div className="mt-10 grid gap-4 md:grid-cols-3">
           {VALUE_CARDS.map(({ icon: Icon, title, body }) => (
             <article
               key={title}
@@ -178,7 +178,7 @@ export function WhySection() {
             {reviews.map((r) => (
               <li
                 key={r.id}
-                className="flex gap-3 rounded-[var(--radius-xl)] bg-[var(--color-surface-muted)] p-5"
+                className="flex gap-2 rounded-[var(--radius-xl)] bg-[var(--color-surface-muted)] p-5"
               >
                 <span
                   aria-hidden="true"

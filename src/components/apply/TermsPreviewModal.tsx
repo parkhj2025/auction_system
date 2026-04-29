@@ -65,7 +65,7 @@ export function TermsPreviewModal({ isOpen, onClose }: Props) {
         </div>
 
         <div className="flex-1 overflow-y-auto px-6 py-5">
-          <div className="legal-body flex flex-col gap-10 text-[var(--color-ink-700)]">
+          <div className="legal-body flex flex-col gap-8 text-[var(--color-ink-700)]">
             <TermsContent />
           </div>
         </div>
