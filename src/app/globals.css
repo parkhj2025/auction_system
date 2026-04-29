@@ -1,5 +1,15 @@
-/* Phase 0.1: Pretendard Variable 로드 = layout.tsx <head> <link rel="stylesheet"> 단일 (사파리 호환성).
- * 기존 globals.css @import 방식은 사파리에서 폰트 로드 실패 → 명조 fallback 본질로 렌더 회귀. */
+/* Phase 0.2: Pretendard Variable self-host (jsdelivr CDN 폐기).
+ * 사파리에서 jsdelivr stylesheet preload+link 4건 모두 로드 실패 → 명조 fallback 회귀.
+ * 본질 = public/fonts/PretendardVariable.woff2 단일 자산 + @font-face 정의. CDN 의존 0. */
+@font-face {
+  font-family: "Pretendard Variable";
+  font-weight: 45 920;
+  font-style: normal;
+  font-display: swap;
+  src: url("/fonts/PretendardVariable.woff2") format("woff2-variations"),
+       url("/fonts/PretendardVariable.woff2") format("woff2");
+}
+
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn/tailwind.css";

@@ -7,10 +7,9 @@ import { createClient } from "@/lib/supabase/server";
 import type { UserMenuProps } from "@/components/auth/UserMenu";
 import { BRAND_NAME } from "@/lib/constants";
 
-/* Phase 0.1: 폰트 단일화 (Pretendard Variable / jsdelivr CDN <link rel="stylesheet">).
- * globals.css @import 방식은 사파리에서 폰트 로드 실패 → <head> link 태그 단일 본질 회복.
- * 기존 Noto Sans KR + JetBrains Mono 패키지 import 폐기.
- * fallback chain 은 globals.css --font-sans 에 보존 (Apple SD Gothic Neo / Malgun Gothic / system-ui). */
+/* Phase 0.2: 폰트 단일화 (Pretendard Variable self-host / public/fonts/PretendardVariable.woff2).
+ * jsdelivr CDN 의존 폐기 — 사파리에서 stylesheet+preload 4건 모두 로드 실패 본질.
+ * @font-face 정의는 globals.css 상단 단일 source. <head> = self-host preload 1건만. */
 
 export const metadata: Metadata = {
   metadataBase: new URL(
@@ -65,25 +64,11 @@ export default async function RootLayout({
     <html lang="ko" className="h-full">
       <head>
         <link
-          rel="preconnect"
-          href="https://cdn.jsdelivr.net"
-          crossOrigin="anonymous"
-        />
-        <link
           rel="preload"
-          as="style"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
-        />
-        <link
-          rel="preload"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/PretendardVariable.woff2"
+          href="/fonts/PretendardVariable.woff2"
           as="font"
           type="font/woff2"
           crossOrigin="anonymous"
-        />
-        <link
-          rel="stylesheet"
-          href="https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.min.css"
         />
       </head>
       <body className="flex min-h-full flex-col bg-white pb-[calc(5rem+env(safe-area-inset-bottom))] text-[var(--color-ink-900)] md:pb-0">
