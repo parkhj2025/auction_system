@@ -354,8 +354,8 @@ html,
 body {
   background: var(--color-background);
   color: var(--color-foreground);
-  /* Phase 0.3: font-family 직접 명시 (Tailwind v4 cascade 우선순위 회귀 방지). var(--font-sans)는 토큰 참조용 보존. */
-  font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
+  /* Phase 0.4: 기본 = 시스템 폰트. Pretendard 로드 완료 시 .fonts-loaded class 분기로 Pretendard 적용 (사파리 새로고침 race condition 회피). */
+  font-family: -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
@@ -364,6 +364,13 @@ body {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* Phase 0.4: Font Loading API class toggle 분기 본질.
+ * layout.tsx inline script가 Pretendard 로드 완료 시 documentElement에 'fonts-loaded' 추가.
+ * sessionStorage 캐시로 두 번째 방문 즉시 class 적용 (FOUT 0). */
+html.fonts-loaded body {
+  font-family: "Pretendard Variable", -apple-system, BlinkMacSystemFont, "Apple SD Gothic Neo", "Malgun Gothic", system-ui, sans-serif;
 }
 
 /* 단계 5-4-2-fix-6 룰 23-A: tabular-nums 글로벌 일관 (Safari + Chrome).

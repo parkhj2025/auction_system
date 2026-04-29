@@ -70,6 +70,14 @@ export default async function RootLayout({
           type="font/woff2"
           crossOrigin="anonymous"
         />
+        {/* Phase 0.4: 사파리 새로고침 race condition 본질 해결 (Filament Group 검증 패턴).
+         * Font Loading API document.fonts.load() 완료 시점에 .fonts-loaded class 추가 → globals.css 분기로 Pretendard 적용.
+         * sessionStorage 두 번째 방문 즉시 class 추가 (FOUT 0). */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html: `(function(){try{if(sessionStorage.getItem('fonts-loaded')==='true'){document.documentElement.classList.add('fonts-loaded');return;}}catch(e){}if(document.fonts&&document.fonts.load){document.fonts.load('1em "Pretendard Variable"').then(function(){document.documentElement.classList.add('fonts-loaded');try{sessionStorage.setItem('fonts-loaded','true');}catch(e){}}).catch(function(){document.documentElement.classList.add('fonts-loaded');});}else{document.documentElement.classList.add('fonts-loaded');}})();`,
+          }}
+        />
       </head>
       <body className="flex min-h-full flex-col bg-white pb-[calc(5rem+env(safe-area-inset-bottom))] text-[var(--color-ink-900)] md:pb-0">
         <TopNav user={navUser} />
