@@ -63,22 +63,22 @@ export function Pricing() {
     <section
       id="pricing"
       aria-labelledby="pricing-heading"
-      className="border-t border-[var(--color-border)] bg-[var(--color-surface-muted)]"
+      className="bg-[var(--soft-stone)]"
     >
-      <div className="mx-auto w-full max-w-6xl px-4 py-20 sm:px-6 sm:py-24">
+      <div className="mx-auto w-full max-w-[var(--container-w)] px-4 py-24 sm:px-6 sm:py-32">
         <div className="max-w-2xl">
-          <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-900)]">
+          <p className="seq text-[var(--deep-green)]">
             수수료
           </p>
           <h2
             id="pricing-heading"
-            className="mt-2 text-3xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-4xl"
+            className="mt-6 text-[length:var(--fs-h1)] font-bold leading-[1.1] tracking-[-0.018em] text-[var(--color-ink-900)]"
           >
             결과가 아닌 신청 시점으로 가격이 정해집니다
           </h2>
-          <p className="mt-3 text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
+          <p className="mt-6 text-[length:var(--fs-lead)] leading-[1.5] text-[var(--color-ink-700)]">
             기본 수수료는 선납이지만, 패찰 시 보증금은{" "}
-            <strong className="text-[var(--color-ink-900)]">당일 즉시 반환</strong>
+            <strong className="text-[var(--deep-green)]">당일 즉시 반환</strong>
             됩니다. 낙찰 성공보수는 낙찰된 경우에만 청구합니다.
           </p>
         </div>
@@ -88,7 +88,7 @@ export function Pricing() {
             <article
               key={tier.key}
               className={cn(
-                "relative flex flex-col rounded-[var(--radius-xl)] border bg-white p-7 shadow-[var(--shadow-card)]",
+                "relative flex flex-col rounded-[var(--r-card)] border bg-white p-7 shadow-[var(--shadow-2)]",
                 tier.highlight
                   ? "border-[var(--color-ink-900)] ring-2 ring-[var(--color-ink-900)]/20"
                   : "border-[var(--color-border)]"

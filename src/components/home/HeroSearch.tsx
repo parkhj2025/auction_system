@@ -127,31 +127,26 @@ export function HeroSearch() {
   }
 
   return (
-    <section className="relative overflow-hidden bg-black text-white">
-      <div
-        aria-hidden="true"
-        className="pointer-events-none absolute -right-32 -top-32 h-96 w-96 rounded-full bg-[var(--color-ink-50)]0/30 blur-3xl"
-      />
-
-      <div className="relative mx-auto w-full max-w-6xl px-4 pb-16 pt-16 sm:px-6 sm:pb-20 sm:pt-20">
-        <p className="text-sm font-semibold tracking-wide text-white/85">
+    <section className="relative overflow-hidden bg-white text-[var(--color-ink-900)]">
+      <div className="relative mx-auto w-full max-w-[var(--container-w)] px-4 pb-20 pt-20 sm:px-6 sm:pb-24 sm:pt-24">
+        <p className="seq text-[var(--deep-green)]">
           법원 안 가는 부동산 경매 입찰 대리
         </p>
-        <h1 className="mt-3 text-4xl font-black leading-[1.15] tracking-tight sm:text-5xl">
+        <h1 className="mt-6 text-[length:var(--fs-display)] font-bold leading-[1] tracking-[-0.02em] text-[var(--color-ink-900)]">
           입찰은 맡기고,
           <br className="sm:hidden" /> 얼리버드{" "}
-          <span className="text-white">
+          <span className="text-[var(--deep-green)]">
             {(FEES.earlybird / 10000).toLocaleString("ko-KR")}만원
           </span>
           부터
         </h1>
-        <p className="mt-4 max-w-xl text-white/85">
+        <p className="mt-6 max-w-xl text-[length:var(--fs-lead)] leading-[1.5] text-[var(--color-ink-700)]">
           공인중개사·서울보증보험 가입. 패찰 시 보증금 당일 즉시 반환.
         </p>
 
         <form
           onSubmit={onSubmit}
-          className="mt-10 rounded-[var(--radius-xl)] bg-white p-4 shadow-[var(--shadow-lift)] sm:p-5"
+          className="mt-10 rounded-[var(--r-3)] bg-[var(--soft-stone)] p-4 shadow-[var(--shadow-2)] sm:p-5"
         >
           {/* 탭 */}
           <div
@@ -305,7 +300,7 @@ export function HeroSearch() {
 
             <button
               type="submit"
-              className="flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-6 text-[length:var(--text-body)] font-bold text-white shadow-[var(--shadow-card)] transition hover:bg-black"
+              className="flex min-h-12 items-center justify-center gap-2 rounded-[var(--r-pill)] bg-[var(--deep-green)] px-7 text-[length:var(--text-body)] font-semibold text-white shadow-[var(--shadow-1)] transition hover:bg-[var(--deep-green-2)]"
             >
               <Search size={18} aria-hidden="true" />
               찾아보기
@@ -327,11 +322,11 @@ export function HeroSearch() {
           </p>
         </form>
 
-        <p className="mt-6 text-sm text-white/85">
+        <p className="mt-8 text-sm text-[var(--color-ink-500)]">
           수수료 체계 ·{" "}
           <a
             href="#pricing"
-            className="font-bold text-white underline decoration-[var(--color-ink-300)] underline-offset-4 hover:decoration-white"
+            className="font-semibold text-[var(--action-blue)] underline decoration-[var(--deep-green-line)] underline-offset-4 hover:decoration-[var(--action-blue)]"
           >
             얼리버드 5만 · 일반 7만 · 급건 10만
           </a>
