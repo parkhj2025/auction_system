@@ -106,39 +106,83 @@ export function PricingBlock() {
           </p>
         </div>
 
-        {/* 수수료 카드 3 */}
+        {/* 수수료 카드 3 — Phase 1: 추천 카드만 .bg-aurora-card + 흰 텍스트. */}
         <div className="mt-12 grid gap-4 md:grid-cols-3">
           {TIERS.map((tier) => (
             <article
               key={tier.key}
               className={cn(
-                "relative flex flex-col rounded-[var(--radius-xl)] border bg-white p-7 shadow-[var(--shadow-card)]",
+                "relative flex flex-col rounded-[var(--r-card-lg)] p-7",
                 tier.highlight
-                  ? "border-[var(--color-ink-900)] ring-2 ring-[var(--color-ink-900)]/20"
-                  : "border-[var(--color-border)]"
+                  ? "bg-aurora-card shadow-[0_24px_60px_-15px_rgba(15,23,42,0.45)]"
+                  : "border border-[var(--color-border)] bg-white shadow-[var(--shadow-card)]"
               )}
             >
               {tier.highlight && (
-                <span className="absolute -top-3 left-7 inline-flex h-6 items-center rounded-full bg-[var(--color-ink-900)] px-3 text-[11px] font-bold uppercase tracking-wide text-white">
+                <span className="glass-pill absolute -top-3 left-7 inline-flex h-6 items-center rounded-full px-3 text-[11px] font-bold uppercase tracking-wide text-white">
                   추천
                 </span>
               )}
               <header>
-                <p className="text-sm font-bold text-[var(--color-ink-900)]">{tier.name}</p>
-                <p className="mt-1 text-xs text-[var(--color-ink-500)]">{tier.tag}</p>
+                <p
+                  className={cn(
+                    "text-sm font-bold",
+                    tier.highlight
+                      ? "text-[var(--lavender-200)]"
+                      : "text-[var(--color-ink-900)]"
+                  )}
+                >
+                  {tier.name}
+                </p>
+                <p
+                  className={cn(
+                    "mt-1 text-xs",
+                    tier.highlight
+                      ? "text-[var(--text-on-aurora-faint)]"
+                      : "text-[var(--color-ink-500)]"
+                  )}
+                >
+                  {tier.tag}
+                </p>
                 <p className="mt-6 flex items-baseline gap-1.5 tabular-nums">
-                  <span className="text-h1 font-black text-[var(--color-ink-900)]">
+                  <span
+                    className={cn(
+                      "text-h1 font-black",
+                      tier.highlight ? "text-white" : "text-[var(--color-ink-900)]"
+                    )}
+                  >
                     {feeLabel(tier.fee)}
                   </span>
                 </p>
-                <p className="mt-2 text-sm text-[var(--color-ink-500)]">{tier.caption}</p>
+                <p
+                  className={cn(
+                    "mt-2 text-sm",
+                    tier.highlight
+                      ? "text-[var(--text-on-aurora-muted)]"
+                      : "text-[var(--color-ink-500)]"
+                  )}
+                >
+                  {tier.caption}
+                </p>
               </header>
-              <ul className="mt-6 flex flex-col gap-2.5 text-sm text-[var(--color-ink-700)]">
+              <ul
+                className={cn(
+                  "mt-6 flex flex-col gap-2.5 text-sm",
+                  tier.highlight
+                    ? "text-[var(--text-on-aurora-muted)]"
+                    : "text-[var(--color-ink-700)]"
+                )}
+              >
                 {tier.bullets.map((b) => (
                   <li key={b} className="flex gap-2">
                     <Check
                       size={16}
-                      className="mt-0.5 shrink-0 text-[var(--color-ink-900)]"
+                      className={cn(
+                        "mt-0.5 shrink-0",
+                        tier.highlight
+                          ? "text-[var(--lavender-200)]"
+                          : "text-[var(--accent-violet)]"
+                      )}
                       aria-hidden="true"
                     />
                     <span>{b}</span>
@@ -148,10 +192,10 @@ export function PricingBlock() {
               <Link
                 href={PRIMARY_CTA.href}
                 className={cn(
-                  "mt-8 flex min-h-12 items-center justify-center rounded-[var(--radius-md)] px-4 text-sm font-bold transition",
+                  "mt-8 flex min-h-12 items-center justify-center rounded-full px-4 text-sm font-bold transition",
                   tier.highlight
-                    ? "bg-[var(--color-ink-900)] text-white hover:bg-black"
-                    : "border border-[var(--color-border)] bg-white text-[var(--color-ink-900)] hover:bg-[var(--color-ink-100)]"
+                    ? "bg-white text-[var(--text-primary)] hover:bg-white/90"
+                    : "border border-[var(--color-ink-900)] bg-white text-[var(--color-ink-900)] hover:bg-[var(--color-ink-900)] hover:text-white"
                 )}
               >
                 이 가격으로 신청

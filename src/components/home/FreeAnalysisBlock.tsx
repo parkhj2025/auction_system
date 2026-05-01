@@ -32,7 +32,7 @@ export function FreeAnalysisBlock() {
       <div className="mx-auto w-full max-w-[var(--c-base)] px-5 pt-20 sm:px-8 sm:pt-24">
         <div className="flex items-end justify-between gap-4">
           <div>
-            <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-900)]">
+            <p className="text-xs font-bold uppercase tracking-wider text-[var(--accent-violet)]">
               무료 물건분석
             </p>
             <h2

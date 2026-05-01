@@ -61,7 +61,7 @@ export function WhyBlock() {
       <div className="mx-auto w-full max-w-[var(--c-base)] px-5 py-20 sm:px-8 sm:py-24">
         {/* 헤더 */}
         <div className="max-w-2xl">
-          <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-900)]">
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--accent-violet)]">
             왜 {BRAND_NAME}인가
           </p>
           <h2
@@ -124,7 +124,7 @@ export function WhyBlock() {
                     <div className="flex gap-2 font-semibold text-[var(--color-ink-900)]">
                       <Check
                         size={16}
-                        className="mt-0.5 shrink-0 text-[var(--color-ink-900)]"
+                        className="mt-0.5 shrink-0 text-[var(--accent-violet)]"
                         aria-hidden="true"
                       />
                       <span>{row.ours}</span>

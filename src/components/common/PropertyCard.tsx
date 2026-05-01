@@ -44,7 +44,7 @@ export function PropertyCard({
       <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-3 rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] p-4 text-xs">
         <div>
           <dt className="text-[var(--color-ink-500)]">최저가</dt>
-          <dd className="mt-0.5 tabular-nums text-[length:var(--text-body)] font-black text-[var(--color-accent-red)]">
+          <dd className="mt-0.5 tabular-nums text-[length:var(--text-body)] font-black text-[var(--text-primary)]">
             {formatKoreanWon(fm.minPrice)}
           </dd>
         </div>
@@ -73,7 +73,7 @@ export function PropertyCard({
           {fm.tags.slice(0, 3).map((t) => (
             <li
               key={t}
-              className="inline-flex h-6 items-center rounded-full border border-[var(--color-border)] bg-[var(--color-ink-100)] px-2 text-[11px] font-semibold text-[var(--color-ink-700)]"
+              className="inline-flex h-6 items-center rounded-full border border-[var(--accent-violet-soft)] bg-[var(--accent-violet-soft)] px-2 text-[11px] font-semibold text-[var(--accent-violet)]"
             >
               {t}
             </li>
@@ -83,7 +83,7 @@ export function PropertyCard({
 
       <span
         aria-hidden="true"
-        className="mt-6 inline-flex items-center gap-1 text-sm font-bold text-[var(--color-ink-900)] transition group-hover:text-black"
+        className="mt-6 inline-flex items-center gap-1 text-sm font-bold text-[var(--accent-violet)] transition group-hover:text-[#3b0f73]"
       >
         분석 전체 보기
         <ArrowRight

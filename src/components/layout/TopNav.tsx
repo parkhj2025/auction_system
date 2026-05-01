@@ -26,17 +26,17 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
   }, [open]);
 
   return (
-    <header className="sticky top-0 z-40 border-b border-[var(--color-border)] bg-white/90 backdrop-blur supports-[backdrop-filter]:bg-white/75">
+    <header className="sticky top-0 z-40 border-b border-[var(--color-border)] bg-white/70 backdrop-blur-xl supports-[backdrop-filter]:bg-white/60">
       <div className="mx-auto flex h-16 w-full max-w-[var(--c-base)] items-center justify-between px-5 sm:px-8">
         <Link
           href="/"
           className="flex items-center gap-2"
           aria-label={`${BRAND_NAME} 홈`}
         >
-          <span className="flex h-8 w-8 items-center justify-center rounded-[var(--radius-sm)] bg-[var(--color-ink-900)] text-sm font-black text-white">
+          <span className="bg-aurora flex h-8 w-8 items-center justify-center rounded-full text-sm font-black text-white">
             경
           </span>
-          <span className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
+          <span className="nav-mark text-lg font-black tracking-tight">
             {BRAND_NAME}
           </span>
         </Link>
@@ -49,7 +49,7 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
             <Link
               key={item.href}
               href={item.href}
-              className="rounded-[var(--radius-sm)] px-3 py-2 text-sm font-medium text-[var(--color-ink-700)] transition hover:bg-[var(--color-ink-100)] hover:text-[var(--color-ink-900)]"
+              className="rounded-full px-3 py-2 text-sm font-medium text-[var(--color-ink-700)] transition hover:bg-[var(--accent-violet-soft)] hover:text-[var(--accent-violet)]"
             >
               {item.label}
             </Link>
@@ -61,7 +61,7 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
             <div className="hidden md:flex md:items-center md:gap-2">
               <Link
                 href={PRIMARY_CTA.href}
-                className="inline-flex h-10 items-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-4 text-sm font-bold text-white shadow-[var(--shadow-card)] transition hover:bg-black"
+                className="inline-flex h-10 items-center rounded-full bg-[var(--color-ink-900)] px-4 text-sm font-bold text-white shadow-[var(--shadow-card)] transition hover:bg-black"
               >
                 {PRIMARY_CTA.label}
               </Link>
@@ -71,13 +71,13 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
             <div className="hidden md:flex md:items-center md:gap-2">
               <Link
                 href="/login"
-                className="inline-flex h-10 items-center rounded-[var(--radius-md)] px-4 text-sm font-bold text-[var(--color-ink-700)] transition hover:bg-[var(--color-ink-100)]"
+                className="inline-flex h-10 items-center rounded-full px-4 text-sm font-bold text-[var(--color-ink-700)] transition hover:bg-[var(--accent-violet-soft)] hover:text-[var(--accent-violet)]"
               >
                 로그인
               </Link>
               <Link
                 href={PRIMARY_CTA.href}
-                className="inline-flex h-10 items-center rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-4 text-sm font-bold text-white shadow-[var(--shadow-card)] transition hover:bg-black"
+                className="inline-flex h-10 items-center rounded-full bg-[var(--color-ink-900)] px-4 text-sm font-bold text-white shadow-[var(--shadow-card)] transition hover:bg-black"
               >
                 {PRIMARY_CTA.label}
               </Link>
