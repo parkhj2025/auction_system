@@ -1,11 +1,19 @@
 import Link from "next/link";
+import { Shield, Building2, Briefcase } from "lucide-react";
 
-/* Phase 1.2 (A-1) — TrustCTA · 모노톤 화이트 + 단순 카드 본질.
- * 본질:
- *  - bg-aurora-trustcta + glass-card 폐기 → 단순 흰 배경 + 카드 본질
- *  - 카피 v1.1 §C-5: eyebrow / h1 / subtext / CTA 2건
- *  - CTA primary "입찰 대리 신청" → /apply (본 cycle 색 본질 보류 — text-primary 본질만)
- *  - CTA secondary "카카오톡 문의" — 본 cycle href는 /contact placeholder (실 카카오톡 링크 별도 cycle) */
+/* Phase 1.2 (A-1-2) v2 — TrustCTA · 카피 광역 압축 + 신뢰 배지 3건 lucide 48px.
+ * 변경:
+ *  - eyebrow 보존
+ *  - h1 "보증보험 가입, 사고율 0%" → "사고율 0%" (압축)
+ *  - subtext 광역 압축 (시각 본질로 표현)
+ *  - 신뢰 배지 3건 신규 (Shield / Building2 / Briefcase / 48px lucide) */
+
+const BADGES = [
+  { icon: Shield, label: "서울보증보험", sub: "가입" },
+  { icon: Building2, label: "매수신청대리인", sub: "등록" },
+  { icon: Briefcase, label: "공인중개사", sub: "자격" },
+] as const;
+
 export function TrustCTA() {
   return (
     <section
@@ -13,31 +21,49 @@ export function TrustCTA() {
       className="bg-[var(--bg-secondary)]"
     >
       <div className="container-app py-[var(--section-py)]">
-        <div className="mx-auto max-w-2xl text-center">
-          <p className="section-eyebrow justify-center">안전한 입찰 대리</p>
-          <h2
-            id="trust-heading"
-            className="text-h1 mt-3 text-[var(--text-primary)]"
-          >
-            보증보험 가입,
-            <br />
-            사고율 0%
-          </h2>
-          <p className="text-body mt-4 text-[var(--text-secondary)]">
-            공인중개사 + 매수신청대리인 등록 + 서울보증보험 가입. 입찰보증금은
-            전용계좌에서만 관리합니다.
-          </p>
+        <div className="grid items-center gap-10 lg:grid-cols-[1fr_1fr] lg:gap-16">
+          <div>
+            <p className="section-eyebrow">안전한 입찰 대리</p>
+            <h2
+              id="trust-heading"
+              className="text-h1 mt-3 text-[var(--text-primary)]"
+            >
+              사고율 0%
+            </h2>
 
-          <div className="mt-8 flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
+            {/* 신뢰 배지 3건 — lucide 48px (큰 본질). */}
+            <ul className="mt-8 flex flex-wrap gap-3">
+              {BADGES.map(({ icon: Icon, label, sub }) => (
+                <li
+                  key={label}
+                  className="flex items-center gap-3 rounded-2xl border border-[var(--border-1)] bg-[var(--bg-primary)] px-5 py-4"
+                >
+                  <span className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-[var(--bg-secondary)] text-[var(--text-primary)]">
+                    <Icon size={28} strokeWidth={1.5} aria-hidden="true" />
+                  </span>
+                  <div className="flex flex-col">
+                    <span className="text-body font-[510] text-[var(--text-primary)]">
+                      {label}
+                    </span>
+                    <span className="text-meta text-[var(--text-tertiary)]">
+                      {sub}
+                    </span>
+                  </div>
+                </li>
+              ))}
+            </ul>
+          </div>
+
+          <div className="flex flex-col gap-3 lg:items-start">
             <Link
               href="/apply"
-              className="inline-flex h-10 min-h-10 items-center justify-center rounded-lg bg-[var(--text-primary)] px-5 text-sm font-semibold text-white transition-colors hover:bg-black lg:h-11 lg:px-6 lg:text-[15px]"
+              className="inline-flex h-14 items-center justify-center rounded-lg bg-[var(--button-bg)] px-6 text-[17px] font-[590] text-white transition-colors hover:bg-black"
             >
               입찰 대리 신청
             </Link>
             <Link
               href="/contact"
-              className="inline-flex h-10 min-h-10 items-center justify-center rounded-lg border border-[var(--border-1)] bg-[var(--bg-primary)] px-5 text-sm font-semibold text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-secondary)] lg:h-11 lg:px-6 lg:text-[15px]"
+              className="inline-flex h-14 items-center justify-center rounded-lg border border-[var(--border-1)] bg-[var(--bg-primary)] px-6 text-[17px] font-[590] text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-secondary)]"
             >
               카카오톡 문의
             </Link>

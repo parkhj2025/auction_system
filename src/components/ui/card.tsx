@@ -19,8 +19,9 @@ function Card({
       data-hover={hover ? "lift" : undefined}
       className={cn(
         "group/card flex flex-col gap-4 overflow-hidden rounded-xl bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-2 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
+        /* Phase 1.2 (A-1-2) v2 hover — scale 1.005 + translate-y(-1) + shadow-sm + 250ms ease-out (앱 본질 정수). */
         hover &&
-          "transition-transform duration-200 ease-out hover:-translate-y-0.5 hover:shadow-[var(--shadow-2)]",
+          "transition-[transform,box-shadow] duration-[250ms] ease-out hover:-translate-y-0.5 hover:scale-[1.005] hover:shadow-sm",
         className
       )}
       {...props}

@@ -630,79 +630,81 @@ p {
  * ════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ─── Phase 1.2 (A-1) 모노톤 7 hex ─────────────────────────────── */
-  --bg-primary: #FFFFFF;        /* 메인 배경 */
-  --bg-secondary: #FAFAFA;      /* 카드 wash·섹션 분리·hover */
-  --bg-tertiary: #F4F4F5;       /* chip 비활성·hover bg */
-  --text-primary: #18181B;      /* 헤딩·핵심 텍스트 (짙은 잉크) */
-  --text-secondary: #52525B;    /* 본문·보조 (회색) */
-  --text-tertiary: #71717A;     /* meta·caption (옅은 회색) */
-  --border-1: #E4E4E7;          /* 카드 border·구분선 */
+  /* ─── Phase 1.2 (A-1-2) v2 모노톤 9 hex ─────────────────────────── */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #FAFAFA;
+  --bg-tertiary: #F4F4F5;
+  --text-primary: #18181B;       /* 본문 가독 본질 */
+  --text-secondary: #525252;
+  --text-tertiary: #737373;
+  --border-1: rgba(0, 0, 0, 0.08);
+  --divider: rgba(0, 0, 0, 0.06);
+  --button-bg: #0A0A0A;          /* button 한정 강조 본질 (text와 분리) */
 
-  /* ─── Phase 1.2 (A-1) typo 토큰 (mobile floor / @1024px desktop step) ─ */
-  /* 앱 본질 압축 — Notion·Linear·Apple Music 웹 reference. */
-  --text-display: 32px;
+  /* ─── Phase 1.2 (A-1-2) v2 typo 토큰 (mobile floor / @1024px desktop step) ─ */
+  /* body floor 17 (Apple HIG) + h1 mobile 28 보존 (한국어 정합) + Variable Font weight 590/510. */
+  --text-display: 40px;
   --text-h1: 28px;
-  --text-h2: 22px;
-  --text-h3: 18px;
-  --text-body-lg: 16px;
-  --text-body: 15px;
-  --text-body-sm: 14px;
+  --text-h2: 24px;
+  --text-h3: 20px;
+  --text-body-lg: 18px;
+  --text-body: 17px;
+  --text-body-sm: 15px;
   --text-caption: 13px;
   --text-meta: 12px;
-  --text-num-md: 24px;
-  --text-num-lg: 32px;
-  --text-num-xl: 40px;
+  --text-num-md: 28px;
+  --text-num-lg: 36px;
+  --text-num-xl: 44px;
 
-  /* ─── Phase 1.2 (A-1) spacing 토큰 (mobile floor) ──────────────── */
-  --section-py: 48px;
-  --section-px: 16px;
-  --card-p: 16px;
-  --hero-py-top: 40px;
-  --hero-py-bottom: 32px;
-  --gap-stack: 12px;
-  --gap-grid: 12px;
+  /* ─── Phase 1.2 (A-1-2) v2 spacing (mobile floor) ────────────── */
+  --section-py: 64px;
+  --section-px: 20px;
+  --card-p: 24px;
+  --hero-py-top: 56px;
+  --hero-py-bottom: 48px;
+  --gap-stack: 16px;
+  --gap-grid: 16px;
   --container-max: 100%;
-  --container-px: 16px;
+  --container-px: 20px;
 
-  /* ─── Phase 1.2 (A-1) border-radius (앱 본질 압축) ────────────── */
-  --r-card-sm: 8px;
-  --r-card-lg: 12px;
+  /* ─── Phase 1.2 (A-1-2) v2 border-radius ───────────────────── */
+  --r-card-sm: 12px;
+  --r-card-lg: 16px;
   --r-pill: 9999px;
   --r-button: 8px;
-  --r-input: 8px;
+  --r-input: 12px;
 
   /* ─── Phase 1 컬러 본질 보존 (사용 영역 0 — Phase 1.2 A-2 색 cycle 결정) ─ */
   --accent-violet: #5B21B6;
   --accent-violet-soft: rgba(91, 33, 182, 0.06);
 
-  /* ─── 분석 페이지 alias 보존 (자동 흡수 — Plan D-(a)) ─────────── */
+  /* ─── 분석 페이지 alias 보존 (자동 흡수). */
   --color-action: var(--accent-violet);
 }
 
-/* Phase 1.2 (A-1) desktop step (≥1024px) — typo + spacing 자동 전환. */
+/* Phase 1.2 (A-1-2) v2 desktop step (≥1024px). */
 @media (min-width: 1024px) {
   :root {
-    --text-display: 40px;
-    --text-h1: 36px;
-    --text-h2: 28px;
-    --text-h3: 22px;
-    --text-body-lg: 17px;
-    --text-body: 16px;
+    --text-display: 56px;
+    --text-h1: 44px;
+    --text-h2: 32px;
+    --text-h3: 24px;
+    --text-body-lg: 19px;
+    --text-body: 17px;
     --text-body-sm: 15px;
-    --text-num-md: 28px;
-    --text-num-lg: 36px;
-    --text-num-xl: 48px;
+    --text-num-md: 32px;
+    --text-num-lg: 44px;
+    --text-num-xl: 56px;
 
-    --section-py: 64px;
-    --section-px: 24px;
-    --card-p: 20px;
-    --hero-py-top: 64px;
-    --hero-py-bottom: 48px;
-    --gap-stack: 16px;
-    --gap-grid: 20px;
+    --section-py: 128px;
+    --section-px: 32px;
+    --card-p: 32px;
+    --hero-py-top: 96px;
+    --hero-py-bottom: 64px;
+    --gap-stack: 24px;
+    --gap-grid: 24px;
     --container-max: 1200px;
-    --container-px: 24px;
+    --container-px: 32px;
   }
 }
 
@@ -725,83 +727,91 @@ p {
   width: 100%;
 }
 
-/* ─── Phase 1.2 (A-1) typo utility class (12건) ─────────────────── */
+/* ─── Phase 1.2 (A-1-2) v2 typo utility class (12건) ──────────── */
+/* letter-spacing 광역 0em + display -0.02em (한국어 Pretendard 정합).
+ * font-weight Variable Font 590 (display·h1) / 510 (h2·h3·meta·caption) / 400 (body). */
 .text-display {
   font-size: var(--text-display);
-  line-height: 1.1;
+  line-height: 1.05;
   letter-spacing: -0.02em;
-  font-weight: 700;
+  font-weight: 590;
 }
 .text-h1 {
   font-size: var(--text-h1);
   line-height: 1.15;
-  letter-spacing: -0.015em;
-  font-weight: 700;
+  letter-spacing: 0;
+  font-weight: 590;
 }
 .text-h2 {
   font-size: var(--text-h2);
-  line-height: 1.2;
-  letter-spacing: -0.01em;
-  font-weight: 600;
+  line-height: 1.25;
+  letter-spacing: 0;
+  font-weight: 510;
 }
 .text-h3 {
   font-size: var(--text-h3);
-  line-height: 1.3;
-  font-weight: 600;
+  line-height: 1.35;
+  letter-spacing: 0;
+  font-weight: 510;
 }
 .text-body-lg {
   font-size: var(--text-body-lg);
-  line-height: 1.55;
+  line-height: 1.6;
+  letter-spacing: 0;
   font-weight: 400;
 }
 .text-body {
   font-size: var(--text-body);
   line-height: 1.6;
+  letter-spacing: 0;
   font-weight: 400;
 }
 .text-body-sm {
   font-size: var(--text-body-sm);
   line-height: 1.55;
+  letter-spacing: 0;
   font-weight: 400;
 }
 .text-caption {
   font-size: var(--text-caption);
   line-height: 1.5;
-  font-weight: 500;
+  letter-spacing: 0;
+  font-weight: 510;
 }
 .text-meta {
   font-size: var(--text-meta);
   line-height: 1.45;
-  font-weight: 500;
+  letter-spacing: 0;
+  font-weight: 510;
 }
 .text-num-md {
   font-size: var(--text-num-md);
   line-height: 1.15;
   letter-spacing: -0.01em;
-  font-weight: 700;
+  font-weight: 590;
   font-variant-numeric: tabular-nums;
 }
 .text-num-lg {
   font-size: var(--text-num-lg);
   line-height: 1.1;
   letter-spacing: -0.015em;
-  font-weight: 700;
+  font-weight: 590;
   font-variant-numeric: tabular-nums;
 }
 .text-num-xl {
   font-size: var(--text-num-xl);
   line-height: 1.05;
   letter-spacing: -0.02em;
-  font-weight: 700;
+  font-weight: 590;
   font-variant-numeric: tabular-nums;
 }
 
-/* Section eyebrow (모노톤 본질 — Phase 1.2 A-1 색 보류 / Phase 1.2 A-2 색 cycle 결정). */
+/* Section eyebrow (모노톤 본질). */
 .section-eyebrow {
   display: inline-flex;
   align-items: center;
   font-size: var(--text-meta);
-  font-weight: 600;
+  font-weight: 510;
   letter-spacing: 0.08em;
   text-transform: uppercase;
   color: var(--text-tertiary);

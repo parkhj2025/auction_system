@@ -4,23 +4,30 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useState, useMemo } from "react";
 
-/* Phase 1.2 (A-1) — Hero · 모노톤 화이트 + 앱 스타일 + 인라인 사건번호 검색.
- * 본질:
- *  - 배경 흰 #FFFFFF (Aurora 폐기)
- *  - eyebrow → 본 cycle 색 보류 (text-tertiary 모노톤)
- *  - h1 단색 짙은 잉크 (lavender 그라데이션 폐기)
- *  - 인라인 사건번호 검색 input + "입찰 대리 시작" 버튼 (Phase 0.1 폐기 본질 부활)
- *  - CTA secondary "경매 인사이트 보기" → /analysis
- *  - 신뢰 strip 3건 (glass-pill 폐기 → 평평한 회색 chip)
- *  - floating card / network SVG / video-label 폐기
- *
- * 검색 분기 (client-side 사전 매칭):
- *  - 사건번호 NFC 정규화 + caseNumbers props 매칭
- *  - 매칭 → /analysis/[case] router.push
- *  - 미매칭 (사건번호 패턴) → /apply?case= router.push
- *  - 미매칭 (패턴 외) → /apply?case= 그대로 (서버 redirect 처리) */
+/* Phase 1.2 (A-1-2) v2 — Hero · 카피 광역 압축 + 콘텐츠 카드 1건 신규.
+ * 변경:
+ *  - eyebrow "법원 안 가는 부동산 경매 입찰 대리" 폐기 (h1으로 표현)
+ *  - h1 "입찰은 맡기고, 물건 보는 시간을 버세요" → "법원 안 가도, 경매 입찰, 됩니다" (압축)
+ *  - subtext "공인중개사·서울보증보험 가입. 입찰보증금 사고율 0%." → "수수료 5만원부터. 사고율 0%." (1줄)
+ *  - 검색 버튼 "입찰 대리 시작 →" → "입찰 대리 시작" (화살표 폐기)
+ *  - trust chip 3건 폐기 (subtext 흡수)
+ *  - 우측 콘텐츠 카드 1건 신규 (카드뉴스 본질 — 썸네일 SVG + 카테고리 chip + 제목 + 짧은 설명) */
 
-export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
+type Featured = {
+  slug: string;
+  title: string;
+  subtitle?: string;
+  caseNumber: string;
+  address: string;
+} | null;
+
+export function HeroSearch({
+  caseNumbers,
+  featured,
+}: {
+  caseNumbers: string[];
+  featured: Featured;
+}) {
   const router = useRouter();
   const [value, setValue] = useState("");
 
@@ -44,27 +51,22 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
   return (
     <section className="bg-[var(--bg-primary)] border-b border-[var(--border-1)]">
       <div className="container-app pb-[var(--hero-py-bottom)] pt-[var(--hero-py-top)]">
-        <div className="grid items-start gap-10 lg:grid-cols-[1.4fr_1fr] lg:gap-16">
-          {/* 좌측 카피 + 검색 + 신뢰 strip. */}
+        <div className="grid items-start gap-10 lg:grid-cols-[1.2fr_1fr] lg:gap-16">
+          {/* 좌측 — 카피 + 검색. */}
           <div>
-            <p className="section-eyebrow">
-              법원 안 가는 부동산 경매 입찰 대리
-            </p>
-
-            <h1 className="text-h1 mt-4 text-[var(--text-primary)]">
-              입찰은 맡기고,
+            <h1 className="text-display text-[var(--text-primary)]">
+              법원 안 가도,
               <br />
-              물건 보는 시간을 버세요
+              경매 입찰, 됩니다
             </h1>
 
-            <p className="text-body-lg mt-4 max-w-xl text-[var(--text-secondary)]">
-              공인중개사·서울보증보험 가입. 입찰보증금 사고율 0%.
+            <p className="text-body-lg mt-5 text-[var(--text-secondary)]">
+              수수료 5만원부터. 사고율 0%.
             </p>
 
-            {/* 인라인 사건번호 검색 — input + 버튼. */}
             <form
               onSubmit={onSubmit}
-              className="mt-8 flex flex-col gap-2 sm:flex-row sm:items-stretch"
+              className="mt-8 flex flex-col gap-3 sm:flex-row sm:items-stretch"
               role="search"
               aria-label="사건번호 검색"
             >
@@ -79,11 +81,11 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
                 value={value}
                 onChange={(e) => setValue(e.target.value)}
                 placeholder="사건번호를 입력하세요 (예: 2026타경500459)"
-                className="h-10 flex-1 rounded-lg border border-[var(--border-1)] bg-white px-3.5 text-[15px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] outline-none transition-colors focus:border-[var(--text-primary)] focus:ring-2 focus:ring-[var(--text-primary)]/10 lg:h-11 lg:px-4"
+                className="h-14 flex-1 rounded-xl border border-[var(--border-1)] bg-white px-5 text-[17px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] outline-none transition-colors focus:border-[var(--text-primary)] focus:ring-2 focus:ring-[var(--text-primary)]/10"
               />
               <button
                 type="submit"
-                className="inline-flex h-10 items-center justify-center rounded-lg bg-[var(--text-primary)] px-5 text-sm font-semibold text-white transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--text-primary)]/30 focus-visible:ring-offset-2 lg:h-11 lg:px-6 lg:text-[15px]"
+                className="inline-flex h-14 items-center justify-center rounded-lg bg-[var(--button-bg)] px-6 text-[17px] font-[590] text-white transition-colors hover:bg-black focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--text-primary)]/30 focus-visible:ring-offset-2"
               >
                 입찰 대리 시작
               </button>
@@ -91,26 +93,79 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
 
             <Link
               href="/analysis"
-              className="text-body-sm mt-4 inline-flex items-center gap-1 font-medium text-[var(--text-primary)] hover:underline"
+              className="text-body-sm mt-5 inline-flex items-center gap-1 font-medium text-[var(--text-primary)] hover:underline"
             >
               경매 인사이트 보기 →
             </Link>
-
-            {/* 신뢰 strip 3건 — 모노톤 회색 chip. */}
-            <div className="mt-10 flex flex-wrap gap-2">
-              {["공인 자격", "사고율 0%", "보증보험 의무 가입"].map((label) => (
-                <span
-                  key={label}
-                  className="text-meta inline-flex h-7 items-center rounded-full bg-[var(--bg-secondary)] border border-[var(--border-1)] px-3 text-[var(--text-secondary)]"
-                >
-                  {label}
-                </span>
-              ))}
-            </div>
           </div>
 
-          {/* 우측 — 본 cycle 비움 (floating card / network SVG / video-label 폐기). */}
-          <div aria-hidden="true" className="hidden lg:block" />
+          {/* 우측 — Featured 콘텐츠 카드 1건 (카드뉴스 본질). */}
+          {featured && (
+            <Link
+              href={`/analysis/${featured.slug}`}
+              className="group flex flex-col overflow-hidden rounded-2xl border border-[var(--border-1)] bg-white transition-[transform,box-shadow] duration-[250ms] ease-out hover:-translate-y-0.5 hover:scale-[1.005] hover:shadow-sm"
+              aria-label={`${featured.title} 분석 자료 보기`}
+            >
+              {/* 썸네일 영역 16:9 — inline SVG 도시 silhouette 본질. */}
+              <div className="relative aspect-[16/9] overflow-hidden bg-[var(--bg-secondary)]">
+                <svg
+                  viewBox="0 0 320 180"
+                  xmlns="http://www.w3.org/2000/svg"
+                  className="h-full w-full"
+                  aria-hidden="true"
+                  preserveAspectRatio="xMidYMid slice"
+                >
+                  {/* 배경 그라데이션 */}
+                  <rect width="320" height="180" fill="#FAFAFA" />
+                  {/* 도시 silhouette (건물 5개) */}
+                  <g fill="#E4E4E7">
+                    <rect x="20" y="100" width="36" height="80" />
+                    <rect x="62" y="80" width="42" height="100" />
+                    <rect x="110" y="60" width="50" height="120" />
+                    <rect x="166" y="90" width="40" height="90" />
+                    <rect x="212" y="70" width="48" height="110" />
+                    <rect x="266" y="105" width="34" height="75" />
+                  </g>
+                  {/* 건물 창 (도트) */}
+                  <g fill="#D4D4D8">
+                    <rect x="120" y="78" width="6" height="6" />
+                    <rect x="135" y="78" width="6" height="6" />
+                    <rect x="120" y="93" width="6" height="6" />
+                    <rect x="135" y="93" width="6" height="6" />
+                    <rect x="222" y="88" width="6" height="6" />
+                    <rect x="237" y="88" width="6" height="6" />
+                    <rect x="247" y="88" width="6" height="6" />
+                    <rect x="222" y="103" width="6" height="6" />
+                    <rect x="237" y="103" width="6" height="6" />
+                  </g>
+                  {/* 위치 핀 */}
+                  <g transform="translate(160 50)">
+                    <circle cx="0" cy="0" r="14" fill="#18181B" />
+                    <circle cx="0" cy="0" r="5" fill="#FFFFFF" />
+                    <path d="M0 14 L0 30" stroke="#18181B" strokeWidth="3" />
+                  </g>
+                </svg>
+              </div>
+
+              {/* 본문. */}
+              <div className="flex flex-col gap-3 p-6">
+                <span className="text-meta inline-flex h-6 w-fit items-center rounded-full border border-[var(--border-1)] bg-[var(--bg-secondary)] px-2.5 text-[var(--text-secondary)]">
+                  무료 물건분석
+                </span>
+                <h3 className="text-h3 text-[var(--text-primary)] group-hover:underline">
+                  {featured.title}
+                </h3>
+                {featured.subtitle && (
+                  <p className="text-body-sm line-clamp-2 text-[var(--text-secondary)]">
+                    {featured.subtitle}
+                  </p>
+                )}
+                <p className="text-meta text-[var(--text-tertiary)]">
+                  {featured.caseNumber} · {featured.address}
+                </p>
+              </div>
+            </Link>
+          )}
         </div>
       </div>
     </section>
