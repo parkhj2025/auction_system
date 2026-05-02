@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { notFound } from "next/navigation";
+import { notFound, redirect } from "next/navigation";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import remarkGfm from "remark-gfm";
 import {
@@ -79,7 +79,15 @@ export default async function AnalysisDetailPage({
   // 한글 slug 호환 위해 명시적으로 decodeURIComponent.
   const slug = safeDecode(rawSlug);
   const post = getAnalysisBySlug(slug);
-  if (!post || post.frontmatter.status !== "published") notFound();
+  // Phase 1.2 (A-1): 분석 자료 없는 사건번호 → /apply?case= 자동 prefill redirect
+  // (Hero 인라인 검색 본질의 fallback 안전망 / v1.1 §F-1 분기 본질 정합).
+  if (!post || post.frontmatter.status !== "published") {
+    // 사건번호 패턴 (YYYY타경NNNNNN) 매칭 시 /apply?case=로 redirect, 그 외는 404.
+    if (/^\d{4}타경\d+$/.test(slug)) {
+      redirect(`/apply?case=${encodeURIComponent(slug)}`);
+    }
+    notFound();
+  }
 
   const fm = post.frontmatter;
   const meta = getAnalysisMeta(slug); // null → 단계 3-1 baseline fallback

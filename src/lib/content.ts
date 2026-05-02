@@ -164,3 +164,62 @@ export function getNoticeBySlug(slug: string): NoticePost | null {
     ) ?? null
   );
 }
+
+/**
+ * Phase 1.2 (A-1) — Hero 인라인 검색 input 사전 매칭 본질.
+ * status="published" + marketData 보유 분석 글의 caseNumber 배열.
+ * client component (HeroSearch)에 props 전달 → NFC 정규화 매칭 + 분기 redirect.
+ */
+export function getActiveCaseNumbers(): string[] {
+  return getAllAnalysisPosts().map((p) => p.frontmatter.caseNumber);
+}
+
+/**
+ * Phase 1.2 (A-1) — 메인 페이지 "경매 인사이트" 블록 본질.
+ * analysis + guide + news 통합 + status="published" + publishedAt DESC.
+ * chip 4건 navigator (무료 물건분석 / 시장 인사이트 / 뉴스 / 경매 기본정보).
+ */
+export type InsightChipKey = "analysis" | "insight" | "news" | "guide";
+
+export type InsightItem = {
+  chip: InsightChipKey;
+  chipLabel: string;
+  slug: string;
+  title: string;
+  subtitle?: string;
+  href: string;
+  publishedAt: string;
+};
+
+export function getActiveInsightPosts(): InsightItem[] {
+  const analysis: InsightItem[] = getAllAnalysisPosts().map((p) => ({
+    chip: "analysis",
+    chipLabel: "무료 물건분석",
+    slug: p.frontmatter.slug,
+    title: p.frontmatter.title,
+    subtitle: p.frontmatter.subtitle,
+    href: `/analysis/${p.frontmatter.slug}`,
+    publishedAt: p.frontmatter.publishedAt,
+  }));
+  const guides: InsightItem[] = getAllGuidePosts().map((p) => ({
+    chip: "guide",
+    chipLabel: "경매 기본정보",
+    slug: p.frontmatter.slug,
+    title: p.frontmatter.title,
+    subtitle: p.frontmatter.subtitle,
+    href: `/guide/${p.frontmatter.slug}`,
+    publishedAt: p.frontmatter.publishedAt,
+  }));
+  const news: InsightItem[] = getAllNewsPosts().map((p) => ({
+    chip: "news",
+    chipLabel: "뉴스",
+    slug: p.frontmatter.slug,
+    title: p.frontmatter.title,
+    subtitle: p.frontmatter.subtitle,
+    href: `/news/${p.frontmatter.slug}`,
+    publishedAt: p.frontmatter.publishedAt,
+  }));
+  return [...analysis, ...guides, ...news].sort((a, b) =>
+    String(b.publishedAt).localeCompare(String(a.publishedAt))
+  );
+}

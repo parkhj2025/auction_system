@@ -73,7 +73,7 @@ export function PropertyCard({
           {fm.tags.slice(0, 3).map((t) => (
             <li
               key={t}
-              className="inline-flex h-6 items-center rounded-full border border-[var(--accent-violet-soft)] bg-[var(--accent-violet-soft)] px-2 text-[11px] font-semibold text-[var(--accent-violet)]"
+              className="inline-flex h-6 items-center rounded-full border border-[var(--border-1)] bg-[var(--bg-secondary)] px-2 text-[11px] font-semibold text-[var(--text-secondary)]"
             >
               {t}
             </li>
@@ -83,7 +83,7 @@ export function PropertyCard({
 
       <span
         aria-hidden="true"
-        className="mt-6 inline-flex items-center gap-1 text-sm font-bold text-[var(--accent-violet)] transition group-hover:text-[#3b0f73]"
+        className="mt-6 inline-flex items-center gap-1 text-sm font-bold text-[var(--text-primary)] transition group-hover:underline"
       >
         분석 전체 보기
         <ArrowRight

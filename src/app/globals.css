@@ -621,101 +621,102 @@ p {
 }
 
 /* ════════════════════════════════════════════════════════════════════════
- * Phase 1 — Aurora Calm + Liquid Glass 광역 토큰 + utility class
+ * Phase 1.2 (A-1) — 모노톤 화이트 + 앱 스타일 + 와이어프레임+@
  * ────────────────────────────────────────────────────────────────────────
- * 본질: 추가만 (기존 라인 0 변경 → Phase 0.4·0.5 본질 영구 보존).
- * 컨셉: Aurora Calm (radial 광원 3건) + Video Hero placeholder + Liquid Glass 5건.
+ * 본질: Phase 1 (Aurora Calm + Liquid Glass) 토큰 광역 폐기 + value 압축.
+ * 색 본질: 모노톤 7 hex만 사용 (violet 코드 본질 보존하되 사용 영역 0).
+ * 색 본질 사후 결정: Phase 1.2 (A-2) 색 cycle 영역.
+ * Phase 0.4·0.5 본질 (Pretendard self-host + hydration mismatch) 영구 보존.
  * ════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ─── Phase 1 컬러 토큰 ───────────────────────────────────────────── */
-  --aurora-deep-navy: #0B1120;
-  --aurora-indigo: #1E1B4B;
-  --aurora-slate: #1E293B;
-  --glow-indigo: rgba(99, 102, 241, 0.28);
-  --glow-violet: rgba(124, 58, 237, 0.22);
-  --glow-cyan: rgba(14, 165, 233, 0.12);
-  --lavender-300: #A5B4FC;
-  --lavender-200: #C4B5FD;
-  --lavender-100: #DDD6FE;
-  --text-on-aurora: #FFFFFF;
-  --text-on-aurora-muted: rgba(255, 255, 255, 0.72);
-  --text-on-aurora-faint: rgba(255, 255, 255, 0.5);
-  --text-primary: #0F172A;
-  --text-secondary: rgba(15, 23, 42, 0.55);
-  --text-tertiary: rgba(15, 23, 42, 0.4);
+  /* ─── Phase 1.2 (A-1) 모노톤 7 hex ─────────────────────────────── */
+  --bg-primary: #FFFFFF;        /* 메인 배경 */
+  --bg-secondary: #FAFAFA;      /* 카드 wash·섹션 분리·hover */
+  --bg-tertiary: #F4F4F5;       /* chip 비활성·hover bg */
+  --text-primary: #18181B;      /* 헤딩·핵심 텍스트 (짙은 잉크) */
+  --text-secondary: #52525B;    /* 본문·보조 (회색) */
+  --text-tertiary: #71717A;     /* meta·caption (옅은 회색) */
+  --border-1: #E4E4E7;          /* 카드 border·구분선 */
+
+  /* ─── Phase 1.2 (A-1) typo 토큰 (mobile floor / @1024px desktop step) ─ */
+  /* 앱 본질 압축 — Notion·Linear·Apple Music 웹 reference. */
+  --text-display: 32px;
+  --text-h1: 28px;
+  --text-h2: 22px;
+  --text-h3: 18px;
+  --text-body-lg: 16px;
+  --text-body: 15px;
+  --text-body-sm: 14px;
+  --text-caption: 13px;
+  --text-meta: 12px;
+  --text-num-md: 24px;
+  --text-num-lg: 32px;
+  --text-num-xl: 40px;
+
+  /* ─── Phase 1.2 (A-1) spacing 토큰 (mobile floor) ──────────────── */
+  --section-py: 48px;
+  --section-px: 16px;
+  --card-p: 16px;
+  --hero-py-top: 40px;
+  --hero-py-bottom: 32px;
+  --gap-stack: 12px;
+  --gap-grid: 12px;
+  --container-max: 100%;
+  --container-px: 16px;
+
+  /* ─── Phase 1.2 (A-1) border-radius (앱 본질 압축) ────────────── */
+  --r-card-sm: 8px;
+  --r-card-lg: 12px;
+  --r-pill: 9999px;
+  --r-button: 8px;
+  --r-input: 8px;
+
+  /* ─── Phase 1 컬러 본질 보존 (사용 영역 0 — Phase 1.2 A-2 색 cycle 결정) ─ */
   --accent-violet: #5B21B6;
   --accent-violet-soft: rgba(91, 33, 182, 0.06);
-  --glass-bg-pill: rgba(255, 255, 255, 0.08);
-  --glass-bg-card: rgba(255, 255, 255, 0.07);
-  --glass-border: rgba(255, 255, 255, 0.18);
-  --glass-blur-pill: 14px;
-  --glass-blur-card: 28px;
 
-  /* ─── Phase 1 typo 토큰 (mobile floor — base @ ≤1023px) ────────── */
-  --text-display: 44px;
-  --text-h1: 44px;
-  --text-h2: 32px;
-  --text-h3: 22px;
-  --text-body-lg: 17px;
-  --text-body: 16px;
-  --text-body-sm: 15px;
-  --text-caption: 14px;
-  --text-meta: 13px;
-  --text-num-md: 28px;
-  --text-num-lg: 38px;
-  --text-num-xl: 44px;
-
-  /* ─── Phase 1 spacing 토큰 (mobile floor) ───────────────────────── */
-  --section-py: 64px;
-  --section-px: 24px;
-  --card-p: 24px;
-  --hero-py-top: 56px;
-  --hero-py-bottom: 40px;
-  --gap-stack: 16px;
-  --gap-grid: 14px;
-  --container-max: 100%;
-  --container-px: 24px;
-
-  /* ─── Phase 1 border-radius scale ──────────────────────────────── */
-  --r-card-sm: 20px;
-  --r-card-lg: 24px;
-  --r-pill: 9999px;
-  --r-button: 9999px;
-  --r-input: 12px;
-
-  /* ─── Phase 1 alias 재지정 (분석 페이지 자동 흡수 — Plan D-(a)) ─ */
+  /* ─── 분석 페이지 alias 보존 (자동 흡수 — Plan D-(a)) ─────────── */
   --color-action: var(--accent-violet);
 }
 
-/* Phase 1 desktop step (≥1024px) — typo + spacing 자동 전환. */
+/* Phase 1.2 (A-1) desktop step (≥1024px) — typo + spacing 자동 전환. */
 @media (min-width: 1024px) {
   :root {
-    --text-display: 64px;
-    --text-h1: 56px;
-    --text-h2: 44px;
-    --text-h3: 28px;
-    --text-body-lg: 19px;
-    --text-body: 17px;
-    --text-num-md: 32px;
-    --text-num-lg: 48px;
-    --text-num-xl: 56px;
+    --text-display: 40px;
+    --text-h1: 36px;
+    --text-h2: 28px;
+    --text-h3: 22px;
+    --text-body-lg: 17px;
+    --text-body: 16px;
+    --text-body-sm: 15px;
+    --text-num-md: 28px;
+    --text-num-lg: 36px;
+    --text-num-xl: 48px;
 
-    --section-py: 96px;
-    --section-px: 32px;
-    --card-p: 32px;
-    --hero-py-top: 80px;
-    --hero-py-bottom: 56px;
-    --gap-stack: 24px;
+    --section-py: 64px;
+    --section-px: 24px;
+    --card-p: 20px;
+    --hero-py-top: 64px;
+    --hero-py-bottom: 48px;
+    --gap-stack: 16px;
     --gap-grid: 20px;
-    --container-max: 1120px;
-    --container-px: 32px;
+    --container-max: 1200px;
+    --container-px: 24px;
   }
 }
 
-/* ─── Phase 1 utility class ─────────────────────────────────────── */
+/* ─── Phase 1.2 (A-1) utility class ─────────────────────────────── */
 
 /* Container — section background full bleed + 안 컨테이너 가운데 정렬. */
+.container-app {
+  max-width: var(--container-max);
+  margin: 0 auto;
+  padding-left: var(--container-px);
+  padding-right: var(--container-px);
+  width: 100%;
+}
+/* alias 보존 (Phase 1 컴포넌트 회귀 방지 — 점진적 마이그레이션). */
 .container-aurora {
   max-width: var(--container-max);
   margin: 0 auto;
@@ -724,118 +725,33 @@ p {
   width: 100%;
 }
 
-/* Hero 본질: radial 광원 3건 (indigo 28% / violet 22% / cyan 12%) + linear deep navy mesh. */
-.bg-aurora {
-  background-color: var(--aurora-deep-navy);
-  background-image:
-    radial-gradient(ellipse 70% 60% at 20% 25%, var(--glow-indigo) 0%, transparent 65%),
-    radial-gradient(ellipse 65% 55% at 80% 20%, var(--glow-violet) 0%, transparent 65%),
-    radial-gradient(ellipse 55% 50% at 50% 90%, var(--glow-cyan) 0%, transparent 60%),
-    linear-gradient(135deg, var(--aurora-indigo) 0%, var(--aurora-deep-navy) 60%, var(--aurora-slate) 100%);
-  color: var(--text-on-aurora);
-}
-
-/* 추천 가격 카드 — 차분 mesh + 흰 텍스트. */
-.bg-aurora-card {
-  background-color: var(--text-primary);
-  background-image:
-    radial-gradient(ellipse 80% 70% at 30% 0%, var(--glow-indigo) 0%, transparent 60%),
-    radial-gradient(ellipse 70% 60% at 100% 100%, var(--glow-violet) 0%, transparent 60%),
-    linear-gradient(135deg, var(--text-primary) 0%, var(--aurora-indigo) 60%, #312E81 100%);
-  color: var(--text-on-aurora);
-}
-
-/* TrustCTA 본질 — Hero 동일 톤 + 좌하단 발광. */
-.bg-aurora-trustcta {
-  background-color: var(--aurora-deep-navy);
-  background-image:
-    radial-gradient(ellipse 60% 50% at 15% 90%, var(--glow-indigo) 0%, transparent 60%),
-    radial-gradient(ellipse 60% 50% at 85% 10%, var(--glow-violet) 0%, transparent 60%),
-    linear-gradient(135deg, var(--aurora-indigo) 0%, var(--aurora-deep-navy) 100%);
-  color: var(--text-on-aurora);
-}
-
-/* Liquid Glass — pill 본질 (trust chip + CTA secondary). */
-.glass-pill {
-  background-color: var(--glass-bg-pill);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(var(--glass-blur-pill)) saturate(180%);
-  -webkit-backdrop-filter: blur(var(--glass-blur-pill)) saturate(180%);
-}
-
-/* Liquid Glass — card 본질 (Hero floating + TrustCTA card). */
-.glass-card {
-  background-color: var(--glass-bg-card);
-  border: 1px solid var(--glass-border);
-  backdrop-filter: blur(var(--glass-blur-card)) saturate(180%);
-  -webkit-backdrop-filter: blur(var(--glass-blur-card)) saturate(180%);
-}
-
-/* "5만원부터" 그라데이션 — lavender-300 → 200 → 100. */
-.text-aurora-lavender {
-  background: linear-gradient(135deg, var(--lavender-300) 0%, var(--lavender-200) 50%, var(--lavender-100) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-}
-
-/* Hero abstract network 패턴 — SVG dot+line overlay. */
-.network-pattern {
-  background-image:
-    radial-gradient(circle at 12% 18%, rgba(255, 255, 255, 0.18) 0, rgba(255, 255, 255, 0.18) 1.5px, transparent 1.5px),
-    radial-gradient(circle at 38% 62%, rgba(255, 255, 255, 0.14) 0, rgba(255, 255, 255, 0.14) 1.5px, transparent 1.5px),
-    radial-gradient(circle at 72% 28%, rgba(255, 255, 255, 0.14) 0, rgba(255, 255, 255, 0.14) 1.5px, transparent 1.5px),
-    radial-gradient(circle at 88% 78%, rgba(255, 255, 255, 0.12) 0, rgba(255, 255, 255, 0.12) 1.5px, transparent 1.5px),
-    radial-gradient(circle at 50% 38%, rgba(255, 255, 255, 0.10) 0, rgba(255, 255, 255, 0.10) 1.5px, transparent 1.5px);
-  background-size: 100% 100%;
-  background-repeat: no-repeat;
-}
-
-/* ▶ "추상 모션 영상" placeholder 라벨 (Phase 3 영상 자산 자리). */
-.video-label {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  font-size: var(--text-meta);
-  font-weight: 500;
-  letter-spacing: 0.005em;
-  color: var(--text-on-aurora-faint);
-}
-.video-label::before {
-  content: "▶";
-  font-size: 10px;
-  opacity: 0.6;
-}
-
-/* ─── Phase 1 typo utility class (12건) ─────────────────────────── */
+/* ─── Phase 1.2 (A-1) typo utility class (12건) ─────────────────── */
 .text-display {
   font-size: var(--text-display);
-  line-height: 1.05;
-  letter-spacing: -0.025em;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   font-weight: 700;
 }
 .text-h1 {
   font-size: var(--text-h1);
-  line-height: 1.08;
-  letter-spacing: -0.02em;
+  line-height: 1.15;
+  letter-spacing: -0.015em;
   font-weight: 700;
 }
 .text-h2 {
   font-size: var(--text-h2);
-  line-height: 1.18;
-  letter-spacing: -0.02em;
-  font-weight: 700;
+  line-height: 1.2;
+  letter-spacing: -0.01em;
+  font-weight: 600;
 }
 .text-h3 {
   font-size: var(--text-h3);
   line-height: 1.3;
-  letter-spacing: -0.01em;
   font-weight: 600;
 }
 .text-body-lg {
   font-size: var(--text-body-lg);
-  line-height: 1.6;
+  line-height: 1.55;
   font-weight: 400;
 }
 .text-body {
@@ -851,53 +767,42 @@ p {
 .text-caption {
   font-size: var(--text-caption);
   line-height: 1.5;
-  letter-spacing: 0.005em;
   font-weight: 500;
 }
 .text-meta {
   font-size: var(--text-meta);
-  line-height: 1.5;
-  letter-spacing: 0.005em;
+  line-height: 1.45;
   font-weight: 500;
 }
 .text-num-md {
   font-size: var(--text-num-md);
-  line-height: 1.1;
+  line-height: 1.15;
   letter-spacing: -0.01em;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 .text-num-lg {
   font-size: var(--text-num-lg);
-  line-height: 1.05;
+  line-height: 1.1;
   letter-spacing: -0.015em;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 .text-num-xl {
   font-size: var(--text-num-xl);
-  line-height: 1.0;
+  line-height: 1.05;
   letter-spacing: -0.02em;
   font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 
-/* Section eyebrow (모든 섹션 상단 violet 라벨). */
+/* Section eyebrow (모노톤 본질 — Phase 1.2 A-1 색 보류 / Phase 1.2 A-2 색 cycle 결정). */
 .section-eyebrow {
   display: inline-flex;
   align-items: center;
   font-size: var(--text-meta);
-  font-weight: 700;
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--accent-violet);
-}
-
-/* Nav-mark gradient (Aurora Calm 본질의 nav 좌측 brand 영역). */
-.nav-mark {
-  background: linear-gradient(135deg, var(--accent-violet) 0%, var(--lavender-300) 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  color: var(--text-tertiary);
 }

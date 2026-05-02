@@ -1,64 +1,45 @@
 import Link from "next/link";
-import { ShieldCheck, Shield, FileCheck } from "lucide-react";
-import { PRIMARY_CTA } from "@/lib/navigation";
 
-const BADGES = [
-  { icon: ShieldCheck, label: "공인중개사 등록" },
-  { icon: Shield, label: "서울보증보험 가입" },
-  { icon: FileCheck, label: "전자본인서명확인서" },
-] as const;
-
-/* Phase 1 — TrustCTA · Aurora Calm + Liquid Glass card.
+/* Phase 1.2 (A-1) — TrustCTA · 모노톤 화이트 + 단순 카드 본질.
  * 본질:
- *  - .bg-aurora-trustcta (Aurora 동일 톤 + 좌하단 발광)
- *  - 안 .glass-card (blur 28 + white/7 bg + white/18 border) 가운데 정렬 단일 카드 (가운데 정렬 예외)
- *  - 신뢰 뱃지 3건 .glass-pill
- *  - CTA primary 흰 bg + violet text
- *  - CTA secondary glass-pill */
+ *  - bg-aurora-trustcta + glass-card 폐기 → 단순 흰 배경 + 카드 본질
+ *  - 카피 v1.1 §C-5: eyebrow / h1 / subtext / CTA 2건
+ *  - CTA primary "입찰 대리 신청" → /apply (본 cycle 색 본질 보류 — text-primary 본질만)
+ *  - CTA secondary "카카오톡 문의" — 본 cycle href는 /contact placeholder (실 카카오톡 링크 별도 cycle) */
 export function TrustCTA() {
   return (
     <section
       aria-labelledby="trust-heading"
-      className="bg-aurora-trustcta relative isolate overflow-hidden"
+      className="bg-[var(--bg-secondary)]"
     >
-      <div className="container-aurora relative py-[var(--section-py)]">
-        {/* 가운데 정렬 trust-cta-card 1건 (가운데 정렬 예외). */}
-        <div className="glass-card mx-auto flex w-full max-w-3xl flex-col items-center rounded-[var(--r-card-lg)] p-[var(--card-p)] text-center text-white shadow-[0_24px_60px_-15px_rgba(15,23,42,0.45)]">
-          <ul className="flex flex-wrap items-center justify-center gap-2">
-            {BADGES.map(({ icon: Icon, label }) => (
-              <li
-                key={label}
-                className="glass-pill inline-flex h-9 items-center gap-2 rounded-full px-4 text-meta font-bold tracking-wide text-white"
-              >
-                <Icon size={14} aria-hidden="true" />
-                {label}
-              </li>
-            ))}
-          </ul>
-
+      <div className="container-app py-[var(--section-py)]">
+        <div className="mx-auto max-w-2xl text-center">
+          <p className="section-eyebrow justify-center">안전한 입찰 대리</p>
           <h2
             id="trust-heading"
-            className="text-h2 mt-8 font-bold leading-tight tracking-tight"
+            className="text-h1 mt-3 text-[var(--text-primary)]"
           >
-            입찰일에 법원 방문이 어려우신가요?
+            보증보험 가입,
+            <br />
+            사고율 0%
           </h2>
-          <p className="text-body-lg mt-5 max-w-2xl text-[var(--text-on-aurora-muted)]">
-            물건은 찾았는데 평일에 시간 내기 어려운 분들을 위해, 경매 입찰 대리
-            서비스를 운영하고 있습니다. 패찰 시 보증금은 당일 즉시 반환됩니다.
+          <p className="text-body mt-4 text-[var(--text-secondary)]">
+            공인중개사 + 매수신청대리인 등록 + 서울보증보험 가입. 입찰보증금은
+            전용계좌에서만 관리합니다.
           </p>
 
-          <div className="mt-10 flex flex-col gap-3 sm:flex-row sm:gap-4">
+          <div className="mt-8 flex flex-col items-center justify-center gap-2 sm:flex-row sm:gap-3">
             <Link
-              href={PRIMARY_CTA.href}
-              className="inline-flex h-12 min-h-12 items-center justify-center rounded-full bg-white px-8 text-base font-semibold text-[var(--accent-violet)] shadow-[var(--shadow-lift)] transition hover:bg-white/90"
+              href="/apply"
+              className="inline-flex h-10 min-h-10 items-center justify-center rounded-lg bg-[var(--text-primary)] px-5 text-sm font-semibold text-white transition-colors hover:bg-black lg:h-11 lg:px-6 lg:text-[15px]"
             >
-              {PRIMARY_CTA.label}
+              입찰 대리 신청
             </Link>
             <Link
-              href="/#pricing"
-              className="glass-pill inline-flex h-12 min-h-12 items-center justify-center rounded-full px-8 text-base font-semibold text-white transition hover:bg-white/15"
+              href="/contact"
+              className="inline-flex h-10 min-h-10 items-center justify-center rounded-lg border border-[var(--border-1)] bg-[var(--bg-primary)] px-5 text-sm font-semibold text-[var(--text-primary)] transition-colors hover:bg-[var(--bg-secondary)] lg:h-11 lg:px-6 lg:text-[15px]"
             >
-              수수료 안내
+              카카오톡 문의
             </Link>
           </div>
         </div>
