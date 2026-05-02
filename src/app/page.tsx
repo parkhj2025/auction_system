@@ -1,35 +1,30 @@
 import { HeroSearch } from "@/components/home/HeroSearch";
+import { BenefitBlock } from "@/components/home/BenefitBlock";
+import { TodayAnalysis } from "@/components/home/TodayAnalysis";
 import { FreeAnalysisBlock } from "@/components/home/FreeAnalysisBlock";
-import { WhyBlock } from "@/components/home/WhyBlock";
+import { CompareBlock } from "@/components/home/CompareBlock";
 import { PricingBlock } from "@/components/home/PricingBlock";
 import { TrustCTA } from "@/components/home/TrustCTA";
-import { getActiveCaseNumbers, getAllAnalysisPosts } from "@/lib/content";
+import { getActiveCaseNumbers } from "@/lib/content";
 
-/* Phase 1.2 (A-1-2) v2 — 카피 압축 + 시각화 강화 + 카드뉴스 본질.
- * 5 블록:
- *  1. Hero (eyebrow 폐기 + h1 압축 + trust chip 폐기 + 콘텐츠 카드 1건 신규)
- *  2. 인사이트 (chip-nav 폐기 + 카드뉴스 grid + SVG 썸네일 4 카테고리)
- *  3. Why (비교표 폐기 + Before/After 인포그래픽 + 효용 카드 lucide 48px)
- *  4. Pricing (카피 압축 + 시간축 인포그래픽 / mobile 세로 + desktop 가로)
- *  5. TrustCTA (카피 압축 + 신뢰 배지 3건 lucide 48px) */
+/* Phase 1.2 (A-1-2) v4 — 7 블록 본질 (시안 정합 본질).
+ *  1. Hero (브랜드 캐치프레이즈 + 검색 카드 + 3D Shield + Gavel)
+ *  2. Benefit (★ 신규 — 경매퀵을 쓰면 + 3 카드 + CTA primary green)
+ *  3. TodayAnalysis (★ 신규 — 오늘의 무료 물건분석 큰 카드)
+ *  4. 인사이트 (chip filter row + 4 col grid + SVG 토큰)
+ *  5. Compare (★ 신규 — 3h vs 0h / WhyBlock 폐기 흡수)
+ *  6. Pricing (가로 점선 connector + dot ring + 추천 yellow chip + 보증금 박스)
+ *  7. TrustCTA (dark Charcoal + radial green glow + 배지 stagger + CTA 2) */
 export default function Home() {
   const caseNumbers = getActiveCaseNumbers();
-  const allAnalysis = getAllAnalysisPosts();
-  const featured = allAnalysis[0]
-    ? {
-        slug: allAnalysis[0].frontmatter.slug,
-        title: allAnalysis[0].frontmatter.title,
-        subtitle: allAnalysis[0].frontmatter.subtitle,
-        caseNumber: allAnalysis[0].frontmatter.caseNumber,
-        address: allAnalysis[0].frontmatter.address,
-      }
-    : null;
 
   return (
     <main className="flex flex-1 flex-col">
-      <HeroSearch caseNumbers={caseNumbers} featured={featured} />
+      <HeroSearch caseNumbers={caseNumbers} />
+      <BenefitBlock />
+      <TodayAnalysis />
       <FreeAnalysisBlock />
-      <WhyBlock />
+      <CompareBlock />
       <PricingBlock />
       <TrustCTA />
     </main>

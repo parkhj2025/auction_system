@@ -19,11 +19,20 @@ const badgeVariants = cva(
         ghost:
           "hover:bg-muted hover:text-muted-foreground dark:hover:bg-muted/50",
         link: "text-primary underline-offset-4 hover:underline",
-        /* Phase 0 표준 — Chip 활성/비활성 (필터·상태 칩). */
+        /* Phase 0 표준 — Chip 활성/비활성 (필터·상태 칩). 분석 페이지 회귀 0 본질 보존. */
         "chip-active":
           "h-7 rounded-full bg-[var(--color-ink-900)] px-3 text-[13px] font-medium text-white",
         "chip-inactive":
           "h-7 rounded-full border border-[var(--color-ink-200)] bg-white px-3 text-[13px] font-medium text-[var(--color-ink-700)] hover:border-[var(--color-ink-900)] hover:text-[var(--color-ink-900)]",
+        /* Phase 1.2 (A-1-2) v4 — Brand chip variant (시안 정합 본질). */
+        "brand-light":
+          "h-7 rounded-full bg-[var(--brand-green-soft)] px-3 text-[13px] font-semibold text-[var(--brand-green-deep)]",
+        "brand-yellow":
+          "h-7 rounded-md bg-[var(--accent-yellow)] px-3 text-[12px] font-bold text-[#4A3A00] shadow-[var(--shadow-glow-yellow)]",
+        "brand-charcoal":
+          "h-7 rounded-full bg-[var(--text-primary)] px-3 text-[13px] font-semibold text-white",
+        "brand-outline":
+          "h-7 rounded-full border border-[var(--border-1)] bg-transparent px-3 text-[13px] font-medium text-[var(--text-secondary)] hover:border-[var(--text-primary)] hover:text-[var(--text-primary)]",
       },
     },
     defaultVariants: {

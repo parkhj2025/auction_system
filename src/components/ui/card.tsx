@@ -18,10 +18,10 @@ function Card({
       data-size={size}
       data-hover={hover ? "lift" : undefined}
       className={cn(
-        "group/card flex flex-col gap-4 overflow-hidden rounded-xl bg-card py-4 text-sm text-card-foreground ring-1 ring-foreground/10 has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-2 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-xl *:[img:last-child]:rounded-b-xl",
-        /* Phase 1.2 (A-1-2) v2 hover — scale 1.005 + translate-y(-1) + shadow-sm + 250ms ease-out (앱 본질 정수). */
+        "group/card flex flex-col gap-4 overflow-hidden rounded-2xl bg-card py-4 text-sm text-card-foreground border border-[var(--border-1)] has-data-[slot=card-footer]:pb-0 has-[>img:first-child]:pt-0 data-[size=sm]:gap-2 data-[size=sm]:py-3 data-[size=sm]:has-data-[slot=card-footer]:pb-0 *:[img:first-child]:rounded-t-2xl *:[img:last-child]:rounded-b-2xl",
+        /* Phase 1.2 (A-1-2) v4 hover — scale 1.005 + translate-y(-2) + shadow-md + 250ms cubic-bezier (시안 정합). */
         hover &&
-          "transition-[transform,box-shadow] duration-[250ms] ease-out hover:-translate-y-0.5 hover:scale-[1.005] hover:shadow-sm",
+          "transition-[transform,box-shadow,border-color] duration-[250ms] ease-out hover:-translate-y-0.5 hover:scale-[1.005] hover:shadow-[var(--shadow-card-hover)] hover:border-[var(--brand-green)]/20",
         className
       )}
       {...props}

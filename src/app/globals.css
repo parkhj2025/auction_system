@@ -257,10 +257,11 @@
   --container-w-narrow: 760px;
   --gutter: 24px;
 
-  /* Phase 0 Container — 5단계 표준 본질. */
+  /* Phase 0 Container — 5단계 표준 본질.
+   * Phase 1.2 (A-1-2) v4 부채 #3 본질 — --c-base 1200 → 1280 본질 (Linear / Vercel / Stripe 정합). */
   --c-prose: 720px;        /* 긴 본문 (분석 페이지 본문 영역) */
   --c-narrow: 960px;       /* 좁은 컨테이너 */
-  --c-base: 1200px;        /* 기본 (Home / 콘텐츠 페이지 그리드) */
+  --c-base: 1280px;        /* 기본 본질 — v4 본질 1200→1280 본질 (부채 #3) */
   --c-wide: 1280px;        /* 넓은 컨테이너 */
   --c-full: 1536px;        /* 최대 폭 */
   --pad-x-mobile: 20px;    /* 모바일 좌우 padding */
@@ -621,89 +622,118 @@ p {
 }
 
 /* ════════════════════════════════════════════════════════════════════════
- * Phase 1.2 (A-1) — 모노톤 화이트 + 앱 스타일 + 와이어프레임+@
+ * Phase 1.2 (A-1-2) v4 — 신뢰 초록 + 서브 노랑 + Charcoal 본질 광역
  * ────────────────────────────────────────────────────────────────────────
- * 본질: Phase 1 (Aurora Calm + Liquid Glass) 토큰 광역 폐기 + value 압축.
- * 색 본질: 모노톤 7 hex만 사용 (violet 코드 본질 보존하되 사용 영역 0).
- * 색 본질 사후 결정: Phase 1.2 (A-2) 색 cycle 영역.
+ * 본질: 모노톤 only (v2) → green #00C853 + yellow #FFD400 + Charcoal #111418 광역 진입.
+ * 컬러 비율 본질: 모노톤 ~85-90% / green ~8-12% / yellow ~2-3%.
+ * 시안 정합 본질: 형준님 직접 송부 (번개 SVG mark + italic 800 wordmark + 6 hex 토큰).
  * Phase 0.4·0.5 본질 (Pretendard self-host + hydration mismatch) 영구 보존.
+ * Phase 0 토큰 (--color-ink-*) 본질 = 분석 페이지 회귀 0 본질 보존.
  * ════════════════════════════════════════════════════════════════════════ */
 
 :root {
-  /* ─── Phase 1.2 (A-1-2) v2 모노톤 9 hex ─────────────────────────── */
+  /* ─── Phase 1.2 (A-1-2) v4 색 6 hex (시안 정합) ─────────────── */
+  /* 메인 = green (CTA / 로고 / 신뢰 배지 / pulse) ~ 8-12% */
+  /* 서브 = yellow (추천 chip / 로고 trail / 형광펜) ~ 2-3% */
+  --brand-green: #00C853;          /* Primary Green — CTA / 로고 / 배지 본질 */
+  --brand-green-deep: #00B248;     /* hover 본질 */
+  --brand-green-dark: #00A040;     /* gradient deep 본질 */
+  --brand-green-soft: #E6FAEE;     /* bg light 본질 */
+  --accent-yellow: #FFD400;        /* Secondary Yellow — 추천 chip / motion trail */
+  --accent-yellow-soft: #FFF8CC;   /* bg light 본질 (옵션) */
+
+  /* 모노톤 본질 (시안 정합) */
   --bg-primary: #FFFFFF;
-  --bg-secondary: #FAFAFA;
-  --bg-tertiary: #F4F4F5;
-  --text-primary: #18181B;       /* 본문 가독 본질 */
-  --text-secondary: #525252;
-  --text-tertiary: #737373;
-  --border-1: rgba(0, 0, 0, 0.08);
-  --divider: rgba(0, 0, 0, 0.06);
-  --button-bg: #0A0A0A;          /* button 한정 강조 본질 (text와 분리) */
+  --bg-secondary: #FAFAFA;         /* Background */
+  --bg-tertiary: #F2F3F5;          /* Light Gray (이전 #F4F4F5 → 시안 정합) */
+  --text-primary: #111418;         /* Deep Charcoal (이전 #18181B → 시안 정합) */
+  --text-secondary: #6B7280;       /* Medium Gray (이전 #525252 → 시안 정합) */
+  --text-tertiary: #9CA3AF;        /* placeholder 본질 */
+  --border-1: rgba(17, 20, 24, 0.08);
+  --border-2: rgba(17, 20, 24, 0.12);
+  --divider: rgba(17, 20, 24, 0.06);
 
-  /* ─── Phase 1.2 (A-1-2) v2 typo 토큰 (mobile floor / @1024px desktop step) ─ */
-  /* body floor 17 (Apple HIG) + h1 mobile 28 보존 (한국어 정합) + Variable Font weight 590/510. */
-  --text-display: 40px;
-  --text-h1: 28px;
+  /* button 본질 (이전 #0A0A0A 검정 → green 본질 / 영역 9 정수) */
+  --button-bg: var(--brand-green);
+  --button-bg-hover: var(--brand-green-deep);
+
+  /* ─── shadow 토큰 신규 (부채 #6 본질) ───────────────────── */
+  --shadow-card: 0 1px 3px rgba(17, 20, 24, 0.04), 0 4px 16px rgba(17, 20, 24, 0.04);
+  --shadow-card-hover: 0 4px 12px rgba(17, 20, 24, 0.06), 0 12px 32px rgba(17, 20, 24, 0.08);
+  --shadow-card-lg: 0 16px 48px rgba(17, 20, 24, 0.06);
+  --shadow-glow-green: 0 8px 24px rgba(0, 200, 83, 0.32);
+  --shadow-glow-green-soft: 0 4px 16px rgba(0, 200, 83, 0.12);
+  --shadow-glow-yellow: 0 4px 12px rgba(255, 212, 0, 0.32);
+  --shadow-button-green: 0 6px 16px rgba(0, 200, 83, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  --shadow-button-green-hover: 0 8px 20px rgba(0, 200, 83, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+
+  /* ─── Phase 1.2 (A-1-2) v4 typo (mobile floor) ─────────────── */
+  /* 시안 정합 본질 — h1·h2·h3 weight 700 (이전 590/510 → 시안 정수 본질).
+   * brand-h1 = italic 800 (Brand 컴포넌트 본질). */
+  --text-display: 40px;            /* mobile (Hero h1·h2 본질) */
+  --text-h1: 32px;                 /* 시안 본질 mobile 32 (이전 28 → 32) */
   --text-h2: 24px;
-  --text-h3: 20px;
-  --text-body-lg: 18px;
-  --text-body: 17px;
-  --text-body-sm: 15px;
-  --text-caption: 13px;
-  --text-meta: 12px;
+  --text-h3: 18px;                 /* 카드 title 본질 */
+  --text-body-lg: 17px;
+  --text-body: 16px;               /* 모바일 줌 방지 16 (이전 17 → 16) */
+  --text-body-sm: 14px;            /* 카드 desc 본질 */
+  --text-caption: 13px;            /* chip 본질 */
+  --text-meta: 12px;               /* meta 본질 */
   --text-num-md: 28px;
-  --text-num-lg: 36px;
-  --text-num-xl: 44px;
+  --text-num-lg: 40px;             /* Pricing 가격 본질 */
+  --text-num-xl: 64px;             /* 비교 (3h vs 0h) 본질 / 영역 6 */
 
-  /* ─── Phase 1.2 (A-1-2) v2 spacing (mobile floor) ────────────── */
+  /* brand-h1 본질 (Hero / Brand 컴포넌트) */
+  --brand-h1-mobile: 32px;
+  --brand-h1-desktop: 56px;
+
+  /* ─── Phase 1.2 (A-1-2) v4 spacing (mobile floor) ────────────── */
   --section-py: 64px;
   --section-px: 20px;
   --card-p: 24px;
   --hero-py-top: 56px;
-  --hero-py-bottom: 48px;
+  --hero-py-bottom: 56px;
   --gap-stack: 16px;
   --gap-grid: 16px;
   --container-max: 100%;
   --container-px: 20px;
 
-  /* ─── Phase 1.2 (A-1-2) v2 border-radius ───────────────────── */
-  --r-card-sm: 12px;
-  --r-card-lg: 16px;
+  /* ─── Phase 1.2 (A-1-2) v4 border-radius (시안 정합) ───── */
+  --r-card-sm: 16px;               /* 작은 카드 */
+  --r-card-md: 20px;               /* 인사이트 카드 / 비교 카드 (시안 본질) */
+  --r-card-lg: 24px;               /* 큰 카드 (오늘의 분석 / Trust block) */
   --r-pill: 9999px;
-  --r-button: 8px;
-  --r-input: 12px;
+  --r-button: 14px;                /* button 본질 (시안 정합 / 영역 9 정수) */
+  --r-input: 16px;                 /* 검색 카드 본질 */
 
-  /* ─── Phase 1 컬러 본질 보존 (사용 영역 0 — Phase 1.2 A-2 색 cycle 결정) ─ */
-  --accent-violet: #5B21B6;
-  --accent-violet-soft: rgba(91, 33, 182, 0.06);
-
-  /* ─── 분석 페이지 alias 보존 (자동 흡수). */
-  --color-action: var(--accent-violet);
+  /* ─── alias 본질 (분석 페이지 회귀 본질 0) ─ */
+  --accent-violet: var(--brand-green);
+  --accent-violet-soft: var(--brand-green-soft);
+  --color-action: var(--brand-green);
 }
 
-/* Phase 1.2 (A-1-2) v2 desktop step (≥1024px). */
+/* Phase 1.2 (A-1-2) v4 desktop step (≥1024px). */
 @media (min-width: 1024px) {
   :root {
-    --text-display: 56px;
+    --text-display: 56px;          /* Brand-h1 desktop 본질 */
     --text-h1: 44px;
     --text-h2: 32px;
-    --text-h3: 24px;
-    --text-body-lg: 19px;
+    --text-h3: 20px;
+    --text-body-lg: 18px;
     --text-body: 17px;
     --text-body-sm: 15px;
     --text-num-md: 32px;
-    --text-num-lg: 44px;
-    --text-num-xl: 56px;
+    --text-num-lg: 48px;
+    --text-num-xl: 80px;           /* 비교 본질 desktop 본질 */
 
-    --section-py: 128px;
+    --section-py: 96px;            /* Agent 평가 본질 80-96 본질 (이전 128 → 96) */
     --section-px: 32px;
     --card-p: 32px;
-    --hero-py-top: 96px;
-    --hero-py-bottom: 64px;
+    --hero-py-top: 80px;
+    --hero-py-bottom: 80px;
     --gap-stack: 24px;
     --gap-grid: 24px;
-    --container-max: 1200px;
+    --container-max: 1280px;       /* 1200 → 1280 본질 (부채 #3) */
     --container-px: 32px;
   }
 }
@@ -727,43 +757,51 @@ p {
   width: 100%;
 }
 
-/* ─── Phase 1.2 (A-1-2) v2 typo utility class (12건) ──────────── */
-/* letter-spacing 광역 0em + display -0.02em (한국어 Pretendard 정합).
- * font-weight Variable Font 590 (display·h1) / 510 (h2·h3·meta·caption) / 400 (body). */
+/* ─── Phase 1.2 (A-1-2) v4 typo utility class ──────────── */
+/* 시안 정합 본질: weight 700 (h1·h2·h3) / 800 italic (brand-h1) / 400 (body) / 600 (caption·meta).
+ * 한국어 정합 본질: letter-spacing -0.025em (display·h1) / -0.015em (h2) / -0.01em (h3) / -0.005em (body) / 0 (caption·meta).
+ * line-height 한국어 디센더 안전 본질 1.25 (h1) / 1.3 (h2) / 1.4 (h3) / 1.55-1.6 (body). */
 .text-display {
   font-size: var(--text-display);
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-  font-weight: 590;
+  line-height: 1.15;
+  letter-spacing: -0.025em;
+  font-weight: 700;
+}
+.text-brand {
+  font-size: var(--text-display);
+  line-height: 1.1;
+  letter-spacing: -0.03em;
+  font-weight: 800;
+  font-style: italic;             /* SVG outline 본질 + fake oblique fallback */
 }
 .text-h1 {
   font-size: var(--text-h1);
-  line-height: 1.15;
-  letter-spacing: 0;
-  font-weight: 590;
+  line-height: 1.25;
+  letter-spacing: -0.025em;
+  font-weight: 700;
 }
 .text-h2 {
   font-size: var(--text-h2);
-  line-height: 1.25;
-  letter-spacing: 0;
-  font-weight: 510;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+  font-weight: 700;
 }
 .text-h3 {
   font-size: var(--text-h3);
-  line-height: 1.35;
-  letter-spacing: 0;
-  font-weight: 510;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  font-weight: 700;
 }
 .text-body-lg {
   font-size: var(--text-body-lg);
-  line-height: 1.6;
-  letter-spacing: 0;
+  line-height: 1.55;
+  letter-spacing: -0.005em;
   font-weight: 400;
 }
 .text-body {
   font-size: var(--text-body);
   line-height: 1.6;
-  letter-spacing: 0;
+  letter-spacing: -0.005em;
   font-weight: 400;
 }
 .text-body-sm {
@@ -776,43 +814,91 @@ p {
   font-size: var(--text-caption);
   line-height: 1.5;
   letter-spacing: 0;
-  font-weight: 510;
+  font-weight: 600;
 }
 .text-meta {
   font-size: var(--text-meta);
   line-height: 1.45;
-  letter-spacing: 0;
-  font-weight: 510;
+  letter-spacing: 0.02em;
+  font-weight: 600;
 }
 .text-num-md {
   font-size: var(--text-num-md);
   line-height: 1.15;
-  letter-spacing: -0.01em;
-  font-weight: 590;
+  letter-spacing: -0.02em;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 .text-num-lg {
   font-size: var(--text-num-lg);
-  line-height: 1.1;
-  letter-spacing: -0.015em;
-  font-weight: 590;
+  line-height: 1.05;
+  letter-spacing: -0.025em;
+  font-weight: 700;
   font-variant-numeric: tabular-nums;
 }
 .text-num-xl {
   font-size: var(--text-num-xl);
-  line-height: 1.05;
-  letter-spacing: -0.02em;
-  font-weight: 590;
+  line-height: 1.0;
+  letter-spacing: -0.03em;
+  font-weight: 800;
   font-variant-numeric: tabular-nums;
 }
 
-/* Section eyebrow (모노톤 본질). */
+/* Section eyebrow (모노톤 본질 + tertiary 색). */
 .section-eyebrow {
   display: inline-flex;
   align-items: center;
   font-size: var(--text-meta);
-  font-weight: 510;
+  font-weight: 600;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: var(--text-tertiary);
+  color: var(--text-secondary);
+}
+
+/* Phase 1.2 (A-1-2) v4 강조 utility class (절제 본질). */
+/* 강조 단어 (h1 안 "빠르고" 본질 / 영역 2 정수). */
+.text-accent-green {
+  color: var(--brand-green);
+}
+
+/* 형광펜 highlight (옵션 본질). */
+.text-highlight-yellow {
+  background: linear-gradient(180deg, transparent 60%, rgba(255, 212, 0, 0.4) 60%);
+}
+
+/* scroll-revealed stagger (Trust 배지 본질 / Opus 자유 3 본 cycle 진입). */
+.stagger-item {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 500ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 500ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.stagger-item.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+.stagger-item:nth-child(1) { transition-delay: 0ms; }
+.stagger-item:nth-child(2) { transition-delay: 120ms; }
+.stagger-item:nth-child(3) { transition-delay: 240ms; }
+
+/* green pulse dot (Hero "사고율 0%" 본질). */
+@keyframes pulse-green {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.4);
+  }
+}
+.pulse-dot::before {
+  content: "";
+  position: absolute;
+  inset: -2px;
+  border-radius: 9999px;
+  background: var(--brand-green);
+  opacity: 0.4;
+  animation: pulse-green 2s ease-out infinite;
+  pointer-events: none;
 }

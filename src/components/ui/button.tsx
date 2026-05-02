@@ -18,6 +18,16 @@ const buttonVariants = cva(
         destructive:
           "bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40",
         link: "text-primary underline-offset-4 hover:underline",
+        /* Phase 1.2 (A-1-2) v4 — Brand green primary CTA (시안 정합 / 영역 9 정수).
+         * bg green / hover green-deep / box-shadow 입체 / focus-visible white layer + green ring 이중. */
+        "brand-primary":
+          "bg-[var(--brand-green)] text-white shadow-[var(--shadow-button-green)] hover:bg-[var(--brand-green-deep)] hover:shadow-[var(--shadow-button-green-hover)] focus-visible:shadow-[0_0_0_3px_white,0_0_0_6px_rgba(0,200,83,0.4),var(--shadow-button-green)]",
+        /* Phase 1.2 (A-1-2) v4 — secondary (white bg / green text). */
+        "brand-secondary":
+          "bg-[rgba(0,200,83,0.08)] text-[var(--brand-green-deep)] border border-[rgba(0,200,83,0.2)] hover:bg-[rgba(0,200,83,0.12)] hover:border-[rgba(0,200,83,0.32)]",
+        /* Phase 1.2 (A-1-2) v4 — secondary on dark block (Trust). */
+        "brand-on-dark":
+          "bg-white/8 text-white border border-white/12 hover:bg-white/12 backdrop-blur-sm",
       },
       size: {
         default:
@@ -25,8 +35,8 @@ const buttonVariants = cva(
         xs: "h-6 gap-1 rounded-[min(var(--radius-md),10px)] px-2 text-xs in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3",
         sm: "h-7 gap-1 rounded-[min(var(--radius-md),12px)] px-2.5 text-[0.8rem] in-data-[slot=button-group]:rounded-lg has-data-[icon=inline-end]:pr-1.5 has-data-[icon=inline-start]:pl-1.5 [&_svg:not([class*='size-'])]:size-3.5",
         lg: "h-9 gap-1.5 px-2.5 has-data-[icon=inline-end]:pr-2 has-data-[icon=inline-start]:pl-2",
-        /* Phase 1.2 (A-1-2) v2 — h56 통일 (form 본질 정합) / radius 8 / 17/590 / px 24. */
-        xl: "h-14 gap-2 rounded-lg px-6 text-[17px] font-[590] has-data-[icon=inline-end]:pr-5 has-data-[icon=inline-start]:pl-5 [&_svg:not([class*='size-'])]:size-5",
+        /* Phase 1.2 (A-1-2) v4 — h13 mobile / h14 lg + radius 14 + 시안 정합 (Toss paradigm 본질). */
+        xl: "h-13 gap-2 rounded-[14px] px-6 text-[15px] font-bold lg:h-14 lg:text-[16px] has-data-[icon=inline-end]:pr-5 has-data-[icon=inline-start]:pl-5 [&_svg:not([class*='size-'])]:size-5",
         icon: "size-8",
         "icon-xs":
           "size-6 rounded-[min(var(--radius-md),10px)] in-data-[slot=button-group]:rounded-lg [&_svg:not([class*='size-'])]:size-3",
