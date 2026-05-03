@@ -220,6 +220,28 @@ export const APPLY_STEPS = [
 
 export type ApplyStepId = (typeof APPLY_STEPS)[number]["id"];
 
+/* Phase 1.2 (A-1-2) v6 — InsightBlock 카테고리 색 시스템.
+ * 4 카테고리: 무료 물건분석 (green) / 가이드 (blue) / 시장 인사이트 (orange) / 낙찰사례 (purple). */
+export type InsightCategoryKey = "analysis" | "guide" | "insight" | "cases";
+
+export const INSIGHT_CATEGORIES: Record<
+  InsightCategoryKey,
+  { label: string; color: string; bgVar: string }
+> = {
+  analysis: {
+    label: "무료 물건분석",
+    color: "#00C853",
+    bgVar: "var(--cat-analysis)",
+  },
+  guide: { label: "가이드", color: "#3B82F6", bgVar: "var(--cat-guide)" },
+  insight: {
+    label: "시장 인사이트",
+    color: "#F59E0B",
+    bgVar: "var(--cat-insight)",
+  },
+  cases: { label: "낙찰사례", color: "#8B5CF6", bgVar: "var(--cat-cases)" },
+};
+
 export const COMPLIANCE_ITEMS = [
   "본 콘텐츠는 대법원 경매정보 및 공공데이터를 기초로 작성된 참고 자료이며, 투자 권유가 아닙니다. 투자 판단에 대한 책임은 본인에게 있습니다.",
   "본 서비스는 공인중개사법에 따른 매수신청 대리(입찰 대리) 업무만을 수행하며, 권리분석·투자자문·명도 등의 업무는 포함되지 않습니다.",

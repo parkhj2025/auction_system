@@ -1,48 +1,34 @@
 import Link from "next/link";
 import { FEES } from "@/lib/constants";
 
-/* Phase 1.2 (A-1-2) v4 — PricingBlock (시안 정합 본질).
- * h2 "필요한 만큼만" + 세로 timeline (mobile) / 가로 점선 connector (lg) + dot ring 24x24.
- * 추천 카드 (D-7~D-2 일반) — border 2px green + scale 1.02 + yellow chip "가장 많이 선택".
- * "패찰 시 보증금 전액 반환" 별도 박스 (CLAUDE.md 신뢰 핵심 의무 위치). */
+/* Phase 1.2 (A-1-2) v6 — PricingBlock (timeline 시각화 + 카피 v4).
+ * h2 "신청이 빠를수록 저렴합니다." (eyebrow 폐기)
+ * subtext "5만원부터 시작합니다."
+ * timeline: 시간축 (D-7+ → D-7~D-2 → D-2 이내) 가로 + 가격축 (5만 / 7만 / 10만) bar height 시각화.
+ * 강조: 얼리버드 = green border + chip "가장 많이 선택"
+ * caption: "낙찰 시 +5만원" / "패찰 시 보증금 전액 반환"
+ * CTA "지금 신청하기" (광역 정수 1건). */
 
 type Tier = {
   key: "earlybird" | "standard" | "rush";
-  name: string;
   point: string;
-  tag: string;
+  name: string;
   fee: number;
   recommended?: boolean;
 };
 
 const TIERS: Tier[] = [
-  {
-    key: "earlybird",
-    name: "얼리버드",
-    point: "D-7+",
-    tag: "입찰 7일 이상 전",
-    fee: FEES.earlybird,
-  },
-  {
-    key: "standard",
-    name: "일반",
-    point: "D-7~D-2",
-    tag: "입찰 2~7일 전",
-    fee: FEES.standard,
-    recommended: true,
-  },
-  {
-    key: "rush",
-    name: "급건",
-    point: "D-1",
-    tag: "입찰 2일 이내",
-    fee: FEES.rush,
-  },
+  { key: "earlybird", point: "D-7+", name: "얼리버드", fee: FEES.earlybird, recommended: true },
+  { key: "standard", point: "D-7~D-2", name: "일반", fee: FEES.standard },
+  { key: "rush", point: "D-2 이내", name: "급건", fee: FEES.rush },
 ];
 
 function feeLabel(won: number) {
   return `${(won / 10_000).toLocaleString("ko-KR")}만원`;
 }
+
+/* bar height paradigm — 최대 fee (rush 10만) = 100% / 비례 height. */
+const MAX_FEE = Math.max(...TIERS.map((t) => t.fee));
 
 export function PricingBlock() {
   return (
@@ -52,103 +38,85 @@ export function PricingBlock() {
       className="bg-[var(--bg-secondary)]"
     >
       <div className="container-app py-[var(--section-py)]">
-        <div className="max-w-2xl">
-          <p className="section-eyebrow">수수료</p>
-          <h2
-            id="pricing-heading"
-            className="mt-3 text-[28px] font-bold leading-[1.25] tracking-[-0.025em] text-[var(--text-primary)] lg:text-[40px]"
-          >
-            필요한 만큼만
-          </h2>
-          <p className="mt-4 text-[16px] leading-[1.6] text-[var(--text-secondary)] lg:text-[18px]">
-            신청 시점에 따라 5만원부터.
-          </p>
-        </div>
+        <h2
+          id="pricing-heading"
+          className="max-w-2xl text-[var(--text-h2)] font-extrabold leading-[1.1] tracking-[-0.025em] text-[var(--text-primary)]"
+          style={{ fontWeight: 800 }}
+        >
+          신청이 빠를수록 저렴합니다.
+        </h2>
+        <p className="mt-4 text-[16px] leading-[1.6] text-[var(--text-secondary)] lg:mt-5 lg:text-[18px]">
+          5만원부터 시작합니다.
+        </p>
 
-        {/* 카드 grid + 가로 점선 connector (lg) / 세로 timeline (mobile). */}
-        <div className="relative mt-12">
-          {/* 가로 점선 connector (lg). */}
-          <span
-            aria-hidden="true"
-            className="pointer-events-none absolute left-12 right-12 top-9 hidden h-0 border-t-2 border-dashed border-[var(--border-2)] lg:block"
-          />
-
-          <div className="grid gap-4 md:grid-cols-3 lg:gap-6">
-            {TIERS.map((tier) => (
+        {/* timeline visualization — 가로 시간축 + 세로 bar. */}
+        <div className="mt-12 grid grid-cols-3 gap-3 lg:gap-6">
+          {TIERS.map((tier) => {
+            const heightPct = (tier.fee / MAX_FEE) * 100;
+            return (
               <article
                 key={tier.key}
                 className={
-                  "relative flex flex-col rounded-[20px] bg-white p-7 transition-all duration-[250ms] ease-out lg:p-8 " +
+                  "relative flex flex-col rounded-2xl bg-white p-5 lg:p-7 " +
                   (tier.recommended
-                    ? "border-2 border-[var(--brand-green)] shadow-[0_16px_32px_rgba(0,200,83,0.10)] lg:scale-[1.02]"
+                    ? "border-2 border-[var(--brand-green)] shadow-[0_16px_32px_rgba(0,200,83,0.10)]"
                     : "border border-[var(--border-1)]")
                 }
               >
-                {/* 추천 chip yellow (절대 위치 / 우상단 / 시안 정합). */}
                 {tier.recommended && (
-                  <span className="absolute -top-3 right-6 inline-flex items-center rounded-md bg-[var(--accent-yellow)] px-3 py-1.5 text-[12px] font-bold text-[#4A3A00] shadow-[var(--shadow-glow-yellow)]">
+                  <span className="absolute -top-3 left-5 inline-flex items-center rounded-md bg-[var(--brand-green)] px-2.5 py-1 text-[11px] font-bold text-white shadow-[var(--shadow-glow-green)] lg:left-7">
                     가장 많이 선택
                   </span>
                 )}
 
-                {/* dot ring 24x24 (상단 가운데). */}
-                <span
-                  aria-hidden="true"
-                  className={
-                    "mx-auto flex h-6 w-6 items-center justify-center rounded-full bg-white " +
-                    (tier.recommended
-                      ? "ring-4 ring-[var(--brand-green)]"
-                      : "ring-4 ring-[var(--border-2)]")
-                  }
-                >
-                  <span
-                    className={
-                      "h-2 w-2 rounded-full " +
-                      (tier.recommended
-                        ? "bg-[var(--brand-green)]"
-                        : "bg-[var(--text-tertiary)]")
-                    }
-                  />
-                </span>
-
-                <p className="mt-6 text-center text-[12px] font-bold uppercase tracking-[0.06em] text-[var(--text-tertiary)]">
+                <p className="text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--text-tertiary)] lg:text-[12px]">
                   {tier.point}
                 </p>
-                <p className="mt-3 text-center text-[40px] font-bold leading-none tracking-[-0.025em] text-[var(--text-primary)]">
+                <p className="mt-2 text-[20px] font-extrabold tracking-[-0.025em] text-[var(--text-primary)] lg:mt-3 lg:text-[28px]">
                   {feeLabel(tier.fee)}
                 </p>
-                <p className="mt-2 text-center text-[14px] font-semibold text-[var(--text-secondary)]">
+                <p className="mt-1 text-[12px] text-[var(--text-tertiary)] lg:text-[13px]">
                   {tier.name}
                 </p>
-                <p className="mt-1 text-center text-[13px] text-[var(--text-tertiary)]">
-                  {tier.tag}
-                </p>
+
+                {/* bar visualization — 가격축 본질. */}
+                <div className="mt-5 flex h-24 items-end lg:mt-7 lg:h-32">
+                  <div
+                    aria-hidden="true"
+                    className={
+                      "w-full rounded-md transition-all duration-[400ms] ease-out " +
+                      (tier.recommended
+                        ? "bg-gradient-to-t from-[var(--brand-green)] to-[var(--brand-green-deep)]"
+                        : "bg-[var(--bg-tertiary)]")
+                    }
+                    style={{ height: `${heightPct}%` }}
+                  />
+                </div>
               </article>
-            ))}
-          </div>
+            );
+          })}
         </div>
 
-        {/* "패찰 시 보증금 전액 반환" 별도 박스 (CLAUDE.md 신뢰 핵심 의무). */}
-        <div className="mt-8 rounded-2xl border-l-[3px] border-[var(--brand-green)] bg-[rgba(0,200,83,0.06)] px-5 py-4 lg:px-6 lg:py-5">
-          <p className="text-[14px] font-semibold leading-[1.6] text-[var(--text-primary)] lg:text-[15px]">
-            패찰 시 보증금은 <span className="text-[var(--brand-green-deep)]">전액 반환</span>됩니다. 결과와 무관하게 청구되는 숨은 비용은 없습니다.
-          </p>
-        </div>
+        {/* caption — 외부 정수 본질. */}
+        <p className="mt-8 text-center text-[13px] text-[var(--text-secondary)] lg:text-[14px]">
+          낙찰 시{" "}
+          <strong className="font-bold text-[var(--text-primary)]">
+            +{feeLabel(FEES.successBonus)} (성공 보수)
+          </strong>{" "}
+          · 패찰 시 보증금{" "}
+          <strong className="font-bold text-[var(--brand-green-deep)]">
+            전액 반환
+          </strong>
+          .
+        </p>
 
-        {/* foot row — 성공보수 + CTA. */}
-        <div className="mt-6 flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <p className="text-[14px] text-[var(--text-secondary)]">
-            낙찰 시{" "}
-            <strong className="font-bold text-[var(--text-primary)]">
-              +{feeLabel(FEES.successBonus)}
-            </strong>{" "}
-            (낙찰된 경우만)
-          </p>
+        {/* CTA — 광역 정수 1건. */}
+        <div className="mt-8 flex justify-center lg:mt-10">
           <Link
-            href="/pricing"
-            className="text-[14px] font-semibold text-[var(--text-primary)] transition-colors duration-150 hover:text-[var(--brand-green-deep)]"
+            href="/apply"
+            className="inline-flex h-13 items-center justify-center rounded-[14px] bg-[var(--brand-green)] px-8 text-[15px] font-bold text-white shadow-[var(--shadow-button-green)] transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 lg:h-14 lg:px-10 lg:text-[16px]"
           >
-            수수료 자세히 →
+            지금 신청하기
           </Link>
         </div>
       </div>

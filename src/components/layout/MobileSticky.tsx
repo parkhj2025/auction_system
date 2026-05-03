@@ -26,7 +26,7 @@ export function MobileSticky() {
           href={PRIMARY_CTA.href}
           className="flex h-13 w-full items-center justify-center rounded-[14px] bg-[var(--brand-green)] px-4 text-[15px] font-bold text-white shadow-[var(--shadow-button-green)] transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2"
         >
-          무료 상담 신청
+          사건번호 입력하기
         </Link>
       </div>
     </div>

@@ -3,16 +3,16 @@
 import Link from "next/link";
 import { useState, useEffect } from "react";
 import { Menu, X, User } from "lucide-react";
-import { PRIMARY_CTA } from "@/lib/navigation";
 import { cn } from "@/lib/utils";
 import { UserMenu, type UserMenuProps } from "@/components/auth/UserMenu";
 import { Brand } from "@/components/Brand";
 import { BRAND_NAME } from "@/lib/constants";
 
-/* Phase 1.2 (A-1-2) v4 — TopNav (시안 정합 본질).
- * 본질: Brand 컴포넌트 활용 + nav 4 link (서비스 소개·이용 절차·낙찰 사례·FAQ) + 우측 "무료 상담 신청" green CTA + user icon.
+/* Phase 1.2 (A-1-2) v6 — TopNav (CTA 광역 폐기 / nav 4 link 보존).
+ * Brand 컴포넌트 + nav 4 link (서비스 소개 · 이용 절차 · 경매 인사이트 · FAQ) + user icon.
+ * v6 paradigm: CTA 광역 2 영역 한정 (Hero + Pricing) → TopNav CTA 광역 폐기.
  * sticky bg-white/80 backdrop-blur + scroll>8 border (Linear paradigm).
- * 한국어 nav brkpt 1024px (md → lg 변경 본질). */
+ * 한국어 nav brkpt 1024px. */
 
 /* TopNav 본질 nav links (v5 Q5 형준님 결정 — 낙찰사례 폐기 + 경매 인사이트 메인).
  * lib/navigation.ts PRIMARY_NAV (모바일 drawer 본질) 본질 보존. */
@@ -81,30 +81,19 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
         </nav>
 
         <div className="flex items-center gap-2">
+          {/* v6 — TopNav CTA 광역 폐기 (CTA 광역 2 영역 한정 paradigm). user icon만 보존. */}
           {user ? (
-            <div className="hidden lg:flex lg:items-center lg:gap-3">
-              <Link
-                href={PRIMARY_CTA.href}
-                className="inline-flex h-10 items-center rounded-[12px] bg-[var(--brand-green)] px-5 text-[14px] font-semibold text-white shadow-[var(--shadow-button-green)] transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2"
-              >
-                무료 상담 신청
-              </Link>
+            <div className="hidden lg:flex lg:items-center">
               <UserMenu {...user} />
             </div>
           ) : (
-            <div className="hidden lg:flex lg:items-center lg:gap-2">
+            <div className="hidden lg:flex lg:items-center">
               <Link
                 href="/login"
                 className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-1)] text-[var(--text-secondary)] transition-colors duration-150 hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
                 aria-label="로그인"
               >
                 <User size={18} strokeWidth={1.75} />
-              </Link>
-              <Link
-                href={PRIMARY_CTA.href}
-                className="inline-flex h-10 items-center rounded-[12px] bg-[var(--brand-green)] px-5 text-[14px] font-semibold text-white shadow-[var(--shadow-button-green)] transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2"
-              >
-                무료 상담 신청
               </Link>
             </div>
           )}
@@ -144,13 +133,6 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
               </li>
             ))}
           </ul>
-          <Link
-            href={PRIMARY_CTA.href}
-            onClick={() => setOpen(false)}
-            className="mt-4 flex h-13 items-center justify-center rounded-[14px] bg-[var(--brand-green)] px-4 text-[16px] font-bold text-white shadow-[var(--shadow-button-green)] transition-colors duration-150 hover:bg-[var(--brand-green-deep)]"
-          >
-            무료 상담 신청
-          </Link>
           {user ? (
             <div className="mt-3 rounded-2xl border border-[var(--border-1)] px-4 py-3">
               <p className="truncate text-sm font-bold text-[var(--text-primary)]">

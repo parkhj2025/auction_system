@@ -1,13 +1,10 @@
-/* Phase 1.2 (A-1-2) v4 — CompareBlock (★ 신규 / 시안 정합 본질).
- * 좌 흰 카드 (직접 입찰 시 / 3시간) vs 우 Charcoal gradient 카드 (경매퀵 이용 시 / 0시간 / radial green glow).
- * WhyBlock 폐기 본질 → CompareBlock 본질 본질 본질 본질 (Q3 형준님 결정).
- * 영역 6 정수 — Linear vs / Stripe before-after paradigm 정합. */
+/* Phase 1.2 (A-1-2) v6 — CompareBlock (typography-driven 대형 numeric / 카피 v4).
+ * "비교" 라벨 광역 폐기.
+ * h2 "법원 가는 3시간, 물건 보는 시간으로." (광역 정수)
+ * 시각: 좌 "3 hours" 96px+ charcoal/40 → 우 "0 hours" 96px+ green
+ * caption: 좌 "직접 입찰 시 법원 왕복 + 대기" / 우 "경매퀵 이용 시 신청 → 결과 알림" */
 
-const ROWS = [
-  { label: "법원 방문", direct: "필수 (왕복 + 대기)", quick: "0회" },
-  { label: "서류 준비", direct: "본인 직접", quick: "전문가 대행" },
-  { label: "결과 통보", direct: "현장 확인", quick: "알림으로 받기" },
-] as const;
+import { ArrowRight } from "lucide-react";
 
 export function CompareBlock() {
   return (
@@ -16,86 +13,53 @@ export function CompareBlock() {
       className="bg-[var(--bg-primary)]"
     >
       <div className="container-app py-[var(--section-py)]">
-        <div className="max-w-2xl">
-          <p className="section-eyebrow">비교</p>
-          <h2
-            id="compare-heading"
-            className="mt-3 text-[28px] font-bold leading-[1.25] tracking-[-0.025em] text-[var(--text-primary)] lg:text-[40px]"
-          >
-            법원 가는 시간을
-            <br />
-            물건 보는 시간으로
-          </h2>
-        </div>
+        <h2
+          id="compare-heading"
+          className="max-w-3xl text-[var(--text-h2)] font-extrabold leading-[1.1] tracking-[-0.025em] text-[var(--text-primary)]"
+          style={{ fontWeight: 800 }}
+        >
+          법원 가는 <span className="text-[var(--brand-green)]">3시간</span>,
+          <br className="hidden sm:block" />
+          물건 보는 시간으로.
+        </h2>
 
-        <div className="mt-12 grid grid-cols-2 gap-3 lg:gap-6">
-          {/* 좌 — 직접 입찰 (형준님 #8 mobile 2 col). */}
-          <article className="rounded-[24px] border border-[var(--border-1)] bg-[var(--bg-secondary)] p-5 lg:p-10">
-            <p className="text-[12px] font-bold uppercase tracking-[0.06em] text-[var(--text-tertiary)]">
-              직접 입찰 시
-            </p>
-            <p className="mt-3 text-[64px] font-bold leading-none tracking-[-0.03em] text-[var(--text-primary)]/60 lg:text-[80px]">
+        {/* 대형 numeric typography 시각 — 96px mobile / 144px desktop. */}
+        <div className="mt-12 flex flex-col items-stretch gap-6 lg:mt-20 lg:flex-row lg:items-center lg:justify-center lg:gap-12">
+          {/* 좌 — 3 hours (직접 입찰). */}
+          <div className="flex-1 text-center lg:text-right">
+            <p
+              className="text-[var(--text-num-xl)] font-extrabold leading-[0.95] tracking-[-0.04em] text-[var(--text-primary)]/30 tabular-nums"
+              style={{ fontWeight: 800 }}
+            >
               3h
             </p>
-            <p className="mt-2 text-[14px] text-[var(--text-secondary)] lg:text-[15px]">
-              법원 왕복 + 대기
+            <p className="mt-3 text-[14px] text-[var(--text-tertiary)] lg:mt-4 lg:text-[16px]">
+              직접 입찰 시 법원 왕복 + 대기
             </p>
-            <ul className="mt-8 flex flex-col">
-              {ROWS.map((r) => (
-                <li
-                  key={r.label}
-                  className="flex items-center justify-between border-t border-[var(--divider)] py-4 text-[13px] lg:text-[14px]"
-                >
-                  <span className="font-medium text-[var(--text-tertiary)]">
-                    {r.label}
-                  </span>
-                  <span className="font-semibold text-[var(--text-secondary)]">
-                    {r.direct}
-                  </span>
-                </li>
-              ))}
-            </ul>
-          </article>
+          </div>
 
-          {/* 우 — 경매퀵 (Charcoal gradient + radial green glow). */}
-          <article className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-[#111418] to-[#1F2429] p-5 text-white lg:p-10">
-            {/* radial green glow (우상단 hotspot). */}
-            <span
+          {/* arrow — 모바일 가운데 / 데스크탑 가운데. */}
+          <div className="flex items-center justify-center text-[var(--text-tertiary)]">
+            <ArrowRight
+              size={32}
+              strokeWidth={1.5}
               aria-hidden="true"
-              className="pointer-events-none absolute -right-24 -top-24 h-[400px] w-[400px] rounded-full"
-              style={{
-                background:
-                  "radial-gradient(circle, rgba(0,200,83,0.18), transparent 60%)",
-              }}
+              className="lg:size-12"
             />
-            <div className="relative">
-              <p className="text-[12px] font-bold uppercase tracking-[0.06em] text-[#34D17A]">
-                경매퀵 이용 시
-              </p>
-              <div className="mt-3 flex items-baseline gap-3">
-                <p className="text-[64px] font-bold leading-none tracking-[-0.03em] text-white lg:text-[80px]">
-                  0h
-                </p>
-                <span className="inline-flex items-center rounded-md bg-[var(--brand-green)] px-2 py-1 text-[11px] font-bold text-white">
-                  법원 안 감
-                </span>
-              </div>
-              <p className="mt-2 text-[14px] text-white/70 lg:text-[15px]">
-                전문가 대리 입찰
-              </p>
-              <ul className="mt-8 flex flex-col">
-                {ROWS.map((r) => (
-                  <li
-                    key={r.label}
-                    className="flex items-center justify-between border-t border-white/10 py-4 text-[13px] lg:text-[14px]"
-                  >
-                    <span className="font-medium text-white/60">{r.label}</span>
-                    <span className="font-semibold text-white">{r.quick}</span>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </article>
+          </div>
+
+          {/* 우 — 0 hours (경매퀵). */}
+          <div className="flex-1 text-center lg:text-left">
+            <p
+              className="text-[var(--text-num-xl)] font-extrabold leading-[0.95] tracking-[-0.04em] text-[var(--brand-green)] tabular-nums"
+              style={{ fontWeight: 800 }}
+            >
+              0h
+            </p>
+            <p className="mt-3 text-[14px] text-[var(--text-tertiary)] lg:mt-4 lg:text-[16px]">
+              경매퀵 이용 시 신청 → 결과 알림
+            </p>
+          </div>
         </div>
       </div>
     </section>

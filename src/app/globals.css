@@ -667,21 +667,20 @@ p {
   --shadow-button-green: 0 6px 16px rgba(0, 200, 83, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   --shadow-button-green-hover: 0 8px 20px rgba(0, 200, 83, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 
-  /* ─── Phase 1.2 (A-1-2) v4 typo (mobile floor) ─────────────── */
-  /* 시안 정합 본질 — h1·h2·h3 weight 700 (이전 590/510 → 시안 정수 본질).
-   * brand-h1 = italic 800 (Brand 컴포넌트 본질). */
-  --text-display: 40px;            /* mobile (Hero h1·h2 본질) */
-  --text-h1: 32px;                 /* v5 본질 mobile 32 (h1 광역 ↑) */
-  --text-h2: 24px;
-  --text-h3: 18px;                 /* 카드 title 본질 */
+  /* ─── Phase 1.2 (A-1-2) v6 typo (mobile floor) — 광역 ↑ ─────── */
+  /* 본질: h1 광역 정수 ↑ / h2 광역 정수 ↑ / 카테고리 라벨 ↓ / hierarchy 명확. */
+  --text-display: 44px;            /* Hero h1 mobile (v6 광역 ↑ from 40) */
+  --text-h1: 44px;                 /* v6 mobile 44 (광역 ↑ from 32) */
+  --text-h2: 32px;                 /* v6 section h2 mobile 32 (광역 ↑ from 24) */
+  --text-h3: 20px;                 /* 카드 title (광역 ↑ from 18) */
   --text-body-lg: 17px;
-  --text-body: 16px;               /* 모바일 줌 방지 16 (이전 17 → 16) */
-  --text-body-sm: 14px;            /* 카드 desc 본질 */
-  --text-caption: 13px;            /* chip 본질 */
-  --text-meta: 12px;               /* meta 본질 */
+  --text-body: 16px;
+  --text-body-sm: 14px;
+  --text-caption: 13px;
+  --text-meta: 12px;
   --text-num-md: 28px;
-  --text-num-lg: 40px;             /* Pricing 가격 본질 */
-  --text-num-xl: 64px;             /* 비교 (3h vs 0h) 본질 / 영역 6 */
+  --text-num-lg: 40px;
+  --text-num-xl: 96px;             /* v6 Compare 대형 numeric (광역 ↑ from 64) */
 
   /* brand-h1 본질 (Hero / Brand 컴포넌트) */
   --brand-h1-mobile: 32px;
@@ -715,16 +714,16 @@ p {
 /* Phase 1.2 (A-1-2) v4 desktop step (≥1024px). */
 @media (min-width: 1024px) {
   :root {
-    --text-display: 56px;          /* Brand-h1 desktop 본질 */
-    --text-h1: 56px;               /* v5 본질 desktop 56 (h1 광역 ↑ from 44) */
-    --text-h2: 32px;
-    --text-h3: 20px;
+    --text-display: 72px;          /* v6 Hero h1 desktop (광역 ↑ from 56) */
+    --text-h1: 72px;               /* v6 desktop 72 (광역 ↑ from 56) */
+    --text-h2: 56px;               /* v6 section h2 desktop 56 (광역 ↑ from 32) */
+    --text-h3: 24px;               /* v6 카드 title desktop 24 */
     --text-body-lg: 18px;
     --text-body: 17px;
     --text-body-sm: 15px;
     --text-num-md: 32px;
     --text-num-lg: 48px;
-    --text-num-xl: 80px;           /* 비교 본질 desktop 본질 */
+    --text-num-xl: 144px;          /* v6 Compare 대형 numeric desktop (광역 ↑ from 80) */
 
     --section-py: 96px;            /* Agent 평가 본질 80-96 본질 (이전 128 → 96) */
     --section-px: 32px;
@@ -755,6 +754,37 @@ p {
   padding-left: var(--container-px);
   padding-right: var(--container-px);
   width: 100%;
+}
+
+/* ─── Phase 1.2 (A-1-2) v6 카테고리 색 시스템 (InsightBlock 4 카테고리) ─── */
+:root {
+  --cat-analysis: #00C853;         /* 무료 물건분석 = green */
+  --cat-guide: #3B82F6;            /* 가이드 = blue */
+  --cat-insight: #F59E0B;          /* 시장 인사이트 = orange */
+  --cat-cases: #8B5CF6;            /* 낙찰사례 = purple */
+}
+
+/* ─── Phase 1.2 (A-1-2) v6 mesh gradient (Hero) ─── */
+@keyframes hero-mesh-rotate {
+  0% { transform: rotate(0deg) scale(1); }
+  50% { transform: rotate(180deg) scale(1.1); }
+  100% { transform: rotate(360deg) scale(1); }
+}
+.hero-mesh-bg {
+  background:
+    radial-gradient(ellipse at 20% 30%, rgba(0, 200, 83, 0.15) 0%, transparent 50%),
+    radial-gradient(ellipse at 80% 70%, rgba(0, 150, 64, 0.12) 0%, transparent 50%),
+    radial-gradient(ellipse at 50% 100%, rgba(255, 212, 0, 0.06) 0%, transparent 60%),
+    #111418;
+}
+.hero-mesh-orb {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(80px);
+  opacity: 0.45;
+  animation: hero-mesh-rotate 22s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+  pointer-events: none;
+  will-change: transform;
 }
 
 /* ─── Phase 1.2 (A-1-2) v4 typo utility class ──────────── */
