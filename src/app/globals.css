@@ -994,24 +994,31 @@ p {
 }
 /* v12 정정: Features 카드 border-left 영구 폐기 (AI 슬롭 디자인 회피). */
 
-/* Plan v13 — Aurora Background 영구 폐기 / Hero mesh blob 3겹 (비비드 + 부유 모션). */
+/* Plan v14 — Hero mesh blob 4겹 (비비드 강화 / 큰 blob + 짧은 blur + 짧은 모션). */
 @keyframes meshFloat1 {
   0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  33%      { transform: translate3d(40px, -30px, 0) scale(1.05); }
-  66%      { transform: translate3d(-30px, 40px, 0) scale(0.95); }
+  33%      { transform: translate3d(60px, -50px, 0) scale(1.1); }
+  66%      { transform: translate3d(-50px, 60px, 0) scale(0.9); }
 }
 @keyframes meshFloat2 {
   0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  33%      { transform: translate3d(-40px, 30px, 0) scale(0.95); }
-  66%      { transform: translate3d(30px, -40px, 0) scale(1.05); }
+  33%      { transform: translate3d(-60px, 50px, 0) scale(0.9); }
+  66%      { transform: translate3d(50px, -60px, 0) scale(1.1); }
 }
 @keyframes meshFloat3 {
   0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
-  50%      { transform: translate3d(50px, 50px, 0) scale(1.1); }
+  50%      { transform: translate3d(70px, 70px, 0) scale(1.15); }
 }
-.hero-mesh-blob-1 { animation: meshFloat1 40s ease-in-out infinite; will-change: transform; }
-.hero-mesh-blob-2 { animation: meshFloat2 50s ease-in-out infinite; will-change: transform; }
-.hero-mesh-blob-3 { animation: meshFloat3 60s ease-in-out infinite; will-change: transform; }
+@keyframes meshFloat4 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  25%      { transform: translate3d(-40px, -50px, 0) scale(1.1); }
+  50%      { transform: translate3d(50px, 40px, 0) scale(0.9); }
+  75%      { transform: translate3d(-30px, 50px, 0) scale(1.05); }
+}
+.hero-mesh-blob-1 { animation: meshFloat1 25s ease-in-out infinite; will-change: transform; }
+.hero-mesh-blob-2 { animation: meshFloat2 30s ease-in-out infinite; will-change: transform; }
+.hero-mesh-blob-3 { animation: meshFloat3 35s ease-in-out infinite; will-change: transform; }
+.hero-mesh-blob-4 { animation: meshFloat4 40s ease-in-out infinite; will-change: transform; }
 
 /* 접근성 — prefers-reduced-motion 4 animation 자동 정지 + scroll reveal 즉시 노출. */
 @media (prefers-reduced-motion: reduce) {
@@ -1022,7 +1029,8 @@ p {
   .trust-orb-float-delay,
   .hero-mesh-blob-1,
   .hero-mesh-blob-2,
-  .hero-mesh-blob-3 {
+  .hero-mesh-blob-3,
+  .hero-mesh-blob-4 {
     animation: none !important;
   }
   .scroll-reveal {

@@ -2,16 +2,16 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
+import { motion } from "motion/react";
 
-/* Phase 1.2 (A-1-2) v13 — Hero (mesh blob 3겹 비비드 + 입력 박스 비율 정정 + 4 카드 영구 폐기 + 1 column).
- * 정정 6건:
- * 1. 배경 = mesh blob 3겹 (green 0.45 / yellow 0.35 / green-light 0.30 / 부유 모션 40s/50s/60s)
- *    Aurora Background 영구 폐기 (옅음 NG)
- * 2. 입력 박스 비율 정정 (input flex-1 h-14/16 + button h-14/16 동일 + 컨테이너 max-w 600 + rounded-2xl shadow-md)
- * 3. 우측 4 카드 영구 폐기 (HeroDifferentiationGrid git rm)
- * 4. layout 1 column (모바일 + 데스크탑 동일 / 좌측 단독 max-w 800)
- * 5. h1 강제 line-break (lg+ only) 보존 + 44/80 보존
- * 6. CTA glow halo 보존 */
+/* Phase 1.2 (A-1-2) v14 — Hero (mesh blob 4겹 비비드 강화 + 분석 카드 mockup + 4 카드 영구 폐기).
+ * 정정 5건:
+ * 1. 배경 mesh blob 4겹 (green 0.85 + yellow 0.65 + green-light 0.55 + green-deep 0.50 / blur 50-80px / 모션 25-40s)
+ *    v13 3겹 / opacity 0.45 / blur 80-120px = 옅음 NG → 4겹 + 강한 색감 + 큰 blob + 짧은 blur
+ * 2. 우측 분석 카드 mockup (데스크탑 only / 사건번호 → 분석 결과 흐름 / rotate -3deg + hover scale 1.02)
+ * 3. 차별화 grid 영구 폐기 (해당 컴포넌트 import 0 / Hero 4 라벨 카피 영역 진입 0)
+ * 4. 좌측 max-w 640 + h1 line-break + 입력 박스 v13 보존 (max-w 600 + p-1.5 + rounded-2xl shadow-md)
+ * 5. 모바일 우측 카드 0 (hidden lg:flex) + 좌측 단독 layout */
 
 export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
   const router = useRouter();
@@ -36,32 +36,32 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
 
   return (
     <section className="relative isolate overflow-hidden bg-white">
-      {/* mesh blob 3겹 — 비비드 + 부유 모션 (모바일 + 데스크탑 동일). */}
+      {/* Hero 배경 mesh blob 4겹 (비비드 강화 / 큰 blob + 짧은 blur + 강한 opacity). */}
       <div className="pointer-events-none absolute inset-0 overflow-hidden">
         <div
           aria-hidden="true"
           className="hero-mesh-blob-1 absolute"
           style={{
-            top: "-10%",
-            left: "-10%",
-            width: "480px",
-            height: "480px",
+            top: "-15%",
+            left: "-15%",
+            width: "640px",
+            height: "640px",
             background:
-              "radial-gradient(circle, rgba(0, 200, 83, 0.45) 0%, transparent 70%)",
-            filter: "blur(80px)",
+              "radial-gradient(circle, rgba(0, 200, 83, 0.85) 0%, transparent 70%)",
+            filter: "blur(50px)",
           }}
         />
         <div
           aria-hidden="true"
           className="hero-mesh-blob-2 absolute"
           style={{
-            top: "-5%",
-            right: "-15%",
-            width: "400px",
-            height: "400px",
+            top: "-10%",
+            right: "-10%",
+            width: "560px",
+            height: "560px",
             background:
-              "radial-gradient(circle, rgba(255, 212, 59, 0.35) 0%, transparent 70%)",
-            filter: "blur(100px)",
+              "radial-gradient(circle, rgba(255, 212, 59, 0.65) 0%, transparent 70%)",
+            filter: "blur(60px)",
           }}
         />
         <div
@@ -69,66 +69,146 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
           className="hero-mesh-blob-3 absolute"
           style={{
             bottom: "-15%",
-            left: "20%",
-            width: "360px",
-            height: "360px",
+            left: "15%",
+            width: "520px",
+            height: "520px",
             background:
-              "radial-gradient(circle, rgba(110, 231, 183, 0.30) 0%, transparent 70%)",
-            filter: "blur(120px)",
+              "radial-gradient(circle, rgba(110, 231, 183, 0.55) 0%, transparent 70%)",
+            filter: "blur(70px)",
+          }}
+        />
+        <div
+          aria-hidden="true"
+          className="hero-mesh-blob-4 absolute"
+          style={{
+            top: "35%",
+            left: "45%",
+            width: "480px",
+            height: "480px",
+            background:
+              "radial-gradient(circle, rgba(0, 136, 56, 0.50) 0%, transparent 70%)",
+            filter: "blur(80px)",
           }}
         />
       </div>
 
-      <div className="container-app relative z-10 py-16 lg:py-24">
-        <div className="mx-auto max-w-[800px]">
-          <h1
-            className="text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:text-[80px]"
-            style={{ fontWeight: 800 }}
-          >
-            법원에 가지 않고,<br className="hidden lg:inline" />{" "}
-            <span className="text-[var(--brand-green)]">경매를 시작하다.</span>
-          </h1>
-
-          <p className="mt-5 text-[16px] font-medium leading-[1.6] text-[var(--text-secondary)] lg:mt-7 lg:text-[20px]">
-            사건번호만 주시면, 법원은 저희가 갑니다.
-          </p>
-
-          {/* 입력 박스 — 비율 정정 (input + button h-14/16 동일 / max-w 600 / rounded-2xl shadow-md). */}
-          <div className="relative mt-8 max-w-[600px] lg:mt-10">
-            <div
-              aria-hidden="true"
-              className="cta-glow-pulse pointer-events-none absolute inset-0 -z-10 rounded-2xl blur-2xl"
-              style={{
-                background:
-                  "radial-gradient(ellipse at center, var(--brand-green) 0%, transparent 70%)",
-              }}
-            />
-            <form
-              onSubmit={onSubmit}
-              role="search"
-              aria-label="사건번호 검색"
-              className="flex w-full items-center rounded-2xl bg-white p-1.5 shadow-md transition-shadow duration-200 focus-within:shadow-lg"
+      <div className="container-app relative z-10 min-h-[80vh] py-24 lg:min-h-[90vh] lg:py-32">
+        <div className="flex flex-col items-center gap-12 lg:flex-row lg:gap-16">
+          {/* 좌측 — h1 + subtext + 입력 박스 (모바일 + 데스크탑 동일). */}
+          <div className="z-10 max-w-[640px] flex-1 space-y-8 lg:space-y-10">
+            <h1
+              className="text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:text-[80px]"
+              style={{ fontWeight: 800 }}
             >
-              <label htmlFor="hero-case" className="sr-only">
-                사건번호
-              </label>
-              <input
-                id="hero-case"
-                type="text"
-                inputMode="text"
-                autoComplete="off"
-                value={value}
-                onChange={(e) => setValue(e.target.value)}
-                placeholder="사건번호 입력 (예: 2026타경500459)"
-                className="h-14 flex-1 bg-transparent px-6 text-[16px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] outline-none lg:h-16"
+              법원에 가지 않고,<br />
+              <span className="text-[var(--brand-green)]">경매를 시작하다.</span>
+            </h1>
+
+            <p className="text-[18px] font-medium leading-[1.6] text-[var(--text-secondary)] lg:text-[24px]">
+              사건번호만 주시면, 법원은 저희가 갑니다.
+            </p>
+
+            {/* 입력 박스 (v13 보존 — max-w 600 + p-1.5 + rounded-2xl shadow-md). */}
+            <div className="relative max-w-[600px]">
+              <div
+                aria-hidden="true"
+                className="cta-glow-pulse pointer-events-none absolute inset-0 -z-10 rounded-2xl blur-2xl"
+                style={{
+                  background:
+                    "radial-gradient(ellipse at center, var(--brand-green) 0%, transparent 70%)",
+                }}
               />
-              <button
-                type="submit"
-                className="inline-flex h-14 items-center justify-center rounded-xl bg-[var(--brand-green)] px-8 text-[16px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 lg:h-16 lg:text-[18px]"
+              <form
+                onSubmit={onSubmit}
+                role="search"
+                aria-label="사건번호 검색"
+                className="flex w-full items-center rounded-2xl bg-white p-1.5 shadow-md transition-shadow duration-200 focus-within:shadow-lg"
               >
-                사건번호 입력하기
-              </button>
-            </form>
+                <label htmlFor="hero-case" className="sr-only">
+                  사건번호
+                </label>
+                <input
+                  id="hero-case"
+                  type="text"
+                  inputMode="text"
+                  autoComplete="off"
+                  value={value}
+                  onChange={(e) => setValue(e.target.value)}
+                  placeholder="사건번호 입력 (예: 2026타경500459)"
+                  className="h-14 flex-1 bg-transparent px-6 text-[16px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] outline-none lg:h-16"
+                />
+                <button
+                  type="submit"
+                  className="inline-flex h-14 items-center justify-center rounded-xl bg-[var(--brand-green)] px-8 text-[16px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 lg:h-16 lg:text-[18px]"
+                >
+                  사건번호 입력하기
+                </button>
+              </form>
+            </div>
+          </div>
+
+          {/* 우측 분석 카드 mockup (데스크탑 only / 모바일 0). */}
+          <div className="hidden max-w-[560px] flex-1 items-center justify-center lg:flex">
+            <motion.div
+              initial={{ opacity: 0, y: 40, rotate: -3 }}
+              animate={{ opacity: 1, y: 0, rotate: -3 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              whileHover={{ rotate: 0, scale: 1.02 }}
+              className="flex h-[480px] w-[400px] flex-col justify-between rounded-3xl bg-white p-8"
+              style={{ boxShadow: "0 24px 60px rgba(0, 0, 0, 0.15)" }}
+            >
+              {/* 헤더. */}
+              <div className="space-y-3">
+                <div className="text-[12px] font-bold tracking-wider text-[var(--brand-green)]">
+                  분석 결과
+                </div>
+                <div className="text-[20px] font-bold leading-tight text-gray-900">
+                  2026타경500459
+                </div>
+                <div className="text-[14px] text-gray-600">
+                  미추홀구 오피스텔
+                </div>
+              </div>
+
+              {/* 가격 영역. */}
+              <div className="space-y-4">
+                <div className="flex items-baseline justify-between">
+                  <span className="text-[14px] text-gray-600">감정가</span>
+                  <span className="text-[18px] font-bold text-gray-900">
+                    1억 8,500만원
+                  </span>
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-[14px] text-gray-600">최저가 (49%)</span>
+                  <span className="text-[24px] font-bold text-[var(--brand-green)]">
+                    9,100만원
+                  </span>
+                </div>
+                <div className="flex items-baseline justify-between">
+                  <span className="text-[14px] text-gray-600">유찰 횟수</span>
+                  <span className="text-[16px] font-bold text-gray-900">4회</span>
+                </div>
+              </div>
+
+              {/* 권리 영역. */}
+              <div className="space-y-2 rounded-2xl bg-gray-50 p-4">
+                <div className="text-[12px] font-bold tracking-wider text-gray-500">
+                  권리 영역
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-yellow-400" />
+                  <span className="text-[14px] text-gray-700">
+                    HUG 말소동의 1건
+                  </span>
+                </div>
+                <div className="flex items-center gap-2">
+                  <div className="h-2 w-2 rounded-full bg-yellow-400" />
+                  <span className="text-[14px] text-gray-700">
+                    임차보증금 인수 1건
+                  </span>
+                </div>
+              </div>
+            </motion.div>
           </div>
         </div>
       </div>
