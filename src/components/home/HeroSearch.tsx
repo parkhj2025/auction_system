@@ -2,16 +2,17 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
-import { motion } from "motion/react";
+import { Building2, FileText, Lock } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v14 — Hero (mesh blob 4겹 비비드 강화 + 분석 카드 mockup + 4 카드 영구 폐기).
- * 정정 5건:
- * 1. 배경 mesh blob 4겹 (green 0.85 + yellow 0.65 + green-light 0.55 + green-deep 0.50 / blur 50-80px / 모션 25-40s)
- *    v13 3겹 / opacity 0.45 / blur 80-120px = 옅음 NG → 4겹 + 강한 색감 + 큰 blob + 짧은 blur
- * 2. 우측 분석 카드 mockup (데스크탑 only / 사건번호 → 분석 결과 흐름 / rotate -3deg + hover scale 1.02)
- * 3. 차별화 grid 영구 폐기 (해당 컴포넌트 import 0 / Hero 4 라벨 카피 영역 진입 0)
- * 4. 좌측 max-w 640 + h1 line-break + 입력 박스 v13 보존 (max-w 600 + p-1.5 + rounded-2xl shadow-md)
- * 5. 모바일 우측 카드 0 (hidden lg:flex) + 좌측 단독 layout */
+/* Phase 1.2 (A-1-2) v15 — Hero (동영상 배경 + center 정렬 + 칩 + 데스크탑 3 강점 1행).
+ * 정정 9건:
+ * 1. 동영상 배경 /videos/hero-bg.mp4 (autoplay muted loop playsInline / object-cover / z-0)
+ * 2. 가독성 overlay bg-white/30 + 하단 페이딩 white linear-gradient (z-1)
+ * 3. center 정렬 단독 (max-w 800 / text-center / items-center)
+ * 4. 칩 = "공인중개사 직접 입찰" + ping 점 green (white/80 + backdrop-blur-sm + rounded-full)
+ * 5. h1 + subtext (v14 보존) + 입력 박스 (v13 보존 max-w 600 + p-1.5 + rounded-2xl shadow-md)
+ * 6. 데스크탑 3 강점 1행 (Lucide 20px green + 라벨 15px) — hidden lg:flex
+ * 7. 모바일 우측 분석 카드 영역 0 / Hero 4 카드 영역 0 (영구 폐기) */
 
 export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
   const router = useRouter();
@@ -35,180 +36,120 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
   }
 
   return (
-    <section className="relative isolate overflow-hidden bg-white">
-      {/* Hero 배경 mesh blob 4겹 (비비드 강화 / 큰 blob + 짧은 blur + 강한 opacity). */}
-      <div className="pointer-events-none absolute inset-0 overflow-hidden">
-        <div
-          aria-hidden="true"
-          className="hero-mesh-blob-1 absolute"
-          style={{
-            top: "-15%",
-            left: "-15%",
-            width: "640px",
-            height: "640px",
-            background:
-              "radial-gradient(circle, rgba(0, 200, 83, 0.85) 0%, transparent 70%)",
-            filter: "blur(50px)",
-          }}
-        />
-        <div
-          aria-hidden="true"
-          className="hero-mesh-blob-2 absolute"
-          style={{
-            top: "-10%",
-            right: "-10%",
-            width: "560px",
-            height: "560px",
-            background:
-              "radial-gradient(circle, rgba(255, 212, 59, 0.65) 0%, transparent 70%)",
-            filter: "blur(60px)",
-          }}
-        />
-        <div
-          aria-hidden="true"
-          className="hero-mesh-blob-3 absolute"
-          style={{
-            bottom: "-15%",
-            left: "15%",
-            width: "520px",
-            height: "520px",
-            background:
-              "radial-gradient(circle, rgba(110, 231, 183, 0.55) 0%, transparent 70%)",
-            filter: "blur(70px)",
-          }}
-        />
-        <div
-          aria-hidden="true"
-          className="hero-mesh-blob-4 absolute"
-          style={{
-            top: "35%",
-            left: "45%",
-            width: "480px",
-            height: "480px",
-            background:
-              "radial-gradient(circle, rgba(0, 136, 56, 0.50) 0%, transparent 70%)",
-            filter: "blur(80px)",
-          }}
-        />
-      </div>
+    <section className="relative isolate flex min-h-[80vh] items-center justify-center overflow-hidden bg-white lg:min-h-[90vh]">
+      {/* 1. 동영상 배경 (z-0). */}
+      <video
+        autoPlay
+        muted
+        loop
+        playsInline
+        className="absolute inset-0 z-0 h-full w-full object-cover"
+      >
+        <source src="/videos/hero-bg.mp4" type="video/mp4" />
+      </video>
 
-      <div className="container-app relative z-10 min-h-[80vh] py-24 lg:min-h-[90vh] lg:py-32">
-        <div className="flex flex-col items-center gap-12 lg:flex-row lg:gap-16">
-          {/* 좌측 — h1 + subtext + 입력 박스 (모바일 + 데스크탑 동일). */}
-          <div className="z-10 max-w-[640px] flex-1 space-y-8 lg:space-y-10">
-            <h1
-              className="text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:text-[80px]"
-              style={{ fontWeight: 800 }}
+      {/* 2. 가독성 overlay (z-1 / white 30%). */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 z-[1] bg-white/30"
+      />
+
+      {/* 3. 하단 페이딩 → white (z-1 / h-40% bottom-0). */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[40%]"
+        style={{
+          background:
+            "linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.6) 50%, #FFFFFF 100%)",
+        }}
+      />
+
+      {/* 4. 콘텐츠 center (z-10 / max-w 800). */}
+      <div className="container-app relative z-10 mx-auto flex max-w-[800px] flex-col items-center gap-8 py-24 text-center lg:gap-12 lg:py-32">
+        {/* 4-1. 칩 — "공인중개사 직접 입찰" + ping 점 green. */}
+        <div className="inline-flex items-center gap-2 rounded-full border border-gray-200/60 bg-white/80 px-4 py-2 shadow-sm backdrop-blur-sm">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--brand-green)] opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--brand-green)]" />
+          </span>
+          <span className="text-[13px] font-semibold tracking-tight text-gray-700">
+            공인중개사 직접 입찰
+          </span>
+        </div>
+
+        {/* 4-2. h1 (v14 보존). */}
+        <h1
+          className="text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:text-[80px]"
+          style={{ fontWeight: 800 }}
+        >
+          법원에 가지 않고,<br />
+          <span className="text-[var(--brand-green)]">경매를 시작하다.</span>
+        </h1>
+
+        {/* 4-3. subtext (v14 보존). */}
+        <p className="text-[18px] font-medium leading-[1.6] text-gray-700 lg:text-[24px]">
+          사건번호만 주시면, 법원은 저희가 갑니다.
+        </p>
+
+        {/* 4-4. 입력 박스 (v13 보존). */}
+        <div className="relative w-full max-w-[600px]">
+          <div
+            aria-hidden="true"
+            className="cta-glow-pulse pointer-events-none absolute inset-0 -z-10 rounded-2xl blur-2xl"
+            style={{
+              background:
+                "radial-gradient(ellipse at center, var(--brand-green) 0%, transparent 70%)",
+            }}
+          />
+          <form
+            onSubmit={onSubmit}
+            role="search"
+            aria-label="사건번호 검색"
+            className="flex w-full items-center rounded-2xl bg-white p-1.5 shadow-md transition-shadow duration-200 focus-within:shadow-lg"
+          >
+            <label htmlFor="hero-case" className="sr-only">
+              사건번호
+            </label>
+            <input
+              id="hero-case"
+              type="text"
+              inputMode="text"
+              autoComplete="off"
+              value={value}
+              onChange={(e) => setValue(e.target.value)}
+              placeholder="사건번호 입력 (예: 2026타경500459)"
+              className="h-14 flex-1 bg-transparent px-6 text-[16px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] outline-none lg:h-16"
+            />
+            <button
+              type="submit"
+              className="inline-flex h-14 items-center justify-center rounded-xl bg-[var(--brand-green)] px-8 text-[16px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 lg:h-16 lg:text-[18px]"
             >
-              법원에 가지 않고,<br />
-              <span className="text-[var(--brand-green)]">경매를 시작하다.</span>
-            </h1>
+              사건번호 입력하기
+            </button>
+          </form>
+        </div>
 
-            <p className="text-[18px] font-medium leading-[1.6] text-[var(--text-secondary)] lg:text-[24px]">
-              사건번호만 주시면, 법원은 저희가 갑니다.
-            </p>
-
-            {/* 입력 박스 (v13 보존 — max-w 600 + p-1.5 + rounded-2xl shadow-md). */}
-            <div className="relative max-w-[600px]">
-              <div
-                aria-hidden="true"
-                className="cta-glow-pulse pointer-events-none absolute inset-0 -z-10 rounded-2xl blur-2xl"
-                style={{
-                  background:
-                    "radial-gradient(ellipse at center, var(--brand-green) 0%, transparent 70%)",
-                }}
-              />
-              <form
-                onSubmit={onSubmit}
-                role="search"
-                aria-label="사건번호 검색"
-                className="flex w-full items-center rounded-2xl bg-white p-1.5 shadow-md transition-shadow duration-200 focus-within:shadow-lg"
-              >
-                <label htmlFor="hero-case" className="sr-only">
-                  사건번호
-                </label>
-                <input
-                  id="hero-case"
-                  type="text"
-                  inputMode="text"
-                  autoComplete="off"
-                  value={value}
-                  onChange={(e) => setValue(e.target.value)}
-                  placeholder="사건번호 입력 (예: 2026타경500459)"
-                  className="h-14 flex-1 bg-transparent px-6 text-[16px] text-[var(--text-primary)] placeholder:text-[var(--text-tertiary)] outline-none lg:h-16"
-                />
-                <button
-                  type="submit"
-                  className="inline-flex h-14 items-center justify-center rounded-xl bg-[var(--brand-green)] px-8 text-[16px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 lg:h-16 lg:text-[18px]"
-                >
-                  사건번호 입력하기
-                </button>
-              </form>
-            </div>
+        {/* 4-5. 데스크탑 3 강점 1행 (모바일 0). */}
+        <div className="mt-4 hidden items-center gap-12 lg:flex">
+          <div className="flex items-center gap-3">
+            <Building2 size={20} className="text-[var(--brand-green)]" strokeWidth={2} />
+            <span className="text-[15px] font-semibold text-gray-700">
+              법원 방문 0회
+            </span>
           </div>
-
-          {/* 우측 분석 카드 mockup (데스크탑 only / 모바일 0). */}
-          <div className="hidden max-w-[560px] flex-1 items-center justify-center lg:flex">
-            <motion.div
-              initial={{ opacity: 0, y: 40, rotate: -3 }}
-              animate={{ opacity: 1, y: 0, rotate: -3 }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              whileHover={{ rotate: 0, scale: 1.02 }}
-              className="flex h-[480px] w-[400px] flex-col justify-between rounded-3xl bg-white p-8"
-              style={{ boxShadow: "0 24px 60px rgba(0, 0, 0, 0.15)" }}
-            >
-              {/* 헤더. */}
-              <div className="space-y-3">
-                <div className="text-[12px] font-bold tracking-wider text-[var(--brand-green)]">
-                  분석 결과
-                </div>
-                <div className="text-[20px] font-bold leading-tight text-gray-900">
-                  2026타경500459
-                </div>
-                <div className="text-[14px] text-gray-600">
-                  미추홀구 오피스텔
-                </div>
-              </div>
-
-              {/* 가격 영역. */}
-              <div className="space-y-4">
-                <div className="flex items-baseline justify-between">
-                  <span className="text-[14px] text-gray-600">감정가</span>
-                  <span className="text-[18px] font-bold text-gray-900">
-                    1억 8,500만원
-                  </span>
-                </div>
-                <div className="flex items-baseline justify-between">
-                  <span className="text-[14px] text-gray-600">최저가 (49%)</span>
-                  <span className="text-[24px] font-bold text-[var(--brand-green)]">
-                    9,100만원
-                  </span>
-                </div>
-                <div className="flex items-baseline justify-between">
-                  <span className="text-[14px] text-gray-600">유찰 횟수</span>
-                  <span className="text-[16px] font-bold text-gray-900">4회</span>
-                </div>
-              </div>
-
-              {/* 권리 영역. */}
-              <div className="space-y-2 rounded-2xl bg-gray-50 p-4">
-                <div className="text-[12px] font-bold tracking-wider text-gray-500">
-                  권리 영역
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-yellow-400" />
-                  <span className="text-[14px] text-gray-700">
-                    HUG 말소동의 1건
-                  </span>
-                </div>
-                <div className="flex items-center gap-2">
-                  <div className="h-2 w-2 rounded-full bg-yellow-400" />
-                  <span className="text-[14px] text-gray-700">
-                    임차보증금 인수 1건
-                  </span>
-                </div>
-              </div>
-            </motion.div>
+          <div className="h-5 w-px bg-gray-300" />
+          <div className="flex items-center gap-3">
+            <FileText size={20} className="text-[var(--brand-green)]" strokeWidth={2} />
+            <span className="text-[15px] font-semibold text-gray-700">
+              서류 비대면 100%
+            </span>
+          </div>
+          <div className="h-5 w-px bg-gray-300" />
+          <div className="flex items-center gap-3">
+            <Lock size={20} className="text-[var(--brand-green)]" strokeWidth={2} />
+            <span className="text-[15px] font-semibold text-gray-700">
+              보증금 분리 보관
+            </span>
           </div>
         </div>
       </div>
