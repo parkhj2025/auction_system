@@ -994,25 +994,24 @@ p {
 }
 /* v12 정정: Features 카드 border-left 영구 폐기 (AI 슬롭 디자인 회피). */
 
-/* Plan v11 — Aurora Background @keyframes (60s 자율 모션 + GPU accelerated). */
-@keyframes aurora {
-  0%, 100% {
-    background-position: 50% 50%, 50% 50%;
-  }
-  25% {
-    background-position: 60% 40%, 40% 60%;
-  }
-  50% {
-    background-position: 40% 60%, 60% 40%;
-  }
-  75% {
-    background-position: 55% 45%, 45% 55%;
-  }
+/* Plan v13 — Aurora Background 영구 폐기 / Hero mesh blob 3겹 (비비드 + 부유 모션). */
+@keyframes meshFloat1 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33%      { transform: translate3d(40px, -30px, 0) scale(1.05); }
+  66%      { transform: translate3d(-30px, 40px, 0) scale(0.95); }
 }
-.aurora-bg {
-  animation: aurora 60s ease-in-out infinite;
-  will-change: background-position;
+@keyframes meshFloat2 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  33%      { transform: translate3d(-40px, 30px, 0) scale(0.95); }
+  66%      { transform: translate3d(30px, -40px, 0) scale(1.05); }
 }
+@keyframes meshFloat3 {
+  0%, 100% { transform: translate3d(0, 0, 0) scale(1); }
+  50%      { transform: translate3d(50px, 50px, 0) scale(1.1); }
+}
+.hero-mesh-blob-1 { animation: meshFloat1 40s ease-in-out infinite; will-change: transform; }
+.hero-mesh-blob-2 { animation: meshFloat2 50s ease-in-out infinite; will-change: transform; }
+.hero-mesh-blob-3 { animation: meshFloat3 60s ease-in-out infinite; will-change: transform; }
 
 /* 접근성 — prefers-reduced-motion 4 animation 자동 정지 + scroll reveal 즉시 노출. */
 @media (prefers-reduced-motion: reduce) {
@@ -1021,7 +1020,9 @@ p {
   .cta-glow-pulse,
   .trust-orb-float,
   .trust-orb-float-delay,
-  .aurora-bg {
+  .hero-mesh-blob-1,
+  .hero-mesh-blob-2,
+  .hero-mesh-blob-3 {
     animation: none !important;
   }
   .scroll-reveal {
