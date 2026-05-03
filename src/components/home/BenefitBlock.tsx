@@ -1,25 +1,28 @@
-import { MapPin, FileCheck, Lock } from "lucide-react";
+import Image from "next/image";
 
-/* Phase 1.2 (A-1-2) v6 — Features (구 BenefitBlock / 카피 v4 광역 적용).
- * h2 "이렇게 진행됩니다." (eyebrow 폐기)
- * 카드 1 MapPin / "법원 방문 0회"
- * 카드 2 FileCheck / "서류 비대면 처리"
- * 카드 3 Lock / "보증금 분리 보관"
- * CTA 광역 폐기 (CTA 광역 2 영역 한정 paradigm). */
+/* Phase 1.2 (A-1-2) v7 — Features (Manako 3 일러스트 + 자신감 h2 v5).
+ * h2 "법원에 갈 일이 없습니다." (eyebrow 폐기 / 자신감 본문 정수)
+ * 카드 1 — feature-1-no-courthouse + "법원 방문 0회"
+ * 카드 2 — feature-2-document-digital + "서류 비대면 처리"
+ * 카드 3 — feature-3-deposit-separated + "보증금 분리 보관"
+ * CTA 광역 폐기 (CTA 광역 2건 한정 paradigm). */
 
 const FEATURES = [
   {
-    icon: MapPin,
+    img: "/illustrations/feature-1-no-courthouse.png",
+    alt: "집 거실에서 모바일로 알림을 받는 사람",
     title: "법원 방문 0회",
     desc: "신청 후 결과만 알림으로 받습니다.",
   },
   {
-    icon: FileCheck,
+    img: "/illustrations/feature-2-document-digital.png",
+    alt: "데스크에서 종이 서류를 모바일로 변환하는 사람",
     title: "서류 비대면 처리",
     desc: "위임장부터 입찰표까지 모바일로.",
   },
   {
-    icon: Lock,
+    img: "/illustrations/feature-3-deposit-separated.png",
+    alt: "보증금이 보호되는 분리 계좌와 보증보험",
     title: "보증금 분리 보관",
     desc: "전용 계좌 + 보증보험 가입.",
   },
@@ -34,25 +37,34 @@ export function BenefitBlock() {
       <div className="container-app py-[var(--section-py)]">
         <h2
           id="features-heading"
-          className="max-w-2xl text-[var(--text-h2)] font-extrabold leading-[1.1] tracking-[-0.025em] text-[var(--text-primary)]"
+          className="max-w-3xl text-[var(--text-h2)] font-extrabold leading-[1.1] tracking-[-0.025em] text-[var(--text-primary)]"
           style={{ fontWeight: 800 }}
         >
-          이렇게 진행됩니다.
+          법원에 갈 일이{" "}
+          <span className="text-[var(--brand-green)]">없습니다.</span>
         </h2>
 
-        <ul className="mt-12 grid grid-cols-1 gap-4 md:grid-cols-3 lg:gap-6 lg:mt-16">
-          {FEATURES.map(({ icon: Icon, title, desc }) => (
+        <ul className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-3 lg:gap-8 lg:mt-16">
+          {FEATURES.map(({ img, alt, title, desc }) => (
             <li
               key={title}
-              className="group flex flex-col rounded-2xl border border-[var(--border-1)] bg-[var(--bg-primary)] p-7 transition-[transform,border-color] duration-[250ms] ease-out hover:-translate-y-0.5 hover:border-[var(--text-primary)]/20 lg:p-8"
+              className="group flex flex-col rounded-3xl border border-[var(--border-1)] bg-white p-6 transition-[transform,border-color] duration-[250ms] ease-out hover:-translate-y-1 hover:border-[var(--brand-green)]/30 lg:p-8"
             >
-              <span className="flex h-12 w-12 items-center justify-center rounded-xl bg-[var(--bg-tertiary)] text-[var(--text-primary)]">
-                <Icon size={22} strokeWidth={1.75} aria-hidden="true" />
-              </span>
-              <h3 className="mt-6 text-[20px] font-bold leading-[1.35] tracking-[-0.01em] text-[var(--text-primary)] lg:text-[24px]">
+              {/* Manako 일러스트 — 풍부한 색감 + 캐릭터. */}
+              <div className="relative aspect-square w-full overflow-hidden rounded-2xl bg-gradient-to-br from-[#E6FAEE] to-white">
+                <Image
+                  src={img}
+                  alt={alt}
+                  width={400}
+                  height={400}
+                  sizes="(max-width: 768px) 90vw, 33vw"
+                  className="h-full w-full object-contain"
+                />
+              </div>
+              <h3 className="mt-6 text-[22px] font-bold leading-[1.3] tracking-[-0.01em] text-[var(--text-primary)] lg:text-[28px]">
                 {title}
               </h3>
-              <p className="mt-3 text-[15px] leading-[1.6] text-[var(--text-secondary)] lg:text-[16px]">
+              <p className="mt-3 text-[16px] font-medium leading-[1.6] text-[var(--text-secondary)] lg:text-[17px]">
                 {desc}
               </p>
             </li>

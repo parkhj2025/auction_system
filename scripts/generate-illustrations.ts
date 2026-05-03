@@ -1,8 +1,13 @@
-/* Phase 1.2 (A-1-2) v5 V0 — Gemini API 일러스트 생성 본질.
- * 5 일러스트 (Hero Shield+Temple + 인사이트 4 카테고리).
- * 모델명 fallback paradigm (Opus 권장 3): gemini-3-pro-image → gemini-3-pro-image-preview.
- * 글로벌 style guide 광역 적용.
- * public/illustrations/{filename}.png 저장.
+/* Phase 1.2 (A-1-2) v7 V0 (재진입) — Manako-style flat illustration + 캐릭터 + 환경 + green primary.
+ * paradigm 광역 변경: monoline / 와이어프레임 폐기 → flat illustration full-color + 풍부한 색감.
+ * Manako purple base → green primary 변환 (브랜드 정수 보존).
+ *
+ * 5건 정수 영역:
+ * 1. hero-infographic — 사무실 isometric + 캐릭터(소파/모바일/미소) + 노트북·서류 floating + green checkmark + 식물 + 램프 + 도시 background + green gradient 배경
+ * 2. feature-1 — 집 거실 + 캐릭터(소파/모바일/편안/미소) + green 알림 bubble + 식물 + 램프 + 쿠션
+ * 3. feature-2 — 데스크 + 캐릭터(노트북/미소) + 종이 → 모바일 변환 + green sparkle + 화살표
+ * 4. feature-3 — bank scene + 캐릭터(서류/미소) + 동전 + green shield + 분리 계좌 + green ring
+ * 5. compare — split scene + 좌 캐릭터 stressed (시계 + 법원 + 피곤) → 화살표 → 우 캐릭터 happy (소파 + 모바일 + green + 미소)
  *
  * 실행: pnpm gen:illustrations
  */
@@ -19,49 +24,53 @@ if (!apiKey) {
 
 const ai = new GoogleGenAI({ apiKey });
 
-/* 모델명 fallback (Opus 권장 3 / 핸드오프 명시 → -preview suffix paradigm). */
 const MODELS_FALLBACK = ["gemini-3-pro-image", "gemini-3-pro-image-preview"];
 
-/* 글로벌 style guide (모든 prompt 공통 — §A-3-1 정합). */
+/* v7 (재진입) 광역 style guide — Manako-style flat illustration + green primary. */
 const GLOBAL_STYLE = `
-Style: Flat design illustration, isometric perspective (30deg),
-single accent color #00C853 (green), white background,
-Charcoal #111418 for outlines, Light Gray #F2F3F5 for ambient elements,
-Yellow #FFD400 for small motion accents only,
-clean lines, no gradients except brand green (#00C853 to #009640 135deg),
-geometric shapes, professional but friendly,
-Korean fintech aesthetic (Toss / Kakao Pay reference),
-no text or letters in illustration,
-transparent background (PNG with alpha),
-1024x1024 square format.
+Style: Modern flat vector illustration in the style of Manako/Storyset/Dribbble landing page heros,
+1024x1024 square format, isometric perspective when needed,
+RICH FULL-COLOR illustration (NOT monoline, NOT wireframe, NOT outline-only),
+characters drawn as cute friendly young adults with full body, expressive smiling faces, simple geometric features,
+GREEN PRIMARY dominant color: brand green #00C853 with #009640 (deeper green) for shadows/depth,
+soft green gradient backgrounds (#E6FAEE to #C8F0DC tones for ambient),
+warm secondary colors allowed: yellow #FFD400 (small accents only), peach/orange (object accents),
+charcoal #111418 for text/lines/details (NOT for backgrounds),
+clean shapes with soft shadows underneath objects,
+environment-rich scenes (furniture, plants, lamps, devices, ambient elements),
+no text, no letters, no logos, no numbers, no readable characters anywhere,
+solid background — either pure white #FFFFFF OR soft green gradient (no checkered pattern, no transparency placeholder, no transparency indicator),
+absolutely NO pink, NO red, NO coral, NO purple as primary or background,
+absolutely NO monoline / wireframe / outline-only style.
+Reference aesthetic: Toss landing page illustrations, Storyset.com, Dribbble "fintech illustration" search results,
+but with green primary instead of purple/blue.
 `.trim();
 
-/* 5 prompt 본질 (§A-3-2 정합). */
 const PROMPTS = [
   {
-    filename: "hero-shield-courthouse",
-    desc: "Hero — Shield + modern Korean courthouse (V0+ 재호출 본질)",
-    prompt: `Isometric flat illustration of a modern Korean civic courthouse building, 5 floors with glass facade and concrete structure. The building uses light gray (#F2F3F5) for surfaces and charcoal (#111418) for outlines and window frames. In front of the building, a large prominent green gradient shield (#00C853 to #009640 135deg) with a clean white checkmark inside the shield as the main focal point. Add yellow (#FFD400) speed dashes 2-3 short strokes around the shield to subtly suggest safety and speed. STRICTLY NO greek pillars, NO temple, NO triangular pediment, NO columns, NO gavel, NO hammer, NO scales of justice, NO people, NO text or letters anywhere. Solid pure white background (#FFFFFF), absolutely no checkered pattern, no transparency placeholder. Clean modern Korean fintech style (Toss / Kakao Pay reference).`,
+    filename: "hero-infographic",
+    desc: "Hero — 사무실 + 캐릭터 + 노트북·서류 + green checkmark + 도시 + green gradient",
+    prompt: `Hero scene: Modern bright office interior in isometric perspective with soft green gradient background (light green to white). One cheerful young Korean professional character (full body, sitting comfortably with a laptop on their lap, friendly smile). Around them, floating elements: a smartphone, paper documents stacking up, and a large green checkmark icon glowing. Background details: large windows with soft sun rays, indoor potted plants with green leaves, modern hanging pendant lamps, a small city skyline visible through the windows (cute simple buildings). The dominant color theme is GREEN (#00C853) — character's outfit accents in green, plants in green, ambient gradient in soft green. Yellow #FFD400 small accents allowed (lamp glow / sparkle). NO purple, NO pink. Rich flat illustration style like Manako/Storyset hero.`,
   },
   {
-    filename: "insight-market-chart",
-    desc: "인사이트 1 — 시장 인사이트 (라인 차트) [V0++++ 재호출]",
-    prompt: `Isometric flat illustration of an upward trending line chart with 3 data points, green ascending line (#00C853), small green circular dots at each peak. Charcoal (#111418) thin axis lines. Small yellow (#FFD400) accent star on the highest data point only. Light gray (#F2F3F5) ambient bars in the background to suggest isometric depth. No text or numbers. Friendly fintech style. Solid pure white background (#FFFFFF), absolutely no checkered pattern, no transparency placeholder, no transparency indicator.`,
+    filename: "feature-1-no-courthouse",
+    desc: "Feature 1 — 집 거실 + 캐릭터 소파 + 모바일 + green 알림 bubble + 식물 + 램프",
+    prompt: `Cozy home living room scene with soft green gradient background. One cheerful young Korean character sitting comfortably on a modern sofa with cushions, holding a smartphone with both hands, looking at the screen with a relaxed smile. Above the smartphone, a large green notification bubble icon floats up with a white checkmark inside. Environment details: indoor potted plants with rich green leaves on either side, a tall floor lamp with warm yellow glow, decorative pillows, a small side table, a hanging picture frame on the wall, hardwood floor. The dominant color theme is GREEN — sofa in soft green tone, plants vivid green, notification bright green #00C853. Character's outfit in warm friendly colors (peach top, comfortable). NO purple, NO pink, NO red. Rich flat illustration style like Manako/Storyset cozy home scene.`,
   },
   {
-    filename: "insight-guide-book",
-    desc: "인사이트 2 — 가이드 (책) [V0++++ 재호출]",
-    prompt: `Isometric flat illustration of an open book with a green bookmark ribbon hanging down from the top. White pages with charcoal (#111418) horizontal text placeholder lines (no readable letters). Green (#00C853) book cover and spine. Soft light gray (#F2F3F5) drop shadow underneath the book. Friendly educational style. Solid pure white background (#FFFFFF), absolutely no checkered pattern, no transparency placeholder, no transparency indicator.`,
+    filename: "feature-2-document-digital",
+    desc: "Feature 2 — 데스크 + 캐릭터 노트북 + 종이→모바일 변환 + green sparkle + 화살표",
+    prompt: `Modern workspace desk scene with soft green gradient background. One cheerful young Korean character (full body, sitting at a desk on a comfortable chair, looking at a laptop screen with a satisfied smile). On the desk, a stack of paper documents transforming into a smartphone display through a curved green arrow with a sparkle effect. Environment details: a desk with green tabletop or green accent, indoor plant in a pot, a coffee mug with steam, a desk lamp with warm glow, papers scattered, a calendar on the wall. The dominant color theme is GREEN — desk surface, plant, transformation arrow all in vivid green #00C853. Character in warm friendly outfit. Yellow #FFD400 small accents (sparkle / lamp). NO purple, NO pink. Rich flat illustration style like Manako/Storyset workspace scene.`,
   },
   {
-    filename: "insight-news",
-    desc: "인사이트 3 — 뉴스 (신문) [V0++++ 재호출]",
-    prompt: `Isometric flat illustration of a folded newspaper. Charcoal (#111418) headline placeholder bars (no readable text), light gray (#F2F3F5) body text placeholder lines (preserve as ambient detail). Small green (#00C853) highlight rectangle on one section. Green strip on paper edge. Yellow (#FFD400) burst accents on corners. Subtle light gray drop shadow. Friendly editorial style. Solid pure white background (#FFFFFF), absolutely no checkered pattern, no transparency placeholder, no transparency indicator.`,
+    filename: "feature-3-deposit-separated",
+    desc: "Feature 3 — bank scene + 캐릭터 서류 + 동전 + green shield + 분리 계좌 + green ring",
+    prompt: `Bank/finance scene with soft green gradient background. One cheerful young Korean character (full body, holding a folder of documents with both hands, professional friendly smile). Behind/around the character, financial elements: a large stack of golden coins protected by a glowing green shield icon, a green ring/halo of protection circling the coins, two separated bank account cards floating to the sides (one labeled with a piggy bank icon, one with a vault lock icon), small floating green checkmarks indicating safety. Environment details: a soft green gradient background, indoor plant accent, modern bank counter or desk in the background. The dominant color theme is GREEN — shield, protection ring, account icons all in vivid green #00C853. Coins in golden yellow #FFD400. Character in professional warm outfit. NO purple, NO pink, NO red. Rich flat illustration style like Manako/Storyset finance scene.`,
   },
   {
-    filename: "insight-cases-building",
-    desc: "인사이트 4 — 낙찰사례 (건물 + green pin) [V0++++ 재호출]",
-    prompt: `Isometric flat illustration of a 3-floor apartment building with a green location pin (#00C853) floating above its roof with small motion arcs. Light gray (#F2F3F5) ambient secondary buildings in the background, with small ambient trees and street lamps. Charcoal (#111418) outline for the main building windows and door. White window frames. Yellow (#FFD400) small accents around the pin. No text or letters anywhere on the building. Friendly real estate style. Solid pure white background (#FFFFFF), absolutely no checkered pattern, no transparency placeholder, no transparency indicator.`,
+    filename: "compare-flow",
+    desc: "Compare — split scene + 좌 캐릭터 stressed (시계+법원+피곤) → 화살표 → 우 캐릭터 happy (소파+모바일+green+미소)",
+    prompt: `Split-scene before-and-after comparison illustration with soft green gradient background. LEFT SIDE: A young Korean character looking tired and stressed, walking heavily with a heavy bag towards a small Korean civic courthouse building in the background, with a clock showing many hours floating above their head, sweat drops, slumped posture, neutral/grayish color tones for this side (charcoal outline, muted grays). MIDDLE: A bold curved arrow flowing left to right with a green sparkle / transformation effect. RIGHT SIDE: The same character now happy and relaxed, sitting comfortably on a sofa at home, holding a smartphone with a big bright smile, a green notification bubble with a white checkmark floating up, indoor plants and warm lighting, soft green gradient ambient. The transformation: stressful left → easy joyful right. The right side is GREEN dominant (#00C853) — sofa accent, notification, plants. NO purple, NO pink. Rich flat illustration style like Manako/Storyset transformation scene.`,
   },
 ] as const;
 
@@ -80,7 +89,6 @@ async function generateOne(
       model: modelName,
       contents: fullPrompt,
     });
-
     const candidates = response.candidates ?? [];
     if (candidates.length === 0) {
       return { ok: false, error: "No candidates in response" };
@@ -124,16 +132,10 @@ async function generateWithFallback(
     }
     console.log(`NG (${result.error.slice(0, 80)})`);
   }
-  return {
-    filename,
-    desc,
-    ok: false,
-    error: "All fallback models failed",
-  };
+  return { filename, desc, ok: false, error: "All fallback models failed" };
 }
 
 async function main() {
-  /* ONLY 환경 변수 본질 — 단일 또는 comma-separated list paradigm (V0+ 재호출 + V0++++ 4건 재호출 본질). */
   const onlyFilter = process.env.ONLY;
   const onlySet = onlyFilter
     ? new Set(onlyFilter.split(",").map((s) => s.trim()).filter(Boolean))
@@ -142,7 +144,7 @@ async function main() {
     ? PROMPTS.filter((p) => onlySet.has(p.filename))
     : PROMPTS;
   if (onlySet && targets.length === 0) {
-    console.error(`ONLY=${onlyFilter} 본질 일치 prompt 0건. 사용 가능: ${PROMPTS.map((p) => p.filename).join(", ")}`);
+    console.error(`ONLY=${onlyFilter} 일치 prompt 0건. 사용 가능: ${PROMPTS.map((p) => p.filename).join(", ")}`);
     process.exit(1);
   }
   console.log(`Generating ${targets.length} illustrations via Gemini API${onlyFilter ? ` (ONLY=${onlyFilter})` : ""}\n`);

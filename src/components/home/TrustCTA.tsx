@@ -30,12 +30,16 @@ export function TrustCTA() {
             지금까지 사고{" "}
             <span className="text-[var(--brand-green)]">0건</span>.
           </h2>
-          <p className="mt-6 text-[17px] leading-[1.6] text-white/70 lg:mt-8 lg:text-[20px]">
+          {/* body strong — 자신감 본문 정수 (size ↑ + weight 700). */}
+          <p
+            className="mt-8 text-[17px] font-bold leading-[1.6] text-white/85 lg:mt-10 lg:text-[22px]"
+            style={{ fontWeight: 700 }}
+          >
             공인중개사 직접 입찰 + 보증보험 + 전용 계좌.
           </p>
 
           {/* 검증 영역 — inline caption 한 줄. */}
-          <p className="mt-8 text-[12px] uppercase tracking-[0.06em] text-white/40 lg:mt-12 lg:text-[13px]">
+          <p className="mt-8 text-[12px] uppercase tracking-[0.08em] text-white/45 lg:mt-12 lg:text-[14px]">
             매수신청대리인 등록 · 서울보증보험 가입 · 보증금 분리 보관
           </p>
         </div>

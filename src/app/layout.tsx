@@ -2,7 +2,7 @@ import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { TopNav } from "@/components/layout/TopNav";
 import { Footer } from "@/components/layout/Footer";
-import { MobileSticky } from "@/components/layout/MobileSticky";
+/* v7: MobileSticky 광역 폐기 (CTA 광역 = Hero + Footer 2건 한정 paradigm). */
 import { createClient } from "@/lib/supabase/server";
 import type { UserMenuProps } from "@/components/auth/UserMenu";
 import { BRAND_NAME } from "@/lib/constants";
@@ -79,11 +79,10 @@ export default async function RootLayout({
           }}
         />
       </head>
-      <body className="flex min-h-full flex-col bg-white pb-[calc(5rem+env(safe-area-inset-bottom))] text-[var(--color-ink-900)] md:pb-0">
+      <body className="flex min-h-full flex-col bg-white text-[var(--color-ink-900)]">
         <TopNav user={navUser} />
         <div className="flex flex-1 flex-col">{children}</div>
         <Footer />
-        <MobileSticky />
       </body>
     </html>
   );

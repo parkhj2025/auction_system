@@ -1,10 +1,8 @@
-/* Phase 1.2 (A-1-2) v6 — CompareBlock (typography-driven 대형 numeric / 카피 v4).
- * "비교" 라벨 광역 폐기.
- * h2 "법원 가는 3시간, 물건 보는 시간으로." (광역 정수)
- * 시각: 좌 "3 hours" 96px+ charcoal/40 → 우 "0 hours" 96px+ green
- * caption: 좌 "직접 입찰 시 법원 왕복 + 대기" / 우 "경매퀵 이용 시 신청 → 결과 알림" */
+import Image from "next/image";
 
-import { ArrowRight } from "lucide-react";
+/* Phase 1.2 (A-1-2) v7 — CompareBlock (Manako compare-flow 일러스트 + h2 카피 v5).
+ * h2 "법원 가는 3시간, 물건 보는 시간으로." (보존)
+ * 시각: Manako compare-flow.png (좌 stressed → 화살표 → 우 happy 본질 정수). */
 
 export function CompareBlock() {
   return (
@@ -13,53 +11,30 @@ export function CompareBlock() {
       className="bg-[var(--bg-primary)]"
     >
       <div className="container-app py-[var(--section-py)]">
-        <h2
-          id="compare-heading"
-          className="max-w-3xl text-[var(--text-h2)] font-extrabold leading-[1.1] tracking-[-0.025em] text-[var(--text-primary)]"
-          style={{ fontWeight: 800 }}
-        >
-          법원 가는 <span className="text-[var(--brand-green)]">3시간</span>,
-          <br className="hidden sm:block" />
-          물건 보는 시간으로.
-        </h2>
+        <div className="mx-auto max-w-3xl text-center">
+          <h2
+            id="compare-heading"
+            className="text-[var(--text-h2)] font-extrabold leading-[1.1] tracking-[-0.025em] text-[var(--text-primary)]"
+            style={{ fontWeight: 800 }}
+          >
+            법원 가는{" "}
+            <span className="text-[var(--text-tertiary)]">3시간</span>,
+            <br className="hidden sm:block" />
+            물건 보는{" "}
+            <span className="text-[var(--brand-green)]">시간으로.</span>
+          </h2>
+        </div>
 
-        {/* 대형 numeric typography 시각 — 96px mobile / 144px desktop. */}
-        <div className="mt-12 flex flex-col items-stretch gap-6 lg:mt-20 lg:flex-row lg:items-center lg:justify-center lg:gap-12">
-          {/* 좌 — 3 hours (직접 입찰). */}
-          <div className="flex-1 text-center lg:text-right">
-            <p
-              className="text-[var(--text-num-xl)] font-extrabold leading-[0.95] tracking-[-0.04em] text-[var(--text-primary)]/30 tabular-nums"
-              style={{ fontWeight: 800 }}
-            >
-              3h
-            </p>
-            <p className="mt-3 text-[14px] text-[var(--text-tertiary)] lg:mt-4 lg:text-[16px]">
-              직접 입찰 시 법원 왕복 + 대기
-            </p>
-          </div>
-
-          {/* arrow — 모바일 가운데 / 데스크탑 가운데. */}
-          <div className="flex items-center justify-center text-[var(--text-tertiary)]">
-            <ArrowRight
-              size={32}
-              strokeWidth={1.5}
-              aria-hidden="true"
-              className="lg:size-12"
-            />
-          </div>
-
-          {/* 우 — 0 hours (경매퀵). */}
-          <div className="flex-1 text-center lg:text-left">
-            <p
-              className="text-[var(--text-num-xl)] font-extrabold leading-[0.95] tracking-[-0.04em] text-[var(--brand-green)] tabular-nums"
-              style={{ fontWeight: 800 }}
-            >
-              0h
-            </p>
-            <p className="mt-3 text-[14px] text-[var(--text-tertiary)] lg:mt-4 lg:text-[16px]">
-              경매퀵 이용 시 신청 → 결과 알림
-            </p>
-          </div>
+        {/* Manako compare-flow 일러스트 — 좌 stressed → 화살표 → 우 happy. */}
+        <div className="relative mx-auto mt-12 aspect-square w-full max-w-[720px] lg:mt-16">
+          <Image
+            src="/illustrations/compare-flow.png"
+            alt="법원에 가던 사람이 모바일로 편하게 신청하는 변화"
+            width={720}
+            height={720}
+            sizes="(max-width: 768px) 90vw, 720px"
+            className="h-full w-full object-contain"
+          />
         </div>
       </div>
     </section>

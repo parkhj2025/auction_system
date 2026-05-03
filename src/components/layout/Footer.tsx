@@ -2,10 +2,48 @@ import Link from "next/link";
 import { COMPANY } from "@/lib/constants";
 import { Brand } from "@/components/Brand";
 
-/* Phase 1.2 (A-1-2) v6 — Footer (4 column 심플 / Stripe·Linear paradigm).
- * 면책 본문 광역 폐기 (이용약관 페이지 통합 paradigm).
- * 사업자 정보 conditional 보존 (NEXT_PUBLIC_BUSINESS_REGISTERED).
- * 4 column: 서비스 / 콘텐츠 / 회사 / 법적. */
+/* v7 SNS inline SVG paradigm (lucide-react Instagram·Youtube 미export 본질 회피). */
+function IconInstagram({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
+    </svg>
+  );
+}
+function IconYoutube({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M22 8.5a2.5 2.5 0 0 0-1.8-1.8C18.5 6 12 6 12 6s-6.5 0-8.2.7A2.5 2.5 0 0 0 2 8.5C1.5 10.2 1.5 12 1.5 12s0 1.8.5 3.5a2.5 2.5 0 0 0 1.8 1.8C5.5 18 12 18 12 18s6.5 0 8.2-.7a2.5 2.5 0 0 0 1.8-1.8c.5-1.7.5-3.5.5-3.5s0-1.8-.5-3.5z" />
+      <path d="m10 9.5 5 2.5-5 2.5z" fill="currentColor" />
+    </svg>
+  );
+}
+function IconChat({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z" />
+    </svg>
+  );
+}
+function IconRss({ size = 18 }: { size?: number }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <path d="M4 11a9 9 0 0 1 9 9" />
+      <path d="M4 4a16 16 0 0 1 16 16" />
+      <circle cx="5" cy="19" r="1" fill="currentColor" />
+    </svg>
+  );
+}
+
+/* Phase 1.2 (A-1-2) v7 — Footer (Manako 차용 + CTA 통합 + 원형 SNS + 자신감 본문 + copyright).
+ * Brand + tagline "법원에 가지 않고, 경매를 시작하세요." (자신감 본문 정수)
+ * 4 column (서비스 / 콘텐츠 / 회사 / 법적)
+ * 원형 SNS 4건 (Instagram / KakaoTalk / Blog / YouTube) green 본질
+ * CTA "지금 신청하기" Footer 상단 통합 (Pricing CTA 흡수)
+ * copyright "© 2026 경매퀵. All rights reserved."
+ * 사업자 정보 env conditional 보존. */
 
 const BUSINESS_REGISTERED =
   process.env.NEXT_PUBLIC_BUSINESS_REGISTERED === "true";
@@ -44,41 +82,96 @@ const FOOTER_COLUMNS: { title: string; links: { href: string; label: string }[] 
   },
 ];
 
+const SNS_LINKS = [
+  { href: "#", label: "Instagram", icon: IconInstagram },
+  { href: "#", label: "카카오톡 채널", icon: IconChat },
+  { href: "#", label: "블로그", icon: IconRss },
+  { href: "#", label: "YouTube", icon: IconYoutube },
+] as const;
+
 export function Footer() {
   return (
     <footer className="border-t border-[var(--border-1)] bg-[var(--bg-secondary)]">
-      <div className="container-app px-5 py-12 lg:px-8 lg:py-16">
-        {/* Brand 좌상. */}
-        <div className="mb-10 lg:mb-12">
-          <Brand size="sm" mode="light" />
+      <div className="container-app px-5 py-14 lg:px-8 lg:py-20">
+        {/* Footer 상단 — CTA 통합 (Pricing 흡수). */}
+        <div className="mb-14 flex flex-col items-start gap-6 border-b border-[var(--divider)] pb-12 lg:mb-16 lg:flex-row lg:items-center lg:justify-between lg:pb-16">
+          <div>
+            <p
+              className="text-[24px] font-extrabold leading-[1.2] tracking-[-0.02em] text-[var(--text-primary)] lg:text-[32px]"
+              style={{ fontWeight: 800 }}
+            >
+              법원에 가지 않고,{" "}
+              <span className="text-[var(--brand-green)]">
+                경매를 시작하세요.
+              </span>
+            </p>
+            <p
+              className="mt-3 text-[16px] font-bold leading-[1.6] text-[var(--text-secondary)] lg:text-[18px]"
+              style={{ fontWeight: 700 }}
+            >
+              사건번호만 주시면, 법원은 저희가 갑니다.
+            </p>
+          </div>
+          <Link
+            href="/apply"
+            className="inline-flex h-14 shrink-0 items-center justify-center rounded-[14px] bg-[var(--brand-green)] px-10 text-[16px] font-bold text-white shadow-[var(--shadow-button-green)] transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 lg:h-16 lg:px-12 lg:text-[17px]"
+          >
+            지금 신청하기
+          </Link>
         </div>
 
-        {/* 4 column 광역. */}
-        <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:gap-10">
-          {FOOTER_COLUMNS.map((col) => (
-            <nav key={col.title} aria-label={col.title}>
-              <h3 className="text-[12px] font-bold uppercase tracking-[0.06em] text-[var(--text-tertiary)]">
-                {col.title}
-              </h3>
-              <ul className="mt-4 flex flex-col gap-3">
-                {col.links.map((link) => (
-                  <li key={link.href}>
-                    <Link
-                      href={link.href}
-                      className="text-[13px] text-[var(--text-secondary)] transition-colors duration-150 hover:text-[var(--text-primary)] lg:text-[14px]"
-                    >
-                      {link.label}
-                    </Link>
-                  </li>
-                ))}
-              </ul>
-            </nav>
+        {/* Brand + tagline + 4 column. */}
+        <div className="grid gap-10 lg:grid-cols-[1.2fr_3fr] lg:gap-12">
+          <div>
+            <Brand size="sm" mode="light" />
+            <p className="mt-5 text-[14px] leading-[1.7] text-[var(--text-secondary)] lg:text-[15px]">
+              빠르고 안전한 부동산 경매 입찰 대리 서비스.
+              <br />
+              대표 {COMPANY.ceo} · 공인중개사 · 매수신청대리인.
+            </p>
+          </div>
+
+          {/* 4 column. */}
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:gap-10">
+            {FOOTER_COLUMNS.map((col) => (
+              <nav key={col.title} aria-label={col.title}>
+                <h3 className="text-[12px] font-bold uppercase tracking-[0.06em] text-[var(--text-tertiary)]">
+                  {col.title}
+                </h3>
+                <ul className="mt-4 flex flex-col gap-3">
+                  {col.links.map((link) => (
+                    <li key={link.href}>
+                      <Link
+                        href={link.href}
+                        className="text-[14px] font-medium text-[var(--text-secondary)] transition-colors duration-150 hover:text-[var(--text-primary)] lg:text-[15px]"
+                      >
+                        {link.label}
+                      </Link>
+                    </li>
+                  ))}
+                </ul>
+              </nav>
+            ))}
+          </div>
+        </div>
+
+        {/* 원형 SNS green (Manako 차용 본질). */}
+        <div className="mt-12 flex items-center gap-3">
+          {SNS_LINKS.map(({ href, label, icon: Icon }) => (
+            <Link
+              key={label}
+              href={href}
+              aria-label={label}
+              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[var(--brand-green)] text-white shadow-[var(--shadow-glow-green-soft)] transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
+            >
+              <Icon size={18} />
+            </Link>
           ))}
         </div>
 
         {/* 사업자 conditional. */}
         {BUSINESS_REGISTERED && (
-          <div className="mt-12 border-t border-[var(--divider)] pt-6 text-[12px] leading-[1.7] text-[var(--text-tertiary)]">
+          <div className="mt-10 border-t border-[var(--divider)] pt-6 text-[12px] leading-[1.7] text-[var(--text-tertiary)]">
             <p>
               {process.env.NEXT_PUBLIC_BUSINESS_NAME ?? COMPANY.name} · 대표{" "}
               {process.env.NEXT_PUBLIC_BUSINESS_CEO ?? COMPANY.ceo}
@@ -94,11 +187,9 @@ export function Footer() {
           </div>
         )}
 
-        {/* 우하 copyright. */}
-        <div className="mt-12 flex items-center justify-between border-t border-[var(--divider)] pt-6 text-[12px] text-[var(--text-tertiary)] lg:mt-16">
-          <p>
-            © {new Date().getFullYear()} {COMPANY.name}
-          </p>
+        {/* copyright. */}
+        <div className="mt-10 flex items-center justify-between border-t border-[var(--divider)] pt-6 text-[13px] text-[var(--text-tertiary)] lg:mt-12 lg:text-[14px]">
+          <p>© {new Date().getFullYear()} {COMPANY.name}. All rights reserved.</p>
           <p>서울보증보험 가입</p>
         </div>
       </div>

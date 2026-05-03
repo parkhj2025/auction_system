@@ -667,20 +667,20 @@ p {
   --shadow-button-green: 0 6px 16px rgba(0, 200, 83, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   --shadow-button-green-hover: 0 8px 20px rgba(0, 200, 83, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 
-  /* ─── Phase 1.2 (A-1-2) v6 typo (mobile floor) — 광역 ↑ ─────── */
-  /* 본질: h1 광역 정수 ↑ / h2 광역 정수 ↑ / 카테고리 라벨 ↓ / hierarchy 명확. */
-  --text-display: 44px;            /* Hero h1 mobile (v6 광역 ↑ from 40) */
-  --text-h1: 44px;                 /* v6 mobile 44 (광역 ↑ from 32) */
-  --text-h2: 32px;                 /* v6 section h2 mobile 32 (광역 ↑ from 24) */
-  --text-h3: 20px;                 /* 카드 title (광역 ↑ from 18) */
-  --text-body-lg: 17px;
-  --text-body: 16px;
-  --text-body-sm: 14px;
+  /* ─── Phase 1.2 (A-1-2) v7 typo (mobile floor) — 광역 ↑↑ ─────── */
+  /* v7: h1 48/80 / h2 36/60 / h3 22/28 / body 17/18 + body strong 17/18 weight 700 (자신감 본문 정수). */
+  --text-display: 48px;            /* v7 Hero h1 mobile 48 (광역 ↑ from 44) */
+  --text-h1: 48px;                 /* v7 mobile 48 (광역 ↑ from 44) */
+  --text-h2: 36px;                 /* v7 section h2 mobile 36 (광역 ↑ from 32) */
+  --text-h3: 22px;                 /* v7 카드 title (광역 ↑ from 20) */
+  --text-body-lg: 18px;            /* v7 body 17 → 18 광역 ↑ */
+  --text-body: 17px;               /* v7 body 16 → 17 (가독 ↑) */
+  --text-body-sm: 15px;
   --text-caption: 13px;
   --text-meta: 12px;
   --text-num-md: 28px;
   --text-num-lg: 40px;
-  --text-num-xl: 96px;             /* v6 Compare 대형 numeric (광역 ↑ from 64) */
+  --text-num-xl: 96px;
 
   /* brand-h1 본질 (Hero / Brand 컴포넌트) */
   --brand-h1-mobile: 32px;
@@ -714,16 +714,16 @@ p {
 /* Phase 1.2 (A-1-2) v4 desktop step (≥1024px). */
 @media (min-width: 1024px) {
   :root {
-    --text-display: 72px;          /* v6 Hero h1 desktop (광역 ↑ from 56) */
-    --text-h1: 72px;               /* v6 desktop 72 (광역 ↑ from 56) */
-    --text-h2: 56px;               /* v6 section h2 desktop 56 (광역 ↑ from 32) */
-    --text-h3: 24px;               /* v6 카드 title desktop 24 */
-    --text-body-lg: 18px;
-    --text-body: 17px;
-    --text-body-sm: 15px;
+    --text-display: 80px;          /* v7 Hero h1 desktop (광역 ↑ from 72) */
+    --text-h1: 80px;               /* v7 desktop 80 (광역 ↑ from 72) */
+    --text-h2: 60px;               /* v7 section h2 desktop 60 (광역 ↑ from 56) */
+    --text-h3: 28px;               /* v7 카드 title desktop 28 (광역 ↑ from 24) */
+    --text-body-lg: 19px;          /* v7 body lg 18 → 19 */
+    --text-body: 18px;             /* v7 body 17 → 18 */
+    --text-body-sm: 16px;
     --text-num-md: 32px;
     --text-num-lg: 48px;
-    --text-num-xl: 144px;          /* v6 Compare 대형 numeric desktop (광역 ↑ from 80) */
+    --text-num-xl: 144px;
 
     --section-py: 96px;            /* Agent 평가 본질 80-96 본질 (이전 128 → 96) */
     --section-px: 32px;
