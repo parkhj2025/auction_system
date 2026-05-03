@@ -59,8 +59,11 @@ function StickyFeatureCard({
 }) {
   const start = index / total;
   const end = (index + 1) / total;
-  const opacity = useTransform(progress, [start - 0.1, start, end, end + 0.1], [0.4, 1, 1, 0.4]);
-  const scale = useTransform(progress, [start - 0.1, start, end, end + 0.1], [0.98, 1.02, 1.02, 0.98]);
+  /* clamp 영역 — Web Animations API offsets 0~1 의무 (음수 / 1 초과 0). */
+  const startEdge = Math.max(0, start - 0.1);
+  const endEdge = Math.min(1, end + 0.1);
+  const opacity = useTransform(progress, [startEdge, start, end, endEdge], [0.4, 1, 1, 0.4]);
+  const scale = useTransform(progress, [startEdge, start, end, endEdge], [0.98, 1.02, 1.02, 0.98]);
 
   const Icon = feat.Icon;
 
