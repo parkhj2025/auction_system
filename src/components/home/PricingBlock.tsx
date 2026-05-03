@@ -21,10 +21,10 @@ export function PricingBlock() {
       <div className="container-app py-[var(--section-py)]">
         <h2
           id="pricing-heading"
-          className="max-w-3xl text-[var(--text-h2)] font-extrabold leading-[1.1] tracking-[-0.025em] text-[var(--text-primary)]"
+          className="max-w-4xl text-[56px] font-extrabold leading-[1.05] tracking-[-0.025em] text-[var(--text-primary)] [text-wrap:balance] lg:text-[120px]"
           style={{ fontWeight: 800 }}
         >
-          신청이 빠를수록{" "}
+          신청이 빠를수록,<br className="lg:hidden" />{" "}
           <span className="text-[var(--brand-green)]">저렴합니다.</span>
         </h2>
         <p className="mt-5 text-[17px] font-medium leading-[1.6] text-[var(--text-secondary)] lg:mt-6 lg:text-[19px]">

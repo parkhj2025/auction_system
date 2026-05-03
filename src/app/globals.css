@@ -980,16 +980,21 @@ p {
   50%      { transform: translate3d(20px, -30px, 0); opacity: 0.6; }
 }
 
-/* scroll reveal entrance — useScrollReveal hook 영역 4 영역 광역 (Features / Insight / Pricing / Trust). */
+/* scroll reveal entrance — useScrollReveal hook 4 섹션 (Features / Insight / Pricing / Trust). */
 .scroll-reveal {
   opacity: 0;
-  transform: translateY(16px);
+  transform: translateY(30px) scale(0.95);
   transition: opacity 600ms cubic-bezier(0.16, 1, 0.3, 1),
-              transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+              transform 600ms cubic-bezier(0.16, 1, 0.3, 1),
+              border-color 400ms ease-out;
 }
 .scroll-reveal.is-visible {
   opacity: 1;
-  transform: translateY(0);
+  transform: translateY(0) scale(1);
+}
+/* Features 카드 active border-left (in-view 시 green / hover 0). */
+.feature-card.scroll-reveal.is-visible {
+  border-left-color: var(--brand-green);
 }
 
 /* 접근성 — prefers-reduced-motion 4 animation 자동 정지 + scroll reveal 즉시 노출. */
@@ -1006,4 +1011,41 @@ p {
     transform: none;
     transition: none;
   }
+  html.lenis,
+  html.lenis body {
+    overflow: auto !important;
+    height: auto !important;
+  }
+}
+
+/* Aceternity Spotlight animation — Trust 좌상 → 우하 진입 (lg+ only). */
+.animate-spotlight {
+  animation: spotlight 2s ease 0.75s 1 forwards;
+}
+@keyframes spotlight {
+  0% {
+    opacity: 0;
+    transform: translate(-72%, -62%) scale(0.5);
+  }
+  100% {
+    opacity: 1;
+    transform: translate(-50%, -40%) scale(1);
+  }
+}
+
+/* Phase 1.2 (A-1-2) v10 — Lenis smooth scroll css (메인 페이지 한정 / app/page.tsx wrap). */
+html.lenis {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-smooth [data-lenis-prevent] {
+  overscroll-behavior: contain;
+}
+.lenis.lenis-stopped {
+  overflow: clip;
+}
+.lenis.lenis-smooth iframe {
+  pointer-events: none;
 }

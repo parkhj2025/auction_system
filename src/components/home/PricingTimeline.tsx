@@ -4,11 +4,11 @@ import { FEES } from "@/lib/constants";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
 /* Phase 1.2 (A-1-2) v9 — PricingTimeline (색 변환 + 가로/세로 timeline + hover lift).
- * 색 paradigm: D-7+ green / D-7~D-2 yellow / D-2 orange (시간 ↑ + 색 ↑ + 긴급도 ↑).
+ * 색 분배: 7일+ 전 green / 7~2일 전 yellow / 2일 이내 orange (시간 ↑ + 색 ↑ + 긴급도 ↑).
  * desktop (lg+ / ≥ 1024px): 가로 timeline + line gradient 90deg + 노드 3건 위 가격 카드.
  * mobile (< lg): 세로 timeline + line gradient 180deg + 노드 3건 + 카드.
  * 강조 (얼리버드): green border + chip "가장 많이 선택" + scale 1.02.
- * hover: scale 1.02 + shadow-xl + 색 강조 / 250ms ease-out (3 카드 광역). */
+ * hover: scale 1.02 + shadow-xl + 색 강조 / 250ms ease-out (3 카드 일괄). */
 
 type Tier = {
   key: "earlybird" | "standard" | "rush";
@@ -24,7 +24,7 @@ type Tier = {
 const TIERS: Tier[] = [
   {
     key: "earlybird",
-    point: "D-7+",
+    point: "7일+ 전",
     name: "얼리버드",
     fee: FEES.earlybird,
     recommended: true,
@@ -34,7 +34,7 @@ const TIERS: Tier[] = [
   },
   {
     key: "standard",
-    point: "D-7~D-2",
+    point: "7~2일 전",
     name: "일반",
     fee: FEES.standard,
     color: "#FBBF24",
@@ -43,7 +43,7 @@ const TIERS: Tier[] = [
   },
   {
     key: "rush",
-    point: "D-2 이내",
+    point: "2일 이내",
     name: "급건",
     fee: FEES.rush,
     color: "#F97316",

@@ -1,29 +1,44 @@
 "use client";
 
 import { useRef } from "react";
-import { motion, useScroll, useTransform, useMotionTemplate } from "motion/react";
+import { motion, useInView } from "motion/react";
+import NumberFlow from "@number-flow/react";
+import { Car, FileText, Banknote, Building2, Clock, Smartphone } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v9 — CompareBlock (scroll-driven 변환 / Apple AirPods 변형).
- * h2 "법원 가는 3시간, 물건 보는 시간으로." (보존)
- * 좌 + 우 split scene (3시간 흑백 vs 0시간 컬러 변환).
- * scroll progress 0% → 100%: 우측 grayscale 100→0 + scale 1→1.05 + numeric green ↑.
- * filter saturate 분리: desktop md+ 1.2 (Wise green 정수) / mobile < md 1.0 (chromium repaint 비용 ↓).
- * fallback: scroll API 미지원 = motion graceful (split scene 정수 보존). */
+/* Phase 1.2 (A-1-2) v10 — CompareBlock (5+1 막대 차트 + Lucide 24px + NumberFlow 8건 + "85" 240px).
+ * h2: "법원 가는 3시간, / 물건 보는 시간으로." (강제 line-break / 모바일 + 데스크탑 동일).
+ * 좌측 5단계 (gray #94A3B8 / 변환 0): 휴가 신청 30분 / 서류 준비 45분 / 수표 발행 30분 / 법원 이동 60분 / 입찰 대기 90분.
+ * 우측 1단계 (gray → green scroll progress): 사건번호 입력 3분.
+ * 결론: "85" CountUp 0→85 (240px 데스크탑 / 120px 모바일) + "배 빠릅니다".
+ * 모션: 막대 좌→우 scaleX 0→1 stagger 100ms / 우측 색 변환 / NumberFlow 8건. */
+
+type Step = {
+  Icon: React.ComponentType<{ size?: number; className?: string }>;
+  label: string;
+  minutes: number;
+};
+
+const LEFT_STEPS: Step[] = [
+  { Icon: Car, label: "휴가 신청", minutes: 30 },
+  { Icon: FileText, label: "서류 준비", minutes: 45 },
+  { Icon: Banknote, label: "수표 발행", minutes: 30 },
+  { Icon: Building2, label: "법원 이동", minutes: 60 },
+  { Icon: Clock, label: "입찰 대기", minutes: 90 },
+];
+
+const RIGHT_STEP: Step = {
+  Icon: Smartphone,
+  label: "사건번호 입력",
+  minutes: 3,
+};
+
+const LEFT_TOTAL = LEFT_STEPS.reduce((sum, s) => sum + s.minutes, 0); /* 255 */
+const RATIO = Math.round(LEFT_TOTAL / RIGHT_STEP.minutes); /* 85 */
+const MAX_BAR = 90; /* 막대 최대 width 기준 (입찰 대기 90분 = 100%). */
 
 export function CompareBlock() {
   const sectionRef = useRef<HTMLElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-
-  /* progress 0~0.5 = entrance / 0.5~1 = exit. peak = 0.5 (한복판 영역 영역 ↑). */
-  const grayscale = useTransform(scrollYProgress, [0, 0.5, 1], [100, 0, 0]);
-  const scale = useTransform(scrollYProgress, [0, 0.5, 1], [1, 1.05, 1.05]);
-  const greenOpacity = useTransform(scrollYProgress, [0, 0.5, 1], [0, 1, 1]);
-
-  /* useMotionTemplate — saturate CSS variable 영역 분리 (desktop 1.2 / mobile 1.0). */
-  const filterValue = useMotionTemplate`grayscale(${grayscale}%) var(--saturate)`;
+  const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
 
   return (
     <section
@@ -34,59 +49,126 @@ export function CompareBlock() {
       <div className="container-app py-[var(--section-py)]">
         <h2
           id="compare-heading"
-          className="mx-auto max-w-4xl text-center text-[var(--text-h2)] font-extrabold leading-[1.05] tracking-[-0.025em] text-[var(--text-primary)] [text-wrap:balance]"
+          className="mx-auto max-w-5xl text-center text-[56px] font-extrabold leading-[1.05] tracking-[-0.025em] text-[var(--text-primary)] [text-wrap:balance] lg:text-[120px]"
           style={{ fontWeight: 800 }}
         >
           법원 가는{" "}
-          <span className="text-[var(--text-tertiary)]">3시간</span>, 물건 보는{" "}
+          <span className="text-[var(--text-tertiary)]">3시간</span>,<br />
+          물건 보는{" "}
           <span className="text-[var(--brand-green)]">시간으로.</span>
         </h2>
 
-        {/* split scene 좌(흑백 보존) / 우(컬러 변환). */}
-        <div className="mt-12 grid grid-cols-1 gap-6 md:grid-cols-2 lg:mt-16 lg:gap-10">
-          {/* 좌 — 흑백 보존 (대비 정수). */}
-          <div className="relative flex aspect-[4/3] flex-col items-center justify-center overflow-hidden rounded-3xl bg-[#1A1F25] p-8 text-white">
-            <span className="text-[13px] font-bold uppercase tracking-[0.1em] text-white/50">
+        {/* 5+1 split: mobile 세로 stack / lg+ 가로 split. */}
+        <div className="mt-12 grid grid-cols-1 gap-10 lg:mt-16 lg:grid-cols-2 lg:gap-16">
+          {/* 좌측 — 직접 가는 길 (gray / 5 단계). */}
+          <div className="flex flex-col gap-5">
+            <p className="text-[14px] font-bold uppercase tracking-[0.1em] text-[var(--text-tertiary)]">
               직접 가는 길
-            </span>
-            <div
-              className="mt-4 text-[80px] font-extrabold leading-none tracking-tight text-white/70 lg:text-[140px]"
-              style={{ fontWeight: 800 }}
-            >
-              3<span className="text-[40px] lg:text-[64px] opacity-80">시간</span>
-            </div>
-            <p className="mt-4 max-w-xs text-center text-[14px] leading-[1.6] text-white/60 lg:text-[16px]">
-              반차 · 수표 발행 · 서류 준비 · 대기.
             </p>
+            {LEFT_STEPS.map((step, idx) => (
+              <CompareBar
+                key={step.label}
+                step={step}
+                isInView={isInView}
+                delay={idx * 100}
+                color="gray"
+              />
+            ))}
+            <div className="mt-4 flex items-baseline justify-end gap-2 border-t border-[var(--border-1)] pt-5">
+              <span className="text-[14px] font-medium text-[var(--text-secondary)]">총</span>
+              <span
+                className="text-[64px] font-extrabold leading-none tracking-[-0.025em] text-[var(--text-primary)] lg:text-[96px]"
+                style={{ fontWeight: 800 }}
+              >
+                {isInView ? <NumberFlow value={LEFT_TOTAL} /> : 0}
+              </span>
+              <span className="text-[18px] font-medium text-[var(--text-secondary)] lg:text-[22px]">분</span>
+            </div>
           </div>
 
-          {/* 우 — 스크롤 변환 (흑백 → 컬러 + scale + green ↑). */}
-          <motion.div
-            className="relative flex aspect-[4/3] flex-col items-center justify-center overflow-hidden rounded-3xl bg-[#E6FAEE] p-8 text-[var(--text-primary)] [--saturate:saturate(1)] md:[--saturate:saturate(1.2)]"
-            style={{
-              filter: filterValue,
-              scale,
-            }}
-          >
-            <span className="text-[13px] font-bold uppercase tracking-[0.1em] text-[var(--brand-green-deep)]">
+          {/* 우측 — 경매퀵 길 (gray → green / 1 단계). */}
+          <div className="flex flex-col gap-5">
+            <p className="text-[14px] font-bold uppercase tracking-[0.1em] text-[var(--brand-green-deep)]">
               경매퀵 길
-            </span>
-            <motion.div
-              className="mt-4 text-[80px] font-extrabold leading-none tracking-tight lg:text-[140px]"
-              style={{
-                fontWeight: 800,
-                color: "var(--brand-green-deep)",
-                opacity: greenOpacity,
-              }}
-            >
-              0<span className="text-[40px] lg:text-[64px] opacity-80">시간</span>
-            </motion.div>
-            <p className="mt-4 max-w-xs text-center text-[14px] leading-[1.6] text-[var(--text-secondary)] lg:text-[16px]">
-              사건번호 입력 → 결과 알림. 그것만.
             </p>
-          </motion.div>
+            <CompareBar
+              step={RIGHT_STEP}
+              isInView={isInView}
+              delay={500}
+              color="green"
+            />
+            <div className="mt-4 flex items-baseline justify-end gap-2 border-t border-[var(--border-1)] pt-5">
+              <span className="text-[14px] font-medium text-[var(--text-secondary)]">총</span>
+              <span
+                className="text-[64px] font-extrabold leading-none tracking-[-0.025em] text-[var(--brand-green-deep)] lg:text-[96px]"
+                style={{ fontWeight: 800 }}
+              >
+                {isInView ? <NumberFlow value={RIGHT_STEP.minutes} /> : 0}
+              </span>
+              <span className="text-[18px] font-medium text-[var(--text-secondary)] lg:text-[22px]">분</span>
+            </div>
+          </div>
+        </div>
+
+        {/* 결론 — "85" CountUp + "배 빠릅니다". */}
+        <div className="mt-16 flex flex-col items-center justify-center gap-2 lg:mt-24">
+          <span
+            className="text-[120px] font-extrabold leading-none tracking-[-0.03em] text-[var(--brand-green)] lg:text-[240px]"
+            style={{ fontWeight: 800 }}
+          >
+            {isInView ? <NumberFlow value={RATIO} /> : 0}
+          </span>
+          <span
+            className="text-[32px] font-bold text-[var(--text-primary)] lg:text-[56px]"
+            style={{ fontWeight: 700 }}
+          >
+            배 빠릅니다.
+          </span>
         </div>
       </div>
     </section>
+  );
+}
+
+function CompareBar({
+  step,
+  isInView,
+  delay,
+  color,
+}: {
+  step: Step;
+  isInView: boolean;
+  delay: number;
+  color: "gray" | "green";
+}) {
+  const widthPercent = (step.minutes / MAX_BAR) * 100;
+  const Icon = step.Icon;
+
+  return (
+    <div className="flex items-center gap-3">
+      <Icon size={24} className="text-[var(--text-secondary)] flex-shrink-0" />
+      <span className="w-[88px] flex-shrink-0 text-[14px] font-medium text-[var(--text-primary)] lg:text-[15px]">
+        {step.label}
+      </span>
+      <div className="relative h-3 flex-1 overflow-hidden rounded-full bg-[var(--bg-tertiary)]">
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={isInView ? { scaleX: 1 } : { scaleX: 0 }}
+          transition={{
+            duration: 0.8,
+            delay: delay / 1000,
+            ease: [0.16, 1, 0.3, 1],
+          }}
+          className="absolute inset-y-0 left-0 origin-left rounded-full"
+          style={{
+            width: `${widthPercent}%`,
+            background: color === "green" ? "var(--brand-green)" : "#94A3B8",
+          }}
+        />
+      </div>
+      <span className="w-[64px] flex-shrink-0 text-right text-[18px] font-bold text-[var(--text-primary)] lg:text-[22px]">
+        {isInView ? <NumberFlow value={step.minutes} suffix="분" /> : "0분"}
+      </span>
+    </div>
   );
 }

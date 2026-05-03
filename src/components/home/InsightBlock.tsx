@@ -40,7 +40,7 @@ const CARDS: InsightCardData[] = [
     title: "보증금 1.88억 인수 오피스텔, HUG 말소동의로 1.25억 진입",
     brief: "감정가 2.55억 / 4회 유찰 / 임차보증금 인수 구조 분석.",
     metric: "감정가 −51%",
-    date: "오늘의 무료 물건분석",
+    date: "주요 무료 물건분석",
     href: "/analysis/2026타경500459",
     featured: true,
   },
@@ -77,7 +77,7 @@ const CARDS: InsightCardData[] = [
   {
     cat: "cases",
     kind: "auction-trophy",
-    title: "인천 오피스텔 1.32억 낙찰",
+    title: "오피스텔 1.32억 낙찰 사례",
     brief: "경매퀵 입찰 대리 사례.",
     metric: "1.32억",
     href: "/news",
@@ -101,10 +101,10 @@ export function InsightBlock() {
         <div className="max-w-3xl">
           <h2
             id="insight-heading"
-            className="text-[var(--text-h2)] font-extrabold leading-[1.05] tracking-[-0.025em] text-[var(--text-primary)] [text-wrap:balance]"
+            className="text-[56px] font-extrabold leading-[1.05] tracking-[-0.025em] text-[var(--text-primary)] [text-wrap:balance] lg:text-[120px]"
             style={{ fontWeight: 800 }}
           >
-            경매가 처음이라면,{" "}
+            경매가 처음이라면,<br className="lg:hidden" />{" "}
             <span className="text-[var(--brand-green)]">여기부터.</span>
           </h2>
           <p className="mt-5 text-[17px] font-medium leading-[1.6] text-[var(--text-secondary)] lg:mt-6 lg:text-[19px]">
@@ -148,7 +148,7 @@ export function InsightBlock() {
                   key={`${item.cat}-${idx}`}
                   data={item}
                   isFeatured={isFeatured}
-                  delay={idx * 80}
+                  delay={idx * 150}
                 />
               );
             })}

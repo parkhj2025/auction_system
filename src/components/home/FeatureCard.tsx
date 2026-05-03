@@ -1,76 +1,58 @@
 "use client";
 
-import Image from "next/image";
 import { useScrollReveal } from "@/hooks/useScrollReveal";
 
-/* Phase 1.2 (A-1-2) v9 — FeatureCard (bento + scroll reveal + hover lift).
- * isLarge = true → bento 큰 카드 (col-span-2 row-span-2 / aspect 16:10 일러스트)
- * isLarge = false → bento 작은 카드 (col-span-1 row-span-1 / aspect-square 일러스트) */
+/* Phase 1.2 (A-1-2) v10 — FeatureCard (mobile vertical stack 강화 / bento 비율).
+ * isWide = true → 1번 큰 카드 (col-span-2 full width)
+ * isWide = false → 2-3 작은 카드 (col-span-1 = 50% width)
+ * scroll 진입: opacity 0→1 + translateY 30→0 + scale 0.95→1 + active border-left 4px green (in-view).
+ * stagger: 150ms (Hero / Insight 일관성). */
 
 export type FeatureCardProps = {
-  img: string;
-  alt: string;
+  Icon: React.ComponentType<{ size?: number; className?: string }>;
+  value: string;
   title: string;
   desc: string;
-  className?: string;
-  isLarge?: boolean;
   delay?: number;
+  isWide?: boolean;
 };
 
 export function FeatureCard({
-  img,
-  alt,
+  Icon,
+  value,
   title,
   desc,
-  className = "",
-  isLarge = false,
   delay = 0,
+  isWide = false,
 }: FeatureCardProps) {
-  const { ref: revealRef, className: revealClass, style: revealStyle } =
+  const { ref, className, style } =
     useScrollReveal<HTMLLIElement>({ delay });
-  const size = isLarge ? 720 : 400;
 
   return (
     <li
-      ref={revealRef}
-      className={`${revealClass} group flex flex-col rounded-3xl border border-[var(--border-1)] bg-white p-6 transition-[transform,box-shadow,border-color] duration-[250ms] ease-out hover:-translate-y-1 hover:scale-[1.02] hover:border-[var(--brand-green)]/30 hover:shadow-[var(--shadow-card-hover)] lg:p-8 ${className}`}
-      style={revealStyle}
+      ref={ref}
+      className={`${className} feature-card group flex flex-col gap-4 rounded-3xl border-l-4 border-l-transparent border border-[var(--border-1)] bg-white p-5 transition-[transform,box-shadow,border-color] duration-[300ms] ease-out hover:-translate-y-1 hover:shadow-[var(--shadow-card-hover)] ${isWide ? "col-span-2" : "col-span-1"}`}
+      style={style}
     >
-      <div
-        className={`relative w-full overflow-hidden rounded-2xl bg-gradient-to-br from-[#E6FAEE] to-white ${
-          isLarge ? "aspect-[16/10]" : "aspect-square"
-        }`}
-      >
-        <Image
-          src={img}
-          alt={alt}
-          width={size}
-          height={isLarge ? Math.round((size * 10) / 16) : size}
-          sizes={
-            isLarge
-              ? "(max-width: 1024px) 90vw, 60vw"
-              : "(max-width: 1024px) 90vw, 33vw"
-          }
-          className="h-full w-full object-contain"
-        />
+      <Icon size={isWide ? 64 : 48} className="text-[var(--brand-green)]" />
+      <div>
+        <span
+          className={`block font-extrabold leading-none tracking-[-0.025em] text-[var(--text-primary)] ${isWide ? "text-[80px]" : "text-[56px]"}`}
+          style={{ fontWeight: 800 }}
+        >
+          {value}
+        </span>
+        <h3
+          className={`mt-3 font-bold leading-[1.3] tracking-[-0.01em] text-[var(--text-primary)] ${isWide ? "text-[22px]" : "text-[17px]"}`}
+        >
+          {title}
+        </h3>
+        <p
+          className={`mt-2 font-medium leading-[1.6] text-[var(--text-secondary)] ${isWide ? "text-[16px]" : "text-[14px]"}`}
+        >
+          {desc}
+        </p>
       </div>
-
-      <h3
-        className={`mt-6 font-bold leading-[1.3] tracking-[-0.01em] text-[var(--text-primary)] ${
-          isLarge
-            ? "text-[26px] lg:text-[36px]"
-            : "text-[22px] lg:text-[28px]"
-        }`}
-      >
-        {title}
-      </h3>
-      <p
-        className={`mt-3 font-medium leading-[1.6] text-[var(--text-secondary)] ${
-          isLarge ? "text-[17px] lg:text-[19px]" : "text-[16px] lg:text-[17px]"
-        }`}
-      >
-        {desc}
-      </p>
     </li>
   );
 }
