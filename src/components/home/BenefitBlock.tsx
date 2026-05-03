@@ -7,14 +7,16 @@ import { FeaturesStickyDesktop } from "./FeaturesStickyDesktop";
 /* Phase 1.2 (A-1-2) v10 — Features (Sticky Scroll Reveal lg+ + vertical stack 강화 mobile + h2 56/120).
  * h2: "당신이 신경 쓸 일은\n사건번호 하나뿐." (강제 line-break + green accent on "사건번호 하나뿐").
  * lg+: 좌측 sticky h2 + 우측 카드 3장 progress 활성 (StickyScrollReveal).
- * mobile: vertical stack 강화 (fade+slide+scale stagger 200ms / border-left active / hover lift).
+ * mobile: vertical stack + 컬러 믹싱 (카드 1·3 green / 카드 2 yellow / hover lift / border-left 영구 폐기).
  * 카드 3건 (Code 결정 (i) "1개 / 전용 계좌" 보존):
  *   1. Building2 / 0회 / 법원 방문
  *   2. FileText / 100% / 서류 비대면 처리
  *   3. Lock / 1개 / 전용 계좌 분리 보관 */
 
+import type { LucideIcon } from "lucide-react";
+
 export type FeatureItem = {
-  Icon: React.ComponentType<{ size?: number; className?: string }>;
+  Icon: LucideIcon;
   value: string;
   title: string;
   desc: string;
@@ -65,17 +67,21 @@ export function BenefitBlock() {
           </h2>
 
           <ul className="mt-10 grid grid-cols-2 gap-4">
-            {FEATURES.map((feat, idx) => (
-              <FeatureCard
-                key={feat.title}
-                Icon={feat.Icon}
-                value={feat.value}
-                title={feat.title}
-                desc={feat.desc}
-                delay={idx * 80}
-                isWide={idx === 0}
-              />
-            ))}
+            {FEATURES.map((feat, idx) => {
+              const colors = ["green", "yellow", "green-yellow"] as const;
+              return (
+                <FeatureCard
+                  key={feat.title}
+                  Icon={feat.Icon}
+                  value={feat.value}
+                  title={feat.title}
+                  desc={feat.desc}
+                  delay={idx * 80}
+                  isWide={idx === 0}
+                  color={colors[idx]}
+                />
+              );
+            })}
           </ul>
         </div>
       </div>

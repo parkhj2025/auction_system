@@ -992,10 +992,7 @@ p {
   opacity: 1;
   transform: translateY(0) scale(1);
 }
-/* Features 카드 active border-left (in-view 시 green / hover 0). */
-.feature-card.scroll-reveal.is-visible {
-  border-left-color: var(--brand-green);
-}
+/* v12 정정: Features 카드 border-left 영구 폐기 (AI 슬롭 디자인 회피). */
 
 /* Plan v11 — Aurora Background @keyframes (60s 자율 모션 + GPU accelerated). */
 @keyframes aurora {
