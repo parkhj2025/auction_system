@@ -1,265 +1,210 @@
 import { INSIGHT_CATEGORIES, type InsightCategoryKey } from "@/lib/constants";
 
-/* Phase 1.2 (A-1-2) v7 — InsightThumbnail (콘텐츠별 SVG 차별화 6건).
- * 광역 paradigm: 카테고리 색 base (gradient) + 콘텐츠 정수 영역 SVG (도식·다이어그램·아이콘).
- * 6건 차별화 — 광역 동일 0. */
+/* Phase 1.2 (A-1-2) v9 — InsightThumbnail (큰 숫자 typography + 미세 시각 도식 6건 차별화).
+ * 기하학 SVG 광역 폐기 → 콘텐츠 정수 큰 숫자 우선 + 미세 도식 보조 영역.
+ * 색 분배: green 2 (analysis) + blue 2 (guide) + orange 1 (insight) + purple 1 (cases).
+ * isLarge = true → 큰 카드 (col-span-2 row-span-2 / typography 광역 ↑↑) */
 
 export type ThumbnailKind =
-  | "hug-deposit" /* 카드 1: HUG 말소동의 / 보증금 1.88억 → 1.25억 변환 */
-  | "price-drop" /* 카드 2: 감정가 -27% / 가격 변화 그래프 */
-  | "bid-criteria" /* 카드 3: 입찰가 산정 3가지 기준 다이어그램 */
-  | "process-flow" /* 카드 4: 절차 4단계 플로우 */
-  | "market-trend" /* 카드 5: 시장 인사이트 / 트렌드 그래프 */
-  | "auction-trophy"; /* 카드 6: 낙찰 사례 / 트로피 + 가격 */
+  | "hug-deposit"     /* 카드 1 (큰): HUG 말소동의 / 보증금 변환 1.88억 → 1.25억 */
+  | "price-drop"      /* 카드 2: 감정가 -27% */
+  | "bid-criteria"    /* 카드 3: 입찰가 산정 3가지 기준 */
+  | "process-flow"    /* 카드 4: 절차 4단계 */
+  | "market-trend"    /* 카드 5: 낙찰가율 +4.2%p */
+  | "auction-trophy"; /* 카드 6: 낙찰가 1.32억 */
 
 export function InsightThumbnail({
   cat,
   kind,
-  large = false,
+  isLarge = false,
 }: {
   cat: InsightCategoryKey;
   kind: ThumbnailKind;
-  large?: boolean;
+  isLarge?: boolean;
 }) {
   const category = INSIGHT_CATEGORIES[cat];
   const color = category.color;
 
   return (
-    <svg
-      viewBox="0 0 320 200"
-      xmlns="http://www.w3.org/2000/svg"
-      preserveAspectRatio="xMidYMid slice"
+    <div
+      className="absolute inset-0 flex items-center justify-center overflow-hidden"
+      style={{
+        background: `linear-gradient(135deg, ${color} 0%, ${color}b3 100%)`,
+      }}
       aria-hidden="true"
-      className="absolute inset-0 h-full w-full"
     >
-      {/* gradient bg base. */}
-      <defs>
-        <linearGradient id={`grad-${kind}`} x1="0" y1="0" x2="1" y2="1">
-          <stop offset="0%" stopColor={color} />
-          <stop offset="100%" stopColor={color} stopOpacity="0.7" />
-        </linearGradient>
-      </defs>
-      <rect width="320" height="200" fill={`url(#grad-${kind})`} />
-
-      {/* 콘텐츠 정수별 SVG 차별화. */}
-      {kind === "hug-deposit" && <HugDeposit large={large} />}
-      {kind === "price-drop" && <PriceDrop large={large} />}
-      {kind === "bid-criteria" && <BidCriteria />}
-      {kind === "process-flow" && <ProcessFlow />}
-      {kind === "market-trend" && <MarketTrend />}
-      {kind === "auction-trophy" && <AuctionTrophy />}
-    </svg>
-  );
-}
-
-/* 카드 1 (HUG 말소동의 / 보증금 변환) — large featured 카드 본질. */
-function HugDeposit({ large }: { large: boolean }) {
-  return (
-    <g>
-      {/* 오피스텔 building (좌). */}
-      <g transform={large ? "translate(50 50)" : "translate(40 50)"}>
-        <rect x="0" y="0" width="60" height="100" fill="white" opacity="0.95" rx="4" />
-        <g fill="white" opacity="0.6">
-          <rect x="8" y="14" width="12" height="10" />
-          <rect x="28" y="14" width="12" height="10" />
-          <rect x="48" y="14" width="6" height="10" />
-          <rect x="8" y="32" width="12" height="10" />
-          <rect x="28" y="32" width="12" height="10" />
-          <rect x="48" y="32" width="6" height="10" />
-          <rect x="8" y="50" width="12" height="10" />
-          <rect x="28" y="50" width="12" height="10" />
-          <rect x="48" y="50" width="6" height="10" />
-          <rect x="8" y="68" width="12" height="10" />
-          <rect x="28" y="68" width="12" height="10" />
-          <rect x="48" y="68" width="6" height="10" />
-        </g>
-      </g>
-      {/* 화살표 + 가격 변환. */}
-      <g transform={large ? "translate(140 90)" : "translate(120 90)"}>
-        <path
-          d="M0 0 L40 0 M30 -8 L40 0 L30 8"
-          stroke="white"
-          strokeWidth="3"
-          fill="none"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-      </g>
-      {/* 보증금 분리 / down 영역 시각. */}
-      <g transform={large ? "translate(200 60)" : "translate(180 60)"}>
-        <circle cx="30" cy="30" r="28" fill="white" opacity="0.95" />
-        <path
-          d="M20 20 L20 40 L40 40 M30 28 L40 40"
-          stroke={INSIGHT_CATEGORIES.analysis.color}
-          strokeWidth="3"
-          fill="none"
-          strokeLinecap="round"
-        />
-      </g>
-    </g>
-  );
-}
-
-/* 카드 2 (감정가 -27% / 가격 변화 그래프). */
-function PriceDrop({ large: _large = false }: { large?: boolean }) {
-  /* large 영역 보존 (현 시점 미사용 / 추후 본질 강조 영역). */
-  void _large;
-  return (
-    <g>
-      <g transform="translate(60 60)">
-        {/* 그래프 axis. */}
-        <line x1="0" y1="0" x2="0" y2="80" stroke="white" strokeWidth="2" opacity="0.5" />
-        <line x1="0" y1="80" x2="200" y2="80" stroke="white" strokeWidth="2" opacity="0.5" />
-        {/* 가격 line drop. */}
-        <polyline
-          points="0,10 60,30 120,55 180,72"
-          fill="none"
-          stroke="white"
-          strokeWidth="3.5"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        />
-        {/* drop arrow + 강조 dot. */}
-        <circle cx="180" cy="72" r="6" fill="white" />
-        <circle cx="0" cy="10" r="6" fill="white" opacity="0.5" />
-      </g>
-    </g>
-  );
-}
-
-/* 카드 3 (입찰가 산정 3가지 기준 다이어그램). */
-function BidCriteria() {
-  return (
-    <g transform="translate(80 50)">
-      {/* 중심 노드. */}
-      <circle cx="80" cy="50" r="22" fill="white" />
-      <text
-        x="80"
-        y="56"
-        textAnchor="middle"
-        fontSize="22"
-        fontWeight="700"
-        fill={INSIGHT_CATEGORIES.guide.color}
+      {/* 미세 도식 (배경 영역 / SVG 광역). */}
+      <svg
+        viewBox="0 0 320 200"
+        xmlns="http://www.w3.org/2000/svg"
+        preserveAspectRatio="xMidYMid slice"
+        className="absolute inset-0 h-full w-full opacity-30"
       >
+        {kind === "hug-deposit" && <DotGridDecor />}
+        {kind === "price-drop" && <LineGraphDecor direction="down" />}
+        {kind === "bid-criteria" && <CheckListDecor />}
+        {kind === "process-flow" && <FlowDotsDecor />}
+        {kind === "market-trend" && <LineGraphDecor direction="up" />}
+        {kind === "auction-trophy" && <SparkleDecor />}
+      </svg>
+
+      {/* 콘텐츠 정수 큰 숫자 typography (영역 우선). */}
+      <div className="relative z-10 px-4 text-center text-white">
+        {kind === "hug-deposit" && <HugDepositText isLarge={isLarge} />}
+        {kind === "price-drop" && <PriceDropText isLarge={isLarge} />}
+        {kind === "bid-criteria" && <BidCriteriaText isLarge={isLarge} />}
+        {kind === "process-flow" && <ProcessFlowText isLarge={isLarge} />}
+        {kind === "market-trend" && <MarketTrendText isLarge={isLarge} />}
+        {kind === "auction-trophy" && <AuctionTrophyText isLarge={isLarge} />}
+      </div>
+    </div>
+  );
+}
+
+/* ─── 콘텐츠별 큰 숫자 typography 6건 ───────────────────────── */
+
+function HugDepositText({ isLarge }: { isLarge: boolean }) {
+  return (
+    <div className="space-y-2">
+      <div className={`font-extrabold leading-none tracking-tight ${isLarge ? "text-[44px] lg:text-[64px]" : "text-[28px] lg:text-[36px]"}`}>
+        1.88억 <span className="opacity-70">→</span> 1.25억
+      </div>
+      <div className={`inline-flex rounded-full bg-white/25 px-3 py-1 font-bold ${isLarge ? "text-[15px] lg:text-[18px]" : "text-[12px] lg:text-[14px]"}`}>
+        −51%
+      </div>
+    </div>
+  );
+}
+
+function PriceDropText({ isLarge }: { isLarge: boolean }) {
+  return (
+    <div className="space-y-2">
+      <div className={`font-extrabold leading-none tracking-tight ${isLarge ? "text-[80px] lg:text-[120px]" : "text-[48px] lg:text-[64px]"}`}>
+        −27<span className="opacity-80">%</span>
+      </div>
+      <div className={`font-medium opacity-85 ${isLarge ? "text-[15px] lg:text-[17px]" : "text-[12px] lg:text-[13px]"}`}>
+        감정가 대비
+      </div>
+    </div>
+  );
+}
+
+function BidCriteriaText({ isLarge }: { isLarge: boolean }) {
+  return (
+    <div className="space-y-2">
+      <div className={`font-extrabold leading-none tracking-tight ${isLarge ? "text-[80px] lg:text-[120px]" : "text-[48px] lg:text-[64px]"}`}>
         3
-      </text>
-      {/* 3 branch. */}
-      <g stroke="white" strokeWidth="2.5" opacity="0.85">
-        <line x1="80" y1="28" x2="80" y2="0" />
-        <line x1="58" y1="62" x2="20" y2="86" />
-        <line x1="102" y1="62" x2="140" y2="86" />
-      </g>
-      {/* branch nodes. */}
-      <g fill="white">
-        <circle cx="80" cy="0" r="8" />
-        <circle cx="20" cy="86" r="8" />
-        <circle cx="140" cy="86" r="8" />
-      </g>
+      </div>
+      <div className={`font-bold ${isLarge ? "text-[18px] lg:text-[22px]" : "text-[13px] lg:text-[15px]"}`}>
+        가지 기준
+      </div>
+    </div>
+  );
+}
+
+function ProcessFlowText({ isLarge }: { isLarge: boolean }) {
+  return (
+    <div className="space-y-2">
+      <div className={`font-extrabold leading-none tracking-tight ${isLarge ? "text-[80px] lg:text-[120px]" : "text-[48px] lg:text-[64px]"}`}>
+        4
+      </div>
+      <div className={`font-bold ${isLarge ? "text-[18px] lg:text-[22px]" : "text-[13px] lg:text-[15px]"}`}>
+        단계
+      </div>
+    </div>
+  );
+}
+
+function MarketTrendText({ isLarge }: { isLarge: boolean }) {
+  return (
+    <div className="space-y-2">
+      <div className={`font-extrabold leading-none tracking-tight ${isLarge ? "text-[60px] lg:text-[88px]" : "text-[36px] lg:text-[48px]"}`}>
+        +4.2<span className="opacity-80">%p</span>
+      </div>
+      <div className={`font-medium opacity-85 ${isLarge ? "text-[15px] lg:text-[17px]" : "text-[12px] lg:text-[13px]"}`}>
+        낙찰가율
+      </div>
+    </div>
+  );
+}
+
+function AuctionTrophyText({ isLarge }: { isLarge: boolean }) {
+  return (
+    <div className="space-y-2">
+      <div className={`font-extrabold leading-none tracking-tight ${isLarge ? "text-[60px] lg:text-[88px]" : "text-[36px] lg:text-[48px]"}`}>
+        1.32억
+      </div>
+      <div className={`inline-flex items-center gap-1 rounded-full bg-white/25 px-3 py-1 font-bold ${isLarge ? "text-[15px] lg:text-[18px]" : "text-[12px] lg:text-[14px]"}`}>
+        ★ 낙찰 완료
+      </div>
+    </div>
+  );
+}
+
+/* ─── 미세 시각 도식 6건 (배경 영역 / opacity 0.3) ─────────── */
+
+function DotGridDecor() {
+  const dots = [];
+  for (let y = 16; y < 200; y += 24) {
+    for (let x = 16; x < 320; x += 24) {
+      dots.push(<circle key={`${x}-${y}`} cx={x} cy={y} r="1.5" fill="white" />);
+    }
+  }
+  return <g>{dots}</g>;
+}
+
+function LineGraphDecor({ direction }: { direction: "up" | "down" }) {
+  const points = direction === "down"
+    ? "0,40 60,80 120,120 180,150 240,170 320,180"
+    : "0,180 60,150 120,120 180,80 240,50 320,30";
+  return (
+    <g>
+      <polyline
+        points={points}
+        fill="none"
+        stroke="white"
+        strokeWidth="2.5"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
     </g>
   );
 }
 
-/* 카드 4 (절차 4단계 플로우). */
-function ProcessFlow() {
+function CheckListDecor() {
   return (
-    <g transform="translate(40 75)">
-      {/* 4 단계 노드 + 화살표. */}
-      {[0, 1, 2, 3].map((i) => (
-        <g key={i} transform={`translate(${i * 60} 0)`}>
-          <circle cx="20" cy="25" r="14" fill="white" />
-          <text
-            x="20"
-            y="30"
-            textAnchor="middle"
-            fontSize="14"
-            fontWeight="700"
-            fill={INSIGHT_CATEGORIES.guide.color}
-          >
-            {i + 1}
-          </text>
-          {i < 3 && (
-            <path
-              d="M40 25 L52 25 M48 21 L52 25 L48 29"
-              stroke="white"
-              strokeWidth="2"
-              fill="none"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              opacity="0.85"
-            />
-          )}
-        </g>
+    <g fill="white">
+      <circle cx="40" cy="60" r="4" />
+      <circle cx="40" cy="100" r="4" />
+      <circle cx="40" cy="140" r="4" />
+      <rect x="60" y="56" width="120" height="2" rx="1" opacity="0.6" />
+      <rect x="60" y="96" width="100" height="2" rx="1" opacity="0.6" />
+      <rect x="60" y="136" width="140" height="2" rx="1" opacity="0.6" />
+    </g>
+  );
+}
+
+function FlowDotsDecor() {
+  return (
+    <g fill="white">
+      {[40, 120, 200, 280].map((x) => (
+        <circle key={x} cx={x} cy="100" r="4" />
+      ))}
+      {[80, 160, 240].map((x) => (
+        <line key={x} x1={x} y1="100" x2={x + 40} y2="100" stroke="white" strokeWidth="1.5" opacity="0.5" />
       ))}
     </g>
   );
 }
 
-/* 카드 5 (시장 인사이트 / 트렌드 그래프 + bar). */
-function MarketTrend() {
+function SparkleDecor() {
   return (
-    <g transform="translate(60 50)">
-      {/* bars. */}
-      <g fill="white" opacity="0.85">
-        <rect x="0" y="60" width="20" height="40" />
-        <rect x="30" y="40" width="20" height="60" />
-        <rect x="60" y="20" width="20" height="80" />
-        <rect x="90" y="0" width="20" height="100" />
-      </g>
-      {/* trend line. */}
-      <polyline
-        points="10,75 40,55 70,35 100,15"
-        fill="none"
-        stroke="white"
-        strokeWidth="3"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-      {/* 강조 dot. */}
-      <circle cx="100" cy="15" r="6" fill="white" />
-      {/* 화살표. */}
-      <path
-        d="M120 15 L150 15 M145 10 L150 15 L145 20"
-        stroke="white"
-        strokeWidth="2.5"
-        fill="none"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </g>
-  );
-}
-
-/* 카드 6 (낙찰 사례 / 트로피 + 가격). */
-function AuctionTrophy() {
-  return (
-    <g transform="translate(110 40)">
-      {/* trophy cup. */}
-      <path
-        d="M30 0 L70 0 L68 50 Q68 65 50 70 Q32 65 32 50 Z"
-        fill="white"
-      />
-      {/* trophy handles. */}
-      <path
-        d="M30 12 L18 18 L18 32 L30 32 M70 12 L82 18 L82 32 L70 32"
-        stroke="white"
-        strokeWidth="3"
-        fill="none"
-      />
-      {/* trophy base. */}
-      <rect x="42" y="78" width="16" height="14" fill="white" opacity="0.9" />
-      <rect x="34" y="92" width="32" height="10" fill="white" opacity="0.8" rx="2" />
-      {/* 별 강조. */}
-      <circle cx="50" cy="35" r="14" fill={INSIGHT_CATEGORIES.cases.color} />
-      <text
-        x="50"
-        y="42"
-        textAnchor="middle"
-        fontSize="20"
-        fontWeight="700"
-        fill="white"
-      >
-        ★
-      </text>
+    <g fill="white">
+      <circle cx="60" cy="40" r="2" opacity="0.7" />
+      <circle cx="240" cy="60" r="2.5" opacity="0.6" />
+      <circle cx="280" cy="140" r="2" opacity="0.7" />
+      <circle cx="40" cy="160" r="2.5" opacity="0.6" />
+      <circle cx="160" cy="180" r="1.5" opacity="0.8" />
     </g>
   );
 }

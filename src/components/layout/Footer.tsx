@@ -37,12 +37,9 @@ function IconRss({ size = 18 }: { size?: number }) {
   );
 }
 
-/* Phase 1.2 (A-1-2) v7 — Footer (Manako 차용 + CTA 통합 + 원형 SNS + 자신감 본문 + copyright).
- * Brand + tagline "법원에 가지 않고, 경매를 시작하세요." (자신감 본문 정수)
- * 4 column (서비스 / 콘텐츠 / 회사 / 법적)
- * 원형 SNS 4건 (Instagram / KakaoTalk / Blog / YouTube) green 본질
- * CTA "지금 신청하기" Footer 상단 통합 (Pricing CTA 흡수)
- * copyright "© 2026 경매퀵. All rights reserved."
+/* Phase 1.2 (A-1-2) v9 — Footer (Top CTA section 영구 폐기 → Trust 통합 paradigm).
+ * Brand + tagline + 4 column + 원형 SNS + copyright + 사업자 conditional 보존.
+ * CTA section = TrustCTA로 영구 흡수 (CTA 광역 2건 = Hero + Trust paradigm 정합).
  * 사업자 정보 env conditional 보존. */
 
 const BUSINESS_REGISTERED =
@@ -93,34 +90,7 @@ export function Footer() {
   return (
     <footer className="border-t border-[var(--border-1)] bg-[var(--bg-secondary)]">
       <div className="container-app px-5 py-14 lg:px-8 lg:py-20">
-        {/* Footer 상단 — CTA 통합 (Pricing 흡수). */}
-        <div className="mb-14 flex flex-col items-start gap-6 border-b border-[var(--divider)] pb-12 lg:mb-16 lg:flex-row lg:items-center lg:justify-between lg:pb-16">
-          <div>
-            <p
-              className="text-[24px] font-extrabold leading-[1.2] tracking-[-0.02em] text-[var(--text-primary)] lg:text-[32px]"
-              style={{ fontWeight: 800 }}
-            >
-              법원에 가지 않고,{" "}
-              <span className="text-[var(--brand-green)]">
-                경매를 시작하세요.
-              </span>
-            </p>
-            <p
-              className="mt-3 text-[16px] font-bold leading-[1.6] text-[var(--text-secondary)] lg:text-[18px]"
-              style={{ fontWeight: 700 }}
-            >
-              사건번호만 주시면, 법원은 저희가 갑니다.
-            </p>
-          </div>
-          <Link
-            href="/apply"
-            className="inline-flex h-14 shrink-0 items-center justify-center rounded-[14px] bg-[var(--brand-green)] px-10 text-[16px] font-bold text-white shadow-[var(--shadow-button-green)] transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 lg:h-16 lg:px-12 lg:text-[17px]"
-          >
-            지금 신청하기
-          </Link>
-        </div>
-
-        {/* Brand + tagline + 4 column. */}
+        {/* Brand + tagline + 4 column (Top CTA section = TrustCTA 영구 흡수). */}
         <div className="grid gap-10 lg:grid-cols-[1.2fr_3fr] lg:gap-12">
           <div>
             <Brand size="sm" mode="light" />

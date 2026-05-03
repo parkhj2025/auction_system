@@ -667,11 +667,11 @@ p {
   --shadow-button-green: 0 6px 16px rgba(0, 200, 83, 0.24), inset 0 1px 0 rgba(255, 255, 255, 0.15);
   --shadow-button-green-hover: 0 8px 20px rgba(0, 200, 83, 0.32), inset 0 1px 0 rgba(255, 255, 255, 0.15);
 
-  /* ─── Phase 1.2 (A-1-2) v7 typo (mobile floor) — 광역 ↑↑ ─────── */
-  /* v7: h1 48/80 / h2 36/60 / h3 22/28 / body 17/18 + body strong 17/18 weight 700 (자신감 본문 정수). */
-  --text-display: 48px;            /* v7 Hero h1 mobile 48 (광역 ↑ from 44) */
-  --text-h1: 48px;                 /* v7 mobile 48 (광역 ↑ from 44) */
-  --text-h2: 36px;                 /* v7 section h2 mobile 36 (광역 ↑ from 32) */
+  /* ─── Phase 1.2 (A-1-2) v9 typo v5 (mobile floor) — maximalist 광역 ↑ ─────── */
+  /* v9: h1 56/96 / h2 44/80 / h3 22/28 / body 17/18. */
+  --text-display: 56px;            /* v9 Hero h1 mobile (광역 ↑ from 48) */
+  --text-h1: 56px;                 /* v9 mobile (광역 ↑ from 48) */
+  --text-h2: 44px;                 /* v9 section h2 mobile (광역 ↑ from 36) */
   --text-h3: 22px;                 /* v7 카드 title (광역 ↑ from 20) */
   --text-body-lg: 18px;            /* v7 body 17 → 18 광역 ↑ */
   --text-body: 17px;               /* v7 body 16 → 17 (가독 ↑) */
@@ -714,9 +714,9 @@ p {
 /* Phase 1.2 (A-1-2) v4 desktop step (≥1024px). */
 @media (min-width: 1024px) {
   :root {
-    --text-display: 80px;          /* v7 Hero h1 desktop (광역 ↑ from 72) */
-    --text-h1: 80px;               /* v7 desktop 80 (광역 ↑ from 72) */
-    --text-h2: 60px;               /* v7 section h2 desktop 60 (광역 ↑ from 56) */
+    --text-display: 96px;          /* v9 Hero h1 desktop maximalist (광역 ↑ from 80) */
+    --text-h1: 96px;               /* v9 desktop maximalist (광역 ↑ from 80) */
+    --text-h2: 80px;               /* v9 section h2 desktop maximalist (광역 ↑ from 60) */
     --text-h3: 28px;               /* v7 카드 title desktop 28 (광역 ↑ from 24) */
     --text-body-lg: 19px;          /* v7 body lg 18 → 19 */
     --text-body: 18px;             /* v7 body 17 → 18 */
@@ -931,4 +931,79 @@ p {
   opacity: 0.4;
   animation: pulse-green 2s ease-out infinite;
   pointer-events: none;
+}
+
+/* ─── Phase 1.2 (A-1-2) v9 — Hero 배경 모션 + CTA glow halo + Trust orb + scroll reveal ───── */
+
+/* Hero 배경 1층 — mesh gradient 회전 (120s spin / blur 80px / opacity 0.04). */
+.hero-mesh-rotate {
+  animation: hero-mesh-spin 120s linear infinite;
+  will-change: transform;
+}
+@keyframes hero-mesh-spin {
+  0%   { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Hero 배경 2층 — dot grid 이동 (60s dotShift / opacity 0.06 / 우상단 60%×40%). */
+.hero-dot-shift {
+  animation: dotShift 60s linear infinite;
+  will-change: background-position;
+}
+@keyframes dotShift {
+  0%   { background-position: 0 0; }
+  100% { background-position: 24px 24px; }
+}
+
+/* CTA glow halo — radial green pulse (4s ctaGlowPulse / opacity 0.3-0.5 / scale 1-1.05). */
+.cta-glow-pulse {
+  animation: ctaGlowPulse 4s ease-in-out infinite;
+  will-change: opacity, transform;
+}
+@keyframes ctaGlowPulse {
+  0%, 100% { opacity: 0.3; transform: scale(1); }
+  50%      { opacity: 0.5; transform: scale(1.05); }
+}
+
+/* Trust floating orb — 6-8s infinite (translate3d + opacity / GPU accelerated). */
+.trust-orb-float {
+  animation: orbFloat 7s ease-in-out infinite;
+  will-change: transform, opacity;
+}
+.trust-orb-float-delay {
+  animation: orbFloat 8s ease-in-out infinite;
+  animation-delay: -3s;
+  will-change: transform, opacity;
+}
+@keyframes orbFloat {
+  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.4; }
+  50%      { transform: translate3d(20px, -30px, 0); opacity: 0.6; }
+}
+
+/* scroll reveal entrance — useScrollReveal hook 영역 4 영역 광역 (Features / Insight / Pricing / Trust). */
+.scroll-reveal {
+  opacity: 0;
+  transform: translateY(16px);
+  transition: opacity 600ms cubic-bezier(0.16, 1, 0.3, 1),
+              transform 600ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.scroll-reveal.is-visible {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* 접근성 — prefers-reduced-motion 4 animation 자동 정지 + scroll reveal 즉시 노출. */
+@media (prefers-reduced-motion: reduce) {
+  .hero-mesh-rotate,
+  .hero-dot-shift,
+  .cta-glow-pulse,
+  .trust-orb-float,
+  .trust-orb-float-delay {
+    animation: none !important;
+  }
+  .scroll-reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
 }
