@@ -1,184 +1,105 @@
-import { INSIGHT_CATEGORIES, type InsightCategoryKey } from "@/lib/constants";
+"use client";
 
-/* Phase 1.2 (A-1-2) v9 — InsightThumbnail (큰 숫자 typography + 미세 시각 도식 6건 차별화).
- * 기하학 SVG 광역 폐기 → 콘텐츠 정수 큰 숫자 우선 + 미세 도식 보조 영역.
- * 색 분배: green 2 (analysis) + blue 2 (guide) + orange 1 (insight) + purple 1 (cases).
- * isLarge = true → 큰 카드 (col-span-2 row-span-2 / typography 광역 ↑↑) */
+import Link from "next/link";
+import { motion } from "motion/react";
+import { FileSearch, BookOpen, ScrollText, Newspaper, type LucideIcon } from "lucide-react";
 
-export type ThumbnailKind =
-  | "hug-deposit"     /* 카드 1 (큰): HUG 말소동의 / 보증금 변환 1.88억 → 1.25억 */
-  | "price-drop"      /* 카드 2: 감정가 -27% */
-  | "bid-criteria"    /* 카드 3: 입찰가 산정 3가지 기준 */
-  | "process-flow"    /* 카드 4: 절차 4단계 */
-  | "market-trend";   /* 카드 5: 낙찰가율 +4.2%p */
-/* v11 정정: auction-trophy 카드 영역 영구 폐기 (Insight bento 6→5건). */
+/* Phase 1.2 (A-1-2) v16 — InsightThumbnail (Editorial Card paradigm / 3:4 / 60-40 split).
+ * 카테고리 4건: analysis green / guide blue / glossary orange / news purple (낙찰사례 영구 폐기).
+ * 상단 60% (flex-3) = 카테고리 색 + 아이콘 36 + 라벨 + 카드 수.
+ * 하단 40% (flex-2) = white + 미리보기 제목 + 본문. */
+
+export type InsightCategorySlug = "analysis" | "guide" | "glossary" | "news";
+export type InsightCategoryColor = "green" | "blue" | "orange" | "purple";
+
+export type InsightCategory = {
+  slug: InsightCategorySlug;
+  label: string;
+  color: InsightCategoryColor;
+};
+
+export type InsightFeatured = {
+  title: string;
+  preview: string;
+  count: number;
+};
+
+const ICON_MAP: Record<InsightCategorySlug, LucideIcon> = {
+  analysis: FileSearch,
+  guide: BookOpen,
+  glossary: ScrollText,
+  news: Newspaper,
+};
+
+const COLOR_MAP: Record<InsightCategoryColor, { bg: string; text: string }> = {
+  green: { bg: "#00C853", text: "#FFFFFF" },
+  blue: { bg: "#4DABF7", text: "#FFFFFF" },
+  orange: { bg: "#F97316", text: "#FFFFFF" },
+  purple: { bg: "#9775FA", text: "#FFFFFF" },
+};
+
+const HREF_MAP: Record<InsightCategorySlug, string> = {
+  analysis: "/analysis",
+  guide: "/guide",
+  glossary: "/guide",
+  news: "/news",
+};
 
 export function InsightThumbnail({
-  cat,
-  kind,
-  isLarge = false,
+  category,
+  featured,
 }: {
-  cat: InsightCategoryKey;
-  kind: ThumbnailKind;
-  isLarge?: boolean;
+  category: InsightCategory;
+  featured: InsightFeatured;
 }) {
-  const category = INSIGHT_CATEGORIES[cat];
-  const color = category.color;
+  const Icon = ICON_MAP[category.slug];
+  const colors = COLOR_MAP[category.color];
+  const href = HREF_MAP[category.slug];
 
   return (
-    <div
-      className="absolute inset-0 flex items-center justify-center overflow-hidden"
-      style={{
-        background: `linear-gradient(135deg, ${color} 0%, ${color}b3 100%)`,
-      }}
-      aria-hidden="true"
+    <motion.div
+      whileHover={{ y: -8 }}
+      transition={{ duration: 0.3 }}
+      className="block"
     >
-      {/* 미세 도식 (배경 영역 / SVG 광역). */}
-      <svg
-        viewBox="0 0 320 200"
-        xmlns="http://www.w3.org/2000/svg"
-        preserveAspectRatio="xMidYMid slice"
-        className="absolute inset-0 h-full w-full opacity-30"
+      <Link
+        href={href}
+        className="group block aspect-[3/4] overflow-hidden rounded-3xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-xl"
       >
-        {kind === "hug-deposit" && <DotGridDecor />}
-        {kind === "price-drop" && <LineGraphDecor direction="down" />}
-        {kind === "bid-criteria" && <CheckListDecor />}
-        {kind === "process-flow" && <FlowDotsDecor />}
-        {kind === "market-trend" && <LineGraphDecor direction="up" />}
-      </svg>
+        <div className="flex h-full flex-col">
+          {/* 상단 60% — 카테고리 색 배경. */}
+          <div
+            className="flex flex-[3] flex-col justify-between p-5 lg:p-6"
+            style={{ backgroundColor: colors.bg }}
+          >
+            <Icon size={36} color={colors.text} strokeWidth={2} />
+            <div>
+              <div
+                className="text-[16px] font-bold lg:text-[20px]"
+                style={{ color: colors.text }}
+              >
+                {category.label}
+              </div>
+              <div
+                className="mt-1 text-[12px] opacity-80 lg:text-[14px]"
+                style={{ color: colors.text }}
+              >
+                {featured.count}건
+              </div>
+            </div>
+          </div>
 
-      {/* 콘텐츠 정수 큰 숫자 typography (영역 우선). */}
-      <div className="relative z-10 px-4 text-center text-white">
-        {kind === "hug-deposit" && <HugDepositText isLarge={isLarge} />}
-        {kind === "price-drop" && <PriceDropText isLarge={isLarge} />}
-        {kind === "bid-criteria" && <BidCriteriaText isLarge={isLarge} />}
-        {kind === "process-flow" && <ProcessFlowText isLarge={isLarge} />}
-        {kind === "market-trend" && <MarketTrendText isLarge={isLarge} />}
-      </div>
-    </div>
+          {/* 하단 40% — white 미리보기. */}
+          <div className="flex flex-[2] flex-col justify-center bg-white p-5 lg:p-6">
+            <div className="mb-2 line-clamp-2 text-[13px] font-bold leading-snug text-gray-900 lg:text-[14px]">
+              {featured.title}
+            </div>
+            <div className="line-clamp-1 text-[11px] text-gray-500 lg:text-[12px]">
+              {featured.preview}
+            </div>
+          </div>
+        </div>
+      </Link>
+    </motion.div>
   );
 }
-
-/* ─── 콘텐츠별 큰 숫자 typography 6건 ───────────────────────── */
-
-function HugDepositText({ isLarge }: { isLarge: boolean }) {
-  return (
-    <div className="space-y-2">
-      <div className={`font-extrabold leading-none tracking-tight ${isLarge ? "text-[44px] lg:text-[64px]" : "text-[28px] lg:text-[36px]"}`}>
-        1.88억 <span className="opacity-70">→</span> 1.25억
-      </div>
-      <div className={`inline-flex rounded-full bg-white/25 px-3 py-1 font-bold ${isLarge ? "text-[15px] lg:text-[18px]" : "text-[12px] lg:text-[14px]"}`}>
-        −51%
-      </div>
-    </div>
-  );
-}
-
-function PriceDropText({ isLarge }: { isLarge: boolean }) {
-  return (
-    <div className="space-y-2">
-      <div className={`font-extrabold leading-none tracking-tight ${isLarge ? "text-[56px] lg:text-[88px]" : "text-[48px] lg:text-[64px]"}`}>
-        −27<span className="opacity-80">%</span>
-      </div>
-      <div className={`font-medium opacity-85 ${isLarge ? "text-[15px] lg:text-[17px]" : "text-[12px] lg:text-[13px]"}`}>
-        감정가 대비
-      </div>
-    </div>
-  );
-}
-
-function BidCriteriaText({ isLarge }: { isLarge: boolean }) {
-  return (
-    <div className="space-y-2">
-      <div className={`font-extrabold leading-none tracking-tight ${isLarge ? "text-[56px] lg:text-[88px]" : "text-[48px] lg:text-[64px]"}`}>
-        3
-      </div>
-      <div className={`font-bold ${isLarge ? "text-[18px] lg:text-[22px]" : "text-[13px] lg:text-[15px]"}`}>
-        가지 기준
-      </div>
-    </div>
-  );
-}
-
-function ProcessFlowText({ isLarge }: { isLarge: boolean }) {
-  return (
-    <div className="space-y-2">
-      <div className={`font-extrabold leading-none tracking-tight ${isLarge ? "text-[56px] lg:text-[88px]" : "text-[48px] lg:text-[64px]"}`}>
-        4
-      </div>
-      <div className={`font-bold ${isLarge ? "text-[18px] lg:text-[22px]" : "text-[13px] lg:text-[15px]"}`}>
-        단계
-      </div>
-    </div>
-  );
-}
-
-function MarketTrendText({ isLarge }: { isLarge: boolean }) {
-  return (
-    <div className="space-y-2">
-      <div className={`font-extrabold leading-none tracking-tight ${isLarge ? "text-[60px] lg:text-[88px]" : "text-[36px] lg:text-[48px]"}`}>
-        +4.2<span className="opacity-80">%p</span>
-      </div>
-      <div className={`font-medium opacity-85 ${isLarge ? "text-[15px] lg:text-[17px]" : "text-[12px] lg:text-[13px]"}`}>
-        낙찰가율
-      </div>
-    </div>
-  );
-}
-
-/* ─── 미세 시각 도식 5건 (배경 영역 / opacity 0.3) ─────────── */
-
-function DotGridDecor() {
-  const dots = [];
-  for (let y = 16; y < 200; y += 24) {
-    for (let x = 16; x < 320; x += 24) {
-      dots.push(<circle key={`${x}-${y}`} cx={x} cy={y} r="1.5" fill="white" />);
-    }
-  }
-  return <g>{dots}</g>;
-}
-
-function LineGraphDecor({ direction }: { direction: "up" | "down" }) {
-  const points = direction === "down"
-    ? "0,40 60,80 120,120 180,150 240,170 320,180"
-    : "0,180 60,150 120,120 180,80 240,50 320,30";
-  return (
-    <g>
-      <polyline
-        points={points}
-        fill="none"
-        stroke="white"
-        strokeWidth="2.5"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </g>
-  );
-}
-
-function CheckListDecor() {
-  return (
-    <g fill="white">
-      <circle cx="40" cy="60" r="4" />
-      <circle cx="40" cy="100" r="4" />
-      <circle cx="40" cy="140" r="4" />
-      <rect x="60" y="56" width="120" height="2" rx="1" opacity="0.6" />
-      <rect x="60" y="96" width="100" height="2" rx="1" opacity="0.6" />
-      <rect x="60" y="136" width="140" height="2" rx="1" opacity="0.6" />
-    </g>
-  );
-}
-
-function FlowDotsDecor() {
-  return (
-    <g fill="white">
-      {[40, 120, 200, 280].map((x) => (
-        <circle key={x} cx={x} cy="100" r="4" />
-      ))}
-      {[80, 160, 240].map((x) => (
-        <line key={x} x1={x} y1="100" x2={x + 40} y2="100" stroke="white" strokeWidth="1.5" opacity="0.5" />
-      ))}
-    </g>
-  );
-}
-

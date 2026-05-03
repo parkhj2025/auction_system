@@ -1,18 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useMemo } from "react";
-import { Building2, FileText, Lock } from "lucide-react";
+import { useState, useMemo, useEffect } from "react";
+import { motion, AnimatePresence } from "motion/react";
+import { Building2, FileText, Lock, type LucideIcon } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v15 — Hero (동영상 배경 + center 정렬 + 칩 + 데스크탑 3 강점 1행).
- * 정정 9건:
- * 1. 동영상 배경 /videos/hero-bg.mp4 (autoplay muted loop playsInline / object-cover / z-0)
- * 2. 가독성 overlay bg-white/30 + 하단 페이딩 white linear-gradient (z-1)
- * 3. center 정렬 단독 (max-w 800 / text-center / items-center)
- * 4. 칩 = "공인중개사 직접 입찰" + ping 점 green (white/80 + backdrop-blur-sm + rounded-full)
- * 5. h1 + subtext (v14 보존) + 입력 박스 (v13 보존 max-w 600 + p-1.5 + rounded-2xl shadow-md)
- * 6. 데스크탑 3 강점 1행 (Lucide 20px green + 라벨 15px) — hidden lg:flex
- * 7. 모바일 우측 분석 카드 영역 0 / Hero 4 카드 영역 0 (영구 폐기) */
+/* Phase 1.2 (A-1-2) v16 — Hero (frosted glass + 1 viewport + 페이딩 #FAFAFA + overlay ↓ + carousel 통합).
+ * 정정 5건:
+ * 1. min-h calc(100vh-64px) 모바일 / calc(100vh-80px) 데스크탑 (1 viewport 정합)
+ * 2. py-8 lg:py-12 (현 py-32 → ↓ / 칩 ~ 헤더 gap ↓)
+ * 3. overlay bg-white/15 (현 0.30 → ↓ / 영상 임팩트 ↑)
+ * 4. 페이딩 종료 = #FAFAFA (Insight 배경 정합)
+ * 5. frosted glass 박스 (bg-white/85 + backdrop-blur-2xl + max-w 720) — 광역 콘텐츠 통합 (모바일 carousel 박스 안). */
 
 export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
   const router = useRouter();
@@ -36,7 +35,7 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
   }
 
   return (
-    <section className="relative isolate flex min-h-[80vh] items-center justify-center overflow-hidden bg-white lg:min-h-[90vh]">
+    <section className="relative isolate flex min-h-[calc(100vh-64px)] items-center justify-center overflow-hidden bg-white px-4 py-8 lg:min-h-[calc(100vh-80px)] lg:px-6 lg:py-12">
       {/* 1. 동영상 배경 (z-0). */}
       <video
         autoPlay
@@ -48,26 +47,29 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
         <source src="/videos/hero-bg.mp4" type="video/mp4" />
       </video>
 
-      {/* 2. 가독성 overlay (z-1 / white 30%). */}
+      {/* 2. 가독성 overlay ↓ (z-1 / white 15% — 영상 임팩트 ↑). */}
       <div
         aria-hidden="true"
-        className="pointer-events-none absolute inset-0 z-[1] bg-white/30"
+        className="pointer-events-none absolute inset-0 z-[1] bg-white/15"
       />
 
-      {/* 3. 하단 페이딩 → white (z-1 / h-40% bottom-0). */}
+      {/* 3. 하단 페이딩 → #FAFAFA (z-1 / Insight 배경 정합). */}
       <div
         aria-hidden="true"
         className="pointer-events-none absolute inset-x-0 bottom-0 z-[1] h-[40%]"
         style={{
           background:
-            "linear-gradient(to bottom, transparent 0%, rgba(255, 255, 255, 0.6) 50%, #FFFFFF 100%)",
+            "linear-gradient(to bottom, transparent 0%, rgba(250, 250, 250, 0.6) 50%, #FAFAFA 100%)",
         }}
       />
 
-      {/* 4. 콘텐츠 center (z-10 / max-w 800). */}
-      <div className="container-app relative z-10 mx-auto flex max-w-[800px] flex-col items-center gap-8 py-24 text-center lg:gap-12 lg:py-32">
+      {/* 4. frosted glass 박스 — bg-white/85 + backdrop-blur-2xl + max-w 720 + center. */}
+      <div
+        className="relative z-10 flex w-full max-w-[720px] flex-col items-center gap-6 rounded-[32px] border border-white/40 bg-white/85 px-8 py-10 text-center backdrop-blur-2xl lg:gap-8 lg:px-12 lg:py-14"
+        style={{ boxShadow: "0 32px 80px -16px rgba(0, 0, 0, 0.25)" }}
+      >
         {/* 4-1. 칩 — "공인중개사 직접 입찰" + ping 점 green. */}
-        <div className="inline-flex items-center gap-2 rounded-full border border-gray-200/60 bg-white/80 px-4 py-2 shadow-sm backdrop-blur-sm">
+        <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 shadow-sm">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--brand-green)] opacity-75" />
             <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--brand-green)]" />
@@ -77,7 +79,7 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
           </span>
         </div>
 
-        {/* 4-2. h1 (v14 보존). */}
+        {/* 4-2. h1 (보존). */}
         <h1
           className="text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:text-[80px]"
           style={{ fontWeight: 800 }}
@@ -86,21 +88,13 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
           <span className="text-[var(--brand-green)]">경매를 시작하다.</span>
         </h1>
 
-        {/* 4-3. subtext (v14 보존). */}
+        {/* 4-3. subtext (보존). */}
         <p className="text-[18px] font-medium leading-[1.6] text-gray-700 lg:text-[24px]">
           사건번호만 주시면, 법원은 저희가 갑니다.
         </p>
 
         {/* 4-4. 입력 박스 (v13 보존). */}
         <div className="relative w-full max-w-[600px]">
-          <div
-            aria-hidden="true"
-            className="cta-glow-pulse pointer-events-none absolute inset-0 -z-10 rounded-2xl blur-2xl"
-            style={{
-              background:
-                "radial-gradient(ellipse at center, var(--brand-green) 0%, transparent 70%)",
-            }}
-          />
           <form
             onSubmit={onSubmit}
             role="search"
@@ -130,7 +124,7 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
         </div>
 
         {/* 4-5. 데스크탑 3 강점 1행 (모바일 0). */}
-        <div className="mt-4 hidden items-center gap-12 lg:flex">
+        <div className="hidden items-center gap-12 lg:flex">
           <div className="flex items-center gap-3">
             <Building2 size={20} className="text-[var(--brand-green)]" strokeWidth={2} />
             <span className="text-[15px] font-semibold text-gray-700">
@@ -152,7 +146,79 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
             </span>
           </div>
         </div>
+
+        {/* 4-6. 모바일 carousel (lg:hidden / 박스 안 통합). */}
+        <div className="mt-2 w-full lg:hidden">
+          <HeroMobileCarousel />
+        </div>
       </div>
     </section>
+  );
+}
+
+/* HeroMobileCarousel — Hero 박스 안 모바일 only (lg:hidden / height 80px / 4초 자동). */
+type Strength = {
+  icon: LucideIcon;
+  label: string;
+  body: string;
+};
+
+const STRENGTHS: Strength[] = [
+  { icon: Building2, label: "법원 방문 0회", body: "신청 후 결과만 받습니다." },
+  { icon: FileText, label: "서류 비대면 100%", body: "위임장부터 입찰표까지." },
+  { icon: Lock, label: "보증금 분리 보관", body: "전용 계좌 + 보증보험." },
+];
+
+function HeroMobileCarousel() {
+  const [index, setIndex] = useState(0);
+  const [isPaused, setIsPaused] = useState(false);
+
+  useEffect(() => {
+    if (isPaused) return;
+    const timer = setInterval(() => {
+      setIndex((prev) => (prev + 1) % STRENGTHS.length);
+    }, 4000);
+    return () => clearInterval(timer);
+  }, [isPaused]);
+
+  const current = STRENGTHS[index];
+  const Icon = current.icon;
+
+  return (
+    <div
+      className="relative h-[80px] w-full"
+      onTouchStart={() => setIsPaused(true)}
+      onTouchEnd={() => setTimeout(() => setIsPaused(false), 2000)}
+    >
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={index}
+          initial={{ opacity: 0, x: 40 }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: -40 }}
+          transition={{ duration: 0.4, ease: "easeOut" }}
+          className="absolute inset-0 flex items-center justify-center gap-3"
+        >
+          <Icon size={24} strokeWidth={2} className="shrink-0 text-[var(--brand-green)]" />
+          <div className="flex flex-col items-start">
+            <span className="text-[15px] font-bold text-gray-900">{current.label}</span>
+            <span className="text-[12px] text-gray-600">{current.body}</span>
+          </div>
+        </motion.div>
+      </AnimatePresence>
+
+      <div className="absolute -bottom-6 left-1/2 flex -translate-x-1/2 gap-2">
+        {STRENGTHS.map((_, i) => (
+          <button
+            key={i}
+            onClick={() => setIndex(i)}
+            className={`rounded-full transition-all duration-300 ${
+              i === index ? "h-2 w-6 bg-[var(--brand-green)]" : "h-2 w-2 bg-gray-300"
+            }`}
+            aria-label={`강점 ${i + 1}`}
+          />
+        ))}
+      </div>
+    </div>
   );
 }
