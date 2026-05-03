@@ -28,9 +28,9 @@ export function CompareBlock() {
           </h2>
         </div>
 
-        <div className="mt-12 grid gap-4 md:grid-cols-2 lg:gap-6">
-          {/* 좌 — 직접 입찰. */}
-          <article className="rounded-[24px] border border-[var(--border-1)] bg-[var(--bg-secondary)] p-8 lg:p-10">
+        <div className="mt-12 grid grid-cols-2 gap-3 lg:gap-6">
+          {/* 좌 — 직접 입찰 (형준님 #8 mobile 2 col). */}
+          <article className="rounded-[24px] border border-[var(--border-1)] bg-[var(--bg-secondary)] p-5 lg:p-10">
             <p className="text-[12px] font-bold uppercase tracking-[0.06em] text-[var(--text-tertiary)]">
               직접 입찰 시
             </p>
@@ -58,7 +58,7 @@ export function CompareBlock() {
           </article>
 
           {/* 우 — 경매퀵 (Charcoal gradient + radial green glow). */}
-          <article className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-[#111418] to-[#1F2429] p-8 text-white lg:p-10">
+          <article className="relative overflow-hidden rounded-[24px] bg-gradient-to-br from-[#111418] to-[#1F2429] p-5 text-white lg:p-10">
             {/* radial green glow (우상단 hotspot). */}
             <span
               aria-hidden="true"

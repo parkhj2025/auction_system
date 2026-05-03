@@ -3,14 +3,18 @@ import { FOOTER_SECTIONS } from "@/lib/navigation";
 import { COMPANY, COMPLIANCE_ITEMS } from "@/lib/constants";
 import { Brand } from "@/components/Brand";
 
-/* Phase 1.2 (A-1-2) v4 — Footer (시안 정합 본질).
- * Brand sm + line 1·2 + Phase 0 토큰 (--color-ink-* / --color-border / --shadow-lift) 폐기.
+/* Phase 1.2 (A-1-2) v5 — Footer (형준님 #9 광역 적용).
+ * Brand sm + 사업자 정보 conditional (NEXT_PUBLIC_BUSINESS_REGISTERED 분기) +
+ * 메뉴 4 link + padding 24 mobile/64 desktop + 좌측 정렬 + Phase 0 토큰 폐기.
  * 지역 명기 X (확장 paradigm 정합 / 시안 정합). */
+
+const BUSINESS_REGISTERED =
+  process.env.NEXT_PUBLIC_BUSINESS_REGISTERED === "true";
 
 export function Footer() {
   return (
     <footer className="border-t border-[var(--border-1)] bg-[var(--bg-secondary)]">
-      <div className="container-app py-14 lg:py-16">
+      <div className="container-app px-5 py-12 lg:px-8 lg:py-16">
         <div className="grid gap-10 md:grid-cols-4">
           <div className="md:col-span-1">
             <Brand size="sm" mode="light" />
@@ -42,7 +46,24 @@ export function Footer() {
           ))}
         </div>
 
-        <div className="mt-12 border-t border-[var(--divider)] pt-8">
+        {/* 사업자 정보 conditional (NEXT_PUBLIC_BUSINESS_REGISTERED=true 시 표시). */}
+        {BUSINESS_REGISTERED && (
+          <div className="mt-10 border-t border-[var(--divider)] pt-6 text-[12px] leading-[1.7] text-[var(--text-tertiary)]">
+            <p>
+              {process.env.NEXT_PUBLIC_BUSINESS_NAME ?? COMPANY.name} · 대표{" "}
+              {process.env.NEXT_PUBLIC_BUSINESS_CEO ?? COMPANY.ceo}
+              {process.env.NEXT_PUBLIC_BUSINESS_REGISTRATION_NUMBER &&
+                ` · 사업자등록번호 ${process.env.NEXT_PUBLIC_BUSINESS_REGISTRATION_NUMBER}`}
+            </p>
+            {process.env.NEXT_PUBLIC_BUSINESS_ADDRESS && (
+              <p className="mt-1">
+                {process.env.NEXT_PUBLIC_BUSINESS_ADDRESS} · 매수신청대리인 등록 · 공인중개사
+              </p>
+            )}
+          </div>
+        )}
+
+        <div className="mt-10 border-t border-[var(--divider)] pt-8">
           <h4 className="text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--text-tertiary)]">
             안내 및 면책
           </h4>
@@ -59,7 +80,9 @@ export function Footer() {
         </div>
 
         <div className="mt-8 flex flex-col gap-2 text-[12px] text-[var(--text-tertiary)] sm:flex-row sm:items-center sm:justify-between">
-          <p>© {new Date().getFullYear()} {COMPANY.name}. All rights reserved.</p>
+          <p>
+            © {new Date().getFullYear()} {COMPANY.name}. All rights reserved.
+          </p>
           <p>서울보증보험 가입 · 전자본인서명확인서 비대면 처리</p>
         </div>
       </div>

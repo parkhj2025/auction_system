@@ -671,7 +671,7 @@ p {
   /* 시안 정합 본질 — h1·h2·h3 weight 700 (이전 590/510 → 시안 정수 본질).
    * brand-h1 = italic 800 (Brand 컴포넌트 본질). */
   --text-display: 40px;            /* mobile (Hero h1·h2 본질) */
-  --text-h1: 32px;                 /* 시안 본질 mobile 32 (이전 28 → 32) */
+  --text-h1: 32px;                 /* v5 본질 mobile 32 (h1 광역 ↑) */
   --text-h2: 24px;
   --text-h3: 18px;                 /* 카드 title 본질 */
   --text-body-lg: 17px;
@@ -716,7 +716,7 @@ p {
 @media (min-width: 1024px) {
   :root {
     --text-display: 56px;          /* Brand-h1 desktop 본질 */
-    --text-h1: 44px;
+    --text-h1: 56px;               /* v5 본질 desktop 56 (h1 광역 ↑ from 44) */
     --text-h2: 32px;
     --text-h3: 20px;
     --text-body-lg: 18px;

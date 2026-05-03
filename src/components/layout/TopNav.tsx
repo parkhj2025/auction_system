@@ -14,12 +14,12 @@ import { BRAND_NAME } from "@/lib/constants";
  * sticky bg-white/80 backdrop-blur + scroll>8 border (Linear paradigm).
  * 한국어 nav brkpt 1024px (md → lg 변경 본질). */
 
-/* TopNav 본질 nav links (시안 정합 4 link / Q3 형준님 결정 본질).
- * lib/navigation.ts PRIMARY_NAV (모바일 drawer 본질) 본질 보존 본질. */
+/* TopNav 본질 nav links (v5 Q5 형준님 결정 — 낙찰사례 폐기 + 경매 인사이트 메인).
+ * lib/navigation.ts PRIMARY_NAV (모바일 drawer 본질) 본질 보존. */
 const TOPNAV_LINKS = [
   { href: "/about", label: "서비스 소개" },
   { href: "/service", label: "이용 절차" },
-  { href: "/analysis", label: "낙찰 사례" },
+  { href: "/analysis", label: "경매 인사이트" },
   { href: "/faq", label: "FAQ" },
 ] as const;
 
