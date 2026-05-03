@@ -38,7 +38,7 @@ const MAX_BAR = 90; /* 막대 최대 width 기준 (입찰 대기 90분 = 100%). 
 
 export function CompareBlock() {
   const sectionRef = useRef<HTMLElement>(null);
-  const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
+  const isInView = useInView(sectionRef, { once: false, amount: 0.1 });
 
   return (
     <section
@@ -49,7 +49,7 @@ export function CompareBlock() {
       <div className="container-app py-[var(--section-py)]">
         <h2
           id="compare-heading"
-          className="mx-auto max-w-5xl text-center text-[56px] font-extrabold leading-[1.05] tracking-[-0.025em] text-[var(--text-primary)] [text-wrap:balance] lg:text-[120px]"
+          className="mx-auto max-w-5xl text-center text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:text-[88px]"
           style={{ fontWeight: 800 }}
         >
           법원 가는{" "}
@@ -77,7 +77,7 @@ export function CompareBlock() {
             <div className="mt-4 flex items-baseline justify-end gap-2 border-t border-[var(--border-1)] pt-5">
               <span className="text-[14px] font-medium text-[var(--text-secondary)]">총</span>
               <span
-                className="text-[64px] font-extrabold leading-none tracking-[-0.025em] text-[var(--text-primary)] lg:text-[96px]"
+                className="text-[48px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] lg:text-[72px]"
                 style={{ fontWeight: 800 }}
               >
                 {isInView ? <NumberFlow value={LEFT_TOTAL} /> : 0}
@@ -100,7 +100,7 @@ export function CompareBlock() {
             <div className="mt-4 flex items-baseline justify-end gap-2 border-t border-[var(--border-1)] pt-5">
               <span className="text-[14px] font-medium text-[var(--text-secondary)]">총</span>
               <span
-                className="text-[64px] font-extrabold leading-none tracking-[-0.025em] text-[var(--brand-green-deep)] lg:text-[96px]"
+                className="text-[48px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--brand-green-deep)] lg:text-[72px]"
                 style={{ fontWeight: 800 }}
               >
                 {isInView ? <NumberFlow value={RIGHT_STEP.minutes} /> : 0}
@@ -110,16 +110,16 @@ export function CompareBlock() {
           </div>
         </div>
 
-        {/* 결론 — "85" CountUp + "배 빠릅니다". */}
-        <div className="mt-16 flex flex-col items-center justify-center gap-2 lg:mt-24">
+        {/* 결론 — "85배 빠릅니다." 1줄 인라인 (Plan v11 정정). */}
+        <div className="mt-12 flex items-baseline justify-center gap-3 lg:mt-20">
           <span
-            className="text-[120px] font-extrabold leading-none tracking-[-0.03em] text-[var(--brand-green)] lg:text-[240px]"
+            className="text-[80px] font-extrabold leading-[1] tracking-[-0.02em] text-[var(--brand-green)] lg:text-[160px]"
             style={{ fontWeight: 800 }}
           >
             {isInView ? <NumberFlow value={RATIO} /> : 0}
           </span>
           <span
-            className="text-[32px] font-bold text-[var(--text-primary)] lg:text-[56px]"
+            className="text-[24px] font-bold text-[var(--text-primary)] lg:text-[36px]"
             style={{ fontWeight: 700 }}
           >
             배 빠릅니다.

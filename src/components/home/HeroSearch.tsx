@@ -2,13 +2,13 @@
 
 import { useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
-import { Boxes } from "@/components/aceternity/BackgroundBoxes";
+import { AuroraBackground } from "@/components/aceternity/AuroraBackground";
 import { HeroDifferentiationGrid } from "@/components/HeroDifferentiationGrid";
 
-/* Phase 1.2 (A-1-2) v10 — Hero (Background Boxes lg+ + 4 grid lg+ + h1 lg 강제 line-break).
+/* Phase 1.2 (A-1-2) v11 — Hero (Aurora Background + 4 grid lg+ + h1 44/80).
  * 좌측 (lg w-1/2): h1 + subtext + CTA + glow halo (보존).
  * 우측 (lg w-1/2 / mobile 0): 4 큰 숫자 grid (0회 / 5만원~ / 0건 / +5만원).
- * 배경: white + Background Boxes (lg+) + green tapestry dot grid (보존).
+ * 배경: Aurora Background (모바일 + 데스크탑 모두 / 60s 자율 모션 / GPU accelerated).
  * h1 line-break: lg+ 강제 br / mobile 자연 줄바꿈 + text-wrap balance. */
 
 export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
@@ -34,36 +34,24 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
 
   return (
     <section className="relative isolate overflow-hidden bg-white">
-      {/* 배경: lg+ Background Boxes (1,200 cells / hover green) — mobile 폐기 (touch hover 0 + 비용 ↓). */}
-      <div className="pointer-events-none absolute inset-0 hidden h-full w-full overflow-hidden lg:block">
-        <div className="pointer-events-auto absolute inset-0 h-full w-full bg-white [mask-image:radial-gradient(transparent,white)]" />
-        <Boxes />
-      </div>
-
-      {/* 미세 green tapestry dot grid (보존 / 우상단 60%×40% / opacity 0.06). */}
-      <div
-        aria-hidden="true"
-        className="hero-dot-shift pointer-events-none absolute right-0 top-0 z-10 h-[60%] w-[40%] opacity-[0.06]"
-        style={{
-          backgroundImage:
-            "radial-gradient(circle, var(--brand-green) 1px, transparent 1px)",
-          backgroundSize: "24px 24px",
-        }}
-      />
+      {/* Aurora Background — 모바일 + 데스크탑 자율 모션 (60s ease-in-out infinite / GPU accelerated). */}
+      <AuroraBackground className="pointer-events-none absolute inset-0 h-full w-full" showRadialGradient={true}>
+        <></>
+      </AuroraBackground>
 
       <div className="container-app relative z-20 py-16 lg:py-24">
         <div className="grid items-center gap-10 lg:grid-cols-2 lg:gap-12">
           {/* 좌측 — h1 + subtext + 검색 카드 + CTA glow halo. */}
           <div>
             <h1
-              className="text-[56px] font-extrabold leading-[1.05] tracking-[-0.025em] text-[var(--text-primary)] [text-wrap:balance] lg:text-[96px]"
+              className="text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:text-[80px]"
               style={{ fontWeight: 800 }}
             >
               법원에 가지 않고,<br className="hidden lg:inline" />{" "}
               <span className="text-[var(--brand-green)]">경매를 시작하다.</span>
             </h1>
 
-            <p className="mt-6 text-[18px] font-medium leading-[1.6] text-[var(--text-secondary)] lg:mt-8 lg:text-[22px]">
+            <p className="mt-5 text-[16px] font-medium leading-[1.6] text-[var(--text-secondary)] lg:mt-7 lg:text-[20px]">
               사건번호만 주시면, 법원은 저희가 갑니다.
             </p>
 

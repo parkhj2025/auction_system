@@ -74,15 +74,8 @@ const CARDS: InsightCardData[] = [
     metric: "+4.2%p",
     href: "/news",
   },
-  {
-    cat: "cases",
-    kind: "auction-trophy",
-    title: "오피스텔 1.32억 낙찰 사례",
-    brief: "경매퀵 입찰 대리 사례.",
-    metric: "1.32억",
-    href: "/news",
-  },
 ];
+/* v11 정정: auction-trophy (cases / purple) 6번 카드 영구 폐기 (bento 6→5건). */
 
 export function InsightBlock() {
   const [active, setActive] = useState<FilterKey>("all");
@@ -101,7 +94,7 @@ export function InsightBlock() {
         <div className="max-w-3xl">
           <h2
             id="insight-heading"
-            className="text-[56px] font-extrabold leading-[1.05] tracking-[-0.025em] text-[var(--text-primary)] [text-wrap:balance] lg:text-[120px]"
+            className="text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:text-[88px]"
             style={{ fontWeight: 800 }}
           >
             경매가 처음이라면,<br className="lg:hidden" />{" "}
@@ -148,7 +141,7 @@ export function InsightBlock() {
                   key={`${item.cat}-${idx}`}
                   data={item}
                   isFeatured={isFeatured}
-                  delay={idx * 150}
+                  delay={idx * 80}
                 />
               );
             })}

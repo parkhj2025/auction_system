@@ -22,7 +22,7 @@ export function FeaturesStickyDesktop({ features }: { features: FeatureItem[] })
       <div className="sticky top-24 self-start">
         <h2
           id="features-heading"
-          className="text-[120px] font-extrabold leading-[1.05] tracking-[-0.025em] text-[var(--text-primary)] [text-wrap:balance]"
+          className="text-[88px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance]"
           style={{ fontWeight: 800 }}
         >
           당신이 신경 쓸 일은<br />
@@ -75,7 +75,7 @@ function StickyFeatureCard({
       <Icon size={64} className="text-[var(--brand-green)]" />
       <div>
         <span
-          className="block text-[120px] font-extrabold leading-none tracking-[-0.025em] text-[var(--text-primary)]"
+          className="block text-[88px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)]"
           style={{ fontWeight: 800 }}
         >
           {feat.value}

@@ -46,12 +46,12 @@ function DifferentiationCard({
       style={style}
     >
       <span
-        className="text-[80px] font-extrabold leading-none tracking-[-0.025em] text-[var(--brand-green)]"
+        className="text-[64px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--brand-green)]"
         style={{ fontWeight: 800 }}
       >
         {value}
       </span>
-      <span className="text-[18px] font-medium text-[var(--text-secondary)]">
+      <span className="text-[16px] font-medium text-[var(--text-secondary)]">
         {label}
       </span>
     </div>

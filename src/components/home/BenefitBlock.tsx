@@ -57,14 +57,14 @@ export function BenefitBlock() {
         <div className="lg:hidden">
           <h2
             id="features-heading"
-            className="max-w-3xl text-[56px] font-extrabold leading-[1.05] tracking-[-0.025em] text-[var(--text-primary)] [text-wrap:balance]"
+            className="max-w-3xl text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance]"
             style={{ fontWeight: 800 }}
           >
             당신이 신경 쓸 일은<br />
             <span className="text-[var(--brand-green)]">사건번호 하나뿐.</span>
           </h2>
 
-          <ul className="mt-12 grid grid-cols-2 gap-4">
+          <ul className="mt-10 grid grid-cols-2 gap-4">
             {FEATURES.map((feat, idx) => (
               <FeatureCard
                 key={feat.title}
@@ -72,7 +72,7 @@ export function BenefitBlock() {
                 value={feat.value}
                 title={feat.title}
                 desc={feat.desc}
-                delay={idx * 150}
+                delay={idx * 80}
                 isWide={idx === 0}
               />
             ))}

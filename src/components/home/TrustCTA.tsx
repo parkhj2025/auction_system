@@ -69,32 +69,32 @@ export function TrustCTA() {
 
       <div className="container-app relative z-10 py-[var(--section-py)]">
         <div className="mx-auto flex max-w-4xl flex-col items-center text-center">
-          {/* "지금까지" + "0" + "건의 사고" 분리. */}
+          {/* "지금까지" + "0" + "건의 사고" 분리 (Plan v11 정정 — 절대 크기 다운그레이드). */}
           <div
             ref={h2Ref}
             className={`${h2Class}`}
             style={h2Style}
             id="trust-heading"
           >
-            <span className="block text-[24px] font-medium text-white/60 lg:text-[36px]">
+            <span className="block text-[18px] font-medium text-white/60 lg:text-[24px]">
               지금까지
             </span>
           </div>
 
           <div
             ref={zeroRef}
-            className={`${zeroClass} mt-2 lg:mt-4`}
+            className={`${zeroClass} mt-2 lg:mt-3`}
             style={zeroStyle}
           >
             <TextGenerateEffect
               words="0"
               filter={false}
               duration={0.8}
-              className="text-[200px] font-extrabold leading-none tracking-[-0.04em] text-[var(--brand-green)] lg:text-[400px]"
+              className="text-[160px] font-extrabold leading-[1] tracking-[-0.025em] text-[var(--brand-green)] lg:text-[280px]"
             />
           </div>
 
-          <span className="mt-2 block text-[32px] font-bold text-white lg:mt-4 lg:text-[56px]" style={{ fontWeight: 700 }}>
+          <span className="mt-2 block text-[24px] font-bold text-white lg:mt-3 lg:text-[40px]" style={{ fontWeight: 700 }}>
             건의 사고
           </span>
 
@@ -128,7 +128,7 @@ export function TrustCTA() {
             className={`${ctaClass} mt-12 flex flex-col items-center gap-6 lg:mt-16`}
             style={ctaStyle}
           >
-            <p className="text-[36px] font-bold leading-[1.3] text-white lg:text-[64px] [text-wrap:balance]" style={{ fontWeight: 700 }}>
+            <p className="text-[28px] font-bold leading-[1.3] text-white lg:text-[48px] [text-wrap:balance]" style={{ fontWeight: 700 }}>
               법원에 가지 않고,{" "}
               <span className="text-[var(--brand-green)]">경매를 시작하세요.</span>
             </p>
@@ -143,7 +143,7 @@ export function TrustCTA() {
               />
               <Link
                 href="/apply"
-                className="inline-flex h-16 items-center justify-center gap-2 rounded-[14px] bg-[var(--brand-green)] px-12 text-[32px] font-bold text-white shadow-[var(--shadow-button-green)] transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 lg:h-20 lg:px-16 lg:text-[56px]"
+                className="inline-flex h-12 items-center justify-center gap-2 rounded-[14px] bg-[var(--brand-green)] px-8 text-[20px] font-bold text-white shadow-[var(--shadow-button-green)] transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 lg:h-14 lg:px-10 lg:text-[28px]"
                 style={{ fontWeight: 700 }}
               >
                 지금 신청하기

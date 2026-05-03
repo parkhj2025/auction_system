@@ -37,7 +37,7 @@ export function FeatureCard({
       <Icon size={isWide ? 64 : 48} className="text-[var(--brand-green)]" />
       <div>
         <span
-          className={`block font-extrabold leading-none tracking-[-0.025em] text-[var(--text-primary)] ${isWide ? "text-[80px]" : "text-[56px]"}`}
+          className={`block font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] ${isWide ? "text-[64px]" : "text-[44px]"}`}
           style={{ fontWeight: 800 }}
         >
           {value}

@@ -210,8 +210,8 @@ function PricingCard({
         {tier.point}
       </p>
       <p
-        className={`mt-3 font-extrabold tracking-[-0.025em] text-[var(--text-primary)] ${
-          compact ? "text-[26px]" : "text-[28px] lg:text-[36px]"
+        className={`mt-3 font-extrabold tracking-[-0.015em] text-[var(--text-primary)] ${
+          compact ? "text-[26px]" : "text-[48px] lg:text-[72px]"
         }`}
       >
         {feeLabel(tier.fee)}
