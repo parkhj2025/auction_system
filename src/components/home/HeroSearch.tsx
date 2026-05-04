@@ -5,14 +5,16 @@ import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Building2, FileText, Lock, type LucideIcon } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v17 — Hero (overlay 폐기 + 페이딩 폐기 + 박스 위로 ↑ + 칩 3건 + 여백 ↑).
- * 정정 6건 (Plan v17):
- * 1. 박스 투명도 ↓ (bg-white/85 → bg-white/55 / backdrop-blur-2xl → backdrop-blur-xl / border-white/40 → border-white/50)
- * 2. 영상 overlay (bg-white/15) 영구 폐기
- * 3. 하단 페이딩 (linear-gradient → #FAFAFA) 영구 폐기
- * 4. 박스 transform = -translate-y-12 lg:-translate-y-20 (위로 ↑)
- * 5. 칩 3건 ("공인중개사 직접 입찰" + "보증보험 필수 가입" + "중복 대리 금지" / 칩 1만 ping)
- * 6. 박스 padding/gap ↑ (px-8 py-12 lg:px-12 lg:py-16 / gap-8 lg:gap-10) */
+/* Phase 1.2 (A-1-2) v18 — Hero (h1 + subtext 영상 위 직접 / 박스 = 입력 + 강점 단독).
+ * 정정 8건 (Plan v18):
+ * 1. section flex = flex-col items-center justify-center
+ * 2. 콘텐츠 광역 vertical stack (gap-10 lg:gap-14 / max-w 800)
+ * 3. h1 영상 위 직접 표시 (white + green + glow / 박스 진입 0)
+ * 4. subtext 영상 위 직접 표시 (white/90 + glow / 박스 진입 0)
+ * 5. frosted glass 박스 = 입력 + 데스크탑 3 강점 + 모바일 carousel 단독
+ * 6. CTA 버튼 카피 단축 + px-10 lg:px-12
+ * 7. 신뢰 칩 3건 진입 0 (Trust 섹션 caption 정합 보존)
+ * 8. 박스 transform translate-y 폐기 + padding ↓ + 모서리 28 */
 
 export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
   const router = useRouter();
@@ -36,8 +38,8 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
   }
 
   return (
-    <section className="relative isolate flex min-h-[calc(100vh-64px)] items-center justify-center overflow-hidden bg-white lg:min-h-[calc(100vh-80px)]">
-      {/* 1. 동영상 배경 (z-0 / overlay 영구 폐기 / 페이딩 영구 폐기). */}
+    <section className="relative isolate flex min-h-[calc(100vh-64px)] flex-col items-center justify-center overflow-hidden bg-white px-4 lg:min-h-[calc(100vh-80px)] lg:px-6">
+      {/* 1. 동영상 배경 (z-0 / overlay 0 / 페이딩 0). */}
       <video
         autoPlay
         muted
@@ -48,57 +50,46 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
         <source src="/videos/hero-bg.mp4" type="video/mp4" />
       </video>
 
-      {/* 2. frosted glass 박스 (z-10 / 위로 ↑ / 투명도 ↓). */}
-      <div className="relative z-10 w-full px-4 lg:px-6">
+      {/* 2. 콘텐츠 광역 vertical stack (z-10 / h1 + subtext + 박스). */}
+      <div className="relative z-10 flex w-full max-w-[800px] flex-col items-center gap-10 text-center lg:gap-14">
+        {/* h1 영상 위 직접 표시 — white + green + glow. */}
+        <h1
+          className="text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-white [text-wrap:balance] lg:text-[80px]"
+          style={{
+            fontWeight: 800,
+            textShadow:
+              "0 4px 24px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4)",
+          }}
+        >
+          법원에 가지 않고,<br />
+          <span
+            className="text-[var(--brand-green)]"
+            style={{
+              textShadow:
+                "0 0 32px rgba(0, 200, 83, 0.7), 0 0 64px rgba(0, 200, 83, 0.5), 0 4px 16px rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            경매를 시작하다.
+          </span>
+        </h1>
+
+        {/* subtext 영상 위 직접 표시 — white/90 + glow. */}
+        <p
+          className="text-[18px] font-medium leading-[1.6] text-white/90 lg:text-[24px]"
+          style={{
+            textShadow:
+              "0 2px 12px rgba(0, 0, 0, 0.6), 0 1px 4px rgba(0, 0, 0, 0.5)",
+          }}
+        >
+          사건번호만 주시면, 법원은 저희가 갑니다.
+        </p>
+
+        {/* frosted glass 박스 = 입력 + 데스크탑 3 강점 + 모바일 carousel 단독. */}
         <div
-          className="mx-auto flex max-w-[720px] -translate-y-12 flex-col items-center justify-center gap-8 rounded-[32px] border border-white/50 bg-white/55 px-8 py-12 text-center backdrop-blur-xl lg:-translate-y-20 lg:gap-10 lg:px-12 lg:py-16"
+          className="flex w-full flex-col items-center gap-6 rounded-[28px] border border-white/50 bg-white/55 px-6 py-6 backdrop-blur-xl lg:gap-8 lg:px-10 lg:py-8"
           style={{ boxShadow: "0 32px 80px -16px rgba(0, 0, 0, 0.25)" }}
         >
-          {/* 칩 3건 — flex-wrap + gap-2 + justify-center / 칩 1만 ping. */}
-          <div className="flex flex-wrap items-center justify-center gap-2">
-            {/* 칩 1 — ping 모션. */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 shadow-sm">
-              <span className="relative flex h-2 w-2">
-                <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[var(--brand-green)] opacity-75" />
-                <span className="relative inline-flex h-2 w-2 rounded-full bg-[var(--brand-green)]" />
-              </span>
-              <span className="text-[13px] font-semibold tracking-tight text-gray-700">
-                공인중개사 직접 입찰
-              </span>
-            </div>
-
-            {/* 칩 2 — 정적. */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 shadow-sm">
-              <span className="h-2 w-2 rounded-full bg-[var(--brand-green)]" />
-              <span className="text-[13px] font-semibold tracking-tight text-gray-700">
-                보증보험 필수 가입
-              </span>
-            </div>
-
-            {/* 칩 3 — 정적. */}
-            <div className="inline-flex items-center gap-2 rounded-full border border-gray-200 bg-white px-4 py-2 shadow-sm">
-              <span className="h-2 w-2 rounded-full bg-[var(--brand-green)]" />
-              <span className="text-[13px] font-semibold tracking-tight text-gray-700">
-                중복 대리 금지
-              </span>
-            </div>
-          </div>
-
-          {/* h1 (보존). */}
-          <h1
-            className="text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:text-[80px]"
-            style={{ fontWeight: 800 }}
-          >
-            법원에 가지 않고,<br />
-            <span className="text-[var(--brand-green)]">경매를 시작하다.</span>
-          </h1>
-
-          {/* subtext (보존). */}
-          <p className="text-[18px] font-medium leading-[1.6] text-gray-700 lg:text-[24px]">
-            사건번호만 주시면, 법원은 저희가 갑니다.
-          </p>
-
-          {/* 입력 박스 (v13 보존). */}
+          {/* 입력 박스 — "조회하기" 단축. */}
           <div className="relative w-full max-w-[600px]">
             <form
               onSubmit={onSubmit}
@@ -121,14 +112,14 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
               />
               <button
                 type="submit"
-                className="inline-flex h-14 items-center justify-center rounded-xl bg-[var(--brand-green)] px-8 text-[16px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 lg:h-16 lg:text-[18px]"
+                className="inline-flex h-14 items-center justify-center rounded-xl bg-[var(--brand-green)] px-10 text-[16px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 lg:h-16 lg:px-12 lg:text-[18px]"
               >
-                사건번호 입력하기
+                조회하기
               </button>
             </form>
           </div>
 
-          {/* 데스크탑 3 강점 (보존 / 모바일 0). */}
+          {/* 데스크탑 3 강점 (lg:flex / 모바일 0). */}
           <div className="hidden items-center gap-12 lg:flex">
             <div className="flex items-center gap-3">
               <Building2 size={20} className="text-[var(--brand-green)]" strokeWidth={2} />
