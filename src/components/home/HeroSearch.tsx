@@ -5,16 +5,14 @@ import { useState, useMemo, useEffect } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Building2, FileText, Lock, type LucideIcon } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v18 — Hero (h1 + subtext 영상 위 직접 / 박스 = 입력 + 강점 단독).
- * 정정 8건 (Plan v18):
- * 1. section flex = flex-col items-center justify-center
- * 2. 콘텐츠 광역 vertical stack (gap-10 lg:gap-14 / max-w 800)
- * 3. h1 영상 위 직접 표시 (white + green + glow / 박스 진입 0)
- * 4. subtext 영상 위 직접 표시 (white/90 + glow / 박스 진입 0)
- * 5. frosted glass 박스 = 입력 + 데스크탑 3 강점 + 모바일 carousel 단독
- * 6. CTA 버튼 카피 단축 + px-10 lg:px-12
- * 7. 신뢰 칩 3건 진입 0 (Trust 섹션 caption 정합 보존)
- * 8. 박스 transform translate-y 폐기 + padding ↓ + 모서리 28 */
+/* Phase 1.2 (A-1-2) v19 — Hero (yellow 경매 + subtext 박스 안 + Apple Liquid Glass + 흰색 톤 통일).
+ * 정정 6건 (Plan v19):
+ * 1. h1 "경매" span yellow #FFD43B + yellow halo / "를 시작하다." white + 검정 backdrop
+ * 2. subtext 위치 = vertical stack → 박스 안 최상단 (영상 위 직접 폐기)
+ * 3. 박스 = Apple Liquid Glass (frosted glass className 폐기 / inline style 광역)
+ * 4. 박스 안 subtext font-size 16/24 + text-white/90 + 약화 textShadow
+ * 5. 데스크탑 3 강점 흰색 톤 (라벨 white/95 + 아이콘 green-400 + divider white/30)
+ * 6. 모바일 carousel 흰색 톤 (라벨 white/95 + body white/70 + 아이콘 green-400 + dots white) */
 
 export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
   const router = useRouter();
@@ -50,9 +48,9 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
         <source src="/videos/hero-bg.mp4" type="video/mp4" />
       </video>
 
-      {/* 2. 콘텐츠 광역 vertical stack (z-10 / h1 + subtext + 박스). */}
+      {/* 2. 콘텐츠 광역 vertical stack (z-10 / h1 + 박스). */}
       <div className="relative z-10 flex w-full max-w-[800px] flex-col items-center gap-10 text-center lg:gap-14">
-        {/* h1 영상 위 직접 표시 — white + green + glow. */}
+        {/* h1 영상 위 직접 표시 — "경매" yellow + halo / 첫 줄 white + 검정 backdrop. */}
         <h1
           className="text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-white [text-wrap:balance] lg:text-[80px]"
           style={{
@@ -63,33 +61,47 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
         >
           법원에 가지 않고,<br />
           <span
-            className="text-[var(--brand-green)]"
             style={{
+              color: "#FFD43B",
               textShadow:
-                "0 0 32px rgba(0, 200, 83, 0.7), 0 0 64px rgba(0, 200, 83, 0.5), 0 4px 16px rgba(0, 0, 0, 0.5)",
+                "0 0 32px rgba(255, 212, 59, 0.7), 0 0 64px rgba(255, 212, 59, 0.5), 0 4px 16px rgba(0, 0, 0, 0.5)",
             }}
           >
-            경매를 시작하다.
+            경매
+          </span>
+          <span
+            className="text-white"
+            style={{
+              textShadow:
+                "0 4px 24px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4)",
+            }}
+          >
+            를 시작하다.
           </span>
         </h1>
 
-        {/* subtext 영상 위 직접 표시 — white/90 + glow. */}
-        <p
-          className="text-[18px] font-medium leading-[1.6] text-white/90 lg:text-[24px]"
+        {/* Apple Liquid Glass 박스 = subtext + 입력 + 데스크탑 3 강점 + 모바일 carousel. */}
+        <div
+          className="flex w-full flex-col items-center gap-6 rounded-[28px] px-6 py-6 lg:gap-8 lg:px-10 lg:py-8"
           style={{
-            textShadow:
-              "0 2px 12px rgba(0, 0, 0, 0.6), 0 1px 4px rgba(0, 0, 0, 0.5)",
+            background:
+              "linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.08) 100%)",
+            backdropFilter: "blur(40px) saturate(180%)",
+            WebkitBackdropFilter: "blur(40px) saturate(180%)",
+            border: "1px solid rgba(255, 255, 255, 0.3)",
+            boxShadow:
+              "inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 32px 80px -16px rgba(0, 0, 0, 0.35)",
           }}
         >
-          사건번호만 주시면, 법원은 저희가 갑니다.
-        </p>
+          {/* subtext 박스 안 진입 — text-white/90 + font-medium + 약화 textShadow. */}
+          <p
+            className="text-center text-[16px] font-medium leading-[1.6] text-white/90 lg:text-[24px]"
+            style={{ textShadow: "0 1px 4px rgba(0, 0, 0, 0.3)" }}
+          >
+            사건번호만 주시면, 법원은 저희가 갑니다.
+          </p>
 
-        {/* frosted glass 박스 = 입력 + 데스크탑 3 강점 + 모바일 carousel 단독. */}
-        <div
-          className="flex w-full flex-col items-center gap-6 rounded-[28px] border border-white/50 bg-white/55 px-6 py-6 backdrop-blur-xl lg:gap-8 lg:px-10 lg:py-8"
-          style={{ boxShadow: "0 32px 80px -16px rgba(0, 0, 0, 0.25)" }}
-        >
-          {/* 입력 박스 — "조회하기" 단축. */}
+          {/* 입력 박스 — "조회하기" 보존. */}
           <div className="relative w-full max-w-[600px]">
             <form
               onSubmit={onSubmit}
@@ -119,31 +131,31 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
             </form>
           </div>
 
-          {/* 데스크탑 3 강점 (lg:flex / 모바일 0). */}
+          {/* 데스크탑 3 강점 (lg:flex / 모바일 0) — 흰색 톤. */}
           <div className="hidden items-center gap-12 lg:flex">
             <div className="flex items-center gap-3">
-              <Building2 size={20} className="text-[var(--brand-green)]" strokeWidth={2} />
-              <span className="text-[15px] font-semibold text-gray-700">
+              <Building2 size={20} className="text-green-400" strokeWidth={2} />
+              <span className="text-[15px] font-semibold text-white/95">
                 법원 방문 0회
               </span>
             </div>
-            <div className="h-5 w-px bg-gray-300" />
+            <div className="h-5 w-px bg-white/30" />
             <div className="flex items-center gap-3">
-              <FileText size={20} className="text-[var(--brand-green)]" strokeWidth={2} />
-              <span className="text-[15px] font-semibold text-gray-700">
+              <FileText size={20} className="text-green-400" strokeWidth={2} />
+              <span className="text-[15px] font-semibold text-white/95">
                 서류 비대면 100%
               </span>
             </div>
-            <div className="h-5 w-px bg-gray-300" />
+            <div className="h-5 w-px bg-white/30" />
             <div className="flex items-center gap-3">
-              <Lock size={20} className="text-[var(--brand-green)]" strokeWidth={2} />
-              <span className="text-[15px] font-semibold text-gray-700">
+              <Lock size={20} className="text-green-400" strokeWidth={2} />
+              <span className="text-[15px] font-semibold text-white/95">
                 보증금 분리 보관
               </span>
             </div>
           </div>
 
-          {/* 모바일 carousel (보존 / lg:hidden). */}
+          {/* 모바일 carousel (lg:hidden) — 흰색 톤. */}
           <div className="w-full lg:hidden">
             <HeroMobileCarousel />
           </div>
@@ -153,7 +165,7 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
   );
 }
 
-/* HeroMobileCarousel — Hero 박스 안 모바일 only (lg:hidden / height 80px / 4초 자동). */
+/* HeroMobileCarousel — Hero 박스 안 모바일 only (lg:hidden / height 80px / 4초 자동 / 흰색 톤). */
 type Strength = {
   icon: LucideIcon;
   label: string;
@@ -196,10 +208,10 @@ function HeroMobileCarousel() {
           transition={{ duration: 0.4, ease: "easeOut" }}
           className="absolute inset-0 flex items-center justify-center gap-3"
         >
-          <Icon size={24} strokeWidth={2} className="shrink-0 text-[var(--brand-green)]" />
+          <Icon size={24} strokeWidth={2} className="shrink-0 text-green-400" />
           <div className="flex flex-col items-start">
-            <span className="text-[15px] font-bold text-gray-900">{current.label}</span>
-            <span className="text-[12px] text-gray-600">{current.body}</span>
+            <span className="text-[15px] font-bold text-white/95">{current.label}</span>
+            <span className="text-[12px] text-white/70">{current.body}</span>
           </div>
         </motion.div>
       </AnimatePresence>
@@ -210,7 +222,7 @@ function HeroMobileCarousel() {
             key={i}
             onClick={() => setIndex(i)}
             className={`rounded-full transition-all duration-300 ${
-              i === index ? "h-2 w-6 bg-[var(--brand-green)]" : "h-2 w-2 bg-gray-300"
+              i === index ? "h-2 w-6 bg-white" : "h-2 w-2 bg-white/30"
             }`}
             aria-label={`강점 ${i + 1}`}
           />
