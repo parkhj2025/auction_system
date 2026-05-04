@@ -8,11 +8,12 @@ import {
   type InsightCategorySlug,
 } from "./InsightThumbnail";
 
-/* Phase 1.2 (A-1-2) v16 — InsightBlock (#FAFAFA + 카테고리 4건 + Editorial Card 4 col).
- * 정정 (Plan v16):
- * 1. 배경 #FAFAFA + min-h calc(100vh-80px) + flex-col justify-center
- * 2. 카테고리 4건 (낙찰사례 영구 폐기) — 무료 물건분석 / 경매 가이드 / 경매 용어 / 경매 뉴스
- * 3. 4 카드 균등 grid — grid-cols-2 (모바일) / lg:grid-cols-4 (데스크탑) */
+/* Phase 1.2 (A-1-2) v31 — InsightBlock 다큐 / 게티 paradigm (실사 + glass morphic + 텍스트 ↑).
+ * 정정 (Plan v31):
+ * 1. h2 size ↑ (44 → 48 / 88 → 96)
+ * 2. h2 마침표 "." yellow #FFD43B (Hero 정합 미세 발현)
+ * 3. subtext size ↑ (16 → 17 / 20 → 22)
+ * 4. 4 카드 = InsightThumbnail 광역 재구성 (실사 이미지 + Hero glass morphic / 별도 파일) */
 
 type FilterKey = "all" | InsightCategorySlug;
 
@@ -70,14 +71,15 @@ export function InsightBlock() {
       <div className="container-app w-full">
         <h2
           id="insight-heading"
-          className="mb-4 text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:mb-6 lg:text-[88px]"
+          className="mb-4 text-[48px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:mb-6 lg:text-[96px]"
           style={{ fontWeight: 800 }}
         >
           경매가 처음이라면,<br />
-          <span className="text-[var(--brand-green)]">여기부터.</span>
+          <span className="text-[var(--brand-green)]">여기부터</span>
+          <span style={{ color: "#FFD43B" }}>.</span>
         </h2>
 
-        <p className="mb-8 text-[16px] text-gray-600 lg:mb-12 lg:text-[20px]">
+        <p className="mb-8 text-[17px] text-gray-600 lg:mb-12 lg:text-[22px]">
           물건 분석 · 가이드 · 용어 · 뉴스.
         </p>
 
