@@ -14,22 +14,17 @@ const PROMPTS = [
   {
     slug: "analysis",
     prompt:
-      "Editorial business photograph, 3:4 portrait, modern contemporary office, Korean professional analyst working at standing desk, looking at large monitor displaying real estate data charts and graphs, side view, focused expression, warm natural window light, muted neutral tones (beige, charcoal, soft white), shallow depth of field, cinematic, contemporary corporate atmosphere, Getty Images business editorial aesthetic, no text overlay, no logos. Professional human-centered documentary.",
-  },
-  {
-    slug: "guide",
-    prompt:
-      "Editorial business photograph, 3:4 portrait, modern minimalist consulting meeting room, two Korean professionals (consultant and client) seated across a clean wooden table, consultant gesturing while explaining, paper documents and laptop on table, large window with diffused natural light, muted neutral tones (warm grey, soft white, charcoal), shallow depth of field, cinematic, contemporary corporate consulting atmosphere, Getty Images business editorial aesthetic, no text overlay, no logos. Professional human-centered documentary.",
+      "Editorial real estate photograph, 3:4 portrait, modern contemporary Korean property analyst office, Korean professional analyst looking at large monitor displaying apartment listings, floor plans, and interior photos of Korean residential buildings, blueprints and property documents on the desk, side view, focused expression, warm natural window light, muted neutral tones (beige, charcoal, soft white), shallow depth of field, cinematic, Getty Images real estate editorial aesthetic, no stock charts, no trading screens, no text overlay, no logos. Professional human-centered documentary.",
   },
   {
     slug: "glossary",
     prompt:
-      "Editorial business photograph, 3:4 portrait, modern contemporary office with large digital display screen showing data visualization or financial dashboard, Korean professional standing in front studying the screen, three-quarter back view, focused posture, soft cool ambient light mixed with screen glow, muted neutral tones (slate grey, charcoal, soft white), shallow depth of field, cinematic, contemporary corporate atmosphere, Getty Images business editorial aesthetic, no text overlay, no logos. Professional human-centered documentary.",
+      "Editorial real estate photograph, 3:4 portrait, modern Korean real estate brokerage office, Korean professional reviewing property documents and a city district map showing apartment buildings, real estate listing materials (apartment photos, floor plans) spread on a wide wooden desk, three-quarter view, focused posture, warm natural office light, muted neutral tones (warm beige, charcoal, soft white), shallow depth of field, cinematic, Getty Images real estate editorial aesthetic, no stock charts, no financial data screens, no text overlay, no logos. Professional human-centered documentary.",
   },
   {
     slug: "news",
     prompt:
-      "Editorial business photograph, 3:4 portrait, modern newsroom or media studio, Korean professional journalist seated at desk with multiple monitors showing news content and data, side or three-quarter view, focused expression, soft cool ambient light, muted neutral tones (cool grey, charcoal, soft white), shallow depth of field, cinematic, contemporary media atmosphere, Getty Images business editorial aesthetic, no text overlay, no logos. Professional human-centered documentary.",
+      "Editorial real estate photograph, 3:4 portrait, modern Korean professional reading a newspaper open to a real estate property section showing apartment building photos and housing market articles, sitting at a clean desk in a contemporary office, laptop and coffee cup nearby, side or three-quarter view, focused expression, warm natural window light, muted neutral tones (warm beige, charcoal, soft white), shallow depth of field, cinematic, Getty Images real estate editorial aesthetic, no broadcast TV studio, no anchors, no text overlay, no logos. Professional human-centered documentary.",
   },
 ];
 
@@ -66,5 +61,6 @@ async function generateOne({ slug, prompt }) {
 
 const results = await Promise.all(PROMPTS.map(generateOne));
 const failed = results.filter((r) => !r).length;
-console.log(`\n=== 완료: ${4 - failed}/4 성공 ===`);
+const total = PROMPTS.length;
+console.log(`\n=== 완료: ${total - failed}/${total} 성공 ===`);
 process.exit(failed > 0 ? 1 : 0);

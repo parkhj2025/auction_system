@@ -26,23 +26,23 @@ const CATEGORIES: InsightCategory[] = [
 
 const FEATURED_BY_CATEGORY: Record<InsightCategorySlug, InsightFeatured> = {
   analysis: {
-    title: "주요 무료 물건분석",
-    preview: "감정가 -51% / 4회 유찰",
+    title: "사건번호만 주시면, 분석은 무료",
+    preview: "권리 / 시세 / 수익률 한 번에",
     count: 12,
   },
   guide: {
-    title: "경매 입찰가, 얼마에 써야 할까",
-    preview: "시세 / 위험 / 수익률 3 기준",
+    title: "처음 입찰, 얼마에 써야 할까",
+    preview: "낙찰가 결정의 3가지 기준",
     count: 8,
   },
   glossary: {
-    title: "말소기준권리란?",
-    preview: "권리 분석의 출발점",
+    title: "말소기준권리, 한 줄로 이해하기",
+    preview: "권리분석의 시작점",
     count: 24,
   },
   news: {
-    title: "미추홀구 오피스텔 4회 유찰",
-    preview: "HUG 말소동의 + 임차보증금 인수",
+    title: "오피스텔 4회 유찰, 함정인가 기회인가",
+    preview: "HUG 말소동의 + 임차보증금 구조",
     count: 6,
   },
 };

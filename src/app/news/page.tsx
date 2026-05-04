@@ -4,9 +4,9 @@ import { ContentCard } from "@/components/common/ContentCard";
 import { EmptyState } from "@/components/common/EmptyState";
 
 export const metadata: Metadata = {
-  title: "경매 인사이트",
+  title: "경매 뉴스",
   description:
-    "인천지방법원 경매 시황 · 낙찰가율 동향 · 지역별 이슈. 매주 업데이트되는 경매 시장 인사이트.",
+    "인천지방법원 경매 시황 · 낙찰가율 동향 · 지역별 이슈. 매주 업데이트되는 경매 뉴스.",
 };
 
 const REGION_LABEL: Record<string, string> = {

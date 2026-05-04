@@ -17,9 +17,9 @@ export const PRIMARY_NAV: NavLink[] = [
     description: "경매 물건 7섹션 무료 분석",
   },
   {
-    href: "/news",
+    href: "/insight",
     label: "경매 인사이트",
-    description: "시황·동향·칼럼",
+    description: "물건 분석 · 가이드 · 용어 · 뉴스",
   },
   {
     href: "/guide",
