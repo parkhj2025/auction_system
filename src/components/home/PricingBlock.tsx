@@ -12,7 +12,7 @@ export function PricingBlock() {
     <section
       id="pricing"
       aria-labelledby="pricing-heading"
-      className="flex min-h-[calc(100dvh-64px)] flex-col justify-center bg-[#FAFAFA] py-12 lg:min-h-[calc(100dvh-80px)] lg:py-16 snap-block"
+      className="flex min-h-[calc(100vh-64px)] flex-col justify-center bg-[#FAFAFA] py-12 lg:min-h-[calc(100vh-80px)] lg:py-16"
     >
       <div className="container-app w-full">
         <h2

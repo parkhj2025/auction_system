@@ -3,6 +3,7 @@ import { InsightBlock } from "@/components/home/InsightBlock";
 import { CompareBlock } from "@/components/home/CompareBlock";
 import { PricingBlock } from "@/components/home/PricingBlock";
 import { TrustCTA } from "@/components/home/TrustCTA";
+import { SmoothScroll } from "@/components/SmoothScroll";
 import { getActiveCaseNumbers } from "@/lib/content";
 
 /* Phase 1.2 (A-1-2) v16 — Home (5 블록 광역 정정 / StrengthsCarousel 영구 폐기 / 모바일 carousel = Hero 박스 안 통합).
@@ -15,12 +16,14 @@ export default function Home() {
   const caseNumbers = getActiveCaseNumbers();
 
   return (
-    <main className="flex flex-1 flex-col">
-      <HeroSearch caseNumbers={caseNumbers} />
-      <InsightBlock />
-      <CompareBlock />
-      <PricingBlock />
-      <TrustCTA />
-    </main>
+    <SmoothScroll>
+      <main className="flex flex-1 flex-col">
+        <HeroSearch caseNumbers={caseNumbers} />
+        <InsightBlock />
+        <CompareBlock />
+        <PricingBlock />
+        <TrustCTA />
+      </main>
+    </SmoothScroll>
   );
 }

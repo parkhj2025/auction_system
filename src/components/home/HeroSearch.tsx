@@ -32,7 +32,7 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
   }
 
   return (
-    <section className="relative isolate flex min-h-[calc(100dvh-64px)] flex-col items-center justify-center overflow-hidden bg-white px-6 lg:min-h-[calc(100dvh-80px)] lg:px-6 snap-block">
+    <section className="relative isolate flex min-h-[calc(100dvh-64px)] flex-col items-center justify-center overflow-hidden bg-white px-6 lg:min-h-[calc(100dvh-80px)] lg:px-6">
       {/* 동영상 배경 (z-0 / overlay 0 / 페이딩 0 / query 증분 캐시 무효). */}
       <video
         autoPlay
