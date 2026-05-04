@@ -1049,3 +1049,13 @@ html.lenis {
 .lenis.lenis-smooth iframe {
   pointer-events: none;
 }
+
+/* Phase 1.2 (A-1-2) v29 — scroll-snap 5 블록 (proximity / normal / Hero · Insight · Compare · Pricing · Trust). */
+html {
+  scroll-snap-type: y proximity;
+  scroll-behavior: smooth;
+}
+.snap-block {
+  scroll-snap-align: start;
+  scroll-snap-stop: normal;
+}

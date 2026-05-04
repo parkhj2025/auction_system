@@ -41,7 +41,7 @@ export function CompareBlock() {
     <section
       ref={sectionRef}
       aria-labelledby="compare-heading"
-      className="flex min-h-[calc(100vh-64px)] flex-col justify-center bg-white py-12 lg:min-h-[calc(100vh-80px)] lg:py-16"
+      className="flex min-h-[calc(100vh-64px)] flex-col justify-center bg-white py-12 lg:min-h-[calc(100vh-80px)] lg:py-16 snap-block"
     >
       <div className="container-app w-full">
         <h2
