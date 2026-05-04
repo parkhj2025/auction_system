@@ -4,16 +4,10 @@ import { useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
 import { Building2, FileText, Lock } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v25 — Hero 모바일 size 점진 ↑ + 동영상 캐시 무효.
- * 정정 8건 (Plan v25):
- * 1. h1 모바일 size ↑ (60px / 데스크탑 80px 보존)
- * 2. subtext 모바일 박스 밖 size ↑ (17px)
- * 3. 강점 모바일 size ↑ (외부 gap-7 / 내부 gap-2 / 아이콘 18 / 라벨 14px)
- * 4. 박스 padding ↑ + 박스 안 gap ↑ (py-7 / gap-4 / 데스크탑 보존)
- * 5. 넛지 모바일 size ↑ (15px)
- * 6. 입력 + CTA 모바일 height ↑ (h-16)
- * 7. 보증금 캡션 모바일 size ↑ (gap-2 / Lock 16 / 라벨 14px)
- * 8. video src ?v=2 query (캐시 무효 / Vercel CDN 강제 갱신) */
+/* Phase 1.2 (A-1-2) v26 — h1 모바일 60→48 회귀 (자동 줄바꿈 0) + 동영상 재교체 query 증분.
+ * 정정 2건 (Plan v26):
+ * 1. h1 모바일 60 → 48 (iPhone 14 Pro 박스 폭 345px 대비 약 109% / letter-spacing 압축 후 자동 줄바꿈 0)
+ * 2. video src query 증분 (재교체 영상 CDN/browser 캐시 강제 갱신) */
 
 export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
   const router = useRouter();
@@ -38,7 +32,7 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
 
   return (
     <section className="relative isolate flex min-h-[calc(100dvh-64px)] flex-col items-center justify-center overflow-hidden bg-white px-6 lg:min-h-[calc(100dvh-80px)] lg:px-6">
-      {/* 동영상 배경 (z-0 / overlay 0 / 페이딩 0 / ?v=2 캐시 무효). */}
+      {/* 동영상 배경 (z-0 / overlay 0 / 페이딩 0 / query 증분 캐시 무효). */}
       <video
         autoPlay
         muted
@@ -46,14 +40,14 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
         playsInline
         className="absolute inset-0 z-0 h-full w-full object-cover"
       >
-        <source src="/videos/hero-bg.mp4?v=2" type="video/mp4" />
+        <source src="/videos/hero-bg.mp4?v=3" type="video/mp4" />
       </video>
 
       {/* vstack — h1 + 모바일 subtext + 모바일 강점 + 박스. */}
       <div className="relative z-10 flex flex-col items-center text-center gap-6 lg:gap-14 w-full max-w-[800px]">
         {/* h1 (모바일 60px / 데스크탑 80px 보존). */}
         <h1
-          className="w-full text-[60px] font-extrabold leading-[1.1] tracking-[-0.015em] text-white [text-wrap:balance] lg:text-[80px]"
+          className="w-full text-[48px] font-extrabold leading-[1.1] tracking-[-0.015em] text-white [text-wrap:balance] lg:text-[80px]"
           style={{
             fontWeight: 800,
             textShadow:
