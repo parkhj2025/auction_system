@@ -7,13 +7,12 @@ import {
   type InsightFeatured,
   type InsightCategorySlug,
 } from "./InsightThumbnail";
+import type { InsightFeaturedPost } from "@/lib/content";
 
-/* Phase 1.2 (A-1-2) v32 — InsightBlock 모던 비즈니스 paradigm (벤토 회귀 + 모노톤 + subtext 폐기).
- * 정정 (Plan v32):
- * 1. subtext 광역 폐기 (다른 블록 정합)
- * 2. h2 마침표 "." yellow #FFD43B 보존 (v31 결정)
- * 3. h2 size 광역 보존 (v31 / 48 / 96)
- * 4. 4 카드 = InsightThumbnail 벤토 그리드 회귀 + 모던 비즈니스 실사 (별도 파일) */
+/* Phase 1.2 (A-1-2) v35 — InsightBlock 매거진 카드 paradigm (Featured 자동 + 3D 일러스트).
+ * 정정 (Plan v35):
+ * 1. featuredByCategory props 진입 (server fetch / page.tsx + insight/page.tsx 광역)
+ * 2. InsightThumbnail 매거진 카드 (구분선 + Featured 또는 fallback) 광역 정합 */
 
 type FilterKey = "all" | InsightCategorySlug;
 
@@ -55,7 +54,11 @@ const CHIPS: { key: FilterKey; label: string }[] = [
   { key: "news", label: "경매 뉴스" },
 ];
 
-export function InsightBlock() {
+export function InsightBlock({
+  featuredByCategory,
+}: {
+  featuredByCategory: Record<InsightCategorySlug, InsightFeaturedPost>;
+}) {
   const [active, setActive] = useState<FilterKey>("all");
 
   const filtered =
@@ -108,6 +111,7 @@ export function InsightBlock() {
               key={cat.slug}
               category={cat}
               featured={FEATURED_BY_CATEGORY[cat.slug]}
+              featuredPost={featuredByCategory[cat.slug]}
             />
           ))}
         </div>

@@ -14,17 +14,22 @@ const PROMPTS = [
   {
     slug: "analysis",
     prompt:
-      "Editorial real estate photograph, 3:4 portrait, modern contemporary Korean property analyst office, Korean professional analyst looking at large monitor displaying apartment listings, floor plans, and interior photos of Korean residential buildings, blueprints and property documents on the desk, side view, focused expression, warm natural window light, muted neutral tones (beige, charcoal, soft white), shallow depth of field, cinematic, Getty Images real estate editorial aesthetic, no stock charts, no trading screens, no text overlay, no logos. Professional human-centered documentary.",
+      "3D illustration in flat Apple-style minimalist 3D rendering, 3:4 portrait, Korean male professional in business attire sitting at a clean desk analyzing real estate listings on a monitor, floor plans and apartment listing documents on the desk, pure white background, brand color palette only (vibrant green #00C853, yellow #FFD43B, dark charcoal #111418, plus white and neutral grey), solid flat colors, NO gradient, NO realistic photo, NO stock charts, NO trading graphs, NO cryptocurrency, NO TV studio, soft cast shadows, modern minimalist 3D character design.",
+  },
+  {
+    slug: "guide",
+    prompt:
+      "3D illustration in flat Apple-style minimalist 3D rendering, 3:4 portrait, two Korean professionals (male mentor and male client) at a clean meeting table reviewing a checklist document together, mentor pointing at the checklist, pure white background, brand color palette only (vibrant green #00C853, yellow #FFD43B, dark charcoal #111418, plus white and neutral grey), solid flat colors, NO gradient, NO realistic photo, NO stock charts, soft cast shadows, modern minimalist 3D character design.",
   },
   {
     slug: "glossary",
     prompt:
-      "Editorial real estate photograph, 3:4 portrait, modern Korean real estate brokerage office, Korean professional reviewing property documents and a city district map showing apartment buildings, real estate listing materials (apartment photos, floor plans) spread on a wide wooden desk, three-quarter view, focused posture, warm natural office light, muted neutral tones (warm beige, charcoal, soft white), shallow depth of field, cinematic, Getty Images real estate editorial aesthetic, no stock charts, no financial data screens, no text overlay, no logos. Professional human-centered documentary.",
+      "3D illustration in flat Apple-style minimalist 3D rendering, 3:4 portrait, Korean male professional holding a magnifying glass examining an open book on a desk with small 3D house icons sitting on the book pages, pure white background, brand color palette only (vibrant green #00C853, yellow #FFD43B, dark charcoal #111418, plus white and neutral grey), solid flat colors, NO gradient, NO realistic photo, NO Hanja characters, NO Japanese, soft cast shadows, modern minimalist 3D character design.",
   },
   {
     slug: "news",
     prompt:
-      "Editorial real estate photograph, 3:4 portrait, modern Korean professional reading a newspaper open to a real estate property section showing apartment building photos and housing market articles, sitting at a clean desk in a contemporary office, laptop and coffee cup nearby, side or three-quarter view, focused expression, warm natural window light, muted neutral tones (warm beige, charcoal, soft white), shallow depth of field, cinematic, Getty Images real estate editorial aesthetic, no broadcast TV studio, no anchors, no text overlay, no logos. Professional human-centered documentary.",
+      "3D illustration in flat Apple-style minimalist 3D rendering, 3:4 portrait, Korean male professional in business attire reading a folded newspaper at a clean desk with a laptop open beside him, the newspaper showing real estate property section with small apartment building illustrations, pure white background, brand color palette only (vibrant green #00C853, yellow #FFD43B, dark charcoal #111418, plus white and neutral grey), solid flat colors, NO gradient, NO realistic photo, NO TV studio, NO broadcast anchors, soft cast shadows, modern minimalist 3D character design.",
   },
 ];
 
@@ -49,7 +54,7 @@ async function generateOne({ slug, prompt }) {
       return false;
     }
     const buf = Buffer.from(imagePart.inlineData.data, "base64");
-    const outPath = resolve(`public/images/insight/${slug}.jpg`);
+    const outPath = resolve(`public/images/insight/${slug}.png`);
     await writeFile(outPath, buf);
     console.log(`[${slug}] OK: ${outPath} (${buf.length} bytes)`);
     return true;
