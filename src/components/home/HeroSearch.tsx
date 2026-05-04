@@ -4,12 +4,10 @@ import { useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
 import { Building2, FileText, Lock } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v20 — Hero 모바일 비율 정합 + 글래스 투명도 약화 + 강점 1행 통일.
- * 정정 4건 (Plan v20):
- * 1. section padding 모바일 px-4 → px-6 (좌우 여백 확보)
- * 2. 박스 background rgba 0.22/0.08 → 0.18/0.06 (투명도 약화)
- * 3. 모바일 carousel 폐기 + 3 강점 1행 모바일/데스크탑 통일 (반응형 13/15 + 18/20 + gap-3/6)
- * 4. carousel 관련 motion 모듈 + useEffect import 영구 삭제 */
+/* Phase 1.2 (A-1-2) v22 — Hero CTA 모바일 단축 + 3 강점 모바일 세로 layout + 라벨 변경.
+ * 정정 2건 (Plan v22):
+ * 1. CTA 버튼 모바일 "조회" / 데스크탑 "조회하기" 분기 + 모바일 padding px-6
+ * 2. 3 강점 layout 모바일 세로 / 데스크탑 가로 분기 + 라벨 3건 단축 + 모바일 텍스트 14px */
 
 export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
   const router = useRouter();
@@ -121,42 +119,43 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
               />
               <button
                 type="submit"
-                className="inline-flex h-14 items-center justify-center rounded-xl bg-[var(--brand-green)] px-10 text-[16px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 lg:h-16 lg:px-12 lg:text-[18px]"
+                className="inline-flex h-14 items-center justify-center rounded-xl bg-[var(--brand-green)] px-6 text-[16px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 lg:h-16 lg:px-12 lg:text-[18px]"
               >
-                조회하기
+                <span className="lg:hidden">조회</span>
+                <span className="hidden lg:inline">조회하기</span>
               </button>
             </form>
           </div>
 
-          {/* 3 강점 1행 (모바일/데스크탑 통일) — 흰색 톤. */}
-          <div className="flex items-center justify-center gap-3 lg:gap-6">
-            <div className="flex items-center gap-1.5 lg:gap-2">
+          {/* 3 강점 — 모바일 세로 / 데스크탑 가로 분기 + 흰색 톤. */}
+          <div className="flex flex-col items-start justify-start gap-3 lg:flex-row lg:items-center lg:justify-center lg:gap-6">
+            <div className="flex items-center gap-2">
               <Building2
                 strokeWidth={2}
                 className="h-[18px] w-[18px] flex-shrink-0 text-green-400 lg:h-5 lg:w-5"
               />
-              <span className="whitespace-nowrap text-[13px] font-semibold text-white/95 lg:text-[15px]">
-                법원 방문 0회
+              <span className="whitespace-nowrap text-[14px] font-semibold text-white/95 lg:text-[15px]">
+                법원 방문 없음
               </span>
             </div>
-            <div className="h-[18px] w-px flex-shrink-0 bg-white/30 lg:h-5" />
-            <div className="flex items-center gap-1.5 lg:gap-2">
+            <div className="hidden lg:block h-5 w-px flex-shrink-0 bg-white/30" />
+            <div className="flex items-center gap-2">
               <FileText
                 strokeWidth={2}
                 className="h-[18px] w-[18px] flex-shrink-0 text-green-400 lg:h-5 lg:w-5"
               />
-              <span className="whitespace-nowrap text-[13px] font-semibold text-white/95 lg:text-[15px]">
-                서류 비대면 100%
+              <span className="whitespace-nowrap text-[14px] font-semibold text-white/95 lg:text-[15px]">
+                서류 비대면
               </span>
             </div>
-            <div className="h-[18px] w-px flex-shrink-0 bg-white/30 lg:h-5" />
-            <div className="flex items-center gap-1.5 lg:gap-2">
+            <div className="hidden lg:block h-5 w-px flex-shrink-0 bg-white/30" />
+            <div className="flex items-center gap-2">
               <Lock
                 strokeWidth={2}
                 className="h-[18px] w-[18px] flex-shrink-0 text-green-400 lg:h-5 lg:w-5"
               />
-              <span className="whitespace-nowrap text-[13px] font-semibold text-white/95 lg:text-[15px]">
-                보증금 분리 보관
+              <span className="whitespace-nowrap text-[14px] font-semibold text-white/95 lg:text-[15px]">
+                보증금 전용계좌
               </span>
             </div>
           </div>
