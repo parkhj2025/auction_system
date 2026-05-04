@@ -26,23 +26,23 @@ const CATEGORIES: InsightCategory[] = [
 
 const FEATURED_BY_CATEGORY: Record<InsightCategorySlug, InsightFeatured> = {
   analysis: {
-    title: "사건번호만 주시면, 분석은 무료",
-    preview: "권리 / 시세 / 수익률 한 번에",
+    title: "사건번호 하나면, 분석 끝",
+    preview: "권리 · 시세 · 수익률 한 번에",
     count: 12,
   },
   guide: {
-    title: "처음 입찰, 얼마에 써야 할까",
-    preview: "낙찰가 결정의 3가지 기준",
+    title: "처음부터 차근차근",
+    preview: "입찰 절차와 기본 개념",
     count: 8,
   },
   glossary: {
-    title: "말소기준권리, 한 줄로 이해하기",
-    preview: "권리분석의 시작점",
+    title: "헷갈리는 용어, 한눈에",
+    preview: "권리분석의 기본기",
     count: 24,
   },
   news: {
-    title: "오피스텔 4회 유찰, 함정인가 기회인가",
-    preview: "HUG 말소동의 + 임차보증금 구조",
+    title: "경매 시장의 흐름",
+    preview: "사례 · 판례 · 정책 변화",
     count: 6,
   },
 };

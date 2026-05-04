@@ -4,11 +4,10 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
 
-/* Phase 1.2 (A-1-2) v33 — InsightThumbnail (플랫 + 부동산 실사 + v32 정수 보존).
- * 정정 (Plan v33):
- * 1. 카드 입체 → 플랫 (shadow 광역 폐기 / 칩 paradigm 정합 / border 단독)
- * 2. 부동산 paradigm 이미지 (analysis/glossary/news 재생성 / guide 보존)
- * 보존: 벤토 그리드 (상단 65% + 하단 35%) / 모노톤 텍스트 / 모던 비즈니스 / next/image. */
+/* Phase 1.2 (A-1-2) v34 — InsightThumbnail (미세 gray 그림자 입체감 + v33 정수 보존).
+ * 정정 (Plan v34):
+ * 1. shadow-sm + hover:shadow-md (gray 무채색 단독 / 색감 그림자 영구 폐기)
+ * 보존: 벤토 그리드 + 모노톤 텍스트 + 부동산 실사 + border-gray-200. */
 
 export type InsightCategorySlug = "analysis" | "guide" | "glossary" | "news";
 export type InsightCategoryColor = "green" | "blue" | "orange" | "purple";
@@ -46,7 +45,7 @@ export function InsightThumbnail({
     <motion.div whileHover={{ y: -8 }} transition={{ duration: 0.3 }} className="block">
       <Link
         href={href}
-        className="group block aspect-[3/4] overflow-hidden rounded-2xl border border-gray-200 bg-white transition-colors hover:border-gray-300 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
+        className="group block aspect-[3/4] overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
       >
         <div className="flex h-full flex-col">
           {/* 상단 65% — 실사 이미지 광역. */}
