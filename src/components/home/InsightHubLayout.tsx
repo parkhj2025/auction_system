@@ -1,56 +1,19 @@
 "use client";
 
-import { useState } from "react";
-import {
-  InsightThumbnail,
-  type InsightCategory,
-  type InsightFeatured,
-  type InsightCategorySlug,
-} from "./InsightThumbnail";
-import type { InsightFeaturedPost } from "@/lib/content";
+import Link from "next/link";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useMemo } from "react";
+import { motion } from "motion/react";
+import type { InsightItem } from "@/lib/content";
 
-/* Phase 1.2 (A-1-2) v37 — InsightHubLayout (/insight Topic Gateway / Hero + 본문 + state 단일 client).
- * paradigm (Plan v37):
- * - Hero 영역 (bg-[var(--color-surface-muted)] / /analysis 광역 정합)
- *   - 카테고리 라벨 "경매 인사이트"
- *   - h1 "경매가 처음이라면, 여기부터." (44/80 / "여기부터" green + 마침표 yellow)
- *   - subtitle "경매 가이드부터 시장 동향까지, 한 페이지에서."
- *   - 칩 5건 (전체 + 4 카테고리 / filter useState)
- * - 본문 영역 (bg-white)
- *   - 카운트 "총 N건"
- *   - 4 카드 grid (InsightThumbnail 광역 재사용 / 메인 paradigm 정합) */
+/* Phase 1.2 (A-1-2) v38 — InsightHubLayout (Hybrid paradigm / Editor's Pick + 콘텐츠 list).
+ * paradigm (Plan v38):
+ * - useSearchParams ?cat={slug} → 칩 자동 활성 + 본문 광역 filter
+ * - 칩 클릭 = router.push 광역 URL 쿼리 변경
+ * - 본문 = Editor's Pick (전체 active 시) + 콘텐츠 list (active filter)
+ * - 카드 paradigm = 모바일 1-col / 데스크탑 2-col + 썸네일 4:3 + 텍스트 광역. */
 
-type FilterKey = "all" | InsightCategorySlug;
-
-const CATEGORIES: InsightCategory[] = [
-  { slug: "analysis", label: "무료 물건분석", color: "green" },
-  { slug: "guide", label: "경매 가이드", color: "blue" },
-  { slug: "glossary", label: "경매 용어", color: "orange" },
-  { slug: "news", label: "경매 뉴스", color: "purple" },
-];
-
-const FEATURED_BY_CATEGORY: Record<InsightCategorySlug, InsightFeatured> = {
-  analysis: {
-    title: "사건번호 하나면, 분석 끝",
-    preview: "권리 · 시세 · 수익률 한 번에",
-    count: 12,
-  },
-  guide: {
-    title: "처음부터 차근차근",
-    preview: "입찰 절차와 기본 개념",
-    count: 8,
-  },
-  glossary: {
-    title: "헷갈리는 용어, 한눈에",
-    preview: "권리분석의 기본기",
-    count: 24,
-  },
-  news: {
-    title: "경매 시장의 흐름",
-    preview: "사례 · 판례 · 정책 변화",
-    count: 6,
-  },
-};
+type FilterKey = "all" | "analysis" | "guide" | "glossary" | "news";
 
 const CHIPS: { key: FilterKey; label: string }[] = [
   { key: "all", label: "전체" },
@@ -60,26 +23,52 @@ const CHIPS: { key: FilterKey; label: string }[] = [
   { key: "news", label: "경매 뉴스" },
 ];
 
-export function InsightHubLayout({
-  featuredByCategory,
-}: {
-  featuredByCategory: Record<InsightCategorySlug, InsightFeaturedPost>;
-}) {
-  const [active, setActive] = useState<FilterKey>("all");
+const CATEGORY_BG_MAP: Record<string, string> = {
+  analysis: "/images/insight/analysis.jpg",
+  guide: "/images/insight/guide.jpg",
+  glossary: "/images/insight/glossary.jpg",
+  news: "/images/insight/news.jpg",
+};
 
-  const filtered =
-    active === "all"
-      ? CATEGORIES
-      : CATEGORIES.filter((c) => c.slug === active);
+const CATEGORY_LABEL_MAP: Record<string, string> = {
+  analysis: "무료 물건분석",
+  guide: "경매 가이드",
+  glossary: "경매 용어",
+  news: "경매 뉴스",
+};
 
-  const totalCount = filtered.reduce(
-    (sum, cat) => sum + FEATURED_BY_CATEGORY[cat.slug].count,
-    0
-  );
+function filterPosts(posts: InsightItem[], chip: FilterKey): InsightItem[] {
+  if (chip === "all") return posts;
+  // glossary = guide 흡수 (현 paradigm 정합 / content.ts InsightChipKey 광역 보존).
+  if (chip === "glossary") return posts.filter((p) => p.chip === "guide");
+  return posts.filter((p) => p.chip === chip);
+}
+
+function formatDate(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(d.getDate()).padStart(2, "0")}`;
+}
+
+export function InsightHubLayout({ allPosts }: { allPosts: InsightItem[] }) {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const cat = (searchParams.get("cat") ?? "all") as FilterKey;
+  const active: FilterKey = CHIPS.some((c) => c.key === cat) ? cat : "all";
+
+  const filtered = useMemo(() => filterPosts(allPosts, active), [allPosts, active]);
+  const totalCount = filtered.length;
+  const editorsPick = active === "all" && allPosts.length > 0 ? allPosts[0] : null;
+  const restPosts = editorsPick ? filtered.filter((p) => p.slug !== editorsPick.slug) : filtered;
+
+  function onChipClick(key: FilterKey) {
+    const target = key === "all" ? "/insight" : `/insight?cat=${key}`;
+    router.push(target, { scroll: false });
+  }
 
   return (
     <main className="flex flex-1 flex-col">
-      {/* Hero 영역 (bg gray-surface-muted / /analysis 정합). */}
+      {/* Hero 영역 (bg-gray-surface-muted / /analysis 정합). */}
       <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
         <div className="container-app w-full py-16 lg:py-20">
           <p className="text-xs font-bold uppercase tracking-wider text-[#111418]">
@@ -98,7 +87,7 @@ export function InsightHubLayout({
             경매 가이드부터 시장 동향까지, 한 페이지에서.
           </p>
 
-          {/* 칩 5건 (filter useState). */}
+          {/* 칩 5건 (URL 쿼리 ?cat={slug} 광역 자동 활성). */}
           <div className="mt-8 flex flex-wrap gap-2 lg:mt-10">
             {CHIPS.map((chip) => {
               const isActive = active === chip.key;
@@ -106,7 +95,7 @@ export function InsightHubLayout({
                 <button
                   key={chip.key}
                   type="button"
-                  onClick={() => setActive(chip.key)}
+                  onClick={() => onChipClick(chip.key)}
                   className={
                     "rounded-full px-5 py-2 text-[14px] font-semibold transition " +
                     (isActive
@@ -122,7 +111,7 @@ export function InsightHubLayout({
         </div>
       </section>
 
-      {/* 본문 영역 (bg-white / 카운트 + 4 카드 grid). */}
+      {/* 본문 영역 (bg-white / 카운트 + Editor's Pick + 콘텐츠 list). */}
       <section className="bg-white">
         <div className="container-app w-full py-12 lg:py-16">
           <p className="text-[14px] font-semibold text-gray-500 lg:text-[15px]">
@@ -131,16 +120,90 @@ export function InsightHubLayout({
             건
           </p>
 
-          <div className="mt-6 grid grid-cols-2 gap-4 lg:mt-8 lg:grid-cols-4 lg:gap-6">
-            {filtered.map((cat) => (
-              <InsightThumbnail
-                key={cat.slug}
-                category={cat}
-                featured={FEATURED_BY_CATEGORY[cat.slug]}
-                featuredPost={featuredByCategory[cat.slug]}
-              />
-            ))}
-          </div>
+          {/* Editor's Pick (전체 칩 active 시 단독). */}
+          {editorsPick && (
+            <motion.div
+              whileHover={{ y: -4 }}
+              transition={{ duration: 0.3 }}
+              className="mt-8 lg:mt-10"
+            >
+              <Link
+                href={editorsPick.href}
+                className="group block overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 lg:flex lg:items-stretch"
+              >
+                <div
+                  aria-hidden="true"
+                  className="aspect-[4/3] w-full bg-gray-100 bg-cover bg-center lg:aspect-auto lg:w-[45%]"
+                  style={{ backgroundImage: `url("${CATEGORY_BG_MAP[editorsPick.chip] ?? ""}")` }}
+                />
+                <div className="flex flex-col justify-center gap-3 p-6 lg:flex-1 lg:p-10">
+                  <div className="flex items-center gap-2">
+                    <span className="rounded-full bg-[var(--brand-green)]/10 px-3 py-1 text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--brand-green)]">
+                      Editor&apos;s Pick
+                    </span>
+                    <span className="text-[12px] font-semibold text-gray-500 lg:text-[13px]">
+                      {CATEGORY_LABEL_MAP[editorsPick.chip] ?? editorsPick.chipLabel}
+                    </span>
+                  </div>
+                  <h2 className="text-[22px] font-extrabold leading-tight tracking-[-0.01em] text-[#111418] lg:text-[32px]">
+                    {editorsPick.title}
+                  </h2>
+                  {editorsPick.subtitle && (
+                    <p className="line-clamp-2 text-[14px] leading-relaxed text-gray-600 lg:text-[16px]">
+                      {editorsPick.subtitle}
+                    </p>
+                  )}
+                  <p className="text-[12px] font-medium text-gray-500 lg:text-[13px]">
+                    {formatDate(editorsPick.publishedAt)}
+                  </p>
+                </div>
+              </Link>
+            </motion.div>
+          )}
+
+          {/* 콘텐츠 list (모바일 1-col / 데스크탑 2-col). */}
+          {restPosts.length > 0 ? (
+            <div className="mt-8 grid grid-cols-1 gap-4 lg:mt-12 lg:grid-cols-2 lg:gap-6">
+              {restPosts.map((post) => (
+                <motion.div
+                  key={`${post.chip}-${post.slug}`}
+                  whileHover={{ y: -4 }}
+                  transition={{ duration: 0.3 }}
+                >
+                  <Link
+                    href={post.href}
+                    className="group flex gap-4 overflow-hidden rounded-xl border border-gray-200 bg-white p-3 shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 lg:p-4"
+                  >
+                    <div
+                      aria-hidden="true"
+                      className="aspect-[4/3] w-[120px] flex-shrink-0 rounded-lg bg-gray-100 bg-cover bg-center lg:w-[160px]"
+                      style={{ backgroundImage: `url("${CATEGORY_BG_MAP[post.chip] ?? ""}")` }}
+                    />
+                    <div className="flex flex-1 flex-col justify-center gap-1.5">
+                      <span className="text-[11px] font-bold uppercase tracking-[0.06em] text-[var(--brand-green)] lg:text-[12px]">
+                        {CATEGORY_LABEL_MAP[post.chip] ?? post.chipLabel}
+                      </span>
+                      <h3 className="line-clamp-2 text-[15px] font-bold leading-tight text-[#111418] lg:text-[17px]">
+                        {post.title}
+                      </h3>
+                      {post.subtitle && (
+                        <p className="line-clamp-1 text-[12px] text-gray-500 lg:text-[13px]">
+                          {post.subtitle}
+                        </p>
+                      )}
+                      <p className="text-[11px] font-medium text-gray-400 lg:text-[12px]">
+                        {formatDate(post.publishedAt)}
+                      </p>
+                    </div>
+                  </Link>
+                </motion.div>
+              ))}
+            </div>
+          ) : (
+            <p className="mt-12 text-center text-[14px] text-gray-500">
+              아직 콘텐츠가 없습니다.
+            </p>
+          )}
         </div>
       </section>
     </main>

@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
+import { Suspense } from "react";
 import { InsightHubLayout } from "@/components/home/InsightHubLayout";
-import { getFeaturedByCategory } from "@/lib/content";
+import { getActiveInsightPosts } from "@/lib/content";
 
-/* Phase 1.2 (A-1-2) v37 — /insight Topic Gateway hub 광역 재구성.
- * paradigm: Hero (bg-gray-surface-muted) + 본문 (bg-white) 광역 분리 (/analysis 정합).
- * 메인 InsightBlock 단순 import 광역 폐기 (v33-v36). */
+/* Phase 1.2 (A-1-2) v38 — /insight Topic Gateway hub (Hybrid paradigm).
+ * paradigm: Hero (gray) + 본문 (white) + URL 쿼리 ?cat={slug} + Editor's Pick + 콘텐츠 list.
+ * Suspense 광역 (useSearchParams CSR 광역 정합). */
 
 export const metadata: Metadata = {
   title: "경매 인사이트",
@@ -13,11 +14,10 @@ export const metadata: Metadata = {
 };
 
 export default function InsightHubPage() {
-  const featuredByCategory = {
-    analysis: getFeaturedByCategory("analysis"),
-    guide: getFeaturedByCategory("guide"),
-    glossary: getFeaturedByCategory("glossary"),
-    news: getFeaturedByCategory("news"),
-  };
-  return <InsightHubLayout featuredByCategory={featuredByCategory} />;
+  const allPosts = getActiveInsightPosts();
+  return (
+    <Suspense fallback={null}>
+      <InsightHubLayout allPosts={allPosts} />
+    </Suspense>
+  );
 }

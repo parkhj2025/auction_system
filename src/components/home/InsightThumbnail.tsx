@@ -28,10 +28,10 @@ export type InsightFeatured = {
 };
 
 const HREF_MAP: Record<InsightCategorySlug, string> = {
-  analysis: "/analysis",
-  guide: "/guide",
-  glossary: "/guide",
-  news: "/news",
+  analysis: "/insight?cat=analysis",
+  guide: "/insight?cat=guide",
+  glossary: "/insight?cat=glossary",
+  news: "/insight?cat=news",
 };
 
 export function InsightThumbnail({

@@ -31,6 +31,15 @@ const nextConfig: NextConfig = {
     "pdfkit",
     "fontkit",
   ],
+  // Phase 1.2 (A-1-2) v38 — /insight Hybrid paradigm 광역 redirect (list URL 광역 / 301).
+  // detail page (/{cat}/[slug]) 광역 = Phase B (별도 cycle) — 광역 보존.
+  async redirects() {
+    return [
+      { source: "/analysis", destination: "/insight?cat=analysis", permanent: true },
+      { source: "/guide", destination: "/insight?cat=guide", permanent: true },
+      { source: "/news", destination: "/insight?cat=news", permanent: true },
+    ];
+  },
 };
 
 export default nextConfig;
