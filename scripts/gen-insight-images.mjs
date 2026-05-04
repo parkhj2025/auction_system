@@ -14,22 +14,22 @@ const PROMPTS = [
   {
     slug: "analysis",
     prompt:
-      "Editorial documentary photograph, 3:4 portrait, top-down view of a desk with property analysis documents, real estate auction papers, blueprints partially visible, calculator, marked-up Korean printout, neutral muted tones, beige and slate, soft shadow, depth of field, cinematic lighting, Apple stock photo aesthetic, no text overlay, no people, no logo. Professional documentary still life.",
+      "Editorial business photograph, 3:4 portrait, modern contemporary office, Korean professional analyst working at standing desk, looking at large monitor displaying real estate data charts and graphs, side view, focused expression, warm natural window light, muted neutral tones (beige, charcoal, soft white), shallow depth of field, cinematic, contemporary corporate atmosphere, Getty Images business editorial aesthetic, no text overlay, no logos. Professional human-centered documentary.",
   },
   {
     slug: "guide",
     prompt:
-      "Editorial documentary photograph, 3:4 portrait, library bookshelf scene with old leather bound legal books, gentle golden afternoon light, warm tan and dark brown tones, depth of field, cinematic, classical educational atmosphere, Apple stock photo aesthetic, no text overlay, no people, no logo, no Korean text. Professional documentary still life.",
+      "Editorial business photograph, 3:4 portrait, modern minimalist consulting meeting room, two Korean professionals (consultant and client) seated across a clean wooden table, consultant gesturing while explaining, paper documents and laptop on table, large window with diffused natural light, muted neutral tones (warm grey, soft white, charcoal), shallow depth of field, cinematic, contemporary corporate consulting atmosphere, Getty Images business editorial aesthetic, no text overlay, no logos. Professional human-centered documentary.",
   },
   {
     slug: "glossary",
     prompt:
-      "Editorial documentary photograph, 3:4 portrait, close-up of an open Korean dictionary or legal glossary, Hanja Chinese characters visible on aged paper, vintage fountain pen resting on the page, muted sepia and ivory tones, soft natural light from the side, shallow depth of field, scholarly atmosphere, Apple stock photo aesthetic, no people, no logo. Professional documentary still life.",
+      "Editorial business photograph, 3:4 portrait, modern contemporary office with large digital display screen showing data visualization or financial dashboard, Korean professional standing in front studying the screen, three-quarter back view, focused posture, soft cool ambient light mixed with screen glow, muted neutral tones (slate grey, charcoal, soft white), shallow depth of field, cinematic, contemporary corporate atmosphere, Getty Images business editorial aesthetic, no text overlay, no logos. Professional human-centered documentary.",
   },
   {
     slug: "news",
     prompt:
-      "Editorial documentary photograph, 3:4 portrait, modern minimal cafe table with newspaper folded, laptop closed, ceramic coffee cup, soft morning light through window, neutral grey and warm white tones, shallow depth of field, contemporary urban Seoul atmosphere, Apple stock photo aesthetic, no text overlay, no people, no logo, no Korean text. Professional documentary still life.",
+      "Editorial business photograph, 3:4 portrait, modern newsroom or media studio, Korean professional journalist seated at desk with multiple monitors showing news content and data, side or three-quarter view, focused expression, soft cool ambient light, muted neutral tones (cool grey, charcoal, soft white), shallow depth of field, cinematic, contemporary media atmosphere, Getty Images business editorial aesthetic, no text overlay, no logos. Professional human-centered documentary.",
   },
 ];
 

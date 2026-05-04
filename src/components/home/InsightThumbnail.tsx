@@ -4,11 +4,11 @@ import Image from "next/image";
 import Link from "next/link";
 import { motion } from "motion/react";
 
-/* Phase 1.2 (A-1-2) v31 — InsightThumbnail (다큐 실사 이미지 + Hero paradigm glass morphic).
- * 카테고리 4건: analysis green / guide blue / glossary orange / news purple.
- * 카드 광역 = aspect-[3/4] / 실사 이미지 (Gemini 3 Pro Image / 다큐) 광역 배경.
- * 하단 glass morphic = Hero 박스 paradigm 정합 (rgba 0.35/0.20 + blur(40) saturate(180) + border + inset highlight).
- * 텍스트 광역 ↑ (라벨 24/32 + 카드 수 14/18 + 제목 16/20 + 미리보기 13/15). */
+/* Phase 1.2 (A-1-2) v32 — InsightThumbnail (벤토 그리드 회귀 + 모노톤 + 모던 비즈니스 실사).
+ * 정정 (Plan v32):
+ * 1. glass morphic 광역 폐기 → 벤토 그리드 (상단 65% 이미지 + 하단 35% white)
+ * 2. 텍스트 광역 모노톤 (charcoal + gray-500 / 카테고리 정적 컬러 폐기)
+ * 3. 실사 이미지 = 모던 비즈니스 + 사람 + 컨설팅 (v31 낡은 책/길거리 폐기) */
 
 export type InsightCategorySlug = "analysis" | "guide" | "glossary" | "news";
 export type InsightCategoryColor = "green" | "blue" | "orange" | "purple";
@@ -25,13 +25,6 @@ export type InsightFeatured = {
   count: number;
 };
 
-const ACCENT_MAP: Record<InsightCategoryColor, string> = {
-  green: "#00C853",
-  blue: "#4DABF7",
-  orange: "#F97316",
-  purple: "#9775FA",
-};
-
 const HREF_MAP: Record<InsightCategorySlug, string> = {
   analysis: "/analysis",
   guide: "/guide",
@@ -46,7 +39,6 @@ export function InsightThumbnail({
   category: InsightCategory;
   featured: InsightFeatured;
 }) {
-  const accent = ACCENT_MAP[category.color];
   const href = HREF_MAP[category.slug];
   const imageSrc = `/images/insight/${category.slug}.jpg`;
 
@@ -54,63 +46,41 @@ export function InsightThumbnail({
     <motion.div whileHover={{ y: -8 }} transition={{ duration: 0.3 }} className="block">
       <Link
         href={href}
-        className="group relative block aspect-[3/4] overflow-hidden rounded-3xl shadow-md transition-shadow hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
+        className="group block aspect-[3/4] overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-sm transition-shadow hover:shadow-xl focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
       >
-        {/* 실사 이미지 광역 배경. */}
-        <Image
-          src={imageSrc}
-          alt={category.label}
-          fill
-          sizes="(min-width: 1024px) 25vw, 50vw"
-          className="object-cover transition-transform duration-500 group-hover:scale-105"
-        />
-
-        {/* 약한 하단 그라데이션 (이미지 → 텍스트 가독성 정합). */}
-        <div className="absolute inset-x-0 bottom-0 h-2/3 bg-gradient-to-t from-black/40 via-black/10 to-transparent" />
-
-        {/* 하단 glass morphic 영역 (Hero paradigm 정합). */}
-        <div
-          className="absolute inset-x-3 bottom-3 rounded-[20px] px-5 py-4 lg:inset-x-4 lg:bottom-4 lg:rounded-[24px] lg:px-6 lg:py-5"
-          style={{
-            background:
-              "linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.20) 100%)",
-            backdropFilter: "blur(40px) saturate(180%)",
-            WebkitBackdropFilter: "blur(40px) saturate(180%)",
-            border: "1px solid rgba(255, 255, 255, 0.3)",
-            boxShadow:
-              "inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 16px 40px -8px rgba(0, 0, 0, 0.35)",
-          }}
-        >
-          {/* 라벨 + 카드 수 (한 행 정합). */}
-          <div className="flex items-baseline justify-between gap-3">
-            <h3
-              className="text-[24px] font-bold leading-tight tracking-[-0.01em] text-white lg:text-[32px]"
-              style={{ textShadow: "0 1px 4px rgba(0, 0, 0, 0.5)" }}
-            >
-              {category.label}
-            </h3>
-            <span
-              className="flex-shrink-0 text-[14px] font-semibold lg:text-[18px]"
-              style={{ color: accent, textShadow: "0 1px 4px rgba(0, 0, 0, 0.4)" }}
-            >
-              {featured.count}건
-            </span>
+        <div className="flex h-full flex-col">
+          {/* 상단 65% — 실사 이미지 광역. */}
+          <div className="relative flex-[13] overflow-hidden">
+            <Image
+              src={imageSrc}
+              alt={category.label}
+              fill
+              sizes="(min-width: 1024px) 25vw, 50vw"
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
+            />
           </div>
 
-          {/* 미리보기 제목 + 본문. */}
-          <div className="mt-3">
-            <p
-              className="line-clamp-2 text-[16px] font-semibold leading-snug text-white/95 lg:text-[20px]"
-              style={{ textShadow: "0 1px 4px rgba(0, 0, 0, 0.5)" }}
-            >
-              {featured.title}
-            </p>
-            <p
-              className="mt-1 line-clamp-1 text-[13px] text-white/80 lg:text-[15px]"
-              style={{ textShadow: "0 1px 3px rgba(0, 0, 0, 0.4)" }}
-            >
-              {featured.preview}
-            </p>
+          {/* 하단 35% — white 텍스트 영역 (모노톤). */}
+          <div className="flex flex-[7] flex-col justify-between bg-white px-4 py-3 lg:px-5 lg:py-4">
+            {/* 라벨 + 카드 수 (한 행 정합). */}
+            <div className="flex items-baseline justify-between gap-2">
+              <h3 className="truncate text-[15px] font-bold leading-tight tracking-[-0.01em] text-[#111418] lg:text-[20px]">
+                {category.label}
+              </h3>
+              <span className="flex-shrink-0 text-[13px] font-medium text-gray-500 lg:text-[15px]">
+                {featured.count}건
+              </span>
+            </div>
+
+            {/* 미리보기 제목 + 캡션. */}
+            <div>
+              <p className="line-clamp-1 text-[13px] font-semibold leading-snug text-[#111418] lg:text-[16px]">
+                {featured.title}
+              </p>
+              <p className="mt-0.5 line-clamp-1 text-[12px] text-gray-500 lg:text-[14px]">
+                {featured.preview}
+              </p>
+            </div>
           </div>
         </div>
       </Link>
