@@ -7,7 +7,8 @@ import {
   ArrowRight,
   Building2,
 } from "lucide-react";
-import { BRAND_NAME, COMPANY, COURTS_ACTIVE, COURTS_COMING_SOON } from "@/lib/constants";
+import { COMPANY, COURTS_ACTIVE, COURTS_COMING_SOON } from "@/lib/constants";
+import { PageHero } from "@/components/common/PageHero";
 
 export const metadata: Metadata = {
   title: "대표 소개",
@@ -35,22 +36,17 @@ const VALUES = [
 export default function AboutPage() {
   return (
     <main className="flex flex-1 flex-col">
-      {/* Hero */}
-      <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-4xl px-5 py-16 sm:px-8 sm:py-20">
-          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
-            대표 소개
-          </p>
-          <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
-            법원 안 가고, 경매에 참여할 수 있게
-          </h1>
-          <p className="mt-4 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)] sm:text-lg sm:leading-8">
-            경매는 시세보다 저렴하게 부동산을 취득할 수 있는 합리적인 시스템입니다.
-            그런데 입찰일에 법원에 직접 가야 한다는 물리적 제약이 대부분의 참여를
-            막습니다. 이 불편을 합리적인 가격으로 해결하는 것이 {BRAND_NAME}의 일입니다.
-          </p>
-        </div>
-      </section>
+      {/* Hero — PageHero 광역 (사업 차별화 정수 / 공인중개사 직접 입찰 paradigm). */}
+      <PageHero
+        eyebrow="서비스 소개"
+        title={
+          <>
+            <span className="text-[var(--brand-green)]">공인중개사</span>가 직접 갑니다
+            <span style={{ color: "#FFD43B" }}>.</span>
+          </>
+        }
+        subtitle="5만원부터, 보증금 전용계좌 분리, D-1 할증 없이."
+      />
 
       {/* Founder profile */}
       <section className="mx-auto w-full max-w-4xl px-5 py-16 sm:px-8 sm:py-20">

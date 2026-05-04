@@ -13,6 +13,7 @@ import {
 import { ApplyChecklist } from "@/components/apply/ApplyChecklist";
 import { BRAND_NAME, FEES } from "@/lib/constants";
 import { formatKoreanWon } from "@/lib/utils";
+import { PageHero } from "@/components/common/PageHero";
 
 export const metadata: Metadata = {
   title: "서비스 안내",
@@ -78,22 +79,17 @@ const SOP = [
 export default function ServicePage() {
   return (
     <main className="flex flex-1 flex-col">
-      {/* Hero */}
-      <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-5xl px-5 py-16 sm:px-8 sm:py-20">
-          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
-            서비스 안내
-          </p>
-          <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
-            경매 입찰 대리, 하나만 합니다
-          </h1>
-          <p className="mt-4 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)] sm:text-lg sm:leading-8">
-            공인중개사법에 따른 매수신청 대리(입찰 대리) 업무만 수행합니다.
-            범위를 좁힌 대신 가격을 낮췄고, 결과와 무관하게 투명하게
-            청구합니다.
-          </p>
-        </div>
-      </section>
+      {/* Hero — PageHero 광역 (시작 → 끝 paradigm / 카카오톡 직접 소통). */}
+      <PageHero
+        eyebrow="이용 절차"
+        title={
+          <>
+            사건번호 입력부터, <span className="text-[var(--brand-green)]">낙찰</span>까지
+            <span style={{ color: "#FFD43B" }}>.</span>
+          </>
+        }
+        subtitle="신청 · 서류 · 입찰 · 결과 — 모두 카카오톡으로."
+      />
 
       {/* 업무 범위 비교 */}
       <section className="mx-auto w-full max-w-5xl px-5 py-16 sm:px-8 sm:py-20">

@@ -5,6 +5,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useMemo } from "react";
 import { motion } from "motion/react";
 import type { InsightItem } from "@/lib/content";
+import { PageHero } from "@/components/common/PageHero";
 
 /* Phase 1.2 (A-1-2) v38 — InsightHubLayout (Hybrid paradigm / Editor's Pick + 콘텐츠 list).
  * paradigm (Plan v38):
@@ -68,48 +69,39 @@ export function InsightHubLayout({ allPosts }: { allPosts: InsightItem[] }) {
 
   return (
     <main className="flex flex-1 flex-col">
-      {/* Hero 영역 (bg-gray-surface-muted / /analysis 정합). */}
-      <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="container-app w-full py-16 lg:py-20">
-          <p className="text-xs font-bold uppercase tracking-wider text-[#111418]">
-            경매 인사이트
-          </p>
-          <h1
-            className="mt-2 text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[#111418] [text-wrap:balance] lg:text-[80px]"
-            style={{ fontWeight: 800 }}
-          >
-            경매가 처음이라면,
-            <br />
-            <span className="text-[var(--brand-green)]">여기부터</span>
+      {/* Hero 영역 = PageHero 광역 (sub-page 광역 템플릿 / 카피 정수 = 사업 정수 paradigm). */}
+      <PageHero
+        eyebrow="경매 인사이트"
+        title={
+          <>
+            <span className="text-[var(--brand-green)]">숫자</span>로 판단하는 경매
             <span style={{ color: "#FFD43B" }}>.</span>
-          </h1>
-          <p className="mt-3 max-w-2xl text-[16px] leading-7 text-gray-600 lg:text-[20px]">
-            경매 가이드부터 시장 동향까지, 한 페이지에서.
-          </p>
-
-          {/* 칩 5건 (URL 쿼리 ?cat={slug} 광역 자동 활성). */}
-          <div className="mt-8 flex flex-wrap gap-2 lg:mt-10">
-            {CHIPS.map((chip) => {
-              const isActive = active === chip.key;
-              return (
-                <button
-                  key={chip.key}
-                  type="button"
-                  onClick={() => onChipClick(chip.key)}
-                  className={
-                    "rounded-full px-5 py-2 text-[14px] font-semibold transition " +
-                    (isActive
-                      ? "bg-gray-900 text-white"
-                      : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200")
-                  }
-                >
-                  {chip.label}
-                </button>
-              );
-            })}
-          </div>
+          </>
+        }
+        subtitle="분석부터 가이드까지, 숫자로 보여드립니다."
+      >
+        {/* 칩 5건 (URL 쿼리 ?cat={slug} 광역 자동 활성). */}
+        <div className="flex flex-wrap gap-2">
+          {CHIPS.map((chip) => {
+            const isActive = active === chip.key;
+            return (
+              <button
+                key={chip.key}
+                type="button"
+                onClick={() => onChipClick(chip.key)}
+                className={
+                  "rounded-full px-5 py-2 text-[14px] font-semibold transition " +
+                  (isActive
+                    ? "bg-gray-900 text-white"
+                    : "bg-white text-gray-700 hover:bg-gray-100 border border-gray-200")
+                }
+              >
+                {chip.label}
+              </button>
+            );
+          })}
         </div>
-      </section>
+      </PageHero>
 
       {/* 본문 영역 (bg-white / 카운트 + Editor's Pick + 콘텐츠 list). */}
       <section className="bg-white">

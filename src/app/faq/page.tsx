@@ -3,6 +3,7 @@ import Link from "next/link";
 import { ChevronDown, ArrowRight } from "lucide-react";
 import { FAQ_CATEGORIES } from "@/lib/faq-data";
 import { BRAND_NAME } from "@/lib/constants";
+import { PageHero } from "@/components/common/PageHero";
 
 export const metadata: Metadata = {
   title: "자주 묻는 질문",
@@ -33,43 +34,33 @@ export default function FaqPage() {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
 
-      {/* Hero */}
-      <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-4xl px-5 py-16 sm:px-8 sm:py-20">
-          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
-            자주 묻는 질문
-          </p>
-          <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
-            신청 전 궁금하신 점을 모았습니다
-          </h1>
-          <p className="mt-3 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
-            여기서 답을 찾지 못하신 경우{" "}
-            <Link
-              href="/contact"
-              className="font-bold text-[var(--color-ink-900)] underline decoration-[var(--color-ink-200)] underline-offset-2 hover:text-black"
+      {/* Hero — PageHero 광역 (진입 paradigm / 4 카테고리 명시 / nav children 광역). */}
+      <PageHero
+        eyebrow="자주 묻는 질문"
+        title={
+          <>
+            궁금한 건, <span className="text-[var(--brand-green)]">여기서</span> 먼저
+            <span style={{ color: "#FFD43B" }}>.</span>
+          </>
+        }
+        subtitle="비용 · 절차 · 보증금 · 안전 — 자주 묻는 질문 모음."
+      >
+        {/* 카테고리 anchor 링크. */}
+        <nav
+          aria-label="카테고리 바로가기"
+          className="flex flex-wrap gap-2"
+        >
+          {FAQ_CATEGORIES.map((c) => (
+            <a
+              key={c.id}
+              href={`#${c.id}`}
+              className="inline-flex h-9 items-center rounded-full border border-[var(--color-border)] bg-white px-4 text-xs font-bold text-[var(--color-ink-700)] hover:border-[var(--color-ink-900)] hover:text-black"
             >
-              문의하기
-            </Link>
-            를 통해 추가로 안내드립니다.
-          </p>
-
-          {/* 카테고리 anchor 링크 */}
-          <nav
-            aria-label="카테고리 바로가기"
-            className="mt-8 flex flex-wrap gap-2"
-          >
-            {FAQ_CATEGORIES.map((c) => (
-              <a
-                key={c.id}
-                href={`#${c.id}`}
-                className="inline-flex h-9 items-center rounded-full border border-[var(--color-border)] bg-white px-4 text-xs font-bold text-[var(--color-ink-700)] hover:border-[var(--color-ink-900)] hover:text-black"
-              >
-                {c.label}
-              </a>
-            ))}
-          </nav>
-        </div>
-      </section>
+              {c.label}
+            </a>
+          ))}
+        </nav>
+      </PageHero>
 
       {/* Categories */}
       <section className="mx-auto w-full max-w-4xl px-5 py-16 sm:px-8 sm:py-20">
