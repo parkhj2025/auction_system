@@ -1,18 +1,15 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useMemo, useEffect } from "react";
-import { motion, AnimatePresence } from "motion/react";
-import { Building2, FileText, Lock, type LucideIcon } from "lucide-react";
+import { useState, useMemo } from "react";
+import { Building2, FileText, Lock } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v19 — Hero (yellow 경매 + subtext 박스 안 + Apple Liquid Glass + 흰색 톤 통일).
- * 정정 6건 (Plan v19):
- * 1. h1 "경매" span yellow #FFD43B + yellow halo / "를 시작하다." white + 검정 backdrop
- * 2. subtext 위치 = vertical stack → 박스 안 최상단 (영상 위 직접 폐기)
- * 3. 박스 = Apple Liquid Glass (frosted glass className 폐기 / inline style 광역)
- * 4. 박스 안 subtext font-size 16/24 + text-white/90 + 약화 textShadow
- * 5. 데스크탑 3 강점 흰색 톤 (라벨 white/95 + 아이콘 green-400 + divider white/30)
- * 6. 모바일 carousel 흰색 톤 (라벨 white/95 + body white/70 + 아이콘 green-400 + dots white) */
+/* Phase 1.2 (A-1-2) v20 — Hero 모바일 비율 정합 + 글래스 투명도 약화 + 강점 1행 통일.
+ * 정정 4건 (Plan v20):
+ * 1. section padding 모바일 px-4 → px-6 (좌우 여백 확보)
+ * 2. 박스 background rgba 0.22/0.08 → 0.18/0.06 (투명도 약화)
+ * 3. 모바일 carousel 폐기 + 3 강점 1행 모바일/데스크탑 통일 (반응형 13/15 + 18/20 + gap-3/6)
+ * 4. carousel 관련 motion 모듈 + useEffect import 영구 삭제 */
 
 export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
   const router = useRouter();
@@ -36,7 +33,7 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
   }
 
   return (
-    <section className="relative isolate flex min-h-[calc(100vh-64px)] flex-col items-center justify-center overflow-hidden bg-white px-4 lg:min-h-[calc(100vh-80px)] lg:px-6">
+    <section className="relative isolate flex min-h-[calc(100vh-64px)] flex-col items-center justify-center overflow-hidden bg-white px-6 lg:min-h-[calc(100vh-80px)] lg:px-6">
       {/* 1. 동영상 배경 (z-0 / overlay 0 / 페이딩 0). */}
       <video
         autoPlay
@@ -48,11 +45,11 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
         <source src="/videos/hero-bg.mp4" type="video/mp4" />
       </video>
 
-      {/* 2. 콘텐츠 광역 vertical stack (z-10 / h1 + 박스). */}
+      {/* 2. 콘텐츠 광역 vertical stack (z-10 / h1 + 박스 동일 폭). */}
       <div className="relative z-10 flex w-full max-w-[800px] flex-col items-center gap-10 text-center lg:gap-14">
         {/* h1 영상 위 직접 표시 — "경매" yellow + halo / 첫 줄 white + 검정 backdrop. */}
         <h1
-          className="text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-white [text-wrap:balance] lg:text-[80px]"
+          className="w-full text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-white [text-wrap:balance] lg:text-[80px]"
           style={{
             fontWeight: 800,
             textShadow:
@@ -80,12 +77,12 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
           </span>
         </h1>
 
-        {/* Apple Liquid Glass 박스 = subtext + 입력 + 데스크탑 3 강점 + 모바일 carousel. */}
+        {/* Apple Liquid Glass 박스 = subtext + 입력 + 3 강점 1행 (모바일/데스크탑 통일). */}
         <div
           className="flex w-full flex-col items-center gap-6 rounded-[28px] px-6 py-6 lg:gap-8 lg:px-10 lg:py-8"
           style={{
             background:
-              "linear-gradient(135deg, rgba(255, 255, 255, 0.22) 0%, rgba(255, 255, 255, 0.08) 100%)",
+              "linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.06) 100%)",
             backdropFilter: "blur(40px) saturate(180%)",
             WebkitBackdropFilter: "blur(40px) saturate(180%)",
             border: "1px solid rgba(255, 255, 255, 0.3)",
@@ -131,103 +128,40 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
             </form>
           </div>
 
-          {/* 데스크탑 3 강점 (lg:flex / 모바일 0) — 흰색 톤. */}
-          <div className="hidden items-center gap-12 lg:flex">
-            <div className="flex items-center gap-3">
-              <Building2 size={20} className="text-green-400" strokeWidth={2} />
-              <span className="text-[15px] font-semibold text-white/95">
+          {/* 3 강점 1행 (모바일/데스크탑 통일) — 흰색 톤. */}
+          <div className="flex items-center justify-center gap-3 lg:gap-6">
+            <div className="flex items-center gap-1.5 lg:gap-2">
+              <Building2
+                strokeWidth={2}
+                className="h-[18px] w-[18px] flex-shrink-0 text-green-400 lg:h-5 lg:w-5"
+              />
+              <span className="whitespace-nowrap text-[13px] font-semibold text-white/95 lg:text-[15px]">
                 법원 방문 0회
               </span>
             </div>
-            <div className="h-5 w-px bg-white/30" />
-            <div className="flex items-center gap-3">
-              <FileText size={20} className="text-green-400" strokeWidth={2} />
-              <span className="text-[15px] font-semibold text-white/95">
+            <div className="h-[18px] w-px flex-shrink-0 bg-white/30 lg:h-5" />
+            <div className="flex items-center gap-1.5 lg:gap-2">
+              <FileText
+                strokeWidth={2}
+                className="h-[18px] w-[18px] flex-shrink-0 text-green-400 lg:h-5 lg:w-5"
+              />
+              <span className="whitespace-nowrap text-[13px] font-semibold text-white/95 lg:text-[15px]">
                 서류 비대면 100%
               </span>
             </div>
-            <div className="h-5 w-px bg-white/30" />
-            <div className="flex items-center gap-3">
-              <Lock size={20} className="text-green-400" strokeWidth={2} />
-              <span className="text-[15px] font-semibold text-white/95">
+            <div className="h-[18px] w-px flex-shrink-0 bg-white/30 lg:h-5" />
+            <div className="flex items-center gap-1.5 lg:gap-2">
+              <Lock
+                strokeWidth={2}
+                className="h-[18px] w-[18px] flex-shrink-0 text-green-400 lg:h-5 lg:w-5"
+              />
+              <span className="whitespace-nowrap text-[13px] font-semibold text-white/95 lg:text-[15px]">
                 보증금 분리 보관
               </span>
             </div>
           </div>
-
-          {/* 모바일 carousel (lg:hidden) — 흰색 톤. */}
-          <div className="w-full lg:hidden">
-            <HeroMobileCarousel />
-          </div>
         </div>
       </div>
     </section>
-  );
-}
-
-/* HeroMobileCarousel — Hero 박스 안 모바일 only (lg:hidden / height 80px / 4초 자동 / 흰색 톤). */
-type Strength = {
-  icon: LucideIcon;
-  label: string;
-  body: string;
-};
-
-const STRENGTHS: Strength[] = [
-  { icon: Building2, label: "법원 방문 0회", body: "신청 후 결과만 받습니다." },
-  { icon: FileText, label: "서류 비대면 100%", body: "위임장부터 입찰표까지." },
-  { icon: Lock, label: "보증금 분리 보관", body: "전용 계좌 + 보증보험." },
-];
-
-function HeroMobileCarousel() {
-  const [index, setIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-
-  useEffect(() => {
-    if (isPaused) return;
-    const timer = setInterval(() => {
-      setIndex((prev) => (prev + 1) % STRENGTHS.length);
-    }, 4000);
-    return () => clearInterval(timer);
-  }, [isPaused]);
-
-  const current = STRENGTHS[index];
-  const Icon = current.icon;
-
-  return (
-    <div
-      className="relative h-[80px] w-full"
-      onTouchStart={() => setIsPaused(true)}
-      onTouchEnd={() => setTimeout(() => setIsPaused(false), 2000)}
-    >
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={index}
-          initial={{ opacity: 0, x: 40 }}
-          animate={{ opacity: 1, x: 0 }}
-          exit={{ opacity: 0, x: -40 }}
-          transition={{ duration: 0.4, ease: "easeOut" }}
-          className="absolute inset-0 flex items-center justify-center gap-3"
-        >
-          <Icon size={24} strokeWidth={2} className="shrink-0 text-green-400" />
-          <div className="flex flex-col items-start">
-            <span className="text-[15px] font-bold text-white/95">{current.label}</span>
-            <span className="text-[12px] text-white/70">{current.body}</span>
-          </div>
-        </motion.div>
-      </AnimatePresence>
-
-      <div className="absolute -bottom-6 left-1/2 flex -translate-x-1/2 gap-2">
-        {STRENGTHS.map((_, i) => (
-          <button
-            key={i}
-            onClick={() => setIndex(i)}
-            className={`rounded-full transition-all duration-300 ${
-              i === index ? "h-2 w-6 bg-white" : "h-2 w-2 bg-white/30"
-            }`}
-            aria-label={`강점 ${i + 1}`}
-          />
-        ))}
-      </div>
-    </div>
   );
 }
