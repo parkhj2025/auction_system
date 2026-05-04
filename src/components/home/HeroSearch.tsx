@@ -4,10 +4,11 @@ import { useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
 import { Building2, FileText, Lock } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v26 — h1 모바일 60→48 회귀 (자동 줄바꿈 0) + 동영상 재교체 query 증분.
- * 정정 2건 (Plan v26):
- * 1. h1 모바일 60 → 48 (iPhone 14 Pro 박스 폭 345px 대비 약 109% / letter-spacing 압축 후 자동 줄바꿈 0)
- * 2. video src query 증분 (재교체 영상 CDN/browser 캐시 강제 갱신) */
+/* Phase 1.2 (A-1-2) v27 — Hero polish (카피 + 글래스 약화 + 박스 안 gap 정합).
+ * 정정 3건 (Plan v27):
+ * 1. h1 둘째 줄 카피 종결어미 변경 (정중체)
+ * 2. 글래스 박스 background rgba 0.18/0.06 → 0.25/0.12 (영상 발현 ↓ / 번쩍거림 약 30% ↓)
+ * 3. 박스 안 모바일 gap-4 → gap-5 (넛지 위/아래 여백 비대칭 ↓) */
 
 export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
   const router = useRouter();
@@ -71,7 +72,7 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
                 "0 4px 24px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4)",
             }}
           >
-            를 시작하다.
+            를 시작하세요.
           </span>
         </h1>
 
@@ -116,10 +117,10 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
 
         {/* Apple Liquid Glass 박스 (박스 padding py-7 / 박스 안 gap-4 / 데스크탑 보존). */}
         <div
-          className="flex flex-col gap-4 lg:gap-8 w-full items-center rounded-[28px] px-6 py-7 lg:px-10 lg:py-8"
+          className="flex flex-col gap-5 lg:gap-8 w-full items-center rounded-[28px] px-6 py-7 lg:px-10 lg:py-8"
           style={{
             background:
-              "linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.06) 100%)",
+              "linear-gradient(135deg, rgba(255, 255, 255, 0.25) 0%, rgba(255, 255, 255, 0.12) 100%)",
             backdropFilter: "blur(40px) saturate(180%)",
             WebkitBackdropFilter: "blur(40px) saturate(180%)",
             border: "1px solid rgba(255, 255, 255, 0.3)",

@@ -1,0 +1,12 @@
+<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="경매퀵">
+  <polygon points="6,26 32,15 40,28 18,38"
+           fill="#00C853"
+           stroke="#FFFFFF"
+           stroke-width="2"
+           stroke-linejoin="miter"
+           vector-effect="non-scaling-stroke"/>
+  <polygon points="65,5 20,52 40,55 25,97 80,38 55,40"
+           fill="#00C853"/>
+  <polygon points="40,55 26,82 45,70 43,55"
+           fill="#FFD43B"/>
+</svg>

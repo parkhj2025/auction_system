@@ -5,8 +5,7 @@ import { useState, useEffect } from "react";
 import { Menu, X, User } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserMenu, type UserMenuProps } from "@/components/auth/UserMenu";
-import { Brand } from "@/components/Brand";
-import { BRAND_NAME } from "@/lib/constants";
+import { Logo } from "@/components/Logo";
 
 /* Phase 1.2 (A-1-2) v6 — TopNav (CTA 광역 폐기 / nav 4 link 보존).
  * Brand 컴포넌트 + nav 4 link (서비스 소개 · 이용 절차 · 경매 인사이트 · FAQ) + user icon.
@@ -57,13 +56,7 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
       )}
     >
       <div className="container-app flex h-14 items-center justify-between lg:h-16">
-        <Link
-          href="/"
-          className="flex items-center rounded-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
-          aria-label={`${BRAND_NAME} 홈`}
-        >
-          <Brand size="sm" mode="light" />
-        </Link>
+        <Logo />
 
         <nav
           className="hidden items-center gap-8 lg:flex"

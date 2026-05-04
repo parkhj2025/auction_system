@@ -1,3 +1,6 @@
+@import url('https://cdn.jsdelivr.net/npm/@fontsource/ibm-plex-sans-kr/400.css');
+@import url('https://cdn.jsdelivr.net/npm/@fontsource/ibm-plex-sans-kr/700.css');
+
 /* Phase 0.3: 사파리 폰트 본질 최종 해결 (font-weight 표준화 + format 단일화 + @supports 분기).
  * Phase 0.2 NG 본질 = font-weight: 45 920 비표준 범위 (사파리 거절) + format("woff2-variations") + format("woff2") fall-through.
  * 본 변경 = font-weight: 100 900 표준 + format 단일 + variations 미지원 환경 @supports not 분기 fallback. */

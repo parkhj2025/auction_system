@@ -1,6 +1,6 @@
 import Link from "next/link";
 import { COMPANY } from "@/lib/constants";
-import { Brand } from "@/components/Brand";
+import { Logo } from "@/components/Logo";
 
 /* v7 SNS inline SVG paradigm (lucide-react Instagram·Youtube 미export 본질 회피). */
 function IconInstagram({ size = 18 }: { size?: number }) {
@@ -93,7 +93,7 @@ export function Footer() {
         {/* Brand + tagline + 4 column (Top CTA section = TrustCTA 영구 흡수). */}
         <div className="grid gap-10 lg:grid-cols-[1.2fr_3fr] lg:gap-12">
           <div>
-            <Brand size="sm" mode="light" />
+            <Logo />
             <p className="mt-5 text-[14px] leading-[1.7] text-[var(--text-secondary)] lg:text-[15px]">
               빠르고 안전한 부동산 경매 입찰 대리 서비스.
               <br />
