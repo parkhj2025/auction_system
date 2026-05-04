@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
-import { InsightBlock } from "@/components/home/InsightBlock";
+import { InsightHubLayout } from "@/components/home/InsightHubLayout";
 import { getFeaturedByCategory } from "@/lib/content";
 
-/* Phase 1.2 (A-1-2) v35 — /insight hub 페이지 (매거진 카드 보존 / Topic Gateway = Phase B).
- * 홈 InsightBlock 광역 import + Featured server fetch + props 전달.
- * 콘텐츠 광역 ↑ 시 Topic Gateway 4 섹션 광역 진입 (별도 cycle). */
+/* Phase 1.2 (A-1-2) v37 — /insight Topic Gateway hub 광역 재구성.
+ * paradigm: Hero (bg-gray-surface-muted) + 본문 (bg-white) 광역 분리 (/analysis 정합).
+ * 메인 InsightBlock 단순 import 광역 폐기 (v33-v36). */
 
 export const metadata: Metadata = {
   title: "경매 인사이트",
   description:
-    "물건 분석 · 가이드 · 용어 · 뉴스 — 경매가 처음이라면, 여기부터.",
+    "물건분석 · 가이드 · 용어 · 뉴스 — 경매 가이드부터 시장 동향까지, 한 페이지에서.",
 };
 
 export default function InsightHubPage() {
@@ -19,5 +19,5 @@ export default function InsightHubPage() {
     glossary: getFeaturedByCategory("glossary"),
     news: getFeaturedByCategory("news"),
   };
-  return <InsightBlock featuredByCategory={featuredByCategory} />;
+  return <InsightHubLayout featuredByCategory={featuredByCategory} />;
 }

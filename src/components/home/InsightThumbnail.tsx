@@ -5,12 +5,11 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import type { InsightFeaturedPost } from "@/lib/content";
 
-/* Phase 1.2 (A-1-2) v36 — InsightThumbnail (이미지 ↑ + 벤토 컬러 + Featured 영역 광역 폐기).
- * 정정 (Plan v36):
- * 1. 일러스트 영역 광역 ↑ (50% → 65% / flex-13:7) + padding 광역 ↓ (p-2 / 꽉 차게)
- * 2. 카테고리별 파스텔 배경 (green-50 / blue-50 / orange-50 / purple-50)
- * 3. 카드 안 Featured 영역 광역 폐기 (구분선 + 라벨 + 제목 + fallback 광역 0)
- * 4. 카드 높이 광역 ↓ (Featured 영역 만큼).
+/* Phase 1.2 (A-1-2) v37 — InsightThumbnail (실사 jpg 회복 + 벤토 컬러 폐기 + bg-gray-50 단일).
+ * 정정 (Plan v37):
+ * 1. 이미지 src .png → .jpg (실사 4종 git history 회복)
+ * 2. INSIGHT_BG_MAP 광역 폐기 + 이미지 영역 배경 = bg-gray-50 단일 (벤토 컬러 광역 폐기)
+ * 3. v36 layout 광역 보존 (flex-[13]:flex-[7] / Featured 영역 폐기 / 박스 입체감 v34).
  * 보존: featuredPost props (Phase B 재활용 / UI 잔존 0). */
 
 export type InsightCategorySlug = "analysis" | "guide" | "glossary" | "news";
@@ -35,13 +34,6 @@ const HREF_MAP: Record<InsightCategorySlug, string> = {
   news: "/news",
 };
 
-const BG_MAP: Record<InsightCategoryColor, string> = {
-  green: "bg-green-50",
-  blue: "bg-blue-50",
-  orange: "bg-orange-50",
-  purple: "bg-purple-50",
-};
-
 export function InsightThumbnail({
   category,
   featured,
@@ -51,8 +43,7 @@ export function InsightThumbnail({
   featuredPost?: InsightFeaturedPost;
 }) {
   const href = HREF_MAP[category.slug];
-  const imageSrc = `/images/insight/${category.slug}.png`;
-  const bgClass = BG_MAP[category.color];
+  const imageSrc = `/images/insight/${category.slug}.jpg`;
 
   return (
     <motion.div whileHover={{ y: -8 }} transition={{ duration: 0.3 }} className="block">
@@ -60,14 +51,14 @@ export function InsightThumbnail({
         href={href}
         className="group flex aspect-[3/4] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
       >
-        {/* 상단 일러스트 영역 (65%) — 카테고리별 파스텔 배경 + 광역 padding ↓. */}
-        <div className={`relative flex-[13] overflow-hidden ${bgClass}`}>
+        {/* 상단 이미지 영역 (65%) — bg-gray-50 단일 (벤토 컬러 광역 폐기). */}
+        <div className="relative flex-[13] overflow-hidden bg-gray-50">
           <Image
             src={imageSrc}
             alt={category.label}
             fill
             sizes="(min-width: 1024px) 25vw, 50vw"
-            className="object-contain p-2"
+            className="object-cover transition-transform duration-500 group-hover:scale-105"
           />
         </div>
 
