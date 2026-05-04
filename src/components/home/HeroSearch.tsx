@@ -4,15 +4,10 @@ import { useRouter } from "next/navigation";
 import { useState, useMemo } from "react";
 import { Building2, FileText, Lock } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v23 — Hero 모바일 layout 광범위 재배치 (ChatGPT 시안 정합).
- * 정정 광범위 (Plan v23):
- * 1. vstack gap 모바일 → gap-6 (콘텐츠 늘어남 흡수) / 데스크탑 lg:gap-14 보존
- * 2. subtext 모바일 vstack 안 박스 밖 (lg:hidden 16px) / 데스크탑 박스 안 (hidden lg:block 24px) 분리
- * 3. 강점 모바일 2건 vstack 안 박스 밖 (lg:hidden 가로) / 데스크탑 3건 박스 안 (hidden lg:flex 가로) 분리
- * 4. 박스 안 gap 모바일 gap-3 / 데스크탑 lg:gap-8 (입력+CTA 세로 분리 정합)
- * 5. 입력+CTA 모바일 세로 분리 (lg:hidden form) / 데스크탑 통합 (hidden lg:flex form)
- * 6. 보증금 캡션 모바일 박스 안 신규 (lg:hidden / Lock 14 + 13 white/80)
- * 7. CTA 모바일 "조회" 단축 폐기 → "조회하기" 풀폭 통일 */
+/* Phase 1.2 (A-1-2) v24 — Hero 안드로이드 비율 정합 (vh→dvh) + 모바일 박스 안 넛지.
+ * 정정 2건 (Plan v24):
+ * 1. section min-h vh → dvh (안드로이드 Samsung Browser toolbar 동적 반영)
+ * 2. 박스 안 모바일 넛지 입력 위 신규 (14px white/85 / 모바일만) */
 
 export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
   const router = useRouter();
@@ -36,7 +31,7 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
   }
 
   return (
-    <section className="relative isolate flex min-h-[calc(100vh-64px)] flex-col items-center justify-center overflow-hidden bg-white px-6 lg:min-h-[calc(100vh-80px)] lg:px-6">
+    <section className="relative isolate flex min-h-[calc(100dvh-64px)] flex-col items-center justify-center overflow-hidden bg-white px-6 lg:min-h-[calc(100dvh-80px)] lg:px-6">
       {/* 동영상 배경 (z-0 / overlay 0 / 페이딩 0). */}
       <video
         autoPlay
@@ -140,7 +135,7 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
             사건번호만 주시면, 법원은 저희가 갑니다.
           </p>
 
-          {/* 입력+CTA 모바일 세로 분리 (lg:hidden / form). */}
+          {/* 입력+CTA 모바일 세로 분리 + 넛지 (lg:hidden / form). */}
           <form
             onSubmit={onSubmit}
             role="search"
@@ -150,6 +145,9 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
             <label htmlFor="hero-case-mobile" className="sr-only">
               사건번호
             </label>
+            <p className="text-[14px] text-white/85 font-medium text-center">
+              사건번호로 시작해보세요
+            </p>
             <input
               id="hero-case-mobile"
               type="text"
