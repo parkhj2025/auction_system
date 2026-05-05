@@ -209,9 +209,9 @@ export function CompareBlock() {
               variants={leftLabelVariants}
               initial="hidden"
               animate={isInView ? "visible" : "hidden"}
-              className="mb-2 text-[12px] font-semibold uppercase tracking-wider text-gray-400 lg:mb-4 lg:text-[14px]"
+              className="mb-2 text-[16px] font-semibold tracking-tight text-gray-500 lg:mb-4 lg:text-[20px]"
             >
-              직접 가는 길
+              일반적인 방법
             </motion.div>
             <motion.div
               variants={leftNumberVariants}
@@ -250,15 +250,6 @@ export function CompareBlock() {
               <ArrowRight size={48} strokeWidth={2} className="text-gray-400 lg:hidden" />
               <ArrowRight size={64} strokeWidth={2} className="hidden text-gray-400 lg:block" />
             </motion.div>
-            <motion.div
-              variants={badgeVariants}
-              initial="hidden"
-              animate={isInView ? "visible" : "hidden"}
-              className="hidden whitespace-nowrap rounded-full bg-[#ECFDF5] px-4 py-1.5 text-[36px] font-extrabold text-[var(--brand-green)] lg:block"
-              style={{ fontWeight: 800 }}
-            >
-              98% 단축
-            </motion.div>
           </div>
 
           {/* Step 4 + 5 — 우측 라벨 + 우 NumberFlow 카운트 255 → 3 */}
@@ -267,9 +258,9 @@ export function CompareBlock() {
               variants={rightLabelVariants}
               initial="hidden"
               animate={isInView ? "visible" : "hidden"}
-              className="mb-2 text-[12px] font-semibold uppercase tracking-wider text-[var(--brand-green)] lg:mb-4 lg:text-[14px]"
+              className="mb-2 text-[16px] font-semibold tracking-tight text-[var(--brand-green)] lg:mb-4 lg:text-[20px]"
             >
-              경매퀵 길
+              경매퀵을 이용하면
             </motion.div>
             <motion.div
               variants={rightNumberVariants}
@@ -296,19 +287,23 @@ export function CompareBlock() {
               </span>
               <span className="text-[16px] font-bold text-[var(--brand-green)] lg:text-[40px]">분</span>
             </motion.div>
-
-            {/* 모바일 배지 — "3" 아래 vertical stack */}
-            <motion.div
-              variants={badgeVariants}
-              initial="hidden"
-              animate={isInView ? "visible" : "hidden"}
-              className="mt-3 whitespace-nowrap rounded-full bg-[#ECFDF5] px-3 py-1 text-[24px] font-extrabold text-[var(--brand-green)] lg:hidden"
-              style={{ fontWeight: 800 }}
-            >
-              98% 단축
-            </motion.div>
           </div>
         </div>
+
+        {/* Step 6 — "98% 단축" 배지 (grid 외 별도 row / 모바일·데스크탑 동일 / ArrowRight 아래 가운데) */}
+        <motion.div
+          variants={badgeVariants}
+          initial="hidden"
+          animate={isInView ? "visible" : "hidden"}
+          className="mb-8 flex justify-center lg:mb-12"
+        >
+          <div
+            className="whitespace-nowrap rounded-full bg-[#ECFDF5] px-3 py-1 text-[24px] font-extrabold text-[var(--brand-green)] lg:px-4 lg:py-1.5 lg:text-[36px]"
+            style={{ fontWeight: 800 }}
+          >
+            98% 단축
+          </div>
+        </motion.div>
 
         {/* Step 0 — 보조 카피 (진입 즉시 / h2 후속) */}
         <motion.div
