@@ -21,47 +21,44 @@ import {
   ArrowDown,
 } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v50 cycle 4 — CompareBlock 일러스트 폐기 + 모바일 numbers 세로 + NumberFlow 96.
- * 정정 (Plan v50 cycle 4 / cycle 3 production NG 광역 회복 / cycle 4 5건 GO + 추가 질의 5건 GO):
- * 1. 일러스트 광역 폐기 (스크롤 시스템 꼬임 회피 + 정수 폐기)
- *    - import Image from "next/image" 폐기 (사용 0)
- *    - 일러스트 wrapper div + Image element 폐기 (15 lines)
- *    - src `/illustrations/compare-bg-v49-...` 참조 폐기 (파일 자체 보존)
- *    - opacity 0.40 style 폐기
- *    - section className isolate 폐기 (일러스트 폐기 후 의미 0)
- *    - z-30 sticky 보존 (TopNav 정합)
+/* Phase 1.2 (A-1-2) v50 cycle 5 — CompareBlock 비-sticky 회귀 + 시퀀스 자연 cascade 회복.
+ * 정정 (Plan v50 cycle 5 / cycle 4 production NG 회복 / Q1-Q6 광역 통합):
+ * 1. sticky paradigm 폐기 + 비-sticky 회귀 (형준님 "스크롤 턱 걸림" 회피)
+ *    - wrapperRef declaration + wrapper div 광역 폐기
+ *    - section className sticky / top-14 / lg:top-16 / z-30 광역 폐기
+ *    - useScroll target = wrapperRef → sectionRef
+ *    - useScroll offset = ["start start", "end end"] → ["start end", "end start"]
+ *    - 자연 scroll + scroll-linked 시퀀스 fire / 콘텐츠 viewport 통과 시 fire
  *
- * 2. section py 단축 + flex justify-center 보존 (cycle 3 정합)
- *    - py-10 lg:py-14 → py-6 lg:py-12 (40/56 → 24/48 / 모바일 16px ↓)
- *    - flex flex-col justify-center 보존 = 콘텐츠 viewport 중앙 lock + 위/아래 균등 분산
+ * 2. progress range / threshold 정정 (step 5 30% 빨리 fire)
+ *    - range = [0.25, 0.65] → [0.15, 0.55]
+ *    - 산식 = 0.15 + (start_ms / 8250) × 0.40
+ *    - threshold 6건 = 0.150 / 0.247 / 0.295 / 0.392 / 0.417 / 0.526
+ *    - step 5 0.517 → 0.417 (형준님 "단계별 너무 늦지 않게" 정합)
  *
- * 3. 모바일 numbers 세로 재배치 (255 ↓ → ↓ 3) + 데스크탑 가로 보존
- *    - 현 grid grid-cols-[1fr_auto_1fr] → flex flex-col items-center gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-8
- *    - 모바일 = flex flex-col gap-4 (세로) / 데스크탑 = lg:grid (가로 보존)
+ * 3. numbers wrapper 모바일 mb 단축 (형준님 "3분과 단계 표시 사이 여백 좁힘 / 하단 여백 ↑")
+ *    - mb-16 lg:mb-24 → mb-10 lg:mb-32
+ *    - 모바일 64 → 40 (-24 / 좁힘) + flex justify-center 위/아래 균등 분산 효과로 하단 ↑
  *
- * 4. ArrowDown 신규 import + 모바일 / 데스크탑 분기
- *    - lucide-react ArrowDown 신규 import (신규 npm 0)
- *    - <ArrowDown size={32} className="lg:hidden" /> + <ArrowRight size={64} className="hidden lg:block" />
- *
- * 5. 모바일 NumberFlow 비율 정정 (광역 1:2.08 정합)
- *    - 모바일 64 → 96 (좌 + 우) / 데스크탑 200 보존
- *    - 비율 = 1:2.08 (h2 광역 1:2 + TrustCTA "0" 1:1.75 사이 정합)
- *    - h2 44 vs NumberFlow 96 = 1:2.18 (데스크탑 88 vs 200 = 1:2.27 거의 정합)
- *
- * 6. 모바일 "분" 단위 비율 정정
- *    - 모바일 14 → 18 (좌 + 우) / 데스크탑 40 보존
- *    - 비율 = 1:2.22 (NumberFlow 1:2.08 정합)
+ * 4. 데스크탑 vertical 분산 "살짝" (형준님 "여백 살짝 늘리는 / 세련된 방식")
+ *    - section py: lg:py-12 → lg:py-16 (48 → 64)
+ *    - h2 wrapper mb: lg:mb-24 → lg:mb-32 (96 → 128)
+ *    - numbers wrapper mb: lg:mb-24 → lg:mb-32 (96 → 128)
+ *    - bars wrapper mb-0 보존 (마지막 콘텐츠)
+ *    - 콘텐츠 821 → 917 (sticky lock 1016 안 / flex justify-center 위/아래 균등 ~50)
  *
  * 보존:
- * - sticky 구조 (wrapperRef min-h-[200vh] + section sticky top-14 lg:top-16 z-30)
- * - section min-h calc(100vh-56px) lg:calc(100vh-64px) (TopNav 실측 정합)
- * - h2 mb-16 lg:mb-24 + numbers wrapper mb-16 lg:mb-24 + bars wrapper mb-0
- * - useScroll target=wrapperRef offset=["start start", "end end"] / useSpring 80/25/0.5/0.001
- * - progress range [0.25, 0.65] / threshold 6건 (0.250 / 0.347 / 0.395 / 0.492 / 0.517 / 0.625)
- * - staggerChildren 0.15 / 단방향 advance Math.max guard
+ * - useSpring 80/25/0.5/0.001 (광역 검증된 값)
+ * - timeline 8.25초 (variants duration / staggerChildren 0.15 광역 보존)
+ * - section min-h calc(100vh-56px) lg:calc(100vh-64px) / flex flex-col justify-center
+ * - 모바일 py-6 / h2 mb-16 / numbers mb-10 / bars mb-0
+ * - 단방향 advance Math.max guard / 초기 sync useEffect
  * - h2 진입 = useInView 별도 보존
- * - motion variants 7건 정의 / NumberFlow leftValue/rightValue 로직 + 내장 spin
- * - 데스크탑 절대 크기 (NumberFlow 200 / "분" 40 / ArrowRight 64) 광역 보존
+ * - motion variants 7건 정의 / NumberFlow leftValue/rightValue 로직
+ * - 일러스트 광역 폐기 (cycle 4 정합)
+ * - ArrowDown / ArrowRight 분기 (cycle 4 정합)
+ * - 모바일 numbers 세로 / 데스크탑 가로 분기 (cycle 4 정합)
+ * - NumberFlow 96/200 / "분" 18/40 / ArrowDown 32 / ArrowRight 64 / h2 44/88
  * - 카피 v4 SoT v39 (h2 + stamp 광역) */
 
 type Bar = {
@@ -137,18 +134,17 @@ const stampVariants: Variants = {
 };
 
 export function CompareBlock() {
-  const wrapperRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   // h2 전용 진입 (scroll-linked 시퀀스와 별개 시스템)
   const sectionInView = useInView(sectionRef, { once: true, amount: 0.3 });
   const [step, setStep] = useState(0);
 
   // scroll-linked 시퀀스 진입 (motion v12 useScroll → useSpring smoothing → useTransform 임계값 → useMotionValueEvent)
-  // cycle 3: target = wrapperRef (sticky parent) / offset = ["start start", "end end"]
-  // sticky lock 동안 wrapper의 100vh가 scroll → progress 0 → 1 자연 진입
+  // cycle 5: sticky 폐기 + 비-sticky 회귀 / target = sectionRef / offset = ["start end", "end start"]
+  // 자연 scroll 동안 section viewport 통과 시 progress 0 → 1 자연 fire (형준님 "스크롤 턱 걸림" NG 회피)
   const { scrollYProgress } = useScroll({
-    target: wrapperRef,
-    offset: ["start start", "end end"],
+    target: sectionRef,
+    offset: ["start end", "end start"],
   });
   const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 80,
@@ -156,15 +152,15 @@ export function CompareBlock() {
     mass: 0.5,
     restDelta: 0.001,
   });
-  // progress range [0.25, 0.65] → 6 step 임계값 (산식: 0.25 + (start_ms / 8250) × 0.40)
-  // cycle 2: step 4 → step 5 텀 0 (98% 단축 직후 즉시 5단계) / step 5 → step 6 텀 1500ms (5단계 충분 visible)
+  // progress range [0.15, 0.55] → 6 step 임계값 (산식: 0.15 + (start_ms / 8250) × 0.40)
+  // cycle 5: step 5 threshold 0.517 → 0.417 (30% 빨리 fire / 형준님 "단계별 너무 늦지 않게" 정합)
   const stepValue = useTransform(smoothProgress, (p) => {
-    if (p >= 0.625) return 6;
-    if (p >= 0.517) return 5;
-    if (p >= 0.492) return 4;
-    if (p >= 0.395) return 3;
-    if (p >= 0.347) return 2;
-    if (p >= 0.25) return 1;
+    if (p >= 0.526) return 6;
+    if (p >= 0.417) return 5;
+    if (p >= 0.392) return 4;
+    if (p >= 0.295) return 3;
+    if (p >= 0.247) return 2;
+    if (p >= 0.15) return 1;
     return 0;
   });
   // 단방향 advance (역행 시 step 회귀 0)
@@ -184,12 +180,11 @@ export function CompareBlock() {
   const rightAnimated = step >= 3;
 
   return (
-    <div ref={wrapperRef} className="relative min-h-[200vh]">
-      <section
-        ref={sectionRef}
-        aria-labelledby="compare-heading"
-        className="sticky top-14 z-30 flex min-h-[calc(100vh-56px)] flex-col justify-center overflow-hidden bg-white py-6 lg:top-16 lg:min-h-[calc(100vh-64px)] lg:py-12"
-      >
+    <section
+      ref={sectionRef}
+      aria-labelledby="compare-heading"
+      className="relative flex min-h-[calc(100vh-56px)] flex-col justify-center overflow-hidden bg-white py-6 lg:min-h-[calc(100vh-64px)] lg:py-16"
+    >
         <div className="container-app w-full">
           {/* h2 (sectionInView trigger / step 진입 전 visible) */}
           <motion.h2
@@ -197,7 +192,7 @@ export function CompareBlock() {
             variants={fadeVariants}
             initial="hidden"
             animate={sectionInView ? "visible" : "hidden"}
-            className="mb-16 text-center text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:mb-24 lg:text-[88px]"
+            className="mb-16 text-center text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:mb-32 lg:text-[88px]"
             style={{ fontWeight: 800 }}
           >
             법원 가는 3시간,
@@ -206,8 +201,8 @@ export function CompareBlock() {
             <span style={{ color: "#FFD43B" }}>.</span>
           </motion.h2>
 
-          {/* 숫자 grid wrapper (3단 분리 / cycle 4: 모바일 세로 / 데스크탑 가로 분기) */}
-          <div className="relative mb-16 lg:mb-24">
+          {/* 숫자 grid wrapper (3단 분리 / cycle 5: 모바일 mb-10 단축 + 데스크탑 lg:mb-32 분산) */}
+          <div className="relative mb-10 lg:mb-32">
             {/* 숫자 비교 — 모바일 flex flex-col 세로 / 데스크탑 lg:grid 가로 */}
             <div className="flex flex-col items-center gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-8">
             {/* Step 1 — 좌측 라벨 + 좌 NumberFlow 1 → 255 */}
@@ -365,8 +360,7 @@ export function CompareBlock() {
             ))}
           </motion.div>
         </div>
-        </div>
-      </section>
-    </div>
+      </div>
+    </section>
   );
 }
