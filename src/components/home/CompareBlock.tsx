@@ -12,18 +12,19 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v41 — CompareBlock (3 phase choreography + 보조 카피 정정 + Blueprint Grid + h2 마침표 yellow).
- * 정정 (Plan v41):
- * 1. 보조 카피 "85배 빠릅니다." → "발품도 시간도, 단 한 번에." (에너지 + 시간 + 단계 제거 동시 정합)
- * 2. h2 마침표 yellow #FFD43B (Insight + PageHero paradigm 확장)
- * 3. Phase 1 entrance (0~600ms) — 라벨 + 5 막대 wave (60ms stagger) + 우 큰 숫자 + ArrowRight + 보조 카피
- * 4. Phase 2 dim (600~1100ms) — 좌 5 막대 opacity 1 → 0.3 (단계 제거 시각화)
- * 5. Phase 3 NumberFlow (1100~1600ms) — 좌 255 / 우 3 동시 발화 + ArrowRight bounce + 우 큰 숫자 pulse
- * 6. Blueprint Grid 배경 (24px / rgba(229,231,235,0.5) / Stripe·Linear·Vercel paradigm)
- * 7. useInView once: true / amount 0.3 (재발화 0)
- * 8. 보조 카피 grid 외 별도 row (모바일 28px 한 줄 정합)
- * 9. 분 단위 baseline 통일 (flex items-baseline + 좌우 동일 패러다임)
- * 10. layout 모션 0 (collapse 0 / AnimatePresence 0 / 모바일 lag 차단) */
+/* Phase 1.2 (A-1-2) v42 — CompareBlock 5 phase choreography (잭팟 + X 취소선 + 배지 + stamp + dotted curve).
+ * 정정 (Plan v42):
+ * 1. h2 "3시간" 회색 변조 폐기 (charcoal 통일)
+ * 2. Phase 1 entrance (0-300ms) — 라벨 + 좌 255 + 우 3 + 5 카드 wave + ArrowRight + 보조 카피
+ * 3. Phase 2 잭팟 (300-1900ms) — NumberFlow 255 → 3 / cubic-bezier(0.34, 1.56, 0.64, 1) / 1600ms
+ * 4. Phase 3 strike + dim (1500-2100ms) — X 취소선 5 카드 stagger + 5 카드 + 좌 255 + 좌 라벨 dim
+ * 5. Phase 4 settle + curve (1900-2400ms) — ArrowRight bounce + dotted curve + 배지 spring entrance
+ * 6. "−252분" 배지 (#ECFDF5 bg + #00C853 text / 모바일 24 / 데스크탑 36)
+ * 7. Phase 5 stamp (2400-2900ms) — charcoal #111418 bg + green text (CTA 시각 충돌 회피)
+ * 8. trigger useInView once: true / amount 0.3
+ * 9. dotted curve SVG (좌 → 가운데 → 우 / opacity 0.15 / stroke-dasharray)
+ * 10. h2 마침표 yellow (보존)
+ * 11. skeleton 도식 폐기 (Code 정정 채택 / 11 layer 누적 회피) */
 
 type Bar = {
   Icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>;
@@ -42,29 +43,31 @@ const BAR_DATA: Bar[] = [
 const containerVariants: Variants = {
   hidden: {},
   visible: {
-    transition: {
-      staggerChildren: 0.06,
-      delayChildren: 0.1,
-    },
+    transition: { staggerChildren: 0.06, delayChildren: 0.1 },
   },
 };
 
 const labelVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.2 } },
+  dim: { opacity: 0.4, transition: { duration: 0.5, delay: 1.5, ease: "easeInOut" } },
+};
+
+const leftNumberVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.3, ease: "easeOut" } },
+  dim: { opacity: 0.4, transition: { duration: 0.5, delay: 1.5, ease: "easeInOut" } },
+};
+
+const rightNumberVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.95 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.3, ease: "easeOut" } },
 };
 
 const barVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.95 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: { duration: 0.4, ease: "easeOut" },
-  },
-  dim: {
-    opacity: 0.3,
-    transition: { duration: 0.5, delay: 0.6, ease: "easeInOut" },
-  },
+  hidden: { opacity: 0, y: 8 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
+  dim: { opacity: 0.25, transition: { duration: 0.5, delay: 1.5, ease: "easeInOut" } },
 };
 
 const arrowVariants: Variants = {
@@ -72,7 +75,7 @@ const arrowVariants: Variants = {
   visible: { opacity: 1, transition: { duration: 0.3, delay: 0.3 } },
   bounce: {
     scale: [1, 1.1, 1],
-    transition: { duration: 0.4, delay: 1.1, ease: [0.34, 1.56, 0.64, 1] },
+    transition: { duration: 0.4, delay: 1.9, ease: [0.34, 1.56, 0.64, 1] },
   },
 };
 
@@ -81,27 +84,45 @@ const subCopyVariants: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4, delay: 0.4 } },
 };
 
-const rightNumberVariants: Variants = {
-  hidden: { scale: 0.9, opacity: 0 },
+const badgeVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.85 },
   visible: {
-    scale: 1,
     opacity: 1,
-    transition: { duration: 0.4, ease: "easeOut", delay: 0.2 },
+    scale: 1,
+    transition: { type: "spring", stiffness: 200, damping: 15, delay: 1.9 },
   },
-  pulse: {
-    scale: [1, 1.02, 1],
-    transition: { duration: 0.6, delay: 1.1, ease: "easeInOut" },
+};
+
+const stampVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.9 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.4, delay: 2.4, ease: "easeOut" },
+  },
+};
+
+const dottedCurveVariants: Variants = {
+  hidden: { pathLength: 0 },
+  visible: {
+    pathLength: 1,
+    transition: { duration: 0.4, delay: 1.5, ease: "easeOut" },
   },
 };
 
 export function CompareBlock() {
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
-  const [started, setStarted] = useState(false);
+  const [rightValue, setRightValue] = useState(255);
+  const [rightAnimated, setRightAnimated] = useState(false);
 
   useEffect(() => {
     if (isInView) {
-      const t = setTimeout(() => setStarted(true), 1100);
+      // Phase 2 — 300ms 후 잭팟 발화 (255 → 3 / 1600ms back-out spring)
+      const t = setTimeout(() => {
+        setRightAnimated(true);
+        setRightValue(3);
+      }, 300);
       return () => clearTimeout(t);
     }
   }, [isInView]);
@@ -110,7 +131,7 @@ export function CompareBlock() {
     <section
       ref={sectionRef}
       aria-labelledby="compare-heading"
-      className="flex min-h-[calc(100vh-64px)] flex-col justify-center py-12 lg:min-h-[calc(100vh-80px)] lg:py-16"
+      className="relative flex min-h-[calc(100vh-64px)] flex-col justify-center overflow-hidden py-12 lg:min-h-[calc(100vh-80px)] lg:py-16"
       style={{
         backgroundColor: "white",
         backgroundImage:
@@ -118,74 +139,135 @@ export function CompareBlock() {
         backgroundSize: "24px 24px",
       }}
     >
-      <div className="container-app w-full">
+      {/* dotted curve 배경 SVG (좌 → 가운데 → 우 곡선 흐름) */}
+      <motion.svg
+        className="pointer-events-none absolute inset-x-0 top-[42%] z-0 h-[180px] -translate-y-1/2 lg:top-[45%] lg:h-[260px]"
+        viewBox="0 0 1000 200"
+        preserveAspectRatio="none"
+        fill="none"
+        style={{ opacity: 0.18 }}
+        initial="hidden"
+        animate={isInView ? "visible" : "hidden"}
+      >
+        <motion.path
+          d="M 100 130 Q 500 30, 900 110"
+          stroke="rgb(156 163 175)"
+          strokeWidth={2}
+          strokeDasharray="6 6"
+          strokeLinecap="round"
+          variants={dottedCurveVariants}
+        />
+      </motion.svg>
+
+      <div className="container-app relative z-10 w-full">
         <h2
           id="compare-heading"
           className="mb-12 text-center text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:mb-16 lg:text-[88px]"
           style={{ fontWeight: 800 }}
         >
-          법원 가는 <span className="text-gray-400">3시간,</span>
+          법원 가는 3시간,
           <br />
           물건 보는 <span className="text-[var(--brand-green)]">시간으로</span>
           <span style={{ color: "#FFD43B" }}>.</span>
         </h2>
 
-        {/* 큰 숫자 직접 비교 — 좌 (gray) vs 가운데 (ArrowRight) vs 우 (green) */}
+        {/* 큰 숫자 직접 비교 — 좌 (gray + dim) vs 가운데 (배지 + ArrowRight) vs 우 (green 잭팟) */}
         <motion.div
-          className="mb-8 grid grid-cols-3 items-center gap-4 lg:mb-12 lg:gap-8"
+          className="mb-8 grid grid-cols-3 items-start gap-4 lg:mb-12 lg:items-center lg:gap-8"
           variants={containerVariants}
           initial="hidden"
           animate={isInView ? "visible" : "hidden"}
         >
-          {/* 좌측 — 직접 가는 길 */}
+          {/* 좌측 — 직접 가는 길 (Phase 3 dim 0.4) */}
           <div className="flex flex-col items-center text-center">
             <motion.div
               variants={labelVariants}
+              animate={isInView ? ["visible", "dim"] : "hidden"}
               className="mb-2 text-[12px] font-semibold uppercase tracking-wider text-gray-400 lg:mb-4 lg:text-[14px]"
             >
               직접 가는 길
             </motion.div>
-            <div className="flex items-baseline justify-center gap-1">
+            <motion.div
+              variants={leftNumberVariants}
+              animate={isInView ? ["visible", "dim"] : "hidden"}
+              className="flex items-baseline justify-center gap-1"
+            >
               <span
                 className="text-[80px] font-extrabold leading-none text-gray-400 lg:text-[200px]"
                 style={{ fontWeight: 800 }}
               >
-                {started ? <NumberFlow value={255} /> : "0"}
+                <NumberFlow value={255} />
               </span>
               <span className="text-[20px] font-bold text-gray-400 lg:text-[40px]">분</span>
-            </div>
+            </motion.div>
           </div>
 
-          {/* 가운데 — 화살표 only */}
-          <motion.div
-            variants={arrowVariants}
-            animate={isInView ? ["visible", "bounce"] : "hidden"}
-            className="flex justify-center"
-          >
-            <ArrowRight size={48} strokeWidth={2} className="text-gray-400 lg:hidden" />
-            <ArrowRight size={64} strokeWidth={2} className="hidden text-gray-400 lg:block" />
-          </motion.div>
+          {/* 가운데 — 데스크탑 배지 (ArrowRight 위) + ArrowRight bounce */}
+          <div className="flex flex-col items-center justify-center gap-3 lg:gap-4">
+            {/* 데스크탑 배지 */}
+            <motion.div
+              variants={badgeVariants}
+              initial="hidden"
+              animate={isInView ? "visible" : "hidden"}
+              className="hidden whitespace-nowrap rounded-full bg-[#ECFDF5] px-4 py-1.5 text-[36px] font-extrabold text-[var(--brand-green)] lg:block"
+              style={{ fontWeight: 800 }}
+            >
+              −252분
+            </motion.div>
+            <motion.div
+              variants={arrowVariants}
+              animate={isInView ? ["visible", "bounce"] : "hidden"}
+              className="flex justify-center"
+            >
+              <ArrowRight size={48} strokeWidth={2} className="text-gray-400 lg:hidden" />
+              <ArrowRight size={64} strokeWidth={2} className="hidden text-gray-400 lg:block" />
+            </motion.div>
+          </div>
 
-          {/* 우측 — 경매퀵 길 */}
+          {/* 우측 — 경매퀵 길 (잭팟 카운트 255 → 3) */}
           <div className="flex flex-col items-center text-center">
             <motion.div
               variants={labelVariants}
+              animate={isInView ? "visible" : "hidden"}
               className="mb-2 text-[12px] font-semibold uppercase tracking-wider text-[var(--brand-green)] lg:mb-4 lg:text-[14px]"
             >
               경매퀵 길
             </motion.div>
             <motion.div
               variants={rightNumberVariants}
-              animate={isInView ? ["visible", "pulse"] : "hidden"}
+              initial="hidden"
+              animate={isInView ? "visible" : "hidden"}
               className="flex items-baseline justify-center gap-1"
             >
               <span
                 className="text-[80px] font-extrabold leading-none text-[var(--brand-green)] lg:text-[200px]"
                 style={{ fontWeight: 800 }}
               >
-                {started ? <NumberFlow value={3} /> : "0"}
+                <NumberFlow
+                  value={rightValue}
+                  animated={rightAnimated}
+                  transformTiming={{
+                    duration: 1600,
+                    easing: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+                  }}
+                  spinTiming={{
+                    duration: 1600,
+                    easing: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+                  }}
+                />
               </span>
               <span className="text-[20px] font-bold text-[var(--brand-green)] lg:text-[40px]">분</span>
+            </motion.div>
+
+            {/* 모바일 배지 — "3" 아래 vertical stack */}
+            <motion.div
+              variants={badgeVariants}
+              initial="hidden"
+              animate={isInView ? "visible" : "hidden"}
+              className="mt-3 whitespace-nowrap rounded-full bg-[#ECFDF5] px-3 py-1 text-[24px] font-extrabold text-[var(--brand-green)] lg:hidden"
+              style={{ fontWeight: 800 }}
+            >
+              −252분
             </motion.div>
           </div>
         </motion.div>
@@ -201,33 +283,90 @@ export function CompareBlock() {
           발품도 시간도, 단 한 번에.
         </motion.div>
 
-        {/* 하단 5 막대 — wave entrance + Phase 2 dim */}
-        <motion.div
-          className="mx-auto grid max-w-4xl grid-cols-5 gap-2 lg:gap-4"
-          variants={containerVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-        >
-          {BAR_DATA.map(({ Icon, label, minutes }) => (
-            <motion.div
-              key={label}
-              variants={barVariants}
-              animate={isInView ? ["visible", "dim"] : "hidden"}
-              className="flex flex-col items-center gap-1 lg:gap-2"
-            >
-              <Icon size={20} strokeWidth={2} className="text-gray-400" />
-              <div className="h-1 w-full overflow-hidden rounded-full bg-gray-200">
-                <div
-                  className="h-full rounded-full bg-gray-300"
-                  style={{ width: `${(minutes / 90) * 100}%` }}
-                />
-              </div>
-              <div className="text-[11px] font-semibold text-gray-500 lg:text-[13px]">
-                {label} {minutes}분
-              </div>
-            </motion.div>
-          ))}
-        </motion.div>
+        {/* 5 단계 카드 + stamp */}
+        <div className="relative mx-auto max-w-4xl">
+          {/* stamp — 5단계 위 가운데 (charcoal bg + green text / CTA 시각 충돌 회피) */}
+          <motion.div
+            variants={stampVariants}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+            className="absolute -top-4 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#111418] px-4 py-2 text-[14px] font-bold text-[var(--brand-green)] lg:-top-5 lg:px-6 lg:py-2.5 lg:text-[18px]"
+            style={{ fontWeight: 700 }}
+          >
+            이 모든 단계, 경매퀵이 대신합니다
+          </motion.div>
+
+          {/* 5 카드 grid — wave entrance + dim + X 취소선 */}
+          <motion.div
+            className="grid grid-cols-5 gap-2 pt-6 lg:gap-4 lg:pt-8"
+            variants={containerVariants}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+          >
+            {BAR_DATA.map(({ Icon, label, minutes }, idx) => (
+              <motion.div
+                key={label}
+                variants={barVariants}
+                animate={isInView ? ["visible", "dim"] : "hidden"}
+                className="relative flex flex-col items-center gap-1 lg:gap-2"
+              >
+                {/* X 취소선 SVG — 카드 위 absolute / vector-effect non-scaling-stroke */}
+                <svg
+                  className="pointer-events-none absolute inset-0 z-10"
+                  viewBox="0 0 100 100"
+                  preserveAspectRatio="none"
+                  fill="none"
+                >
+                  <motion.line
+                    x1="20"
+                    y1="20"
+                    x2="80"
+                    y2="80"
+                    stroke="rgb(156 163 175)"
+                    strokeLinecap="round"
+                    vectorEffect="non-scaling-stroke"
+                    className="[stroke-width:1.5] lg:[stroke-width:2]"
+                    initial={{ pathLength: 0 }}
+                    animate={isInView ? { pathLength: 1 } : { pathLength: 0 }}
+                    transition={{
+                      duration: 0.3,
+                      delay: 1.5 + idx * 0.06,
+                      ease: "easeOut",
+                    }}
+                  />
+                  <motion.line
+                    x1="80"
+                    y1="20"
+                    x2="20"
+                    y2="80"
+                    stroke="rgb(156 163 175)"
+                    strokeLinecap="round"
+                    vectorEffect="non-scaling-stroke"
+                    className="[stroke-width:1.5] lg:[stroke-width:2]"
+                    initial={{ pathLength: 0 }}
+                    animate={isInView ? { pathLength: 1 } : { pathLength: 0 }}
+                    transition={{
+                      duration: 0.3,
+                      delay: 1.5 + idx * 0.06,
+                      ease: "easeOut",
+                    }}
+                  />
+                </svg>
+
+                <Icon size={20} strokeWidth={2} className="text-gray-400" />
+                <div className="h-1 w-full overflow-hidden rounded-full bg-gray-200">
+                  <div
+                    className="h-full rounded-full bg-gray-300"
+                    style={{ width: `${(minutes / 90) * 100}%` }}
+                  />
+                </div>
+                <div className="text-[11px] font-semibold text-gray-500 lg:text-[13px]">
+                  {label} {minutes}분
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+        </div>
       </div>
     </section>
   );
