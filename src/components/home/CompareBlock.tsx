@@ -2,7 +2,15 @@
 
 import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
-import { motion, useInView, type Variants } from "motion/react";
+import {
+  motion,
+  useInView,
+  useScroll,
+  useSpring,
+  useTransform,
+  useMotionValueEvent,
+  type Variants,
+} from "motion/react";
 import NumberFlow from "@number-flow/react";
 import {
   Car,
@@ -13,25 +21,30 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v49 — CompareBlock 시퀀스 순서 정합 + 비슷한 속도 + 보조 카피 크기 ↑ + 일러스트 production.
- * 정정 (Plan v49):
- * 1. 시퀀스 순서 정합 (형준님 캡처 정합 / setTimeout chain / 1→2→3→4→5→6→7)
- *    Step 1 (0ms):    좌 라벨 + 좌 NumberFlow 1 → 255
- *    Step 2 (600ms):  ArrowRight + pulse
- *    Step 3 (1200ms): 우 라벨 + 우 NumberFlow 255 → 3
- *    Step 4 (1800ms): "98% 단축" 배지
- *    Step 5 (2400ms): 5단계 PPT Appear stagger
- *    Step 6 (3000ms): stamp + 5단계 dim 동시
- *    Step 7 (3600ms): 보조 카피 (마지막 / layout 위치 = 5단계 + stamp 후)
- * 2. 비슷한 속도 밸런스 (각 순번 간 600ms / Compare section useInView trigger)
- * 3. 모바일 좌우 여백 정합 (px-5 / container-app 광역)
- * 4. 보조 카피 크기 ↑ (모바일 28 / 데스크탑 44)
- * 5. 배경 일러스트 production 노출 (compare-bg-v49-a-refined-cityscape.png / 16:5 ULTRA WIDE)
+/* Phase 1.2 (A-1-2) v50 — CompareBlock scroll-linked 발화 진입.
+ * 정정 (Plan v50):
+ * 1. 시퀀스 trigger source = setTimeout chain → motion v12 useScroll + useSpring + useTransform + useMotionValueEvent
+ *    - target = sectionRef / offset = ["start end", "end start"] (≈ 200vh scroll 거리)
+ *    - useSpring smoothing (stiffness 80 / damping 25 / mass 0.5) → 빠른 scroll "와다다닥" 회피
+ *    - progress range [0.25, 0.75] = section 풍성 visible 구간 mapping
+ *    - 단방향 advance (Math.max guard) → scroll 역행 시 step 회귀 0
+ *    - 초기 sync useEffect → 페이지 reload mid-scroll 대비
+ * 2. 시퀀스 6 Step 균등 (보조 카피 Step 7 영구 폐기)
+ *    Step 1 (progress 0.250): 좌 라벨 + 좌 NumberFlow 1 → 255
+ *    Step 2 (progress 0.364): ArrowRight + pulse
+ *    Step 3 (progress 0.422): 우 라벨 + 우 NumberFlow 255 → 3
+ *    Step 4 (progress 0.536): "98% 단축" 배지
+ *    Step 5 (progress 0.622): 5단계 PPT Appear stagger
+ *    Step 6 (progress 0.722): stamp + 5단계 dim 동시
+ *    threshold 산식: 0.25 + (start_ms / 8750) × 0.50
+ * 3. 일러스트 opacity 0.12 → 0.18 (production 시각 노출)
  *
- * 보존 (v48):
- * - 모바일 우 라벨 한 줄 (whitespace-nowrap / 폰트 16)
- * - stamp "경매퀵" yellow accent (span 분리)
- * - 모바일 비율 ("255"/"3" 64 / ArrowRight 32 / 배지 20) */
+ * 보존:
+ * - h2 진입 = useInView 별도 보존 (sectionInView amount 0.3 / scroll-linked 시퀀스와 별개 시스템)
+ * - motion variants 7건 정의 (labelVariants / numberVariants / arrowVariants / badgeVariants / barContainerVariants / barVariants / stampVariants)
+ * - NumberFlow leftValue/rightValue 로직 + 내장 spin (transformTiming/spinTiming 1200ms)
+ * - barContainerVariants staggerChildren 0.1 (5단계 PPT Appear / 기존 정의 100% 보존)
+ * - 카피 v4 SoT v39 + 절대 크기 + 일러스트 src/inset/object-cover */
 
 type Bar = {
   Icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>;
@@ -85,18 +98,6 @@ const badgeVariants: Variants = {
   },
 };
 
-const subCopyVariants: Variants = {
-  hidden: { opacity: 0, scale: 0.85 },
-  visible: {
-    opacity: 1,
-    scale: 1,
-    transition: {
-      duration: 0.5,
-      ease: [0.34, 1.56, 0.64, 1],
-    },
-  },
-};
-
 const barContainerVariants: Variants = {
   hidden: {},
   visible: {
@@ -119,28 +120,40 @@ const stampVariants: Variants = {
 
 export function CompareBlock() {
   const sectionRef = useRef<HTMLElement>(null);
+  // h2 전용 진입 (scroll-linked 시퀀스와 별개 시스템)
   const sectionInView = useInView(sectionRef, { once: true, amount: 0.3 });
   const [step, setStep] = useState(0);
 
+  // scroll-linked 시퀀스 진입 (motion v12 useScroll → useSpring smoothing → useTransform 임계값 → useMotionValueEvent)
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start end", "end start"],
+  });
+  const smoothProgress = useSpring(scrollYProgress, {
+    stiffness: 80,
+    damping: 25,
+    mass: 0.5,
+    restDelta: 0.001,
+  });
+  // progress range [0.25, 0.75] → 6 step 임계값 (산식: 0.25 + (start_ms / 8750) × 0.50)
+  const stepValue = useTransform(smoothProgress, (p) => {
+    if (p >= 0.722) return 6;
+    if (p >= 0.622) return 5;
+    if (p >= 0.536) return 4;
+    if (p >= 0.422) return 3;
+    if (p >= 0.364) return 2;
+    if (p >= 0.25) return 1;
+    return 0;
+  });
+  // 단방향 advance (역행 시 step 회귀 0)
+  useMotionValueEvent(stepValue, "change", (v) => {
+    setStep((prev) => Math.max(prev, v));
+  });
+  // 초기 sync (페이지 reload mid-scroll 대비)
   useEffect(() => {
-    if (!sectionInView) return;
-    let cancelled = false;
-    const advance = (n: number, delay: number) => {
-      setTimeout(() => {
-        if (!cancelled) setStep(n);
-      }, delay);
-    };
-    advance(1, 0);
-    advance(2, 600);
-    advance(3, 1200);
-    advance(4, 1800);
-    advance(5, 2400);
-    advance(6, 3000);
-    advance(7, 3600);
-    return () => {
-      cancelled = true;
-    };
-  }, [sectionInView]);
+    setStep((prev) => Math.max(prev, stepValue.get()));
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // NumberFlow derived state (cascading render 회피)
   const leftValue = step >= 1 ? 255 : 1;
@@ -172,7 +185,7 @@ export function CompareBlock() {
 
         {/* 일러스트 + 숫자 grid 광역 wrapper */}
         <div className="relative mb-12 lg:mb-16">
-          {/* 일러스트 배경 (compare-bg-v49-a-refined-cityscape.png / opacity 0.12) */}
+          {/* 일러스트 배경 (compare-bg-v49-a-refined-cityscape.png / opacity 0.18) */}
           <div
             className="pointer-events-none absolute inset-0 -z-10"
             aria-hidden="true"
@@ -183,7 +196,7 @@ export function CompareBlock() {
               fill
               sizes="100vw"
               className="object-cover"
-              style={{ opacity: 0.12 }}
+              style={{ opacity: 0.18 }}
             />
           </div>
 
@@ -344,17 +357,6 @@ export function CompareBlock() {
             ))}
           </motion.div>
         </div>
-
-        {/* Step 7 — 보조 카피 (마지막 / 모바일 28 / 데스크탑 44 / weight 700) */}
-        <motion.div
-          variants={subCopyVariants}
-          initial="hidden"
-          animate={step >= 7 ? "visible" : "hidden"}
-          className="text-center text-[28px] font-bold leading-[1.3] tracking-[-0.015em] text-gray-900 lg:text-[44px]"
-          style={{ fontWeight: 700 }}
-        >
-          발품도 시간도, 단 한 번에.
-        </motion.div>
       </div>
     </section>
   );
