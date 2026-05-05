@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef } from "react";
+import { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import { motion, useInView, type Variants } from "motion/react";
 import NumberFlow from "@number-flow/react";
@@ -13,17 +13,25 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v48 — CompareBlock 스크롤 trigger + 모바일 라벨 한 줄 + stamp 경매퀵 yellow + 일러스트 신규.
- * 정정 (Plan v48):
- * 1. 각 요소별 useInView 분리 (Compare section 자체 useInView 폐기 / 자동 타이머 0)
- *    h2 / 좌 라벨 / 좌 숫자 / arrow / 우 라벨 / 우 숫자 / 배지 / 보조 카피 / 5단계 container / stamp 광역 분리 ref
- *    사용자 스크롤 시 각 요소 viewport 진입 발화 (한 개씩)
- * 2. 모바일 우 라벨 "경매퀵을 이용하면" 한 줄 (폰트 18 → 16 / whitespace-nowrap / 카피 변경 0)
- * 3. stamp "경매퀵" #FFD43B yellow accent (span 분리)
- * 4. 모바일 비율 v47 보존 ("255"/"3" 64 / ArrowRight 32 / 배지 20)
- * 5. v48 신규 일러스트 (compare-bg-v48-a-cityscape-wide.png / 16:5 ULTRA WIDE / 형준님 (a) 채택)
- * 6. 일러스트 위치 = 숫자 grid + 보조 카피 광역 wrapper / inset-0 / -z-10 / opacity 0.12
- * 7. 일러스트 production 노출 의무 (Next/Image fill / sizes 100vw / object-cover) */
+/* Phase 1.2 (A-1-2) v49 — CompareBlock 시퀀스 순서 정합 + 비슷한 속도 + 보조 카피 크기 ↑ + 일러스트 production.
+ * 정정 (Plan v49):
+ * 1. 시퀀스 순서 정합 (형준님 캡처 정합 / setTimeout chain / 1→2→3→4→5→6→7)
+ *    Step 1 (0ms):    좌 라벨 + 좌 NumberFlow 1 → 255
+ *    Step 2 (600ms):  ArrowRight + pulse
+ *    Step 3 (1200ms): 우 라벨 + 우 NumberFlow 255 → 3
+ *    Step 4 (1800ms): "98% 단축" 배지
+ *    Step 5 (2400ms): 5단계 PPT Appear stagger
+ *    Step 6 (3000ms): stamp + 5단계 dim 동시
+ *    Step 7 (3600ms): 보조 카피 (마지막 / layout 위치 = 5단계 + stamp 후)
+ * 2. 비슷한 속도 밸런스 (각 순번 간 600ms / Compare section useInView trigger)
+ * 3. 모바일 좌우 여백 정합 (px-5 / container-app 광역)
+ * 4. 보조 카피 크기 ↑ (모바일 28 / 데스크탑 44)
+ * 5. 배경 일러스트 production 노출 (compare-bg-v49-a-refined-cityscape.png / 16:5 ULTRA WIDE)
+ *
+ * 보존 (v48):
+ * - 모바일 우 라벨 한 줄 (whitespace-nowrap / 폰트 16)
+ * - stamp "경매퀵" yellow accent (span 분리)
+ * - 모바일 비율 ("255"/"3" 64 / ArrowRight 32 / 배지 20) */
 
 type Bar = {
   Icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>;
@@ -47,17 +55,17 @@ const fadeVariants: Variants = {
 
 const labelVariants: Variants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.3 } },
+  visible: { opacity: 1, transition: { duration: 0.4 } },
 };
 
 const numberVariants: Variants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.3 } },
+  visible: { opacity: 1, transition: { duration: 0.4 } },
 };
 
 const arrowVariants: Variants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.3 } },
+  visible: { opacity: 1, transition: { duration: 0.4 } },
   pulse: {
     scale: [1, 1.05, 1],
     transition: { duration: 0.4, delay: 0.1, ease: "easeInOut" },
@@ -110,48 +118,49 @@ const stampVariants: Variants = {
 };
 
 export function CompareBlock() {
-  // 각 요소별 ref 광역 분리 (스크롤 trigger 의무 / 자동 타이머 0)
-  const h2Ref = useRef<HTMLHeadingElement>(null);
-  const leftLabelRef = useRef<HTMLDivElement>(null);
-  const leftNumberRef = useRef<HTMLDivElement>(null);
-  const arrowRef = useRef<HTMLDivElement>(null);
-  const rightLabelRef = useRef<HTMLDivElement>(null);
-  const rightNumberRef = useRef<HTMLDivElement>(null);
-  const badgeRef = useRef<HTMLDivElement>(null);
-  const subCopyRef = useRef<HTMLDivElement>(null);
-  const barContainerRef = useRef<HTMLDivElement>(null);
-  const stampRef = useRef<HTMLDivElement>(null);
+  const sectionRef = useRef<HTMLElement>(null);
+  const sectionInView = useInView(sectionRef, { once: true, amount: 0.3 });
+  const [step, setStep] = useState(0);
 
-  const h2InView = useInView(h2Ref, { once: true, amount: 0.5 });
-  const leftLabelInView = useInView(leftLabelRef, { once: true, amount: 0.7 });
-  const leftNumberInView = useInView(leftNumberRef, { once: true, amount: 0.7 });
-  const arrowInView = useInView(arrowRef, { once: true, amount: 0.7 });
-  const rightLabelInView = useInView(rightLabelRef, { once: true, amount: 0.7 });
-  const rightNumberInView = useInView(rightNumberRef, { once: true, amount: 0.7 });
-  const badgeInView = useInView(badgeRef, { once: true, amount: 0.7 });
-  const subCopyInView = useInView(subCopyRef, { once: true, amount: 0.7 });
-  const barContainerInView = useInView(barContainerRef, { once: true, amount: 0.5 });
-  const stampInView = useInView(stampRef, { once: true, amount: 0.5 });
+  useEffect(() => {
+    if (!sectionInView) return;
+    let cancelled = false;
+    const advance = (n: number, delay: number) => {
+      setTimeout(() => {
+        if (!cancelled) setStep(n);
+      }, delay);
+    };
+    advance(1, 0);
+    advance(2, 600);
+    advance(3, 1200);
+    advance(4, 1800);
+    advance(5, 2400);
+    advance(6, 3000);
+    advance(7, 3600);
+    return () => {
+      cancelled = true;
+    };
+  }, [sectionInView]);
 
-  // NumberFlow trigger = 좌·우 숫자 viewport 진입 시 (derived state / cascading render 회피)
-  const leftValue = leftNumberInView ? 255 : 1;
-  const rightValue = rightNumberInView ? 3 : 255;
-  const leftAnimated = leftNumberInView;
-  const rightAnimated = rightNumberInView;
+  // NumberFlow derived state (cascading render 회피)
+  const leftValue = step >= 1 ? 255 : 1;
+  const rightValue = step >= 3 ? 3 : 255;
+  const leftAnimated = step >= 1;
+  const rightAnimated = step >= 3;
 
   return (
     <section
+      ref={sectionRef}
       aria-labelledby="compare-heading"
       className="relative flex min-h-[calc(100vh-64px)] flex-col justify-center overflow-hidden bg-white py-12 lg:min-h-[calc(100vh-80px)] lg:py-16"
     >
       <div className="container-app w-full">
-        {/* h2 (자체 ref + useInView) */}
+        {/* h2 (sectionInView trigger / step 진입 전 visible) */}
         <motion.h2
-          ref={h2Ref}
           id="compare-heading"
           variants={fadeVariants}
           initial="hidden"
-          animate={h2InView ? "visible" : "hidden"}
+          animate={sectionInView ? "visible" : "hidden"}
           className="mb-12 text-center text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:mb-16 lg:text-[88px]"
           style={{ fontWeight: 800 }}
         >
@@ -161,15 +170,15 @@ export function CompareBlock() {
           <span style={{ color: "#FFD43B" }}>.</span>
         </motion.h2>
 
-        {/* 일러스트 광역 wrapper (숫자 grid + 보조 카피 광역 후면) */}
-        <div className="relative">
-          {/* 일러스트 배경 (compare-bg-v48-a-cityscape-wide.png / opacity 0.12) */}
+        {/* 일러스트 + 숫자 grid 광역 wrapper */}
+        <div className="relative mb-12 lg:mb-16">
+          {/* 일러스트 배경 (compare-bg-v49-a-refined-cityscape.png / opacity 0.12) */}
           <div
             className="pointer-events-none absolute inset-0 -z-10"
             aria-hidden="true"
           >
             <Image
-              src="/illustrations/compare-bg-v48-a-cityscape-wide.png"
+              src="/illustrations/compare-bg-v49-a-refined-cityscape.png"
               alt=""
               fill
               sizes="100vw"
@@ -179,23 +188,21 @@ export function CompareBlock() {
           </div>
 
           {/* 숫자 비교 grid */}
-          <div className="mb-12 grid grid-cols-[1fr_auto_1fr] items-center gap-2 lg:mb-16 lg:gap-8">
-            {/* 좌측 — 라벨 + NumberFlow 1 → 255 */}
+          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 lg:gap-8">
+            {/* Step 1 — 좌측 라벨 + 좌 NumberFlow 1 → 255 */}
             <div className="flex flex-col items-center text-center">
               <motion.div
-                ref={leftLabelRef}
                 variants={labelVariants}
                 initial="hidden"
-                animate={leftLabelInView ? "visible" : "hidden"}
+                animate={step >= 1 ? "visible" : "hidden"}
                 className="mb-2 whitespace-nowrap text-[16px] font-semibold tracking-tight text-gray-500 lg:mb-4 lg:text-[24px]"
               >
                 일반적인 방법
               </motion.div>
               <motion.div
-                ref={leftNumberRef}
                 variants={numberVariants}
                 initial="hidden"
-                animate={leftNumberInView ? "visible" : "hidden"}
+                animate={step >= 1 ? "visible" : "hidden"}
                 className="flex items-baseline justify-center gap-1"
               >
                 <span
@@ -220,23 +227,21 @@ export function CompareBlock() {
               </motion.div>
             </div>
 
-            {/* 가운데 — "98% 단축" 배지 + ArrowRight (각 자체 ref) */}
+            {/* Step 2 + 4 — 가운데 ArrowRight + "98% 단축" 배지 */}
             <div className="flex flex-col items-center justify-center gap-2 lg:gap-3">
               <motion.div
-                ref={badgeRef}
                 variants={badgeVariants}
                 initial="hidden"
-                animate={badgeInView ? "visible" : "hidden"}
+                animate={step >= 4 ? "visible" : "hidden"}
                 className="whitespace-nowrap rounded-full bg-[#ECFDF5] px-3 py-1 text-[20px] font-extrabold text-[var(--brand-green)] lg:px-4 lg:py-1.5 lg:text-[36px]"
                 style={{ fontWeight: 800 }}
               >
                 98% 단축
               </motion.div>
               <motion.div
-                ref={arrowRef}
                 variants={arrowVariants}
                 initial="hidden"
-                animate={arrowInView ? ["visible", "pulse"] : "hidden"}
+                animate={step >= 2 ? ["visible", "pulse"] : "hidden"}
                 className="flex justify-center"
               >
                 <ArrowRight size={32} strokeWidth={2} className="text-gray-400 lg:hidden" />
@@ -244,22 +249,20 @@ export function CompareBlock() {
               </motion.div>
             </div>
 
-            {/* 우측 — 라벨 + NumberFlow 255 → 3 (모바일 한 줄 정합) */}
+            {/* Step 3 — 우측 라벨 + 우 NumberFlow 255 → 3 */}
             <div className="flex flex-col items-center text-center">
               <motion.div
-                ref={rightLabelRef}
                 variants={labelVariants}
                 initial="hidden"
-                animate={rightLabelInView ? "visible" : "hidden"}
+                animate={step >= 3 ? "visible" : "hidden"}
                 className="mb-2 whitespace-nowrap text-[16px] font-semibold tracking-tight text-[var(--brand-green)] lg:mb-4 lg:text-[24px]"
               >
                 경매퀵을 이용하면
               </motion.div>
               <motion.div
-                ref={rightNumberRef}
                 variants={numberVariants}
                 initial="hidden"
-                animate={rightNumberInView ? "visible" : "hidden"}
+                animate={step >= 3 ? "visible" : "hidden"}
                 className="flex items-baseline justify-center gap-1"
               >
                 <span
@@ -284,28 +287,15 @@ export function CompareBlock() {
               </motion.div>
             </div>
           </div>
-
-          {/* 보조 카피 (자체 ref + useInView) */}
-          <motion.div
-            ref={subCopyRef}
-            variants={subCopyVariants}
-            initial="hidden"
-            animate={subCopyInView ? "visible" : "hidden"}
-            className="mb-12 text-center text-[28px] font-bold leading-[1.3] tracking-[-0.015em] text-gray-900 lg:mb-16 lg:text-[48px]"
-            style={{ fontWeight: 700 }}
-          >
-            발품도 시간도, 단 한 번에.
-          </motion.div>
         </div>
 
-        {/* 5 카드 + stamp (일러스트 영역 외) */}
-        <div className="relative mx-auto max-w-4xl">
-          {/* stamp (자체 ref + useInView / 5단계 가운데 absolute / "경매퀵" yellow accent) */}
+        {/* Step 5 + 6 — 5단계 + stamp 광역 */}
+        <div className="relative mx-auto mb-12 max-w-4xl lg:mb-16">
+          {/* Step 6 stamp — 5단계 가운데 absolute / "경매퀵" yellow accent */}
           <motion.div
-            ref={stampRef}
             variants={stampVariants}
             initial="hidden"
-            animate={stampInView ? "visible" : "hidden"}
+            animate={step >= 6 ? "visible" : "hidden"}
             className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-[#111418] px-5 py-2.5 text-[18px] font-bold text-[var(--brand-green)] lg:px-8 lg:py-3.5 lg:text-[30px]"
             style={{ fontWeight: 700 }}
           >
@@ -314,21 +304,20 @@ export function CompareBlock() {
             이 대신합니다
           </motion.div>
 
-          {/* 5 카드 PPT Appear stagger + dim (stamp 등장 시점 동시) */}
+          {/* Step 5 — 5단계 PPT Appear stagger / Step 6 dim 동시 */}
           <motion.div
-            ref={barContainerRef}
             className="grid grid-cols-5 gap-2 lg:gap-4"
             variants={barContainerVariants}
             initial="hidden"
-            animate={barContainerInView ? "visible" : "hidden"}
+            animate={step >= 5 ? "visible" : "hidden"}
           >
             {BAR_DATA.map(({ Icon, labelMobile, labelDesktop, minutes }) => (
               <motion.div
                 key={labelDesktop}
                 variants={barVariants}
                 animate={
-                  barContainerInView
-                    ? stampInView
+                  step >= 5
+                    ? step >= 6
                       ? ["visible", "dim"]
                       : "visible"
                     : "hidden"
@@ -355,6 +344,17 @@ export function CompareBlock() {
             ))}
           </motion.div>
         </div>
+
+        {/* Step 7 — 보조 카피 (마지막 / 모바일 28 / 데스크탑 44 / weight 700) */}
+        <motion.div
+          variants={subCopyVariants}
+          initial="hidden"
+          animate={step >= 7 ? "visible" : "hidden"}
+          className="text-center text-[28px] font-bold leading-[1.3] tracking-[-0.015em] text-gray-900 lg:text-[44px]"
+          style={{ fontWeight: 700 }}
+        >
+          발품도 시간도, 단 한 번에.
+        </motion.div>
       </div>
     </section>
   );
