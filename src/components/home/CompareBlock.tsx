@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import Image from "next/image";
 import {
   motion,
   useInView,
@@ -19,53 +18,51 @@ import {
   Building2,
   Clock,
   ArrowRight,
+  ArrowDown,
 } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v50 cycle 3 — CompareBlock 3단 분리 + sticky lock + 일러스트 광역 cover.
- * 정정 (Plan v50 cycle 3 / 2차 NG 2건 fix):
- * 1. sticky 구조 진입 (시퀀스 fire 시점 콘텐츠 viewport 중앙 lock)
- *    - wrapperRef = sticky parent (min-h-[200vh])
- *    - sectionRef = sticky child (top-14 lg:top-16 z-30)
- *    - TopNav z-40 vs CompareBlock z-30 = TopNav 뒤 / 다른 섹션 위
- *    - 다른 섹션 (Hero / Insight / Pricing / TrustCTA) 영향 0
- *    - useScroll target = wrapperRef / offset = ["start start", "end end"]
- *    - sticky lock 동안 wrapper의 100vh가 scroll → progress 0 → 1 자연 fire
+/* Phase 1.2 (A-1-2) v50 cycle 4 — CompareBlock 일러스트 폐기 + 모바일 numbers 세로 + NumberFlow 96.
+ * 정정 (Plan v50 cycle 4 / cycle 3 production NG 광역 회복 / cycle 4 5건 GO + 추가 질의 5건 GO):
+ * 1. 일러스트 광역 폐기 (스크롤 시스템 꼬임 회피 + 정수 폐기)
+ *    - import Image from "next/image" 폐기 (사용 0)
+ *    - 일러스트 wrapper div + Image element 폐기 (15 lines)
+ *    - src `/illustrations/compare-bg-v49-...` 참조 폐기 (파일 자체 보존)
+ *    - opacity 0.40 style 폐기
+ *    - section className isolate 폐기 (일러스트 폐기 후 의미 0)
+ *    - z-30 sticky 보존 (TopNav 정합)
  *
- * 2. TopNav 실측 정합 정정 (cycle 2 64/80 미스매치 정정)
- *    - section min-h 모바일: calc(100vh-64px) → calc(100vh-56px) (TopNav h-14 = 56)
- *    - section min-h 데스크탑: calc(100vh-80px) → calc(100vh-64px) (TopNav lg:h-16 = 64)
- *    - sticky top: top-14 lg:top-16 (TopNav 정확값)
+ * 2. section py 단축 + flex justify-center 보존 (cycle 3 정합)
+ *    - py-10 lg:py-14 → py-6 lg:py-12 (40/56 → 24/48 / 모바일 16px ↓)
+ *    - flex flex-col justify-center 보존 = 콘텐츠 viewport 중앙 lock + 위/아래 균등 분산
  *
- * 3. 3단 spacing 정정 (h2 / numbers / bars+chip 명시 분리 / "다닥다닥" NG 회피)
- *    - h2 mb: mb-8 lg:mb-12 → mb-16 lg:mb-24 (32/48 → 64/96)
- *    - numbers wrapper mb: mb-8 lg:mb-12 → mb-16 lg:mb-24
- *    - bars wrapper mb: mb-0 (보존 / 마지막 콘텐츠)
+ * 3. 모바일 numbers 세로 재배치 (255 ↓ → ↓ 3) + 데스크탑 가로 보존
+ *    - 현 grid grid-cols-[1fr_auto_1fr] → flex flex-col items-center gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-8
+ *    - 모바일 = flex flex-col gap-4 (세로) / 데스크탑 = lg:grid (가로 보존)
  *
- * 4. 일러스트 영역 광역 cover (numbers wrapper 한정 → section 직속 광역)
- *    - 일러스트 wrapper = section 첫째 child (numbers wrapper 외부 이동)
- *    - inset-0 = section 광역 cover (h2 + numbers + bars+chip 광역)
- *    - isolate stacking 보존
+ * 4. ArrowDown 신규 import + 모바일 / 데스크탑 분기
+ *    - lucide-react ArrowDown 신규 import (신규 npm 0)
+ *    - <ArrowDown size={32} className="lg:hidden" /> + <ArrowRight size={64} className="hidden lg:block" />
  *
- * 5. opacity 0.25 → 0.40 (형준님 명령 "배경으로써 인지" 정수 정합)
- *    - 진단: silhouette 35% × 0.40 = 14% / sky 65% × 0.40 = 26% (자연 인지)
- *    - 가독성: NumberFlow 64/200px / 5단계 라벨 13/18px / stamp charcoal bg = OK
- *    - NG 시 cycle: 0.45 / 0.50 (5단계 가독성 NG 시 0.35 회귀)
+ * 5. 모바일 NumberFlow 비율 정정 (광역 1:2.08 정합)
+ *    - 모바일 64 → 96 (좌 + 우) / 데스크탑 200 보존
+ *    - 비율 = 1:2.08 (h2 광역 1:2 + TrustCTA "0" 1:1.75 사이 정합)
+ *    - h2 44 vs NumberFlow 96 = 1:2.18 (데스크탑 88 vs 200 = 1:2.27 거의 정합)
  *
- * 6. 시퀀스 timeline (8.25초 / cycle 2 보존)
- *    Step 1 (progress 0.250): 좌 라벨 + 좌 NumberFlow 1 → 255
- *    Step 2 (progress 0.347): ArrowRight + pulse
- *    Step 3 (progress 0.395): 우 라벨 + 우 NumberFlow 255 → 3
- *    Step 4 (progress 0.492): "98% 단축" 배지
- *    Step 5 (progress 0.517): 5단계 PPT Appear stagger
- *    Step 6 (progress 0.625): stamp + 5단계 dim 동시
- *    progress range [0.25, 0.65] / staggerChildren 0.15
+ * 6. 모바일 "분" 단위 비율 정정
+ *    - 모바일 14 → 18 (좌 + 우) / 데스크탑 40 보존
+ *    - 비율 = 1:2.22 (NumberFlow 1:2.08 정합)
  *
  * 보존:
- * - h2 진입 = useInView 별도 보존 (sectionInView amount 0.3)
- * - motion variants 7건 정의 (staggerChildren 0.15 / 그 외 변환 0)
- * - NumberFlow leftValue/rightValue 로직 + 내장 spin (transformTiming/spinTiming 1200ms)
- * - useSpring 80/25/0.5/0.001 / 단방향 advance Math.max guard
- * - 카피 v4 SoT v39 + 절대 크기 광역 */
+ * - sticky 구조 (wrapperRef min-h-[200vh] + section sticky top-14 lg:top-16 z-30)
+ * - section min-h calc(100vh-56px) lg:calc(100vh-64px) (TopNav 실측 정합)
+ * - h2 mb-16 lg:mb-24 + numbers wrapper mb-16 lg:mb-24 + bars wrapper mb-0
+ * - useScroll target=wrapperRef offset=["start start", "end end"] / useSpring 80/25/0.5/0.001
+ * - progress range [0.25, 0.65] / threshold 6건 (0.250 / 0.347 / 0.395 / 0.492 / 0.517 / 0.625)
+ * - staggerChildren 0.15 / 단방향 advance Math.max guard
+ * - h2 진입 = useInView 별도 보존
+ * - motion variants 7건 정의 / NumberFlow leftValue/rightValue 로직 + 내장 spin
+ * - 데스크탑 절대 크기 (NumberFlow 200 / "분" 40 / ArrowRight 64) 광역 보존
+ * - 카피 v4 SoT v39 (h2 + stamp 광역) */
 
 type Bar = {
   Icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>;
@@ -191,23 +188,8 @@ export function CompareBlock() {
       <section
         ref={sectionRef}
         aria-labelledby="compare-heading"
-        className="sticky top-14 z-30 isolate flex min-h-[calc(100vh-56px)] flex-col justify-center overflow-hidden bg-white py-10 lg:top-16 lg:min-h-[calc(100vh-64px)] lg:py-14"
+        className="sticky top-14 z-30 flex min-h-[calc(100vh-56px)] flex-col justify-center overflow-hidden bg-white py-6 lg:top-16 lg:min-h-[calc(100vh-64px)] lg:py-12"
       >
-        {/* 일러스트 배경 광역 cover (section 직속 자식 / compare-bg-v49 / opacity 0.40 / section isolate stacking 정합) */}
-        <div
-          className="pointer-events-none absolute inset-0 -z-10"
-          aria-hidden="true"
-        >
-          <Image
-            src="/illustrations/compare-bg-v49-a-refined-cityscape.png"
-            alt=""
-            fill
-            sizes="100vw"
-            className="object-cover"
-            style={{ opacity: 0.4 }}
-          />
-        </div>
-
         <div className="container-app w-full">
           {/* h2 (sectionInView trigger / step 진입 전 visible) */}
           <motion.h2
@@ -224,10 +206,10 @@ export function CompareBlock() {
             <span style={{ color: "#FFD43B" }}>.</span>
           </motion.h2>
 
-          {/* 숫자 grid wrapper (3단 분리 / 일러스트 wrapper section 직속 이동 cycle 3) */}
+          {/* 숫자 grid wrapper (3단 분리 / cycle 4: 모바일 세로 / 데스크탑 가로 분기) */}
           <div className="relative mb-16 lg:mb-24">
-            {/* 숫자 비교 grid */}
-            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 lg:gap-8">
+            {/* 숫자 비교 — 모바일 flex flex-col 세로 / 데스크탑 lg:grid 가로 */}
+            <div className="flex flex-col items-center gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-8">
             {/* Step 1 — 좌측 라벨 + 좌 NumberFlow 1 → 255 */}
             <div className="flex flex-col items-center text-center">
               <motion.div
@@ -245,7 +227,7 @@ export function CompareBlock() {
                 className="flex items-baseline justify-center gap-1"
               >
                 <span
-                  className="text-[64px] font-extrabold leading-none text-gray-400 lg:text-[200px]"
+                  className="text-[96px] font-extrabold leading-none text-gray-400 lg:text-[200px]"
                   style={{ fontWeight: 800 }}
                 >
                   <NumberFlow
@@ -262,7 +244,7 @@ export function CompareBlock() {
                     }}
                   />
                 </span>
-                <span className="text-[14px] font-bold text-gray-400 lg:text-[40px]">분</span>
+                <span className="text-[18px] font-bold text-gray-400 lg:text-[40px]">분</span>
               </motion.div>
             </div>
 
@@ -283,7 +265,7 @@ export function CompareBlock() {
                 animate={step >= 2 ? ["visible", "pulse"] : "hidden"}
                 className="flex justify-center"
               >
-                <ArrowRight size={32} strokeWidth={2} className="text-gray-400 lg:hidden" />
+                <ArrowDown size={32} strokeWidth={2} className="text-gray-400 lg:hidden" />
                 <ArrowRight size={64} strokeWidth={2} className="hidden text-gray-400 lg:block" />
               </motion.div>
             </div>
@@ -305,7 +287,7 @@ export function CompareBlock() {
                 className="flex items-baseline justify-center gap-1"
               >
                 <span
-                  className="text-[64px] font-extrabold leading-none text-[var(--brand-green)] lg:text-[200px]"
+                  className="text-[96px] font-extrabold leading-none text-[var(--brand-green)] lg:text-[200px]"
                   style={{ fontWeight: 800 }}
                 >
                   <NumberFlow
@@ -322,7 +304,7 @@ export function CompareBlock() {
                     }}
                   />
                 </span>
-                <span className="text-[14px] font-bold text-[var(--brand-green)] lg:text-[40px]">분</span>
+                <span className="text-[18px] font-bold text-[var(--brand-green)] lg:text-[40px]">분</span>
               </motion.div>
             </div>
           </div>
