@@ -21,30 +21,39 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v50 — CompareBlock scroll-linked 발화 진입.
- * 정정 (Plan v50):
- * 1. 시퀀스 trigger source = setTimeout chain → motion v12 useScroll + useSpring + useTransform + useMotionValueEvent
- *    - target = sectionRef / offset = ["start end", "end start"] (≈ 200vh scroll 거리)
- *    - useSpring smoothing (stiffness 80 / damping 25 / mass 0.5) → 빠른 scroll "와다다닥" 회피
- *    - progress range [0.25, 0.75] = section 풍성 visible 구간 mapping
- *    - 단방향 advance (Math.max guard) → scroll 역행 시 step 회귀 0
- *    - 초기 sync useEffect → 페이지 reload mid-scroll 대비
- * 2. 시퀀스 6 Step 균등 (보조 카피 Step 7 영구 폐기)
+/* Phase 1.2 (A-1-2) v50 cycle 2 — CompareBlock 여백 단축 + timeline 정정 + 일러스트 visible.
+ * 정정 (Plan v50 cycle 2 / 1차 NG 3건 fix):
+ * 1. NG 1 여백 단축
+ *    - section: flex flex-col justify-center 제거 (콘텐츠 vertical 중앙 정렬 자동 빈공간 NG)
+ *    - section: py-12 lg:py-16 → py-10 lg:py-14
+ *    - section: min-h 유지 (scroll-linked 시퀀스 거리 보장 / 옵션 B 채택)
+ *    - h2 mb: mb-12 lg:mb-16 → mb-8 lg:mb-12
+ *    - numbers wrapper mb: mb-12 lg:mb-16 → mb-8 lg:mb-12
+ *    - bars wrapper mb: mb-12 lg:mb-16 → mb-0 (마지막 콘텐츠)
+ *
+ * 2. NG 2 timeline 정정 (8.25초 / step 4 → step 5 즉시 / step 5 → step 6 1500ms)
  *    Step 1 (progress 0.250): 좌 라벨 + 좌 NumberFlow 1 → 255
- *    Step 2 (progress 0.364): ArrowRight + pulse
- *    Step 3 (progress 0.422): 우 라벨 + 우 NumberFlow 255 → 3
- *    Step 4 (progress 0.536): "98% 단축" 배지
- *    Step 5 (progress 0.622): 5단계 PPT Appear stagger
- *    Step 6 (progress 0.722): stamp + 5단계 dim 동시
- *    threshold 산식: 0.25 + (start_ms / 8750) × 0.50
- * 3. 일러스트 opacity 0.12 → 0.18 (production 시각 노출)
+ *    Step 2 (progress 0.347): ArrowRight + pulse
+ *    Step 3 (progress 0.395): 우 라벨 + 우 NumberFlow 255 → 3
+ *    Step 4 (progress 0.492): "98% 단축" 배지
+ *    Step 5 (progress 0.517): 5단계 PPT Appear stagger (98% 단축 직후 즉시)
+ *    Step 6 (progress 0.625): stamp + 5단계 dim 동시 (5단계 1500ms 충분 visible 후)
+ *    threshold 산식: 0.25 + (start_ms / 8250) × 0.40
+ *    progress range: [0.25, 0.75] → [0.25, 0.65] (사용자 화면 중간 도달 시 시퀀스 종료)
+ *    barContainerVariants staggerChildren: 0.1 → 0.15 (5단계 인지 시간 ↑)
+ *
+ * 3. NG 3 일러스트 production 시각 노출
+ *    - section className에 isolate 추가 (Tailwind isolation: isolate / stacking context root 형성)
+ *    - 진단: 이전 -z-10이 section bg-white 뒤로 propagate → invisible NG
+ *    - isolate 후: section 안 stacking root → -z-10 일러스트가 bg-white 위 / 콘텐츠 뒤 visible 보장
+ *    - opacity 0.18 → 0.25 (visibility 마진 / NG 시 0.30 cycle)
  *
  * 보존:
- * - h2 진입 = useInView 별도 보존 (sectionInView amount 0.3 / scroll-linked 시퀀스와 별개 시스템)
- * - motion variants 7건 정의 (labelVariants / numberVariants / arrowVariants / badgeVariants / barContainerVariants / barVariants / stampVariants)
+ * - h2 진입 = useInView 별도 보존 (sectionInView amount 0.3)
+ * - motion variants 7건 정의 (staggerChildren만 0.15 정정 / 그 외 변환 0)
  * - NumberFlow leftValue/rightValue 로직 + 내장 spin (transformTiming/spinTiming 1200ms)
- * - barContainerVariants staggerChildren 0.1 (5단계 PPT Appear / 기존 정의 100% 보존)
- * - 카피 v4 SoT v39 + 절대 크기 + 일러스트 src/inset/object-cover */
+ * - useScroll offset ["start end", "end start"] / useSpring 80/25/0.5/0.001
+ * - 단방향 advance Math.max guard / 카피 v4 SoT v39 + 절대 크기 광역 */
 
 type Bar = {
   Icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>;
@@ -102,7 +111,7 @@ const barContainerVariants: Variants = {
   hidden: {},
   visible: {
     transition: {
-      staggerChildren: 0.1,
+      staggerChildren: 0.15,
     },
   },
 };
@@ -135,13 +144,14 @@ export function CompareBlock() {
     mass: 0.5,
     restDelta: 0.001,
   });
-  // progress range [0.25, 0.75] → 6 step 임계값 (산식: 0.25 + (start_ms / 8750) × 0.50)
+  // progress range [0.25, 0.65] → 6 step 임계값 (산식: 0.25 + (start_ms / 8250) × 0.40)
+  // cycle 2: step 4 → step 5 텀 0 (98% 단축 직후 즉시 5단계) / step 5 → step 6 텀 1500ms (5단계 충분 visible)
   const stepValue = useTransform(smoothProgress, (p) => {
-    if (p >= 0.722) return 6;
-    if (p >= 0.622) return 5;
-    if (p >= 0.536) return 4;
-    if (p >= 0.422) return 3;
-    if (p >= 0.364) return 2;
+    if (p >= 0.625) return 6;
+    if (p >= 0.517) return 5;
+    if (p >= 0.492) return 4;
+    if (p >= 0.395) return 3;
+    if (p >= 0.347) return 2;
     if (p >= 0.25) return 1;
     return 0;
   });
@@ -165,7 +175,7 @@ export function CompareBlock() {
     <section
       ref={sectionRef}
       aria-labelledby="compare-heading"
-      className="relative flex min-h-[calc(100vh-64px)] flex-col justify-center overflow-hidden bg-white py-12 lg:min-h-[calc(100vh-80px)] lg:py-16"
+      className="relative isolate min-h-[calc(100vh-64px)] overflow-hidden bg-white py-10 lg:min-h-[calc(100vh-80px)] lg:py-14"
     >
       <div className="container-app w-full">
         {/* h2 (sectionInView trigger / step 진입 전 visible) */}
@@ -174,7 +184,7 @@ export function CompareBlock() {
           variants={fadeVariants}
           initial="hidden"
           animate={sectionInView ? "visible" : "hidden"}
-          className="mb-12 text-center text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:mb-16 lg:text-[88px]"
+          className="mb-8 text-center text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:mb-12 lg:text-[88px]"
           style={{ fontWeight: 800 }}
         >
           법원 가는 3시간,
@@ -184,8 +194,8 @@ export function CompareBlock() {
         </motion.h2>
 
         {/* 일러스트 + 숫자 grid 광역 wrapper */}
-        <div className="relative mb-12 lg:mb-16">
-          {/* 일러스트 배경 (compare-bg-v49-a-refined-cityscape.png / opacity 0.18) */}
+        <div className="relative mb-8 lg:mb-12">
+          {/* 일러스트 배경 (compare-bg-v49-a-refined-cityscape.png / opacity 0.25 / section isolate stacking 정합) */}
           <div
             className="pointer-events-none absolute inset-0 -z-10"
             aria-hidden="true"
@@ -196,7 +206,7 @@ export function CompareBlock() {
               fill
               sizes="100vw"
               className="object-cover"
-              style={{ opacity: 0.18 }}
+              style={{ opacity: 0.25 }}
             />
           </div>
 
@@ -303,7 +313,7 @@ export function CompareBlock() {
         </div>
 
         {/* Step 5 + 6 — 5단계 + stamp 광역 */}
-        <div className="relative mx-auto mb-12 max-w-4xl lg:mb-16">
+        <div className="relative mx-auto max-w-4xl">
           {/* Step 6 stamp — 5단계 가운데 absolute / "경매퀵" yellow accent */}
           <motion.div
             variants={stampVariants}
