@@ -21,39 +21,51 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v50 cycle 2 — CompareBlock 여백 단축 + timeline 정정 + 일러스트 visible.
- * 정정 (Plan v50 cycle 2 / 1차 NG 3건 fix):
- * 1. NG 1 여백 단축
- *    - section: flex flex-col justify-center 제거 (콘텐츠 vertical 중앙 정렬 자동 빈공간 NG)
- *    - section: py-12 lg:py-16 → py-10 lg:py-14
- *    - section: min-h 유지 (scroll-linked 시퀀스 거리 보장 / 옵션 B 채택)
- *    - h2 mb: mb-12 lg:mb-16 → mb-8 lg:mb-12
- *    - numbers wrapper mb: mb-12 lg:mb-16 → mb-8 lg:mb-12
- *    - bars wrapper mb: mb-12 lg:mb-16 → mb-0 (마지막 콘텐츠)
+/* Phase 1.2 (A-1-2) v50 cycle 3 — CompareBlock 3단 분리 + sticky lock + 일러스트 광역 cover.
+ * 정정 (Plan v50 cycle 3 / 2차 NG 2건 fix):
+ * 1. sticky 구조 진입 (시퀀스 fire 시점 콘텐츠 viewport 중앙 lock)
+ *    - wrapperRef = sticky parent (min-h-[200vh])
+ *    - sectionRef = sticky child (top-14 lg:top-16 z-30)
+ *    - TopNav z-40 vs CompareBlock z-30 = TopNav 뒤 / 다른 섹션 위
+ *    - 다른 섹션 (Hero / Insight / Pricing / TrustCTA) 영향 0
+ *    - useScroll target = wrapperRef / offset = ["start start", "end end"]
+ *    - sticky lock 동안 wrapper의 100vh가 scroll → progress 0 → 1 자연 fire
  *
- * 2. NG 2 timeline 정정 (8.25초 / step 4 → step 5 즉시 / step 5 → step 6 1500ms)
+ * 2. TopNav 실측 정합 정정 (cycle 2 64/80 미스매치 정정)
+ *    - section min-h 모바일: calc(100vh-64px) → calc(100vh-56px) (TopNav h-14 = 56)
+ *    - section min-h 데스크탑: calc(100vh-80px) → calc(100vh-64px) (TopNav lg:h-16 = 64)
+ *    - sticky top: top-14 lg:top-16 (TopNav 정확값)
+ *
+ * 3. 3단 spacing 정정 (h2 / numbers / bars+chip 명시 분리 / "다닥다닥" NG 회피)
+ *    - h2 mb: mb-8 lg:mb-12 → mb-16 lg:mb-24 (32/48 → 64/96)
+ *    - numbers wrapper mb: mb-8 lg:mb-12 → mb-16 lg:mb-24
+ *    - bars wrapper mb: mb-0 (보존 / 마지막 콘텐츠)
+ *
+ * 4. 일러스트 영역 광역 cover (numbers wrapper 한정 → section 직속 광역)
+ *    - 일러스트 wrapper = section 첫째 child (numbers wrapper 외부 이동)
+ *    - inset-0 = section 광역 cover (h2 + numbers + bars+chip 광역)
+ *    - isolate stacking 보존
+ *
+ * 5. opacity 0.25 → 0.40 (형준님 명령 "배경으로써 인지" 정수 정합)
+ *    - 진단: silhouette 35% × 0.40 = 14% / sky 65% × 0.40 = 26% (자연 인지)
+ *    - 가독성: NumberFlow 64/200px / 5단계 라벨 13/18px / stamp charcoal bg = OK
+ *    - NG 시 cycle: 0.45 / 0.50 (5단계 가독성 NG 시 0.35 회귀)
+ *
+ * 6. 시퀀스 timeline (8.25초 / cycle 2 보존)
  *    Step 1 (progress 0.250): 좌 라벨 + 좌 NumberFlow 1 → 255
  *    Step 2 (progress 0.347): ArrowRight + pulse
  *    Step 3 (progress 0.395): 우 라벨 + 우 NumberFlow 255 → 3
  *    Step 4 (progress 0.492): "98% 단축" 배지
- *    Step 5 (progress 0.517): 5단계 PPT Appear stagger (98% 단축 직후 즉시)
- *    Step 6 (progress 0.625): stamp + 5단계 dim 동시 (5단계 1500ms 충분 visible 후)
- *    threshold 산식: 0.25 + (start_ms / 8250) × 0.40
- *    progress range: [0.25, 0.75] → [0.25, 0.65] (사용자 화면 중간 도달 시 시퀀스 종료)
- *    barContainerVariants staggerChildren: 0.1 → 0.15 (5단계 인지 시간 ↑)
- *
- * 3. NG 3 일러스트 production 시각 노출
- *    - section className에 isolate 추가 (Tailwind isolation: isolate / stacking context root 형성)
- *    - 진단: 이전 -z-10이 section bg-white 뒤로 propagate → invisible NG
- *    - isolate 후: section 안 stacking root → -z-10 일러스트가 bg-white 위 / 콘텐츠 뒤 visible 보장
- *    - opacity 0.18 → 0.25 (visibility 마진 / NG 시 0.30 cycle)
+ *    Step 5 (progress 0.517): 5단계 PPT Appear stagger
+ *    Step 6 (progress 0.625): stamp + 5단계 dim 동시
+ *    progress range [0.25, 0.65] / staggerChildren 0.15
  *
  * 보존:
  * - h2 진입 = useInView 별도 보존 (sectionInView amount 0.3)
- * - motion variants 7건 정의 (staggerChildren만 0.15 정정 / 그 외 변환 0)
+ * - motion variants 7건 정의 (staggerChildren 0.15 / 그 외 변환 0)
  * - NumberFlow leftValue/rightValue 로직 + 내장 spin (transformTiming/spinTiming 1200ms)
- * - useScroll offset ["start end", "end start"] / useSpring 80/25/0.5/0.001
- * - 단방향 advance Math.max guard / 카피 v4 SoT v39 + 절대 크기 광역 */
+ * - useSpring 80/25/0.5/0.001 / 단방향 advance Math.max guard
+ * - 카피 v4 SoT v39 + 절대 크기 광역 */
 
 type Bar = {
   Icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>;
@@ -128,15 +140,18 @@ const stampVariants: Variants = {
 };
 
 export function CompareBlock() {
+  const wrapperRef = useRef<HTMLDivElement>(null);
   const sectionRef = useRef<HTMLElement>(null);
   // h2 전용 진입 (scroll-linked 시퀀스와 별개 시스템)
   const sectionInView = useInView(sectionRef, { once: true, amount: 0.3 });
   const [step, setStep] = useState(0);
 
   // scroll-linked 시퀀스 진입 (motion v12 useScroll → useSpring smoothing → useTransform 임계값 → useMotionValueEvent)
+  // cycle 3: target = wrapperRef (sticky parent) / offset = ["start start", "end end"]
+  // sticky lock 동안 wrapper의 100vh가 scroll → progress 0 → 1 자연 진입
   const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
+    target: wrapperRef,
+    offset: ["start start", "end end"],
   });
   const smoothProgress = useSpring(scrollYProgress, {
     stiffness: 80,
@@ -172,46 +187,47 @@ export function CompareBlock() {
   const rightAnimated = step >= 3;
 
   return (
-    <section
-      ref={sectionRef}
-      aria-labelledby="compare-heading"
-      className="relative isolate min-h-[calc(100vh-64px)] overflow-hidden bg-white py-10 lg:min-h-[calc(100vh-80px)] lg:py-14"
-    >
-      <div className="container-app w-full">
-        {/* h2 (sectionInView trigger / step 진입 전 visible) */}
-        <motion.h2
-          id="compare-heading"
-          variants={fadeVariants}
-          initial="hidden"
-          animate={sectionInView ? "visible" : "hidden"}
-          className="mb-8 text-center text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:mb-12 lg:text-[88px]"
-          style={{ fontWeight: 800 }}
+    <div ref={wrapperRef} className="relative min-h-[200vh]">
+      <section
+        ref={sectionRef}
+        aria-labelledby="compare-heading"
+        className="sticky top-14 z-30 isolate flex min-h-[calc(100vh-56px)] flex-col justify-center overflow-hidden bg-white py-10 lg:top-16 lg:min-h-[calc(100vh-64px)] lg:py-14"
+      >
+        {/* 일러스트 배경 광역 cover (section 직속 자식 / compare-bg-v49 / opacity 0.40 / section isolate stacking 정합) */}
+        <div
+          className="pointer-events-none absolute inset-0 -z-10"
+          aria-hidden="true"
         >
-          법원 가는 3시간,
-          <br />
-          물건 보는 <span className="text-[var(--brand-green)]">시간으로</span>
-          <span style={{ color: "#FFD43B" }}>.</span>
-        </motion.h2>
+          <Image
+            src="/illustrations/compare-bg-v49-a-refined-cityscape.png"
+            alt=""
+            fill
+            sizes="100vw"
+            className="object-cover"
+            style={{ opacity: 0.4 }}
+          />
+        </div>
 
-        {/* 일러스트 + 숫자 grid 광역 wrapper */}
-        <div className="relative mb-8 lg:mb-12">
-          {/* 일러스트 배경 (compare-bg-v49-a-refined-cityscape.png / opacity 0.25 / section isolate stacking 정합) */}
-          <div
-            className="pointer-events-none absolute inset-0 -z-10"
-            aria-hidden="true"
+        <div className="container-app w-full">
+          {/* h2 (sectionInView trigger / step 진입 전 visible) */}
+          <motion.h2
+            id="compare-heading"
+            variants={fadeVariants}
+            initial="hidden"
+            animate={sectionInView ? "visible" : "hidden"}
+            className="mb-16 text-center text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:mb-24 lg:text-[88px]"
+            style={{ fontWeight: 800 }}
           >
-            <Image
-              src="/illustrations/compare-bg-v49-a-refined-cityscape.png"
-              alt=""
-              fill
-              sizes="100vw"
-              className="object-cover"
-              style={{ opacity: 0.25 }}
-            />
-          </div>
+            법원 가는 3시간,
+            <br />
+            물건 보는 <span className="text-[var(--brand-green)]">시간으로</span>
+            <span style={{ color: "#FFD43B" }}>.</span>
+          </motion.h2>
 
-          {/* 숫자 비교 grid */}
-          <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 lg:gap-8">
+          {/* 숫자 grid wrapper (3단 분리 / 일러스트 wrapper section 직속 이동 cycle 3) */}
+          <div className="relative mb-16 lg:mb-24">
+            {/* 숫자 비교 grid */}
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2 lg:gap-8">
             {/* Step 1 — 좌측 라벨 + 좌 NumberFlow 1 → 255 */}
             <div className="flex flex-col items-center text-center">
               <motion.div
@@ -367,7 +383,8 @@ export function CompareBlock() {
             ))}
           </motion.div>
         </div>
-      </div>
-    </section>
+        </div>
+      </section>
+    </div>
   );
 }
