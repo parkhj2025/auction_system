@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
+import Image from "next/image";
 import { motion, useInView, type Variants } from "motion/react";
 import NumberFlow from "@number-flow/react";
 import {
@@ -12,19 +13,25 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v43 — CompareBlock 8 Step 시퀀스 (스코어보드 플립 + % 단축 + dim only).
- * 정정 (Plan v43):
- * 1. 8 Step 시퀀스 (PPT 순서 / 좌→우 / 1개씩 발화)
- * 2. 좌 NumberFlow 0 → 255 (Step 2 / 300-1500ms / 1200ms / ease-out)
- * 3. 우 NumberFlow 255 → 3 (Step 5 / 2100-3300ms / 1200ms / back-out)
- * 4. "98% 단축" 배지 (Step 6 / 3300-3800ms / spring / ArrowRight 아래)
- * 5. X 취소선 영구 폐기 (5단계 카드 dim only / opacity 0.3)
- * 6. stamp 오버레이 (Step 8 / 4300-4800ms / charcoal bg + green text)
- * 7. h2 마침표 yellow + "3시간" charcoal + "시간으로" green (v42 보존)
- * 8. 모바일 좌우 침범 정정 (grid-cols-[1fr_auto_1fr] / "255"/"3" 70px / "분" 16px)
- * 9. 모바일 5단계 짧은 카피 ("휴가 30분" / 12px) / 데스크탑 긴 카피 ("휴가 신청 30분" / 18px)
- * 10. Blueprint Grid + dotted curve 보존 (Step 3-5 동시 발화 / 1500-3300ms)
- * 11. useInView once: true / amount 0.3 */
+/* Phase 1.2 (A-1-2) v45 — CompareBlock 모던 일러스트 배경 + 시퀀스 재구성 + NumberFlow 수직 + 라벨 ↑.
+ * 정정 (Plan v45):
+ * 1. Blueprint Grid + 잔존 곡선 영구 폐기 (section background-image / dotted curve SVG 광역 0)
+ * 2. 모던 일러스트 배경 (compare-bg-a-cityscape.png / Next/Image fill / opacity 0.18)
+ * 3. NumberFlow 수직 회전 정합 (좌 trend={1} / 우 trend={-1})
+ * 4. "98% 단축" 좌·우 가운데 시각 연결 (grid 외 별도 row / v44 patch 보존)
+ * 5. 시퀀스 재구성 (10 Step / 총 5.3초)
+ *    Step 0 (-300ms): h2 (진입 즉시)
+ *    Step 1 (0-300ms): 좌 라벨 fade
+ *    Step 2 (300-1500ms): 좌 NumberFlow 0 → 255 (trend=1)
+ *    Step 3 (1500-1800ms): ArrowRight fade + pulse
+ *    Step 4 (1800-2100ms): 우 라벨 fade
+ *    Step 5 (2100-3300ms): 우 NumberFlow 255 → 3 (trend=-1)
+ *    Step 6 (3300-3800ms): "98% 단축" 배지 spring
+ *    Step 7 (3800-4300ms): 보조 카피 fade + y 16 → 0 (Step 7 진입 의무 / 고정 노출 0)
+ *    Step 8 (4300-4800ms): 5단계 카드 fade + 즉시 dim 0.3
+ *    Step 9 (4800-5300ms): stamp
+ * 6. 좌·우 라벨 시인성 ↑ (모바일 18 / 데스크탑 24 / font-bold 700)
+ * 7. useInView once: true / amount 0.3 (재발화 0) */
 
 type Bar = {
   Icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>;
@@ -41,15 +48,10 @@ const BAR_DATA: Bar[] = [
   { Icon: Clock, labelMobile: "대기", labelDesktop: "입찰 대기", minutes: 90 },
 ];
 
-// Step 0 — h2 + 보조 카피 (진입 즉시)
+// Step 0 — h2 (진입 즉시)
 const headVariants: Variants = {
   hidden: { opacity: 0, y: 8 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
-};
-
-const subCopyVariants: Variants = {
-  hidden: { opacity: 0, y: 8 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.4, delay: 0.1 } },
 };
 
 // Step 1 — 좌 라벨 fade (0-300ms)
@@ -58,13 +60,13 @@ const leftLabelVariants: Variants = {
   visible: { opacity: 1, transition: { duration: 0.3 } },
 };
 
-// Step 2 — 좌 NumberFlow span fade (300-1500ms / NumberFlow 자체 카운트 광역)
+// Step 2 — 좌 NumberFlow span fade (300-1500ms)
 const leftNumberVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.3, delay: 0.3 } },
 };
 
-// Step 3 — ArrowRight fade + 미세 pulse (1500-1800ms)
+// Step 3 — ArrowRight fade + pulse (1500-1800ms)
 const arrowVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.3, delay: 1.5 } },
@@ -80,7 +82,7 @@ const rightLabelVariants: Variants = {
   visible: { opacity: 1, transition: { duration: 0.3, delay: 1.8 } },
 };
 
-// Step 5 — 우 NumberFlow span fade (2100-3300ms / NumberFlow 자체 카운트 광역)
+// Step 5 — 우 NumberFlow span fade (2100-3300ms)
 const rightNumberVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.3, delay: 2.1 } },
@@ -101,28 +103,25 @@ const badgeVariants: Variants = {
   },
 };
 
-// Step 7 — 5 카드 fade + 즉시 dim 0.3 (3800-4300ms)
-const barVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 0.3, transition: { duration: 0.5, delay: 3.8 } },
+// Step 7 — 보조 카피 fade + y 16 → 0 (3800-4300ms / 단축 배지 후 발화)
+const subCopyVariants: Variants = {
+  hidden: { opacity: 0, y: 16 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.5, delay: 3.8 } },
 };
 
-// Step 8 — stamp scale entrance (4300-4800ms)
+// Step 8 — 5 카드 fade + 즉시 dim 0.3 (4300-4800ms)
+const barVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 0.3, transition: { duration: 0.5, delay: 4.3 } },
+};
+
+// Step 9 — stamp (4800-5300ms)
 const stampVariants: Variants = {
   hidden: { opacity: 0, scale: 0.9 },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.4, delay: 4.3 },
-  },
-};
-
-// dotted curve (Step 3-5 동시 / 1500-3300ms / 1.8s duration)
-const dottedCurveVariants: Variants = {
-  hidden: { pathLength: 0 },
-  visible: {
-    pathLength: 1,
-    transition: { duration: 1.8, delay: 1.5, ease: "easeInOut" },
+    transition: { duration: 0.4, delay: 4.8 },
   },
 };
 
@@ -136,12 +135,12 @@ export function CompareBlock() {
 
   useEffect(() => {
     if (isInView) {
-      // Step 2 — 300ms 후 좌 카운트 0 → 255 (1200ms ease-out 가속 후 정착)
+      // Step 2 — 300ms 후 좌 카운트 0 → 255
       const t1 = setTimeout(() => {
         setLeftAnimated(true);
         setLeftValue(255);
       }, 300);
-      // Step 5 — 2100ms 후 우 카운트 255 → 3 (1200ms back-out / 감속 후 정착)
+      // Step 5 — 2100ms 후 우 카운트 255 → 3
       const t2 = setTimeout(() => {
         setRightAnimated(true);
         setRightValue(3);
@@ -157,33 +156,19 @@ export function CompareBlock() {
     <section
       ref={sectionRef}
       aria-labelledby="compare-heading"
-      className="relative flex min-h-[calc(100vh-64px)] flex-col justify-center overflow-hidden py-12 lg:min-h-[calc(100vh-80px)] lg:py-16"
-      style={{
-        backgroundColor: "white",
-        backgroundImage:
-          "linear-gradient(to right, rgba(229,231,235,0.5) 1px, transparent 1px), linear-gradient(to bottom, rgba(229,231,235,0.5) 1px, transparent 1px)",
-        backgroundSize: "24px 24px",
-      }}
+      className="relative flex min-h-[calc(100vh-64px)] flex-col justify-center overflow-hidden bg-white py-12 lg:min-h-[calc(100vh-80px)] lg:py-16"
     >
-      {/* dotted curve 배경 SVG (좌 → 가운데 → 우 곡선 흐름 / Step 3-5 동시 발화) */}
-      <motion.svg
-        className="pointer-events-none absolute inset-x-0 top-[42%] z-0 h-[180px] -translate-y-1/2 lg:top-[45%] lg:h-[260px]"
-        viewBox="0 0 1000 200"
-        preserveAspectRatio="none"
-        fill="none"
-        style={{ opacity: 0.18 }}
-        initial="hidden"
-        animate={isInView ? "visible" : "hidden"}
-      >
-        <motion.path
-          d="M 100 130 Q 500 30, 900 110"
-          stroke="rgb(156 163 175)"
-          strokeWidth={2}
-          strokeDasharray="6 6"
-          strokeLinecap="round"
-          variants={dottedCurveVariants}
+      {/* 모던 일러스트 배경 (compare-bg-a-cityscape.png / opacity 0.18) */}
+      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
+        <Image
+          src="/illustrations/compare-bg-a-cityscape.png"
+          alt=""
+          fill
+          sizes="100vw"
+          className="object-cover"
+          style={{ opacity: 0.18 }}
         />
-      </motion.svg>
+      </div>
 
       <div className="container-app relative z-10 w-full">
         {/* Step 0 — h2 (진입 즉시) */}
@@ -203,13 +188,13 @@ export function CompareBlock() {
 
         {/* 큰 숫자 비교 — grid-cols-[1fr_auto_1fr] / 모바일 좌우 침범 정합 */}
         <div className="mb-8 grid grid-cols-[1fr_auto_1fr] items-start gap-2 lg:mb-12 lg:items-center lg:gap-8">
-          {/* Step 1 + 2 — 좌측 라벨 + 좌 NumberFlow 카운트 0 → 255 */}
+          {/* Step 1 + 2 — 좌측 라벨 + 좌 NumberFlow 0 → 255 (trend=1) */}
           <div className="flex flex-col items-center text-center">
             <motion.div
               variants={leftLabelVariants}
               initial="hidden"
               animate={isInView ? "visible" : "hidden"}
-              className="mb-2 text-[16px] font-semibold tracking-tight text-gray-500 lg:mb-4 lg:text-[20px]"
+              className="mb-2 text-[18px] font-bold tracking-tight text-gray-500 lg:mb-4 lg:text-[24px]"
             >
               일반적인 방법
             </motion.div>
@@ -226,6 +211,7 @@ export function CompareBlock() {
                 <NumberFlow
                   value={leftValue}
                   animated={leftAnimated}
+                  trend={1}
                   transformTiming={{
                     duration: 1200,
                     easing: "cubic-bezier(0.16, 1, 0.3, 1)",
@@ -240,7 +226,7 @@ export function CompareBlock() {
             </motion.div>
           </div>
 
-          {/* Step 3 + 6 — 가운데 ArrowRight + "98% 단축" 배지 (데스크탑 ArrowRight 아래) */}
+          {/* Step 3 — 가운데 ArrowRight + 미세 pulse */}
           <div className="flex flex-col items-center justify-center gap-3 lg:gap-4">
             <motion.div
               variants={arrowVariants}
@@ -252,13 +238,13 @@ export function CompareBlock() {
             </motion.div>
           </div>
 
-          {/* Step 4 + 5 — 우측 라벨 + 우 NumberFlow 카운트 255 → 3 */}
+          {/* Step 4 + 5 — 우측 라벨 + 우 NumberFlow 255 → 3 (trend=-1) */}
           <div className="flex flex-col items-center text-center">
             <motion.div
               variants={rightLabelVariants}
               initial="hidden"
               animate={isInView ? "visible" : "hidden"}
-              className="mb-2 text-[16px] font-semibold tracking-tight text-[var(--brand-green)] lg:mb-4 lg:text-[20px]"
+              className="mb-2 text-[18px] font-bold tracking-tight text-[var(--brand-green)] lg:mb-4 lg:text-[24px]"
             >
               경매퀵을 이용하면
             </motion.div>
@@ -275,6 +261,7 @@ export function CompareBlock() {
                 <NumberFlow
                   value={rightValue}
                   animated={rightAnimated}
+                  trend={-1}
                   transformTiming={{
                     duration: 1200,
                     easing: "cubic-bezier(0.34, 1.56, 0.64, 1)",
@@ -290,7 +277,7 @@ export function CompareBlock() {
           </div>
         </div>
 
-        {/* Step 6 — "98% 단축" 배지 (grid 외 별도 row / 모바일·데스크탑 동일 / ArrowRight 아래 가운데) */}
+        {/* Step 6 — "98% 단축" 배지 (grid 외 별도 row / 좌·우 가운데 시각 연결) */}
         <motion.div
           variants={badgeVariants}
           initial="hidden"
@@ -305,7 +292,7 @@ export function CompareBlock() {
           </div>
         </motion.div>
 
-        {/* Step 0 — 보조 카피 (진입 즉시 / h2 후속) */}
+        {/* Step 7 — 보조 카피 (단축 배지 후 발화 / 고정 노출 0) */}
         <motion.div
           variants={subCopyVariants}
           initial="hidden"
@@ -316,9 +303,9 @@ export function CompareBlock() {
           발품도 시간도, 단 한 번에.
         </motion.div>
 
-        {/* Step 7 + 8 — 5 카드 + stamp 오버레이 */}
+        {/* Step 8 + 9 — 5 카드 + stamp 오버레이 */}
         <div className="relative mx-auto max-w-4xl">
-          {/* Step 8 stamp (charcoal bg + green text / CTA 시각 충돌 회피) */}
+          {/* Step 9 stamp (charcoal bg + green text) */}
           <motion.div
             variants={stampVariants}
             initial="hidden"
@@ -329,7 +316,7 @@ export function CompareBlock() {
             이 모든 단계, 경매퀵이 대신합니다
           </motion.div>
 
-          {/* Step 7 — 5 카드 grid (X 취소선 폐기 / dim only) */}
+          {/* Step 8 — 5 카드 grid (X 취소선 0 / dim only) */}
           <div className="grid grid-cols-5 gap-2 pt-6 lg:gap-4 lg:pt-8">
             {BAR_DATA.map(({ Icon, labelMobile, labelDesktop, minutes }) => (
               <motion.div
