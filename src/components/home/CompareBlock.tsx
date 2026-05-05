@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import Image from "next/image";
 import { motion, useInView, type Variants } from "motion/react";
 import NumberFlow from "@number-flow/react";
 import {
@@ -13,25 +12,28 @@ import {
   ArrowRight,
 } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v45 — CompareBlock 모던 일러스트 배경 + 시퀀스 재구성 + NumberFlow 수직 + 라벨 ↑.
- * 정정 (Plan v45):
- * 1. Blueprint Grid + 잔존 곡선 영구 폐기 (section background-image / dotted curve SVG 광역 0)
- * 2. 모던 일러스트 배경 (compare-bg-a-cityscape.png / Next/Image fill / opacity 0.18)
- * 3. NumberFlow 수직 회전 정합 (좌 trend={1} / 우 trend={-1})
- * 4. "98% 단축" 좌·우 가운데 시각 연결 (grid 외 별도 row / v44 patch 보존)
- * 5. 시퀀스 재구성 (10 Step / 총 5.3초)
- *    Step 0 (-300ms): h2 (진입 즉시)
- *    Step 1 (0-300ms): 좌 라벨 fade
- *    Step 2 (300-1500ms): 좌 NumberFlow 0 → 255 (trend=1)
- *    Step 3 (1500-1800ms): ArrowRight fade + pulse
- *    Step 4 (1800-2100ms): 우 라벨 fade
- *    Step 5 (2100-3300ms): 우 NumberFlow 255 → 3 (trend=-1)
- *    Step 6 (3300-3800ms): "98% 단축" 배지 spring
- *    Step 7 (3800-4300ms): 보조 카피 fade + y 16 → 0 (Step 7 진입 의무 / 고정 노출 0)
- *    Step 8 (4300-4800ms): 5단계 카드 fade + 즉시 dim 0.3
- *    Step 9 (4800-5300ms): stamp
- * 6. 좌·우 라벨 시인성 ↑ (모바일 18 / 데스크탑 24 / font-bold 700)
- * 7. useInView once: true / amount 0.3 (재발화 0) */
+/* Phase 1.2 (A-1-2) v46 — CompareBlock 슬롯머신 + PPT Appear paradigm + 시퀀스 재정합.
+ * 정정 (Plan v46):
+ * 1. NumberFlow 슬롯머신 단순 transition (자리수 stagger setTimeout 폐기 / 좌 1 → 255 / 우 255 → 3)
+ * 2. 배경 일러스트 영구 폐기 (형준님 (a) 채택 / public/illustrations + scripts/gen-compare-bg.ts 영구 삭제)
+ * 3. "98% 단축" 위치 = ArrowRight 위 한 묶음 (가운데 column 안 vertical stack)
+ * 4. 보조 카피 확대 entrance (scale 0.85 → 1 + fade / 500ms / cubic-bezier back-out)
+ * 5. 5단계 PPT Appear stagger entrance (정상 색 / staggerChildren 0.08 / opacity 0 → 1 + y 12 → 0)
+ * 6. 5단계 dim (Step 8 stamp 등장 시점 / opacity 1 → 0.3 / 동시 발화 / color 변경 0)
+ * 7. stamp 5단계 가운데 absolute (top 50% / left 50% / translate -50% / z-10)
+ * 8. 모바일 정합 보존 (px-5 / "255"·"3" 70 / 5단계 라벨 13 / 좌·우 라벨 18·24 weight 600)
+ * 9. useInView once: true / amount 0.3 / 총 5초 8 Step
+ *
+ * 시퀀스:
+ *   Step 0 (-300ms): h2
+ *   Step 1 (0-300ms): 좌 라벨 fade
+ *   Step 2 (300-1500ms): 좌 NumberFlow 1 → 255 슬롯머신
+ *   Step 3 (1500-1900ms): ArrowRight + "98% 단축" 동시 (한 묶음)
+ *   Step 4 (1900-2200ms): 우 라벨 fade
+ *   Step 5 (2200-3400ms): 우 NumberFlow 255 → 3 슬롯머신
+ *   Step 6 (3400-3900ms): 보조 카피 확대 entrance
+ *   Step 7 (3900-4500ms): 5단계 PPT Appear stagger (정상 색)
+ *   Step 8 (4500-5000ms): stamp + 5단계 dim 동시 */
 
 type Bar = {
   Icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>;
@@ -54,7 +56,7 @@ const headVariants: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
 };
 
-// Step 1 — 좌 라벨 fade (0-300ms)
+// Step 1 — 좌 라벨 (0-300ms)
 const leftLabelVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.3 } },
@@ -66,29 +68,13 @@ const leftNumberVariants: Variants = {
   visible: { opacity: 1, transition: { duration: 0.3, delay: 0.3 } },
 };
 
-// Step 3 — ArrowRight fade + pulse (1500-1800ms)
+// Step 3 — ArrowRight (1500-1900ms)
 const arrowVariants: Variants = {
   hidden: { opacity: 0 },
   visible: { opacity: 1, transition: { duration: 0.3, delay: 1.5 } },
-  pulse: {
-    scale: [1, 1.05, 1],
-    transition: { duration: 0.4, delay: 1.6, ease: "easeInOut" },
-  },
 };
 
-// Step 4 — 우 라벨 fade (1800-2100ms)
-const rightLabelVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.3, delay: 1.8 } },
-};
-
-// Step 5 — 우 NumberFlow span fade (2100-3300ms)
-const rightNumberVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.3, delay: 2.1 } },
-};
-
-// Step 6 — "98% 단축" 배지 spring (3300-3800ms)
+// Step 3 — "98% 단축" 배지 spring (1500-1900ms / ArrowRight 동시 / 한 묶음)
 const badgeVariants: Variants = {
   hidden: { opacity: 0, scale: 0.85 },
   visible: {
@@ -98,53 +84,92 @@ const badgeVariants: Variants = {
       type: "spring",
       stiffness: 200,
       damping: 15,
-      delay: 3.3,
+      delay: 1.5,
     },
   },
 };
 
-// Step 7 — 보조 카피 fade + y 16 → 0 (3800-4300ms / 단축 배지 후 발화)
-const subCopyVariants: Variants = {
-  hidden: { opacity: 0, y: 16 },
-  visible: { opacity: 1, y: 0, transition: { duration: 0.5, delay: 3.8 } },
-};
-
-// Step 8 — 5 카드 fade + 즉시 dim 0.3 (4300-4800ms)
-const barVariants: Variants = {
+// Step 4 — 우 라벨 (1900-2200ms)
+const rightLabelVariants: Variants = {
   hidden: { opacity: 0 },
-  visible: { opacity: 0.3, transition: { duration: 0.5, delay: 4.3 } },
+  visible: { opacity: 1, transition: { duration: 0.3, delay: 1.9 } },
 };
 
-// Step 9 — stamp (4800-5300ms)
+// Step 5 — 우 NumberFlow span fade (2200-3400ms)
+const rightNumberVariants: Variants = {
+  hidden: { opacity: 0 },
+  visible: { opacity: 1, transition: { duration: 0.3, delay: 2.2 } },
+};
+
+// Step 6 — 보조 카피 확대 entrance (3400-3900ms / scale 0.85 → 1 + fade / cubic-bezier back-out)
+const subCopyVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.85 },
+  visible: {
+    opacity: 1,
+    scale: 1,
+    transition: {
+      duration: 0.5,
+      delay: 3.4,
+      ease: [0.34, 1.56, 0.64, 1],
+    },
+  },
+};
+
+// Step 7 — 5 카드 PPT Appear stagger entrance (3900-4500ms)
+const barContainerVariants: Variants = {
+  hidden: {},
+  visible: {
+    transition: {
+      staggerChildren: 0.08,
+      delayChildren: 3.9,
+    },
+  },
+};
+
+// Step 7 + 8 — 5 카드 entrance + dim (Step 8 동시 발화 / color 변경 0)
+const barVariants: Variants = {
+  hidden: { opacity: 0, y: 12 },
+  visible: {
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.3, ease: "easeOut" },
+  },
+  dim: {
+    opacity: 0.3,
+    transition: { duration: 0.5, delay: 4.6, ease: "easeInOut" },
+  },
+};
+
+// Step 8 — stamp 5단계 가운데 absolute (4500-5000ms)
 const stampVariants: Variants = {
   hidden: { opacity: 0, scale: 0.9 },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: { duration: 0.4, delay: 4.8 },
+    transition: { duration: 0.4, delay: 4.6 },
   },
 };
 
 export function CompareBlock() {
   const sectionRef = useRef<HTMLElement>(null);
   const isInView = useInView(sectionRef, { once: true, amount: 0.3 });
-  const [leftValue, setLeftValue] = useState(0);
+  const [leftValue, setLeftValue] = useState(1);
   const [rightValue, setRightValue] = useState(255);
   const [leftAnimated, setLeftAnimated] = useState(false);
   const [rightAnimated, setRightAnimated] = useState(false);
 
   useEffect(() => {
     if (isInView) {
-      // Step 2 — 300ms 후 좌 카운트 0 → 255
+      // Step 2 — 300ms 후 좌 슬롯머신 1 → 255 (1200ms slow-fast-slow)
       const t1 = setTimeout(() => {
         setLeftAnimated(true);
         setLeftValue(255);
       }, 300);
-      // Step 5 — 2100ms 후 우 카운트 255 → 3
+      // Step 5 — 2200ms 후 우 슬롯머신 255 → 3 (1200ms back-out)
       const t2 = setTimeout(() => {
         setRightAnimated(true);
         setRightValue(3);
-      }, 2100);
+      }, 2200);
       return () => {
         clearTimeout(t1);
         clearTimeout(t2);
@@ -158,20 +183,8 @@ export function CompareBlock() {
       aria-labelledby="compare-heading"
       className="relative flex min-h-[calc(100vh-64px)] flex-col justify-center overflow-hidden bg-white py-12 lg:min-h-[calc(100vh-80px)] lg:py-16"
     >
-      {/* 모던 일러스트 배경 (compare-bg-a-cityscape.png / opacity 0.18) */}
-      <div className="pointer-events-none absolute inset-0 z-0" aria-hidden="true">
-        <Image
-          src="/illustrations/compare-bg-a-cityscape.png"
-          alt=""
-          fill
-          sizes="100vw"
-          className="object-cover"
-          style={{ opacity: 0.18 }}
-        />
-      </div>
-
-      <div className="container-app relative z-10 w-full">
-        {/* Step 0 — h2 (진입 즉시) */}
+      <div className="container-app w-full">
+        {/* Step 0 — h2 */}
         <motion.h2
           id="compare-heading"
           variants={headVariants}
@@ -186,15 +199,15 @@ export function CompareBlock() {
           <span style={{ color: "#FFD43B" }}>.</span>
         </motion.h2>
 
-        {/* 큰 숫자 비교 — grid-cols-[1fr_auto_1fr] / 모바일 좌우 침범 정합 */}
-        <div className="mb-8 grid grid-cols-[1fr_auto_1fr] items-start gap-2 lg:mb-12 lg:items-center lg:gap-8">
-          {/* Step 1 + 2 — 좌측 라벨 + 좌 NumberFlow 0 → 255 (trend=1) */}
+        {/* 큰 숫자 비교 — grid-cols-[1fr_auto_1fr] */}
+        <div className="mb-12 grid grid-cols-[1fr_auto_1fr] items-center gap-2 lg:mb-16 lg:gap-8">
+          {/* Step 1 + 2 — 좌측 라벨 + 좌 NumberFlow 1 → 255 (slow-fast-slow) */}
           <div className="flex flex-col items-center text-center">
             <motion.div
               variants={leftLabelVariants}
               initial="hidden"
               animate={isInView ? "visible" : "hidden"}
-              className="mb-2 text-[18px] font-bold tracking-tight text-gray-500 lg:mb-4 lg:text-[24px]"
+              className="mb-2 text-[18px] font-semibold tracking-tight text-gray-500 lg:mb-4 lg:text-[24px]"
             >
               일반적인 방법
             </motion.div>
@@ -226,11 +239,21 @@ export function CompareBlock() {
             </motion.div>
           </div>
 
-          {/* Step 3 — 가운데 ArrowRight + 미세 pulse */}
-          <div className="flex flex-col items-center justify-center gap-3 lg:gap-4">
+          {/* Step 3 — 가운데: "98% 단축" 배지 (위) + ArrowRight (아래) 한 묶음 */}
+          <div className="flex flex-col items-center justify-center gap-2 lg:gap-3">
+            <motion.div
+              variants={badgeVariants}
+              initial="hidden"
+              animate={isInView ? "visible" : "hidden"}
+              className="whitespace-nowrap rounded-full bg-[#ECFDF5] px-3 py-1 text-[24px] font-extrabold text-[var(--brand-green)] lg:px-4 lg:py-1.5 lg:text-[36px]"
+              style={{ fontWeight: 800 }}
+            >
+              98% 단축
+            </motion.div>
             <motion.div
               variants={arrowVariants}
-              animate={isInView ? ["visible", "pulse"] : "hidden"}
+              initial="hidden"
+              animate={isInView ? "visible" : "hidden"}
               className="flex justify-center"
             >
               <ArrowRight size={48} strokeWidth={2} className="text-gray-400 lg:hidden" />
@@ -238,13 +261,13 @@ export function CompareBlock() {
             </motion.div>
           </div>
 
-          {/* Step 4 + 5 — 우측 라벨 + 우 NumberFlow 255 → 3 (trend=-1) */}
+          {/* Step 4 + 5 — 우측 라벨 + 우 NumberFlow 255 → 3 (back-out) */}
           <div className="flex flex-col items-center text-center">
             <motion.div
               variants={rightLabelVariants}
               initial="hidden"
               animate={isInView ? "visible" : "hidden"}
-              className="mb-2 text-[18px] font-bold tracking-tight text-[var(--brand-green)] lg:mb-4 lg:text-[24px]"
+              className="mb-2 text-[18px] font-semibold tracking-tight text-[var(--brand-green)] lg:mb-4 lg:text-[24px]"
             >
               경매퀵을 이용하면
             </motion.div>
@@ -277,22 +300,7 @@ export function CompareBlock() {
           </div>
         </div>
 
-        {/* Step 6 — "98% 단축" 배지 (grid 외 별도 row / 좌·우 가운데 시각 연결) */}
-        <motion.div
-          variants={badgeVariants}
-          initial="hidden"
-          animate={isInView ? "visible" : "hidden"}
-          className="mb-8 flex justify-center lg:mb-12"
-        >
-          <div
-            className="whitespace-nowrap rounded-full bg-[#ECFDF5] px-3 py-1 text-[24px] font-extrabold text-[var(--brand-green)] lg:px-4 lg:py-1.5 lg:text-[36px]"
-            style={{ fontWeight: 800 }}
-          >
-            98% 단축
-          </div>
-        </motion.div>
-
-        {/* Step 7 — 보조 카피 (단축 배지 후 발화 / 고정 노출 0) */}
+        {/* Step 6 — 보조 카피 확대 entrance (scale 0.85 → 1 + fade / cubic-bezier back-out) */}
         <motion.div
           variants={subCopyVariants}
           initial="hidden"
@@ -303,37 +311,42 @@ export function CompareBlock() {
           발품도 시간도, 단 한 번에.
         </motion.div>
 
-        {/* Step 8 + 9 — 5 카드 + stamp 오버레이 */}
+        {/* Step 7 + 8 — 5 카드 PPT Appear stagger + dim + stamp 가운데 오버레이 */}
         <div className="relative mx-auto max-w-4xl">
-          {/* Step 9 stamp (charcoal bg + green text) */}
+          {/* Step 8 stamp — 5단계 가운데 absolute (top 50% / left 50% / translate -50%) */}
           <motion.div
             variants={stampVariants}
             initial="hidden"
             animate={isInView ? "visible" : "hidden"}
-            className="absolute -top-4 left-1/2 z-20 -translate-x-1/2 whitespace-nowrap rounded-full bg-[#111418] px-4 py-2 text-[14px] font-bold text-[var(--brand-green)] lg:-top-5 lg:px-6 lg:py-2.5 lg:text-[18px]"
+            className="absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2 whitespace-nowrap rounded-full bg-[#111418] px-5 py-2.5 text-[15px] font-bold text-[var(--brand-green)] lg:px-7 lg:py-3 lg:text-[20px]"
             style={{ fontWeight: 700 }}
           >
             이 모든 단계, 경매퀵이 대신합니다
           </motion.div>
 
-          {/* Step 8 — 5 카드 grid (X 취소선 0 / dim only) */}
-          <div className="grid grid-cols-5 gap-2 pt-6 lg:gap-4 lg:pt-8">
+          {/* Step 7 — 5 카드 PPT Appear stagger (정상 색) + Step 8 dim (동시 발화) */}
+          <motion.div
+            className="grid grid-cols-5 gap-2 lg:gap-4"
+            variants={barContainerVariants}
+            initial="hidden"
+            animate={isInView ? "visible" : "hidden"}
+          >
             {BAR_DATA.map(({ Icon, labelMobile, labelDesktop, minutes }) => (
               <motion.div
                 key={labelDesktop}
                 variants={barVariants}
-                initial="hidden"
-                animate={isInView ? "visible" : "hidden"}
-                className="flex flex-col items-center gap-1 lg:gap-2"
+                animate={isInView ? ["visible", "dim"] : "hidden"}
+                className="flex flex-col items-center gap-2 lg:gap-3"
               >
-                <Icon size={20} strokeWidth={2} className="text-gray-300" />
-                <div className="h-1 w-full overflow-hidden rounded-full bg-gray-100">
+                <Icon size={36} strokeWidth={2} className="text-gray-600 lg:hidden" />
+                <Icon size={48} strokeWidth={2} className="hidden text-gray-600 lg:block" />
+                <div className="h-1 w-full overflow-hidden rounded-full bg-gray-200">
                   <div
-                    className="h-full rounded-full bg-gray-200"
+                    className="h-full rounded-full bg-gray-400"
                     style={{ width: `${(minutes / 90) * 100}%` }}
                   />
                 </div>
-                <div className="text-[12px] font-semibold text-gray-400 lg:text-[18px]">
+                <div className="text-[13px] font-semibold text-gray-700 lg:text-[18px]">
                   <span className="lg:hidden">
                     {labelMobile} {minutes}분
                   </span>
@@ -343,7 +356,7 @@ export function CompareBlock() {
                 </div>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </div>
     </section>
