@@ -5,12 +5,15 @@ import Link from "next/link";
 import { motion } from "motion/react";
 import type { InsightFeaturedPost } from "@/lib/content";
 
-/* Phase 1.2 (A-1-2) v37 — InsightThumbnail (실사 jpg 회복 + 벤토 컬러 폐기 + bg-gray-50 단일).
- * 정정 (Plan v37):
- * 1. 이미지 src .png → .jpg (실사 4종 git history 회복)
- * 2. INSIGHT_BG_MAP 광역 폐기 + 이미지 영역 배경 = bg-gray-50 단일 (벤토 컬러 광역 폐기)
- * 3. v36 layout 광역 보존 (flex-[13]:flex-[7] / Featured 영역 폐기 / 박스 입체감 v34).
- * 보존: featuredPost props (Phase B 재활용 / UI 잔존 0). */
+/* Phase 1.2 (A-1-2) v41 — InsightThumbnail hover 복원 (lenis 폐기 시점 사라짐 정정).
+ * 정정 (Plan v41):
+ * 1. whileHover y -8 → -4 (subtle paradigm)
+ * 2. shadow 명시값 — 0 8px 24px / 0.08 → 0 16px 40px / 0.12 (motion 광역 transition)
+ * 3. transition 200ms ease-out (motion 광역 spec)
+ * 4. 카테고리 색 brightness 1.05 (이미지 영역 group-hover)
+ * 5. transition-shadow Tailwind class 폐기 / motion whileHover boxShadow 광역 통합
+ * 6. 데스크탑 hover only (motion whileHover = 모바일 touch 0 자동)
+ * v37 보존: 이미지 jpg / bg-gray-50 단일 / flex-[13]:flex-[7] layout. */
 
 export type InsightCategorySlug = "analysis" | "guide" | "glossary" | "news";
 export type InsightCategoryColor = "green" | "blue" | "orange" | "purple";
@@ -46,10 +49,18 @@ export function InsightThumbnail({
   const imageSrc = `/images/insight/${category.slug}.jpg`;
 
   return (
-    <motion.div whileHover={{ y: -8 }} transition={{ duration: 0.3 }} className="block">
+    <motion.div
+      whileHover={{
+        y: -4,
+        boxShadow: "0 16px 40px rgba(0,0,0,0.12)",
+      }}
+      transition={{ duration: 0.2, ease: "easeOut" }}
+      style={{ boxShadow: "0 8px 24px rgba(0,0,0,0.08)" }}
+      className="block rounded-2xl"
+    >
       <Link
         href={href}
-        className="group flex aspect-[3/4] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm transition-shadow hover:shadow-md focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
+        className="group flex aspect-[3/4] flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
       >
         {/* 상단 이미지 영역 (65%) — bg-gray-50 단일 (벤토 컬러 광역 폐기). */}
         <div className="relative flex-[13] overflow-hidden bg-gray-50">
@@ -58,7 +69,7 @@ export function InsightThumbnail({
             alt={category.label}
             fill
             sizes="(min-width: 1024px) 25vw, 50vw"
-            className="object-cover transition-transform duration-500 group-hover:scale-105"
+            className="object-cover transition-[transform,filter] duration-500 group-hover:scale-105 group-hover:brightness-105"
           />
         </div>
 
