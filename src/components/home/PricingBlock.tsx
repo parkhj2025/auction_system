@@ -166,8 +166,8 @@ export function PricingBlock() {
             variants={lineVariants}
             initial="hidden"
             animate={sectionInView ? "visible" : "hidden"}
-            className="absolute bottom-0 left-[10px] top-0 w-[6px] rounded-full"
-            style={{ background: VLINE_GRADIENT }}
+            className="absolute left-[10px] top-0 w-[6px] rounded-full"
+            style={{ background: VLINE_GRADIENT, bottom: "50px" }}
           />
 
           {TIERS.map((tier, i) => {
