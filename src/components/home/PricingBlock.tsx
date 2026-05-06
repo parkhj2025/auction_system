@@ -12,15 +12,10 @@ import {
 } from "motion/react";
 import NumberFlow from "@number-flow/react";
 
-/* Phase 1.2 (A-1-2) v19 — PricingBlock (모바일 vertical + 데스크탑 horizontal grid timeline).
- * - 막대 wrapper 폐기 → 카드 안 bar 통합 (50/70/100% / 가격 비례)
- * - tick 폐기 → 카드별 marker (모바일 좌측 vline / 데스크탑 하단 hline)
- * - endpoint 빨간 원 + "입찰일" 라벨 + pulse infinite (영구 / 선택 무관)
- * - 카드 선택 paradigm (default 얼리버드 / click → setSelected / border + box-shadow + marker filled + ring pulse)
- * - scroll-linked 4단 (Compare 학습 정합 / 80/25/0.5/0.001 spring)
- * - Diff 2: 가격 모바일 40px (절대 크기 룰 정합)
- * - Diff 3: 데스크탑 timeline-wrap grid 재정의 + hline right-[12px] + marker column 안 left-1/2
- * - Diff 4: focus-visible ring #00C853/40 직접 (var 의존 0) */
+/* Phase 1.2 (A-1-2) v20 — PricingBlock (production NG 회수 / sub 카피 + 단일 step + 모바일 endpoint left).
+ * - sub 카피 정정 ("낙찰 시에는 성공보수 5만원 추가, 패찰 시 보증금 당일 즉시 반환됩니다.")
+ * - threshold 4단 → 단일 step (p ≥ 0.250 → 1) / stepActive 광역 step >= 1 / scroll 빠를 시 미진입 NG 회피
+ * - 모바일 endpoint-area pl-[30px] 폐기 + endpoint-circle / pulse / label left-[13px] → left-[-17px] (vline center 13 정합) */
 
 type Tier = {
   key: "early" | "normal" | "rush";
@@ -120,11 +115,9 @@ export function PricingBlock() {
     mass: 0.5,
     restDelta: 0.001,
   });
+  // 단일 step 정합 (stagger 폐기 / scroll 빠를 시 미진입 NG 회피)
   const stepValue = useTransform(smoothProgress, (p) => {
-    if (p >= 0.526) return 4;
-    if (p >= 0.392) return 3;
-    if (p >= 0.295) return 2;
-    if (p >= 0.150) return 1;
+    if (p >= 0.250) return 1;
     return 0;
   });
   useMotionValueEvent(stepValue, "change", (v) => {
@@ -163,7 +156,7 @@ export function PricingBlock() {
           animate={sectionInView ? "visible" : "hidden"}
           className="mb-10 text-[14px] text-gray-500 lg:mb-14 lg:text-[16px]"
         >
-          5만원부터 · 낙찰 시 +5만원 (성공 보수) · 패찰 시 보증금 전액 반환
+          낙찰 시에는 성공보수 5만원 추가, 패찰 시 보증금 당일 즉시 반환됩니다.
         </motion.p>
 
         {/* 모바일 vertical wrapper */}
@@ -179,7 +172,7 @@ export function PricingBlock() {
 
           {TIERS.map((tier, i) => {
             const isSelected = selected === i;
-            const stepActive = step >= i + 2;
+            const stepActive = step >= 1;
             return (
               <div key={tier.key} className="relative mb-[14px] last:mb-0">
                 <div className="pointer-events-none absolute left-[-17px] top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
@@ -216,17 +209,17 @@ export function PricingBlock() {
             );
           })}
 
-          {/* endpoint area — 모바일 / row-stack 외부 아래 */}
-          <div className="relative mt-0 min-h-[50px] pl-[30px]">
-            <div className="pointer-events-none absolute left-[13px] top-[-10px] z-10 -translate-x-1/2">
+          {/* endpoint area — 모바일 / row-stack 자식 / pl-[30px] 폐기 / left-[-17px] (vline center 정합) */}
+          <div className="relative mt-0 min-h-[50px]">
+            <div className="pointer-events-none absolute left-[-17px] top-[-10px] z-10 -translate-x-1/2">
               <motion.div
                 variants={endpointVariants}
                 initial="hidden"
-                animate={step >= 4 ? "visible" : "hidden"}
+                animate={step >= 1 ? "visible" : "hidden"}
                 className="relative h-5 w-5 rounded-full"
                 style={{ backgroundColor: "#EF4444" }}
               >
-                {step >= 4 && (
+                {step >= 1 && (
                   <motion.span
                     aria-hidden="true"
                     animate={PULSE_ANIMATE}
@@ -240,8 +233,8 @@ export function PricingBlock() {
             <motion.div
               variants={fadeVariants}
               initial="hidden"
-              animate={step >= 4 ? "visible" : "hidden"}
-              className="absolute left-[13px] top-[18px] -translate-x-1/2 whitespace-nowrap text-[14px] font-medium"
+              animate={step >= 1 ? "visible" : "hidden"}
+              className="absolute left-[-17px] top-[18px] -translate-x-1/2 whitespace-nowrap text-[14px] font-medium"
               style={{ color: "#111418" }}
             >
               입찰일
@@ -254,7 +247,7 @@ export function PricingBlock() {
           <div className="grid grid-cols-3 gap-6">
             {TIERS.map((tier, i) => {
               const isSelected = selected === i;
-              const stepActive = step >= i + 2;
+              const stepActive = step >= 1;
               return (
                 <PricingCard
                   key={tier.key}
@@ -267,7 +260,7 @@ export function PricingBlock() {
             })}
           </div>
 
-          {/* horizontal timeline (Diff 3 grid 재정의 / hline right-[12px] / marker column 안) */}
+          {/* horizontal timeline (정정 0 / stepActive 광역 step >= 1) */}
           <div className="relative mt-12 grid h-[60px] grid-cols-3 gap-6">
             <motion.div
               aria-hidden="true"
@@ -280,7 +273,7 @@ export function PricingBlock() {
 
             {TIERS.map((tier, i) => {
               const isSelected = selected === i;
-              const stepActive = step >= i + 2;
+              const stepActive = step >= 1;
               return (
                 <div key={tier.key} className="relative">
                   <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
@@ -314,11 +307,11 @@ export function PricingBlock() {
               <motion.div
                 variants={endpointVariants}
                 initial="hidden"
-                animate={step >= 4 ? "visible" : "hidden"}
+                animate={step >= 1 ? "visible" : "hidden"}
                 className="relative h-6 w-6 rounded-full"
                 style={{ backgroundColor: "#EF4444" }}
               >
-                {step >= 4 && (
+                {step >= 1 && (
                   <motion.span
                     aria-hidden="true"
                     animate={PULSE_ANIMATE}
@@ -331,7 +324,7 @@ export function PricingBlock() {
               <motion.div
                 variants={fadeVariants}
                 initial="hidden"
-                animate={step >= 4 ? "visible" : "hidden"}
+                animate={step >= 1 ? "visible" : "hidden"}
                 className="absolute left-1/2 top-[36px] -translate-x-1/2 whitespace-nowrap text-[16px] font-medium"
                 style={{ color: "#111418" }}
               >
