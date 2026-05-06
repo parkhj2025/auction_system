@@ -77,8 +77,9 @@ export function InsightBlock({
           className="mb-8 text-[48px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:mb-12 lg:text-[96px]"
           style={{ fontWeight: 800 }}
         >
-          용어부터{" "}
-          <span className="text-[var(--brand-green)]">시황까지</span>
+          물건분석부터 경매용어까지
+          <br />
+          <span className="text-[var(--brand-green)]">알기쉽게</span> 설명드립니다
           <span style={{ color: "#FFD43B" }}>.</span>
         </h2>
 
