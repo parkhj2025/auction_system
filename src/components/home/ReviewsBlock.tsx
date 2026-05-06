@@ -71,7 +71,7 @@ export function ReviewsBlock() {
     <section
       ref={sectionRef}
       aria-labelledby="reviews-heading"
-      className="bg-white py-16 lg:py-24"
+      className="bg-[#FAFAFA] py-16 lg:py-24"
     >
       <div className="container-app w-full">
         <h2
@@ -97,7 +97,7 @@ export function ReviewsBlock() {
             <motion.article
               key={review.id}
               variants={cardVariants}
-              className="rounded-2xl border border-gray-200 bg-[#FAFAFA] p-6 shadow-sm transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-md lg:p-8"
+              className="rounded-2xl border border-gray-200 bg-white p-6 shadow-sm transition-transform duration-200 hover:-translate-y-0.5 hover:shadow-md lg:p-8"
             >
               <p className="text-[18px] leading-[1.5] text-[#111418] lg:text-[20px]">
                 {review.body}

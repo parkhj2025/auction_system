@@ -12,13 +12,15 @@ import {
 } from "motion/react";
 import NumberFlow from "@number-flow/react";
 
-/* Phase 1.2 (A-1-2) v17 — PricingBlock (시안 B + X / 막대 ascending + 카드 + horizontal timeline).
- * - h2 + sub + 막대 grid 3열 + 카드 grid 3열 + 타임라인 horizontal
- * - scroll-linked step 4단 (Compare cycle 5 학습 정합 / 80/25/0.5/0.001 spring / 0.150·0.295·0.392·0.526 threshold)
- * - step 1 → 막대 진입 + line fade / step 2~4 → dot + 가격 카운트업 stagger
- * - Diff 1: h2 텍스트 색 #111418 직접
- * - Diff 2: dot halo 4px / hex 2E (18%)
- * - Diff 3: barVariants dynamic variant + custom={i} (motion v12 prop override 회피) */
+/* Phase 1.2 (A-1-2) v19 — PricingBlock (모바일 vertical + 데스크탑 horizontal grid timeline).
+ * - 막대 wrapper 폐기 → 카드 안 bar 통합 (50/70/100% / 가격 비례)
+ * - tick 폐기 → 카드별 marker (모바일 좌측 vline / 데스크탑 하단 hline)
+ * - endpoint 빨간 원 + "입찰일" 라벨 + pulse infinite (영구 / 선택 무관)
+ * - 카드 선택 paradigm (default 얼리버드 / click → setSelected / border + box-shadow + marker filled + ring pulse)
+ * - scroll-linked 4단 (Compare 학습 정합 / 80/25/0.5/0.001 spring)
+ * - Diff 2: 가격 모바일 40px (절대 크기 룰 정합)
+ * - Diff 3: 데스크탑 timeline-wrap grid 재정의 + hline right-[12px] + marker column 안 left-1/2
+ * - Diff 4: focus-visible ring #00C853/40 직접 (var 의존 0) */
 
 type Tier = {
   key: "early" | "normal" | "rush";
@@ -30,11 +32,8 @@ type Tier = {
   keyword: string;
   reason1: string;
   reason2: string;
-  barColor: string;
-  barHeightMobile: number;
-  barHeightDesktop: number;
-  emphasis: boolean;
-  dotPosition: number;
+  color: string;
+  barWidth: number;
 };
 
 const TIERS: Tier[] = [
@@ -48,11 +47,8 @@ const TIERS: Tier[] = [
     keyword: "여유 일정",
     reason1: "사건 검토 + 권리 분석 충분",
     reason2: "입찰 일정 협의 가능",
-    barColor: "#00C853",
-    barHeightMobile: 45,
-    barHeightDesktop: 80,
-    emphasis: true,
-    dotPosition: 16,
+    color: "#00C853",
+    barWidth: 50,
   },
   {
     key: "normal",
@@ -63,11 +59,8 @@ const TIERS: Tier[] = [
     keyword: "표준 일정",
     reason1: "통상 처리 가능",
     reason2: "입찰 정상 진행",
-    barColor: "#F97316",
-    barHeightMobile: 63,
-    barHeightDesktop: 112,
-    emphasis: false,
-    dotPosition: 50,
+    color: "#F97316",
+    barWidth: 70,
   },
   {
     key: "rush",
@@ -78,51 +71,44 @@ const TIERS: Tier[] = [
     keyword: "긴급 처리",
     reason1: "당일 또는 익일 진행",
     reason2: "우선 배정 비용 추가",
-    barColor: "#EF4444",
-    barHeightMobile: 90,
-    barHeightDesktop: 160,
-    emphasis: false,
-    dotPosition: 84,
+    color: "#EF4444",
+    barWidth: 100,
   },
 ];
+
+const VLINE_GRADIENT =
+  "linear-gradient(180deg, #00C853 0%, #F97316 35%, #EF4444 75%, #EF4444 100%)";
+const HLINE_GRADIENT =
+  "linear-gradient(90deg, #00C853 0%, #F97316 35%, #EF4444 75%, #EF4444 100%)";
 
 const fadeVariants: Variants = {
   hidden: { opacity: 0, y: 20 },
   visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
 };
 
-const barVariants: Variants = {
-  hidden: { scaleY: 0 },
-  visible: (i: number) => ({
-    scaleY: 1,
-    transition: { duration: 1.4, ease: [0.16, 1, 0.3, 1], delay: i * 0.1 },
-  }),
-};
-
-const dotVariants: Variants = {
-  hidden: { opacity: 0.4, scale: 0.7, boxShadow: "0 0 0 0 rgba(0,0,0,0)" },
-  visible: (color: string) => ({
-    opacity: 1,
-    scale: 1.2,
-    boxShadow: `0 0 0 4px ${color}2E`,
-    transition: { duration: 0.5, ease: "easeOut" },
-  }),
-};
-
 const lineVariants: Variants = {
-  hidden: { opacity: 0.2 },
+  hidden: { opacity: 0.3 },
   visible: { opacity: 1, transition: { duration: 0.8, ease: "easeOut" } },
 };
 
-const priceVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.4 } },
+const markerVariants: Variants = {
+  hidden: { opacity: 0, scale: 0.6 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.4, ease: "easeOut" } },
 };
+
+const endpointVariants: Variants = {
+  hidden: { opacity: 0.3, scale: 0.4 },
+  visible: { opacity: 1, scale: 1, transition: { duration: 0.5, ease: "easeOut" } },
+};
+
+const PULSE_ANIMATE = { scale: [1, 2.8], opacity: [0.6, 0] };
+const PULSE_TRANSITION = { duration: 2.2, repeat: Infinity, ease: "easeOut" as const };
 
 export function PricingBlock() {
   const sectionRef = useRef<HTMLElement>(null);
   const sectionInView = useInView(sectionRef, { once: true, amount: 0.3 });
   const [step, setStep] = useState(0);
+  const [selected, setSelected] = useState(0);
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -180,139 +166,257 @@ export function PricingBlock() {
           5만원부터 · 낙찰 시 +5만원 (성공 보수) · 패찰 시 보증금 전액 반환
         </motion.p>
 
-        {/* 막대 ascending wrapper — 카드 색 동기 / 5:7:10 비례 / scaleY origin bottom */}
-        <div
-          aria-hidden="true"
-          className="mb-6 grid h-[90px] grid-cols-3 items-end gap-3 lg:mb-10 lg:h-[160px] lg:gap-6"
-        >
-          {TIERS.map((tier, i) => (
-            <div key={tier.key} className="relative flex h-full items-end justify-center">
-              <motion.div
-                variants={barVariants}
-                custom={i}
-                initial="hidden"
-                animate={step >= 1 ? "visible" : "hidden"}
-                style={{
-                  height: `${tier.barHeightMobile}px`,
-                  backgroundColor: tier.barColor,
-                  transformOrigin: "bottom",
-                  ["--bar-h-lg" as string]: `${tier.barHeightDesktop}px`,
-                }}
-                className="w-full rounded-t-lg lg:!h-[var(--bar-h-lg)]"
-              />
-            </div>
-          ))}
-        </div>
-
-        {/* 카드 grid 3건 — 강조 (카드 1) green border + 뱃지 / 단계별 설명 3줄 */}
-        <div className="mb-12 grid grid-cols-1 gap-4 lg:mb-16 lg:grid-cols-3 lg:gap-6">
-          {TIERS.map((tier, i) => (
-            <motion.article
-              key={tier.key}
-              variants={fadeVariants}
-              initial="hidden"
-              animate={sectionInView ? "visible" : "hidden"}
-              transition={{ delay: 0.1 + i * 0.08 }}
-              className={`relative rounded-3xl bg-white p-6 lg:p-8 ${
-                tier.emphasis
-                  ? "border-2 shadow-lg"
-                  : "border border-gray-200"
-              }`}
-              style={tier.emphasis ? { borderColor: "#00C853" } : undefined}
-            >
-              {tier.badge && (
-                <div
-                  className="absolute -top-3 left-6 rounded-full px-3 py-1 text-[11px] font-medium text-white lg:text-[12px]"
-                  style={{ backgroundColor: "#00C853" }}
-                >
-                  {tier.badge}
-                </div>
-              )}
-              <div
-                className="mb-3 text-[12px] font-medium lg:mb-4 lg:text-[14px]"
-                style={{ color: tier.whenColor }}
-              >
-                {tier.when}
-              </div>
-              <div
-                className="mb-3 text-[40px] font-extrabold leading-none text-gray-900 lg:mb-4 lg:text-[56px]"
-                style={{ fontWeight: 800 }}
-              >
-                <motion.span
-                  variants={priceVariants}
-                  initial="hidden"
-                  animate={step >= i + 2 ? "visible" : "hidden"}
-                  className="inline-block"
-                >
-                  <NumberFlow value={step >= i + 2 ? tier.price : 0} />
-                  만원
-                </motion.span>
-              </div>
-              <div className="mb-4 text-[14px] font-medium text-gray-600 lg:mb-5 lg:text-[16px]">
-                {tier.label}
-              </div>
-              <div className="space-y-1.5">
-                <div
-                  className="text-[13px] font-medium lg:text-[15px]"
-                  style={{ color: "#111418" }}
-                >
-                  {tier.keyword}
-                </div>
-                <div className="text-[12px] leading-[1.55] text-gray-500 lg:text-[14px]">
-                  {tier.reason1}
-                </div>
-                <div className="text-[12px] leading-[1.55] text-gray-500 lg:text-[14px]">
-                  {tier.reason2}
-                </div>
-              </div>
-            </motion.article>
-          ))}
-        </div>
-
-        {/* horizontal timeline — line green→orange→red / dot 3건 + 라벨 */}
-        <div className="relative mx-auto mt-8 w-full max-w-3xl lg:mt-12">
+        {/* 모바일 vertical wrapper */}
+        <div className="relative pl-[30px] lg:hidden">
           <motion.div
             aria-hidden="true"
             variants={lineVariants}
             initial="hidden"
             animate={sectionInView ? "visible" : "hidden"}
-            className="absolute left-0 right-0 top-1/2 h-[2px] -translate-y-1/2"
-            style={{
-              background:
-                "linear-gradient(90deg, #00C853 0%, #F97316 50%, #EF4444 100%)",
-            }}
+            className="absolute bottom-0 left-[10px] top-0 w-[6px] rounded-full"
+            style={{ background: VLINE_GRADIENT }}
           />
-          <div className="relative h-[14px]">
-            {TIERS.map((tier, i) => (
-              <motion.div
-                key={tier.key}
-                variants={dotVariants}
-                custom={tier.barColor}
-                initial="hidden"
-                animate={step >= i + 2 ? "visible" : "hidden"}
-                className="absolute top-1/2 -translate-x-1/2 -translate-y-1/2 rounded-full bg-white"
-                style={{
-                  left: `${tier.dotPosition}%`,
-                  width: 14,
-                  height: 14,
-                  border: `2.5px solid ${tier.barColor}`,
-                }}
-              />
-            ))}
-          </div>
-          <div className="relative mt-2 h-5">
-            {TIERS.map((tier) => (
-              <div
-                key={tier.key}
-                className="absolute -translate-x-1/2 text-[10px] font-medium text-gray-400"
-                style={{ left: `${tier.dotPosition}%` }}
-              >
-                {tier.when}
+
+          {TIERS.map((tier, i) => {
+            const isSelected = selected === i;
+            const stepActive = step >= i + 2;
+            return (
+              <div key={tier.key} className="relative mb-[14px] last:mb-0">
+                <div className="pointer-events-none absolute left-[-17px] top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
+                  <motion.div
+                    variants={markerVariants}
+                    initial="hidden"
+                    animate={stepActive ? "visible" : "hidden"}
+                    className="relative h-5 w-5 rounded-full border-[2.5px]"
+                    style={{
+                      borderColor: tier.color,
+                      backgroundColor: isSelected ? tier.color : "white",
+                      transition: "background-color 0.35s ease-out",
+                    }}
+                  >
+                    {isSelected && stepActive && (
+                      <motion.span
+                        aria-hidden="true"
+                        animate={PULSE_ANIMATE}
+                        transition={PULSE_TRANSITION}
+                        className="absolute inset-0 rounded-full"
+                        style={{ border: `2.5px solid ${tier.color}` }}
+                      />
+                    )}
+                  </motion.div>
+                </div>
+
+                <PricingCard
+                  tier={tier}
+                  selected={isSelected}
+                  stepActive={stepActive}
+                  onClick={() => setSelected(i)}
+                />
               </div>
-            ))}
+            );
+          })}
+
+          {/* endpoint area — 모바일 / row-stack 외부 아래 */}
+          <div className="relative mt-0 min-h-[50px] pl-[30px]">
+            <div className="pointer-events-none absolute left-[13px] top-[-10px] z-10 -translate-x-1/2">
+              <motion.div
+                variants={endpointVariants}
+                initial="hidden"
+                animate={step >= 4 ? "visible" : "hidden"}
+                className="relative h-5 w-5 rounded-full"
+                style={{ backgroundColor: "#EF4444" }}
+              >
+                {step >= 4 && (
+                  <motion.span
+                    aria-hidden="true"
+                    animate={PULSE_ANIMATE}
+                    transition={PULSE_TRANSITION}
+                    className="absolute inset-0 rounded-full"
+                    style={{ border: "2.5px solid #EF4444" }}
+                  />
+                )}
+              </motion.div>
+            </div>
+            <motion.div
+              variants={fadeVariants}
+              initial="hidden"
+              animate={step >= 4 ? "visible" : "hidden"}
+              className="absolute left-[13px] top-[18px] -translate-x-1/2 whitespace-nowrap text-[14px] font-medium"
+              style={{ color: "#111418" }}
+            >
+              입찰일
+            </motion.div>
+          </div>
+        </div>
+
+        {/* 데스크탑 horizontal wrapper */}
+        <div className="hidden lg:block">
+          <div className="grid grid-cols-3 gap-6">
+            {TIERS.map((tier, i) => {
+              const isSelected = selected === i;
+              const stepActive = step >= i + 2;
+              return (
+                <PricingCard
+                  key={tier.key}
+                  tier={tier}
+                  selected={isSelected}
+                  stepActive={stepActive}
+                  onClick={() => setSelected(i)}
+                />
+              );
+            })}
+          </div>
+
+          {/* horizontal timeline (Diff 3 grid 재정의 / hline right-[12px] / marker column 안) */}
+          <div className="relative mt-12 grid h-[60px] grid-cols-3 gap-6">
+            <motion.div
+              aria-hidden="true"
+              variants={lineVariants}
+              initial="hidden"
+              animate={sectionInView ? "visible" : "hidden"}
+              className="absolute left-0 right-[12px] top-1/2 h-[8px] -translate-y-1/2 rounded-full"
+              style={{ background: HLINE_GRADIENT }}
+            />
+
+            {TIERS.map((tier, i) => {
+              const isSelected = selected === i;
+              const stepActive = step >= i + 2;
+              return (
+                <div key={tier.key} className="relative">
+                  <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 -translate-x-1/2 -translate-y-1/2">
+                    <motion.div
+                      variants={markerVariants}
+                      initial="hidden"
+                      animate={stepActive ? "visible" : "hidden"}
+                      className="relative h-6 w-6 rounded-full border-[2.5px]"
+                      style={{
+                        borderColor: tier.color,
+                        backgroundColor: isSelected ? tier.color : "white",
+                        transition: "background-color 0.35s ease-out",
+                      }}
+                    >
+                      {isSelected && stepActive && (
+                        <motion.span
+                          aria-hidden="true"
+                          animate={PULSE_ANIMATE}
+                          transition={PULSE_TRANSITION}
+                          className="absolute inset-0 rounded-full"
+                          style={{ border: `2.5px solid ${tier.color}` }}
+                        />
+                      )}
+                    </motion.div>
+                  </div>
+                </div>
+              );
+            })}
+
+            <div className="pointer-events-none absolute right-0 top-1/2 z-10 -translate-y-1/2">
+              <motion.div
+                variants={endpointVariants}
+                initial="hidden"
+                animate={step >= 4 ? "visible" : "hidden"}
+                className="relative h-6 w-6 rounded-full"
+                style={{ backgroundColor: "#EF4444" }}
+              >
+                {step >= 4 && (
+                  <motion.span
+                    aria-hidden="true"
+                    animate={PULSE_ANIMATE}
+                    transition={PULSE_TRANSITION}
+                    className="absolute inset-0 rounded-full"
+                    style={{ border: "2.5px solid #EF4444" }}
+                  />
+                )}
+              </motion.div>
+              <motion.div
+                variants={fadeVariants}
+                initial="hidden"
+                animate={step >= 4 ? "visible" : "hidden"}
+                className="absolute left-1/2 top-[36px] -translate-x-1/2 whitespace-nowrap text-[16px] font-medium"
+                style={{ color: "#111418" }}
+              >
+                입찰일
+              </motion.div>
+            </div>
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+type PricingCardProps = {
+  tier: Tier;
+  selected: boolean;
+  stepActive: boolean;
+  onClick: () => void;
+};
+
+function PricingCard({ tier, selected, stepActive, onClick }: PricingCardProps) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={selected}
+      aria-label={`${tier.label} ${tier.price}만원 / ${tier.when}`}
+      className="relative w-full cursor-pointer rounded-[14px] bg-white p-[14px] text-left transition-[border-color,box-shadow] duration-[350ms] ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#00C853]/40 focus-visible:ring-offset-2 lg:rounded-3xl lg:p-8"
+      style={{
+        border: `2px solid ${selected ? tier.color : "#E5E7EB"}`,
+        boxShadow: selected ? `0 4px 14px ${tier.color}24` : "none",
+      }}
+    >
+      {tier.badge && (
+        <div
+          className="absolute left-3 top-[-10px] rounded-full px-[10px] py-1 text-[10px] font-medium text-white lg:left-6 lg:px-3 lg:text-[12px]"
+          style={{ backgroundColor: "#00C853" }}
+        >
+          {tier.badge}
+        </div>
+      )}
+      <div
+        className="mb-2 text-[11px] font-medium lg:mb-4 lg:text-[14px]"
+        style={{ color: tier.whenColor }}
+      >
+        {tier.when}
+      </div>
+      <div
+        className="mb-[6px] text-[40px] font-extrabold leading-none tabular-nums text-[#111418] lg:mb-4 lg:text-[56px]"
+        style={{ fontWeight: 800 }}
+      >
+        <motion.span
+          initial={{ opacity: 0 }}
+          animate={{ opacity: stepActive ? 1 : 0 }}
+          transition={{ duration: 0.4 }}
+          className="inline-block"
+        >
+          <NumberFlow value={stepActive ? tier.price : 0} />
+          만원
+        </motion.span>
+      </div>
+      <div className="mb-3 text-[12px] font-medium text-gray-500 lg:mb-5 lg:text-[16px]">
+        {tier.label}
+      </div>
+      <div className="mb-[14px] h-2 w-full overflow-hidden rounded-[4px] bg-[#F3F4F6]">
+        <motion.div
+          initial={{ width: 0 }}
+          animate={{ width: stepActive ? `${tier.barWidth}%` : 0 }}
+          transition={{ duration: 1.4, ease: [0.16, 1, 0.3, 1] }}
+          className="h-full"
+          style={{ backgroundColor: tier.color }}
+        />
+      </div>
+      <div className="-mx-[2px] mb-2 h-px bg-gray-200" />
+      <div className="space-y-1">
+        <div className="text-[12.5px] font-medium lg:text-[15px]" style={{ color: "#111418" }}>
+          {tier.keyword}
+        </div>
+        <div className="text-[11px] leading-[1.55] text-gray-500 lg:text-[14px]">
+          {tier.reason1}
+        </div>
+        <div className="text-[11px] leading-[1.55] text-gray-500 lg:text-[14px]">
+          {tier.reason2}
+        </div>
+      </div>
+    </button>
   );
 }

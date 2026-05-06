@@ -21,7 +21,7 @@ export function TrustCTA() {
   return (
     <section
       aria-labelledby="trust-heading"
-      className="relative flex min-h-[calc(100vh-64px)] flex-col justify-between overflow-hidden bg-gray-900 py-16 lg:min-h-[calc(100vh-80px)] lg:py-20"
+      className="relative flex min-h-[calc(100vh-64px)] flex-col justify-between overflow-hidden bg-[#111418] py-16 lg:min-h-[calc(100vh-80px)] lg:py-20"
     >
       {/* 배경 radial green glow. */}
       <span
