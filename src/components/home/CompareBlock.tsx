@@ -183,7 +183,7 @@ export function CompareBlock() {
     <section
       ref={sectionRef}
       aria-labelledby="compare-heading"
-      className="relative flex min-h-[calc(100vh-56px)] flex-col justify-center overflow-hidden bg-white py-6 lg:min-h-[calc(100vh-64px)] lg:py-16"
+      className="relative flex min-h-[calc(100vh-56px)] flex-col justify-center overflow-hidden bg-white py-16 lg:min-h-[calc(100vh-64px)] lg:py-16"
     >
         <div className="container-app w-full">
           {/* h2 (sectionInView trigger / step 진입 전 visible) */}
@@ -211,7 +211,7 @@ export function CompareBlock() {
                 variants={labelVariants}
                 initial="hidden"
                 animate={step >= 1 ? "visible" : "hidden"}
-                className="mb-2 whitespace-nowrap text-[16px] font-semibold tracking-tight text-gray-500 lg:mb-4 lg:text-[24px]"
+                className="mb-0 whitespace-nowrap text-[16px] font-semibold tracking-tight text-gray-500 lg:mb-4 lg:text-[24px]"
               >
                 일반적인 방법
               </motion.div>
@@ -271,7 +271,7 @@ export function CompareBlock() {
                 variants={labelVariants}
                 initial="hidden"
                 animate={step >= 3 ? "visible" : "hidden"}
-                className="mb-2 whitespace-nowrap text-[16px] font-semibold tracking-tight text-[var(--brand-green)] lg:mb-4 lg:text-[24px]"
+                className="mb-0 whitespace-nowrap text-[16px] font-semibold tracking-tight text-[var(--brand-green)] lg:mb-4 lg:text-[24px]"
               >
                 경매퀵을 이용하면
               </motion.div>
