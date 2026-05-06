@@ -77,9 +77,9 @@ export function InsightBlock({
           className="mb-8 text-[48px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:mb-12 lg:text-[96px]"
           style={{ fontWeight: 800 }}
         >
-          물건분석부터 경매용어까지
+          경매를 분석합니다
           <br />
-          <span className="text-[var(--brand-green)]">알기쉽게</span> 설명드립니다
+          비용은 <span className="text-[var(--brand-green)]">무료</span>
           <span style={{ color: "#FFD43B" }}>.</span>
         </h2>
 
