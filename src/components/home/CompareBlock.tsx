@@ -144,19 +144,19 @@ export function CompareBlock() {
           variants={fadeVariants}
           initial="hidden"
           animate={sectionInView ? "visible" : "hidden"}
-          className="mb-16 text-center text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:mb-32 lg:text-[88px]"
+          className="mb-10 text-center text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:mb-14 lg:text-[88px]"
           style={{ fontWeight: 800 }}
         >
-          법원 가는 3시간,
+          법원 가는 시간에서,
           <br />
           <span className="text-[var(--brand-green)]">물건 보는 시간으로</span>
           <span style={{ color: "#FFD43B" }}>.</span>
         </motion.h2>
 
         {/* 숫자 grid wrapper */}
-        <div className="relative mb-10 lg:mb-32">
+        <div className="relative mb-10 lg:mb-20">
           {/* 박스 wrapper — border only */}
-          <div className="rounded-[28px] border border-gray-200 px-5 py-8 lg:rounded-[32px] lg:px-8 lg:py-12">
+          <div className="rounded-[28px] border border-gray-200 px-5 py-5 lg:rounded-[32px] lg:px-8 lg:py-8">
             {/* 숫자 비교 — 모바일 flex-col gap-6 + CSS order / 데스크탑 lg:grid 3 col gap-8 */}
             <div className="flex flex-col items-center gap-6 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-8">
               {/* 좌측 (label + NumberFlow) — order-1 / lg:order-1 */}
