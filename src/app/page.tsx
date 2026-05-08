@@ -28,8 +28,8 @@ export default function Home() {
       <HeroSearch caseNumbers={caseNumbers} />
       <CompareBlock />
       <PricingBlock />
-      <InsightBlock featuredByCategory={featuredByCategory} />
       <ReviewsBlock />
+      <InsightBlock featuredByCategory={featuredByCategory} />
       <TrustCTA />
     </main>
   );

@@ -69,7 +69,7 @@ export function InsightBlock({
   return (
     <section
       aria-labelledby="insight-heading"
-      className="flex min-h-[calc(100vh-64px)] flex-col justify-center bg-white py-12 lg:min-h-[calc(100vh-80px)] lg:py-16"
+      className="flex min-h-[calc(100vh-64px)] flex-col justify-center bg-[#FAFAFA] py-12 lg:min-h-[calc(100vh-80px)] lg:py-16"
     >
       <div className="container-app w-full">
         <h2
@@ -77,9 +77,9 @@ export function InsightBlock({
           className="mb-8 text-[48px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:mb-12 lg:text-[96px]"
           style={{ fontWeight: 800 }}
         >
-          경매를 분석합니다
+          분석 자료까지,
           <br />
-          비용은 <span className="text-[var(--brand-green)]">무료</span>
+          <span className="text-[var(--brand-green)]">무료로 드립니다</span>
           <span style={{ color: "#FFD43B" }}>.</span>
         </h2>
 
