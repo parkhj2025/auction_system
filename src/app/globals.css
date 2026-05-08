@@ -968,21 +968,6 @@ p {
   50%      { opacity: 0.5; transform: scale(1.05); }
 }
 
-/* Trust floating orb — 6-8s infinite (translate3d + opacity / GPU accelerated). */
-.trust-orb-float {
-  animation: orbFloat 7s ease-in-out infinite;
-  will-change: transform, opacity;
-}
-.trust-orb-float-delay {
-  animation: orbFloat 8s ease-in-out infinite;
-  animation-delay: -3s;
-  will-change: transform, opacity;
-}
-@keyframes orbFloat {
-  0%, 100% { transform: translate3d(0, 0, 0); opacity: 0.4; }
-  50%      { transform: translate3d(20px, -30px, 0); opacity: 0.6; }
-}
-
 /* scroll reveal entrance — Plan v11 정정 (가벼움 + 양방향 발화 / once: false). */
 .scroll-reveal {
   opacity: 0;
@@ -1004,8 +989,6 @@ p {
   .hero-mesh-rotate,
   .hero-dot-shift,
   .cta-glow-pulse,
-  .trust-orb-float,
-  .trust-orb-float-delay,
   .scroll-reveal {
     opacity: 1;
     transform: none;

@@ -1,15 +1,24 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
+import { useRef } from "react";
+import { motion, useInView, type Variants } from "motion/react";
 import { Briefcase, Shield, Lock } from "lucide-react";
-import { TextGenerateEffect } from "@/components/aceternity/TextGenerateEffect";
 
-/* Phase 1.2 (A-1-2) v16 — TrustCTA (justify-between + 0 비율 ↓ + 3 카드 모바일 3 col + CTA + caption).
- * 정정 (Plan v16):
- * 1. min-h calc(100vh-80px) + flex-col justify-between (광역 분포 / CTA 광역 영역 정합)
- * 2. "0" 160/280px (현 ↓) + "지금까지" 18/24 + "건의 사고" 24/40
- * 3. 3 카드 모바일도 3 col (max-w 4xl) — Briefcase / Shield / Lock
- * 4. CTA 광역 표시 + caption "법원에 가지 않고, 경매를 시작하세요." */
+/* Phase 1.2 (A-1-2) v50 cycle 9 — TrustCTA Hero paradigm 광역 차용.
+ * 정정 (Cycle 9):
+ * 1. Hero 동영상 첫 frame poster bg (ffmpeg 추출 / hero-poster.jpg)
+ * 2. section bg dark → poster jpg + light theme paradigm 정합
+ * 3. green halo orb 3건 + trust-orb-float CSS 광역 폐기
+ * 4. 큰 "0" + TextGenerateEffect 광역 폐기
+ * 5. h2 1줄 통일 ("지금까지 사고 0건.") + Hero textShadow 차용 + "0건" yellow + 마침표 yellow
+ * 6. Liquid Glass 박스 = Hero 박스 정확값 직접 차용 (3 trust + CTA + 캡션 단일 wrapper)
+ * 7. 3 trust 카드 = Liquid Glass 박스 안 inline (별개 카드 bg 폐기 / icon white / label white/90)
+ * 8. CTA shadow-2xl 폐기 + w-full + green primary 보존
+ * 9. 캡션 색 white/70 + size 14·16
+ * 10. motion + useInView + variants 5건 (fade / box / container / item / cta) 진입 paradigm
+ * 11. aceternity TextGenerateEffect 광역 폐기 (사용처 0 정합) */
 
 const CARDS = [
   { Icon: Briefcase, label: "공인중개사 직접 입찰" },
@@ -17,92 +26,157 @@ const CARDS = [
   { Icon: Lock, label: "전용 계좌 분리 보관" },
 ] as const;
 
+const fadeVariants: Variants = {
+  hidden: { opacity: 0, y: 20 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+};
+
+const boxVariants: Variants = {
+  hidden: { opacity: 0, y: 30 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.8, ease: "easeOut", delay: 0.2 } },
+};
+
+const containerVariants: Variants = {
+  hidden: {},
+  visible: { transition: { staggerChildren: 0.1, delayChildren: 0.4 } },
+};
+
+const itemVariants: Variants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.4, ease: "easeOut" } },
+};
+
+const ctaVariants: Variants = {
+  hidden: { opacity: 0, y: 10 },
+  visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut", delay: 0.6 } },
+};
+
 export function TrustCTA() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const sectionInView = useInView(sectionRef, { once: true, amount: 0.3 });
+
   return (
     <section
+      ref={sectionRef}
       aria-labelledby="trust-heading"
-      className="relative flex min-h-[calc(100vh-64px)] flex-col justify-between overflow-hidden bg-[#111418] py-16 lg:min-h-[calc(100vh-80px)] lg:py-20"
+      className="relative isolate flex min-h-[calc(100dvh-64px)] flex-col justify-center overflow-hidden py-16 lg:min-h-[calc(100dvh-80px)] lg:py-20"
     >
-      {/* 배경 radial green glow. */}
-      <span
+      {/* bg poster — Hero 동영상 첫 frame jpg (Next/Image fill / 정적 / 페이지 무거움 0). */}
+      <Image
+        src="/images/hero-poster.jpg"
+        alt=""
         aria-hidden="true"
-        className="pointer-events-none absolute left-1/2 top-1/2 h-[700px] w-[700px] -translate-x-1/2 -translate-y-1/2 rounded-full"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(0,200,83,0.18), transparent 65%)",
-        }}
+        fill
+        priority={false}
+        sizes="100vw"
+        className="-z-10 object-cover"
       />
 
-      {/* floating gradient orb (보존). */}
-      <span
-        aria-hidden="true"
-        className="trust-orb-float pointer-events-none absolute right-[8%] top-[12%] h-[260px] w-[260px] rounded-full"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(0,200,83,0.35), transparent 70%)",
-          filter: "blur(40px)",
-        }}
-      />
-      <span
-        aria-hidden="true"
-        className="trust-orb-float-delay pointer-events-none absolute bottom-[10%] left-[6%] h-[200px] w-[200px] rounded-full"
-        style={{
-          background:
-            "radial-gradient(circle, rgba(0,200,83,0.25), transparent 70%)",
-          filter: "blur(50px)",
-        }}
-      />
-
-      <div className="container-app relative z-10 flex w-full flex-1 flex-col justify-between gap-12 lg:gap-16">
-        {/* 상단 — h2 + body. */}
-        <div className="mt-8 flex flex-col items-center text-center lg:mt-12">
-          <div
-            id="trust-heading"
-            className="mb-2 text-[18px] text-gray-300 lg:mb-4 lg:text-[24px]"
+      <div className="container-app relative z-10 flex w-full flex-col items-center gap-10 lg:gap-14">
+        {/* h2 1줄 통일 + Hero textShadow 차용. */}
+        <motion.h2
+          id="trust-heading"
+          variants={fadeVariants}
+          initial="hidden"
+          animate={sectionInView ? "visible" : "hidden"}
+          className="text-center text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-white [text-wrap:balance] lg:text-[88px]"
+          style={{
+            fontWeight: 800,
+            textShadow:
+              "0 4px 24px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4)",
+          }}
+        >
+          지금까지 사고{" "}
+          <span
+            style={{
+              color: "#FFD43B",
+              textShadow:
+                "0 0 32px rgba(255, 212, 59, 0.7), 0 0 64px rgba(255, 212, 59, 0.5), 0 4px 16px rgba(0, 0, 0, 0.5)",
+            }}
           >
-            지금까지
-          </div>
-          <TextGenerateEffect
-            words="0"
-            filter={false}
-            duration={0.8}
-            className="mb-2 text-[160px] font-extrabold leading-none tracking-[-0.02em] text-[var(--brand-green)] lg:mb-4 lg:text-[280px]"
-          />
-          <div className="text-[24px] font-bold text-white lg:text-[40px]" style={{ fontWeight: 700 }}>
-            건의 사고
-          </div>
-          <p className="mt-3 text-[14px] text-gray-400 lg:mt-4 lg:text-[16px]">
-            매수신청대리인 등록 · 서울보증보험 가입 · 보증금 분리 보관
-          </p>
-        </div>
+            0건
+          </span>
+          <span style={{ color: "#FFD43B" }}>.</span>
+        </motion.h2>
 
-        {/* 가운데 — 3 카드 모바일도 3 col. */}
-        <div className="mx-auto grid w-full max-w-4xl grid-cols-3 gap-3 lg:gap-6">
-          {CARDS.map(({ Icon, label }) => (
-            <div
-              key={label}
-              className="flex flex-col items-center rounded-3xl bg-gray-800 p-4 text-center lg:p-6"
+        {/* subtext. */}
+        <motion.p
+          variants={fadeVariants}
+          initial="hidden"
+          animate={sectionInView ? "visible" : "hidden"}
+          className="text-center text-[17px] font-medium leading-[1.6] text-white/80 lg:text-[24px]"
+          style={{ textShadow: "0 2px 12px rgba(0, 0, 0, 0.6), 0 1px 4px rgba(0, 0, 0, 0.5)" }}
+        >
+          매수신청대리인 등록 · 서울보증보험 가입 · 보증금 분리 보관
+        </motion.p>
+
+        {/* Liquid Glass 박스 — Hero 정확값 직접 차용 (3 trust + CTA + 캡션 단일 wrapper). */}
+        <motion.div
+          variants={boxVariants}
+          initial="hidden"
+          animate={sectionInView ? "visible" : "hidden"}
+          className="mx-auto flex w-full max-w-2xl flex-col items-center gap-5 rounded-[28px] px-6 py-7 lg:gap-8 lg:px-10 lg:py-8"
+          style={{
+            background:
+              "linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.20) 100%)",
+            backdropFilter: "blur(40px) saturate(180%)",
+            WebkitBackdropFilter: "blur(40px) saturate(180%)",
+            border: "1px solid rgba(255, 255, 255, 0.3)",
+            boxShadow:
+              "inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 32px 80px -16px rgba(0, 0, 0, 0.35)",
+          }}
+        >
+          {/* 3 trust 카드 — 박스 안 inline horizontal 3-col + stagger. */}
+          <motion.div
+            variants={containerVariants}
+            initial="hidden"
+            animate={sectionInView ? "visible" : "hidden"}
+            className="grid w-full grid-cols-3 gap-3 lg:gap-6"
+          >
+            {CARDS.map(({ Icon, label }) => (
+              <motion.div
+                key={label}
+                variants={itemVariants}
+                className="flex flex-col items-center text-center"
+              >
+                <Icon
+                  size={28}
+                  strokeWidth={2}
+                  className="mb-2 text-white lg:mb-3 lg:h-8 lg:w-8"
+                  aria-hidden="true"
+                />
+                <div className="text-[14px] font-medium text-white/90 lg:text-[18px]">
+                  {label}
+                </div>
+              </motion.div>
+            ))}
+          </motion.div>
+
+          {/* CTA 버튼 — green primary + w-full (Liquid Glass 안 inline). */}
+          <motion.div
+            variants={ctaVariants}
+            initial="hidden"
+            animate={sectionInView ? "visible" : "hidden"}
+            className="w-full"
+          >
+            <Link
+              href="/apply"
+              className="inline-flex w-full items-center justify-center rounded-full bg-[var(--brand-green)] px-12 py-4 text-[18px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 lg:px-16 lg:py-5 lg:text-[20px]"
             >
-              <Icon size={36} strokeWidth={2} className="mb-2 text-[var(--brand-green)] lg:mb-3" />
-              <div className="text-[13px] font-bold text-white lg:text-[16px]">
-                {label}
-              </div>
-            </div>
-          ))}
-        </div>
+              지금 신청하기
+            </Link>
+          </motion.div>
 
-        {/* 하단 — CTA. */}
-        <div className="flex flex-col items-center gap-3 lg:gap-4">
-          <Link
-            href="/apply"
-            className="inline-flex items-center justify-center rounded-full bg-[var(--brand-green)] px-12 py-4 text-[18px] font-bold text-white shadow-2xl transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 lg:px-16 lg:py-5 lg:text-[20px]"
+          {/* 캡션. */}
+          <motion.p
+            variants={ctaVariants}
+            initial="hidden"
+            animate={sectionInView ? "visible" : "hidden"}
+            className="text-[14px] text-white/70 lg:text-[16px]"
           >
-            지금 신청하기
-          </Link>
-          <p className="text-[13px] text-gray-400 lg:text-[14px]">
             법원에 가지 않고, 경매를 시작하세요.
-          </p>
-        </div>
+          </motion.p>
+        </motion.div>
       </div>
     </section>
   );
