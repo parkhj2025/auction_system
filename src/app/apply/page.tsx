@@ -3,16 +3,13 @@ import Link from "next/link";
 import { Suspense } from "react";
 import { getAllAnalysisPosts } from "@/lib/content";
 import { ApplyClient } from "@/components/apply/ApplyClient";
-import { ApplyChecklist } from "@/components/apply/ApplyChecklist";
 import { ApplyHeroMotion } from "@/components/apply/ApplyHeroMotion";
 import { PageHero } from "@/components/common/PageHero";
 
-/* Stage 2 cycle 1-A — 헤더 광역 PageHero 차용 + ApplyChecklist 별개 section 즉시 노출.
- * 보강 (cycle 1-A 1차 후속):
- * 1. ApplyHeroMotion client wrapper 추출 (server component 광역 보존 + motion 광역 적용)
- * 2. PageHero + ApplyChecklist section = ApplyHeroMotion children 광역 stagger 진입
- * 3. breadcrumb 광역 폐기 (PageHero 차용 sub-page 광역 일관성 정합)
- * 4. PageHero h1 size 88 정정 (별개 파일 / 광역 sub-page 일괄 정합) */
+/* Stage 2 cycle 1-A — 헤더 광역 PageHero 차용 + 광역 motion stagger 진입.
+ * cycle 1-A 보강 (ApplyChecklist 광역 폐기):
+ * - 별개 section mount + import 광역 폐기 (형준님 진의 = 안심 5건 광역 0)
+ * - ApplyChecklist.tsx 파일 자체 보존 (/service 광역 사용 / 별개 cycle 영역) */
 
 // 로그인 상태에 따라 달라지는 페이지이므로 정적 캐싱 금지
 export const dynamic = "force-dynamic";
@@ -47,13 +44,6 @@ export default function ApplyPage() {
             처음이세요? 신청 가이드
           </Link>
         </PageHero>
-
-        <section
-          aria-label="신청 전 안심 근거"
-          className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-8 sm:py-12"
-        >
-          <ApplyChecklist values={[true, true, true, true, true]} displayOnly />
-        </section>
       </ApplyHeroMotion>
 
       <Suspense fallback={<ApplyLoading />}>
