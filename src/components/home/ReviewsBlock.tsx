@@ -23,7 +23,7 @@ export function ReviewsBlock() {
     <section
       ref={sectionRef}
       aria-labelledby="reviews-heading"
-      className="bg-white py-16 lg:py-24"
+      className="flex min-h-[calc(100vh-64px)] flex-col justify-center bg-white py-12 lg:min-h-[calc(100vh-80px)] lg:py-16"
     >
       <div className="container-app w-full">
         <motion.h2
