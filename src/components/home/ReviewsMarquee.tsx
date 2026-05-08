@@ -77,12 +77,21 @@ export function ReviewsMarquee() {
 
   return (
     <div className="mt-12 lg:mt-16">
-      {/* 모바일 — 단일 row (좌→우) */}
-      <div className="marquee-wrap lg:hidden" style={maskStyle}>
-        <div className="marquee-row marquee-left">
-          {[...rowA, ...rowA].map((r, i) => (
-            <ReviewCard key={`m-${r.id}-${i}`} review={r} mobile />
-          ))}
+      {/* 모바일 — 2-row 양방향 (위 좌→우 80s / 아래 우→좌 95s) */}
+      <div className="lg:hidden">
+        <div className="marquee-wrap" style={maskStyle}>
+          <div className="marquee-row marquee-left-mobile">
+            {[...rowA, ...rowA].map((r, i) => (
+              <ReviewCard key={`m-a-${r.id}-${i}`} review={r} mobile />
+            ))}
+          </div>
+        </div>
+        <div className="marquee-wrap mt-3" style={maskStyle}>
+          <div className="marquee-row marquee-right-mobile">
+            {[...rowB, ...rowB].map((r, i) => (
+              <ReviewCard key={`m-b-${r.id}-${i}`} review={r} mobile />
+            ))}
+          </div>
         </div>
       </div>
 
@@ -114,6 +123,12 @@ export function ReviewsMarquee() {
         }
         .marquee-right {
           animation: marquee-right 60s linear infinite;
+        }
+        .marquee-left-mobile {
+          animation: marquee-left 80s linear infinite;
+        }
+        .marquee-right-mobile {
+          animation: marquee-right 95s linear infinite;
         }
         @keyframes marquee-left {
           0% {

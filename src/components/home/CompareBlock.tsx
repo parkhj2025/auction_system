@@ -21,45 +21,13 @@ import {
   ArrowDown,
 } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v50 cycle 5 — CompareBlock 비-sticky 회귀 + 시퀀스 자연 cascade 회복.
- * 정정 (Plan v50 cycle 5 / cycle 4 production NG 회복 / Q1-Q6 광역 통합):
- * 1. sticky paradigm 폐기 + 비-sticky 회귀 (형준님 "스크롤 턱 걸림" 회피)
- *    - wrapperRef declaration + wrapper div 광역 폐기
- *    - section className sticky / top-14 / lg:top-16 / z-30 광역 폐기
- *    - useScroll target = wrapperRef → sectionRef
- *    - useScroll offset = ["start start", "end end"] → ["start end", "end start"]
- *    - 자연 scroll + scroll-linked 시퀀스 fire / 콘텐츠 viewport 통과 시 fire
+/* Phase 1.2 (A-1-2) v50 cycle 5 — CompareBlock 비-sticky + 시퀀스 자연 cascade.
+ * Stage 1 cycle 3 cycle 3 정정 추가:
+ * - h2 강조 광역 확장 ("물건 보는 시간으로" green / 마침표 yellow / 1줄 charcoal)
+ * - 박스 wrapper 신규 (bg-gray-100 / 28-32 radius / 5단계 + stamp 영역 시각 분리)
  *
- * 2. progress range / threshold 정정 (step 5 30% 빨리 fire)
- *    - range = [0.25, 0.65] → [0.15, 0.55]
- *    - 산식 = 0.15 + (start_ms / 8250) × 0.40
- *    - threshold 6건 = 0.150 / 0.247 / 0.295 / 0.392 / 0.417 / 0.526
- *    - step 5 0.517 → 0.417 (형준님 "단계별 너무 늦지 않게" 정합)
- *
- * 3. numbers wrapper 모바일 mb 단축 (형준님 "3분과 단계 표시 사이 여백 좁힘 / 하단 여백 ↑")
- *    - mb-16 lg:mb-24 → mb-10 lg:mb-32
- *    - 모바일 64 → 40 (-24 / 좁힘) + flex justify-center 위/아래 균등 분산 효과로 하단 ↑
- *
- * 4. 데스크탑 vertical 분산 "살짝" (형준님 "여백 살짝 늘리는 / 세련된 방식")
- *    - section py: lg:py-12 → lg:py-16 (48 → 64)
- *    - h2 wrapper mb: lg:mb-24 → lg:mb-32 (96 → 128)
- *    - numbers wrapper mb: lg:mb-24 → lg:mb-32 (96 → 128)
- *    - bars wrapper mb-0 보존 (마지막 콘텐츠)
- *    - 콘텐츠 821 → 917 (sticky lock 1016 안 / flex justify-center 위/아래 균등 ~50)
- *
- * 보존:
- * - useSpring 80/25/0.5/0.001 (광역 검증된 값)
- * - timeline 8.25초 (variants duration / staggerChildren 0.15 광역 보존)
- * - section min-h calc(100vh-56px) lg:calc(100vh-64px) / flex flex-col justify-center
- * - 모바일 py-6 / h2 mb-16 / numbers mb-10 / bars mb-0
- * - 단방향 advance Math.max guard / 초기 sync useEffect
- * - h2 진입 = useInView 별도 보존
- * - motion variants 7건 정의 / NumberFlow leftValue/rightValue 로직
- * - 일러스트 광역 폐기 (cycle 4 정합)
- * - ArrowDown / ArrowRight 분기 (cycle 4 정합)
- * - 모바일 numbers 세로 / 데스크탑 가로 분기 (cycle 4 정합)
- * - NumberFlow 96/200 / "분" 18/40 / ArrowDown 32 / ArrowRight 64 / h2 44/88
- * - 카피 v4 SoT v39 (h2 + stamp 광역) */
+ * 보존: useSpring 80/25/0.5/0.001 / threshold 6건 / NumberFlow / motion variants 7건 /
+ *       ArrowDown·ArrowRight 분기 / 5단계 + stamp paradigm */
 
 type Bar = {
   Icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>;
@@ -135,13 +103,9 @@ const stampVariants: Variants = {
 
 export function CompareBlock() {
   const sectionRef = useRef<HTMLElement>(null);
-  // h2 전용 진입 (scroll-linked 시퀀스와 별개 시스템)
   const sectionInView = useInView(sectionRef, { once: true, amount: 0.3 });
   const [step, setStep] = useState(0);
 
-  // scroll-linked 시퀀스 진입 (motion v12 useScroll → useSpring smoothing → useTransform 임계값 → useMotionValueEvent)
-  // cycle 5: sticky 폐기 + 비-sticky 회귀 / target = sectionRef / offset = ["start end", "end start"]
-  // 자연 scroll 동안 section viewport 통과 시 progress 0 → 1 자연 fire (형준님 "스크롤 턱 걸림" NG 회피)
   const { scrollYProgress } = useScroll({
     target: sectionRef,
     offset: ["start end", "end start"],
@@ -152,8 +116,6 @@ export function CompareBlock() {
     mass: 0.5,
     restDelta: 0.001,
   });
-  // progress range [0.15, 0.55] → 6 step 임계값 (산식: 0.15 + (start_ms / 8250) × 0.40)
-  // cycle 5: step 5 threshold 0.517 → 0.417 (30% 빨리 fire / 형준님 "단계별 너무 늦지 않게" 정합)
   const stepValue = useTransform(smoothProgress, (p) => {
     if (p >= 0.526) return 6;
     if (p >= 0.417) return 5;
@@ -163,17 +125,14 @@ export function CompareBlock() {
     if (p >= 0.15) return 1;
     return 0;
   });
-  // 단방향 advance (역행 시 step 회귀 0)
   useMotionValueEvent(stepValue, "change", (v) => {
     setStep((prev) => Math.max(prev, v));
   });
-  // 초기 sync (페이지 reload mid-scroll 대비)
   useEffect(() => {
     setStep((prev) => Math.max(prev, stepValue.get()));
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  // NumberFlow derived state (cascading render 회피)
   const leftValue = step >= 1 ? 255 : 1;
   const rightValue = step >= 3 ? 3 : 255;
   const leftAnimated = step >= 1;
@@ -185,127 +144,130 @@ export function CompareBlock() {
       aria-labelledby="compare-heading"
       className="relative flex min-h-[calc(100vh-56px)] flex-col justify-center overflow-hidden bg-white py-16 lg:min-h-[calc(100vh-64px)] lg:py-16"
     >
-        <div className="container-app w-full">
-          {/* h2 (sectionInView trigger / step 진입 전 visible) */}
-          <motion.h2
-            id="compare-heading"
-            variants={fadeVariants}
-            initial="hidden"
-            animate={sectionInView ? "visible" : "hidden"}
-            className="mb-16 text-center text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:mb-32 lg:text-[88px]"
-            style={{ fontWeight: 800 }}
-          >
-            법원 가는 3시간,
-            <br />
-            물건 보는 <span className="text-[var(--brand-green)]">시간으로</span>
-            <span style={{ color: "#FFD43B" }}>.</span>
-          </motion.h2>
+      <div className="container-app w-full">
+        {/* h2 */}
+        <motion.h2
+          id="compare-heading"
+          variants={fadeVariants}
+          initial="hidden"
+          animate={sectionInView ? "visible" : "hidden"}
+          className="mb-16 text-center text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:mb-32 lg:text-[88px]"
+          style={{ fontWeight: 800 }}
+        >
+          법원 가는 3시간,
+          <br />
+          <span className="text-[var(--brand-green)]">물건 보는 시간으로</span>
+          <span style={{ color: "#FFD43B" }}>.</span>
+        </motion.h2>
 
-          {/* 숫자 grid wrapper (3단 분리 / cycle 5: 모바일 mb-10 단축 + 데스크탑 lg:mb-32 분산) */}
-          <div className="relative mb-10 lg:mb-32">
+        {/* 숫자 grid wrapper (mb 정수 보존 / 박스는 inner) */}
+        <div className="relative mb-10 lg:mb-32">
+          {/* 박스 wrapper (cycle 3 cycle 3) — bg-gray-100 모노톤 / 5단계 + stamp 영역 시각 분리 */}
+          <div className="rounded-[28px] bg-gray-100 px-5 py-8 lg:rounded-[32px] lg:px-8 lg:py-12">
             {/* 숫자 비교 — 모바일 flex flex-col 세로 / 데스크탑 lg:grid 가로 */}
             <div className="flex flex-col items-center gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-8">
-            {/* Step 1 — 좌측 라벨 + 좌 NumberFlow 1 → 255 */}
-            <div className="flex flex-col items-center text-center">
-              <motion.div
-                variants={labelVariants}
-                initial="hidden"
-                animate={step >= 1 ? "visible" : "hidden"}
-                className="mb-0 whitespace-nowrap text-[16px] font-semibold tracking-tight text-gray-500 lg:mb-4 lg:text-[24px]"
-              >
-                일반적인 방법
-              </motion.div>
-              <motion.div
-                variants={numberVariants}
-                initial="hidden"
-                animate={step >= 1 ? "visible" : "hidden"}
-                className="flex items-baseline justify-center gap-1"
-              >
-                <span
-                  className="text-[96px] font-extrabold leading-none text-gray-400 lg:text-[200px]"
+              {/* Step 1 — 좌측 라벨 + 좌 NumberFlow 1 → 255 */}
+              <div className="flex flex-col items-center text-center">
+                <motion.div
+                  variants={labelVariants}
+                  initial="hidden"
+                  animate={step >= 1 ? "visible" : "hidden"}
+                  className="mb-0 whitespace-nowrap text-[16px] font-semibold tracking-tight text-gray-500 lg:mb-4 lg:text-[24px]"
+                >
+                  일반적인 방법
+                </motion.div>
+                <motion.div
+                  variants={numberVariants}
+                  initial="hidden"
+                  animate={step >= 1 ? "visible" : "hidden"}
+                  className="flex items-baseline justify-center gap-1"
+                >
+                  <span
+                    className="text-[96px] font-extrabold leading-none text-gray-400 lg:text-[200px]"
+                    style={{ fontWeight: 800 }}
+                  >
+                    <NumberFlow
+                      value={leftValue}
+                      animated={leftAnimated}
+                      trend={1}
+                      transformTiming={{
+                        duration: 1200,
+                        easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+                      }}
+                      spinTiming={{
+                        duration: 1200,
+                        easing: "cubic-bezier(0.16, 1, 0.3, 1)",
+                      }}
+                    />
+                  </span>
+                  <span className="text-[18px] font-bold text-gray-400 lg:text-[40px]">분</span>
+                </motion.div>
+              </div>
+
+              {/* Step 2 + 4 — 가운데 ArrowRight + "98% 단축" 배지 */}
+              <div className="flex flex-col items-center justify-center gap-2 lg:gap-3">
+                <motion.div
+                  variants={badgeVariants}
+                  initial="hidden"
+                  animate={step >= 4 ? "visible" : "hidden"}
+                  className="whitespace-nowrap rounded-full bg-[#ECFDF5] px-3 py-1 text-[20px] font-extrabold text-[var(--brand-green)] lg:px-4 lg:py-1.5 lg:text-[36px]"
                   style={{ fontWeight: 800 }}
                 >
-                  <NumberFlow
-                    value={leftValue}
-                    animated={leftAnimated}
-                    trend={1}
-                    transformTiming={{
-                      duration: 1200,
-                      easing: "cubic-bezier(0.16, 1, 0.3, 1)",
-                    }}
-                    spinTiming={{
-                      duration: 1200,
-                      easing: "cubic-bezier(0.16, 1, 0.3, 1)",
-                    }}
-                  />
-                </span>
-                <span className="text-[18px] font-bold text-gray-400 lg:text-[40px]">분</span>
-              </motion.div>
-            </div>
-
-            {/* Step 2 + 4 — 가운데 ArrowRight + "98% 단축" 배지 */}
-            <div className="flex flex-col items-center justify-center gap-2 lg:gap-3">
-              <motion.div
-                variants={badgeVariants}
-                initial="hidden"
-                animate={step >= 4 ? "visible" : "hidden"}
-                className="whitespace-nowrap rounded-full bg-[#ECFDF5] px-3 py-1 text-[20px] font-extrabold text-[var(--brand-green)] lg:px-4 lg:py-1.5 lg:text-[36px]"
-                style={{ fontWeight: 800 }}
-              >
-                98% 단축
-              </motion.div>
-              <motion.div
-                variants={arrowVariants}
-                initial="hidden"
-                animate={step >= 2 ? ["visible", "pulse"] : "hidden"}
-                className="flex justify-center"
-              >
-                <ArrowDown size={32} strokeWidth={2} className="text-gray-400 lg:hidden" />
-                <ArrowRight size={64} strokeWidth={2} className="hidden text-gray-400 lg:block" />
-              </motion.div>
-            </div>
-
-            {/* Step 3 — 우측 라벨 + 우 NumberFlow 255 → 3 */}
-            <div className="flex flex-col items-center text-center">
-              <motion.div
-                variants={labelVariants}
-                initial="hidden"
-                animate={step >= 3 ? "visible" : "hidden"}
-                className="mb-0 whitespace-nowrap text-[16px] font-semibold tracking-tight text-[var(--brand-green)] lg:mb-4 lg:text-[24px]"
-              >
-                경매퀵을 이용하면
-              </motion.div>
-              <motion.div
-                variants={numberVariants}
-                initial="hidden"
-                animate={step >= 3 ? "visible" : "hidden"}
-                className="flex items-baseline justify-center gap-1"
-              >
-                <span
-                  className="text-[96px] font-extrabold leading-none text-[var(--brand-green)] lg:text-[200px]"
-                  style={{ fontWeight: 800 }}
+                  98% 단축
+                </motion.div>
+                <motion.div
+                  variants={arrowVariants}
+                  initial="hidden"
+                  animate={step >= 2 ? ["visible", "pulse"] : "hidden"}
+                  className="flex justify-center"
                 >
-                  <NumberFlow
-                    value={rightValue}
-                    animated={rightAnimated}
-                    trend={-1}
-                    transformTiming={{
-                      duration: 1200,
-                      easing: "cubic-bezier(0.34, 1.56, 0.64, 1)",
-                    }}
-                    spinTiming={{
-                      duration: 1200,
-                      easing: "cubic-bezier(0.34, 1.56, 0.64, 1)",
-                    }}
-                  />
-                </span>
-                <span className="text-[18px] font-bold text-[var(--brand-green)] lg:text-[40px]">분</span>
-              </motion.div>
+                  <ArrowDown size={32} strokeWidth={2} className="text-gray-400 lg:hidden" />
+                  <ArrowRight size={64} strokeWidth={2} className="hidden text-gray-400 lg:block" />
+                </motion.div>
+              </div>
+
+              {/* Step 3 — 우측 라벨 + 우 NumberFlow 255 → 3 */}
+              <div className="flex flex-col items-center text-center">
+                <motion.div
+                  variants={labelVariants}
+                  initial="hidden"
+                  animate={step >= 3 ? "visible" : "hidden"}
+                  className="mb-0 whitespace-nowrap text-[16px] font-semibold tracking-tight text-[var(--brand-green)] lg:mb-4 lg:text-[24px]"
+                >
+                  경매퀵을 이용하면
+                </motion.div>
+                <motion.div
+                  variants={numberVariants}
+                  initial="hidden"
+                  animate={step >= 3 ? "visible" : "hidden"}
+                  className="flex items-baseline justify-center gap-1"
+                >
+                  <span
+                    className="text-[96px] font-extrabold leading-none text-[var(--brand-green)] lg:text-[200px]"
+                    style={{ fontWeight: 800 }}
+                  >
+                    <NumberFlow
+                      value={rightValue}
+                      animated={rightAnimated}
+                      trend={-1}
+                      transformTiming={{
+                        duration: 1200,
+                        easing: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+                      }}
+                      spinTiming={{
+                        duration: 1200,
+                        easing: "cubic-bezier(0.34, 1.56, 0.64, 1)",
+                      }}
+                    />
+                  </span>
+                  <span className="text-[18px] font-bold text-[var(--brand-green)] lg:text-[40px]">분</span>
+                </motion.div>
+              </div>
             </div>
           </div>
         </div>
 
-        {/* Step 5 + 6 — 5단계 + stamp 광역 */}
+        {/* Step 5 + 6 — 5단계 + stamp 광역 (박스 외부) */}
         <div className="relative mx-auto max-w-4xl">
           {/* Step 6 stamp — 5단계 가운데 absolute / "경매퀵" yellow accent */}
           <motion.div

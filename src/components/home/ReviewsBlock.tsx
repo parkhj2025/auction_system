@@ -34,10 +34,9 @@ export function ReviewsBlock() {
           className="mb-8 text-[48px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[var(--text-primary)] [text-wrap:balance] lg:mb-12 lg:text-[96px]"
           style={{ fontWeight: 800 }}
         >
-          번거로움은 맡기고
-          <span style={{ color: "#FFD43B" }}>,</span>
+          번거로움은 맡기고,
           <br />
-          일상에 <span className="text-[var(--brand-green)]">투자하세요</span>
+          <span className="text-[var(--brand-green)]">일상에 투자하세요</span>
           <span style={{ color: "#FFD43B" }}>.</span>
         </motion.h2>
       </div>
