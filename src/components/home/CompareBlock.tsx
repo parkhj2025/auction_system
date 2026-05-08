@@ -1,6 +1,6 @@
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useId, useRef, useState, useEffect } from "react";
 import {
   motion,
   useInView,
@@ -11,23 +11,17 @@ import {
   type Variants,
 } from "motion/react";
 import NumberFlow from "@number-flow/react";
-import {
-  Car,
-  FileText,
-  Banknote,
-  Building2,
-  Clock,
-  ArrowRight,
-  ArrowDown,
-} from "lucide-react";
+import { Car, FileText, Banknote, Building2, Clock } from "lucide-react";
 
 /* Phase 1.2 (A-1-2) v50 cycle 5 — CompareBlock 비-sticky + 시퀀스 자연 cascade.
- * Stage 1 cycle 3 cycle 3 정정 추가:
- * - h2 강조 광역 확장 ("물건 보는 시간으로" green / 마침표 yellow / 1줄 charcoal)
- * - 박스 wrapper 신규 (bg-gray-100 / 28-32 radius / 5단계 + stamp 영역 시각 분리)
- *
- * 보존: useSpring 80/25/0.5/0.001 / threshold 6건 / NumberFlow / motion variants 7건 /
- *       ArrowDown·ArrowRight 분기 / 5단계 + stamp paradigm */
+ * Stage 1 cycle 3 cycle 4 정정 7건:
+ * 1. 박스 paradigm: bg-gray-100 → border-gray-200 only (답답 ↓ / bg 0)
+ * 2. 라벨 size 14/16 + weight 500 + mb-8 lg:mb-12 (라벨 ↔ 숫자 균등 정합)
+ * 3. 우측 라벨 색 #00C853 보존 (var(--brand-green) 정합)
+ * 4. 화살표 chunky SVG + green gradient + 좌우 흔들 motion infinite
+ * 5. batch red strong (#EF4444) + pulse infinite + "단축" → "절약"
+ * 6. 카피 "단축" → "절약" (Compare 영역 한정)
+ * 7. 모바일 순서: 좌·우 NumberFlow 사이 화살표 / 마지막 batch (CSS order paradigm) */
 
 type Bar = {
   Icon: React.ComponentType<{ size?: number; className?: string; strokeWidth?: number }>;
@@ -59,35 +53,18 @@ const numberVariants: Variants = {
   visible: { opacity: 1, transition: { duration: 0.4 } },
 };
 
-const arrowVariants: Variants = {
-  hidden: { opacity: 0 },
-  visible: { opacity: 1, transition: { duration: 0.4 } },
-  pulse: {
-    scale: [1, 1.05, 1],
-    transition: { duration: 0.4, delay: 0.1, ease: "easeInOut" },
-  },
-};
-
 const badgeVariants: Variants = {
   hidden: { opacity: 0, scale: 0.85 },
   visible: {
     opacity: 1,
     scale: 1,
-    transition: {
-      type: "spring",
-      stiffness: 200,
-      damping: 15,
-    },
+    transition: { type: "spring", stiffness: 200, damping: 15 },
   },
 };
 
 const barContainerVariants: Variants = {
   hidden: {},
-  visible: {
-    transition: {
-      staggerChildren: 0.15,
-    },
-  },
+  visible: { transition: { staggerChildren: 0.15 } },
 };
 
 const barVariants: Variants = {
@@ -100,6 +77,31 @@ const stampVariants: Variants = {
   hidden: { opacity: 0, scale: 0.9 },
   visible: { opacity: 1, scale: 1, transition: { duration: 0.4 } },
 };
+
+/* ArrowChunky — 신규 paradigm (chunky filled polygon + green gradient + useId namespace) */
+function ArrowChunky({ size, rotate }: { size: number; rotate?: boolean }) {
+  const gradientId = useId();
+  return (
+    <svg
+      width={size}
+      height={size}
+      viewBox="0 0 64 64"
+      style={rotate ? { transform: "rotate(90deg)" } : undefined}
+      aria-hidden="true"
+    >
+      <defs>
+        <linearGradient id={gradientId} x1="0%" y1="0%" x2="100%" y2="0%">
+          <stop offset="0%" stopColor="#00E676" />
+          <stop offset="100%" stopColor="#00A04A" />
+        </linearGradient>
+      </defs>
+      <path
+        d="M4 24 L36 24 L36 12 L60 32 L36 52 L36 40 L4 40 Z"
+        fill={`url(#${gradientId})`}
+      />
+    </svg>
+  );
+}
 
 export function CompareBlock() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -160,19 +162,19 @@ export function CompareBlock() {
           <span style={{ color: "#FFD43B" }}>.</span>
         </motion.h2>
 
-        {/* 숫자 grid wrapper (mb 정수 보존 / 박스는 inner) */}
+        {/* 숫자 grid wrapper */}
         <div className="relative mb-10 lg:mb-32">
-          {/* 박스 wrapper (cycle 3 cycle 3) — bg-gray-100 모노톤 / 5단계 + stamp 영역 시각 분리 */}
-          <div className="rounded-[28px] bg-gray-100 px-5 py-8 lg:rounded-[32px] lg:px-8 lg:py-12">
-            {/* 숫자 비교 — 모바일 flex flex-col 세로 / 데스크탑 lg:grid 가로 */}
+          {/* 박스 wrapper — border only (bg 0 / 답답 ↓) */}
+          <div className="rounded-[28px] border border-gray-200 px-5 py-8 lg:rounded-[32px] lg:px-8 lg:py-12">
+            {/* 숫자 비교 — 모바일 flex-col + CSS order / 데스크탑 lg:grid 3 col */}
             <div className="flex flex-col items-center gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-8">
-              {/* Step 1 — 좌측 라벨 + 좌 NumberFlow 1 → 255 */}
-              <div className="flex flex-col items-center text-center">
+              {/* 좌측 (label + NumberFlow) — order-1 / lg:order-1 */}
+              <div className="order-1 flex flex-col items-center text-center lg:order-1">
                 <motion.div
                   variants={labelVariants}
                   initial="hidden"
                   animate={step >= 1 ? "visible" : "hidden"}
-                  className="mb-0 whitespace-nowrap text-[16px] font-semibold tracking-tight text-gray-500 lg:mb-4 lg:text-[24px]"
+                  className="mb-8 whitespace-nowrap text-[14px] font-medium tracking-tight text-gray-500 lg:mb-12 lg:text-[16px]"
                 >
                   일반적인 방법
                 </motion.div>
@@ -204,35 +206,41 @@ export function CompareBlock() {
                 </motion.div>
               </div>
 
-              {/* Step 2 + 4 — 가운데 ArrowRight + "98% 단축" 배지 */}
-              <div className="flex flex-col items-center justify-center gap-2 lg:gap-3">
+              {/* 데스크탑 가운데 wrapper (batch + arrow vertical stack) — hidden lg:flex / lg:order-2 */}
+              <div className="hidden lg:order-2 lg:flex lg:flex-col lg:items-center lg:gap-3">
+                {/* batch — entrance + infinite pulse (nested motion paradigm) */}
                 <motion.div
                   variants={badgeVariants}
                   initial="hidden"
                   animate={step >= 4 ? "visible" : "hidden"}
-                  className="whitespace-nowrap rounded-full bg-[#ECFDF5] px-3 py-1 text-[20px] font-extrabold text-[var(--brand-green)] lg:px-4 lg:py-1.5 lg:text-[36px]"
-                  style={{ fontWeight: 800 }}
+                  className="whitespace-nowrap rounded-full bg-[#EF4444] px-[18px] py-[6px] text-white"
                 >
-                  98% 단축
+                  <motion.span
+                    animate={step >= 4 ? { scale: [1, 1.06, 1] } : {}}
+                    transition={{ duration: 2.0, repeat: Infinity, ease: "easeInOut" }}
+                    className="inline-block text-[18px] font-bold lg:text-[20px]"
+                  >
+                    98% 절약
+                  </motion.span>
                 </motion.div>
+
+                {/* arrow — chunky SVG + 좌→우 흔들 infinite (lg only) */}
                 <motion.div
-                  variants={arrowVariants}
-                  initial="hidden"
-                  animate={step >= 2 ? ["visible", "pulse"] : "hidden"}
+                  animate={step >= 2 ? { x: [0, 6, 0] } : {}}
+                  transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
                   className="flex justify-center"
                 >
-                  <ArrowDown size={32} strokeWidth={2} className="text-gray-400 lg:hidden" />
-                  <ArrowRight size={64} strokeWidth={2} className="hidden text-gray-400 lg:block" />
+                  <ArrowChunky size={80} />
                 </motion.div>
               </div>
 
-              {/* Step 3 — 우측 라벨 + 우 NumberFlow 255 → 3 */}
-              <div className="flex flex-col items-center text-center">
+              {/* 우측 (label + NumberFlow) — order-3 / lg:order-3 */}
+              <div className="order-3 flex flex-col items-center text-center lg:order-3">
                 <motion.div
                   variants={labelVariants}
                   initial="hidden"
                   animate={step >= 3 ? "visible" : "hidden"}
-                  className="mb-0 whitespace-nowrap text-[16px] font-semibold tracking-tight text-[var(--brand-green)] lg:mb-4 lg:text-[24px]"
+                  className="mb-8 whitespace-nowrap text-[14px] font-medium tracking-tight text-[var(--brand-green)] lg:mb-12 lg:text-[16px]"
                 >
                   경매퀵을 이용하면
                 </motion.div>
@@ -263,13 +271,37 @@ export function CompareBlock() {
                   <span className="text-[18px] font-bold text-[var(--brand-green)] lg:text-[40px]">분</span>
                 </motion.div>
               </div>
+
+              {/* 모바일 화살표 — order-2 / lg:hidden / 위→아래 흔들 infinite */}
+              <motion.div
+                animate={step >= 2 ? { y: [0, 6, 0] } : {}}
+                transition={{ duration: 1.6, repeat: Infinity, ease: "easeInOut" }}
+                className="order-2 flex justify-center lg:hidden"
+              >
+                <ArrowChunky size={56} rotate />
+              </motion.div>
+
+              {/* 모바일 batch — order-4 / lg:hidden / entrance + infinite pulse */}
+              <motion.div
+                variants={badgeVariants}
+                initial="hidden"
+                animate={step >= 4 ? "visible" : "hidden"}
+                className="order-4 whitespace-nowrap rounded-full bg-[#EF4444] px-[18px] py-[6px] text-white lg:hidden"
+              >
+                <motion.span
+                  animate={step >= 4 ? { scale: [1, 1.06, 1] } : {}}
+                  transition={{ duration: 2.0, repeat: Infinity, ease: "easeInOut" }}
+                  className="inline-block text-[18px] font-bold"
+                >
+                  98% 절약
+                </motion.span>
+              </motion.div>
             </div>
           </div>
         </div>
 
-        {/* Step 5 + 6 — 5단계 + stamp 광역 (박스 외부) */}
+        {/* Step 5 + 6 — 5단계 + stamp 광역 (박스 외부 / 변동 0) */}
         <div className="relative mx-auto max-w-4xl">
-          {/* Step 6 stamp — 5단계 가운데 absolute / "경매퀵" yellow accent */}
           <motion.div
             variants={stampVariants}
             initial="hidden"
@@ -282,7 +314,6 @@ export function CompareBlock() {
             이 대신합니다
           </motion.div>
 
-          {/* Step 5 — 5단계 PPT Appear stagger / Step 6 dim 동시 */}
           <motion.div
             className="grid grid-cols-5 gap-2 lg:gap-4"
             variants={barContainerVariants}
