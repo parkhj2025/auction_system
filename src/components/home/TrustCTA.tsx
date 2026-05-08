@@ -53,7 +53,7 @@ export function TrustCTA() {
     <section
       ref={sectionRef}
       aria-labelledby="trust-heading"
-      className="relative isolate flex min-h-[calc(100dvh-64px)] flex-col justify-center overflow-hidden py-16 lg:min-h-[calc(100dvh-80px)] lg:py-20"
+      className="relative isolate flex flex-col justify-center overflow-hidden py-20 lg:py-32"
     >
       {/* bg — Gemini 3 Pro Image / 추상 black-green flow (Next/Image fill / 정적 / 페이지 무거움 0). */}
       <Image

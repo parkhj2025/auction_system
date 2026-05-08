@@ -48,7 +48,7 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
       <div className="relative z-10 flex flex-col items-center text-center gap-6 lg:gap-14 w-full max-w-[800px]">
         {/* h1 (모바일 60px / 데스크탑 80px 보존). */}
         <h1
-          className="w-full text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-white [text-wrap:balance] lg:text-[80px]"
+          className="w-full text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-white [text-wrap:balance] lg:text-[88px]"
           style={{
             fontWeight: 800,
             textShadow:
@@ -58,21 +58,21 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
           법원에 가지 않고,<br />
           <span
             style={{
+              color: "#00C853",
+              textShadow:
+                "0 0 32px rgba(0, 200, 83, 0.7), 0 0 64px rgba(0, 200, 83, 0.5), 0 4px 16px rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            경매를 시작하세요
+          </span>
+          <span
+            style={{
               color: "#FFD43B",
               textShadow:
                 "0 0 32px rgba(255, 212, 59, 0.7), 0 0 64px rgba(255, 212, 59, 0.5), 0 4px 16px rgba(0, 0, 0, 0.5)",
             }}
           >
-            경매
-          </span>
-          <span
-            className="text-white"
-            style={{
-              textShadow:
-                "0 4px 24px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4)",
-            }}
-          >
-            를 시작하세요.
+            .
           </span>
         </h1>
 

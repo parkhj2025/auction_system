@@ -42,8 +42,13 @@ try {
   const pngBuffer = Buffer.from(imagePart.inlineData.data, "base64");
   console.log(`[trust-bg] PNG 수신: ${pngBuffer.length} bytes`);
 
-  const jpgBuffer = await sharp(pngBuffer).jpeg({ quality: 90, mozjpeg: true }).toBuffer();
-  console.log(`[trust-bg] JPG 변환: ${jpgBuffer.length} bytes`);
+  // Cycle 10 — 2x scale (1376×768 → 2752×1536) + lanczos3 + sharpen + mozjpeg q90 (해상도 ↑).
+  const jpgBuffer = await sharp(pngBuffer)
+    .resize(2752, 1536, { kernel: "lanczos3", withoutEnlargement: false })
+    .sharpen({ sigma: 0.7 })
+    .jpeg({ quality: 90, mozjpeg: true })
+    .toBuffer();
+  console.log(`[trust-bg] JPG 변환 (2x scale): ${jpgBuffer.length} bytes`);
 
   const outPath = resolve("public/images/trust-bg.jpg");
   await writeFile(outPath, jpgBuffer);

@@ -2,107 +2,64 @@ import Link from "next/link";
 import { COMPANY } from "@/lib/constants";
 import { Logo } from "@/components/Logo";
 
-/* v7 SNS inline SVG paradigm (lucide-react Instagram·Youtube 미export 본질 회피). */
-function IconInstagram({ size = 18 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <rect x="3" y="3" width="18" height="18" rx="5" />
-      <circle cx="12" cy="12" r="4" />
-      <circle cx="17.5" cy="6.5" r="1" fill="currentColor" />
-    </svg>
-  );
-}
-function IconYoutube({ size = 18 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M22 8.5a2.5 2.5 0 0 0-1.8-1.8C18.5 6 12 6 12 6s-6.5 0-8.2.7A2.5 2.5 0 0 0 2 8.5C1.5 10.2 1.5 12 1.5 12s0 1.8.5 3.5a2.5 2.5 0 0 0 1.8 1.8C5.5 18 12 18 12 18s6.5 0 8.2-.7a2.5 2.5 0 0 0 1.8-1.8c.5-1.7.5-3.5.5-3.5s0-1.8-.5-3.5z" />
-      <path d="m10 9.5 5 2.5-5 2.5z" fill="currentColor" />
-    </svg>
-  );
-}
-function IconChat({ size = 18 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M21 11.5a8.38 8.38 0 0 1-.9 3.8 8.5 8.5 0 0 1-7.6 4.7 8.38 8.38 0 0 1-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 0 1-.9-3.8 8.5 8.5 0 0 1 4.7-7.6 8.38 8.38 0 0 1 3.8-.9h.5a8.48 8.48 0 0 1 8 8z" />
-    </svg>
-  );
-}
-function IconRss({ size = 18 }: { size?: number }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-      <path d="M4 11a9 9 0 0 1 9 9" />
-      <path d="M4 4a16 16 0 0 1 16 16" />
-      <circle cx="5" cy="19" r="1" fill="currentColor" />
-    </svg>
-  );
-}
-
-/* Phase 1.2 (A-1-2) v9 — Footer (Top CTA section 영구 폐기 → Trust 통합 paradigm).
- * Brand + tagline + 4 column + 원형 SNS + copyright + 사업자 conditional 보존.
- * CTA section = TrustCTA로 영구 흡수 (CTA 광역 2건 = Hero + Trust paradigm 정합).
- * 사업자 정보 env conditional 보존. */
+/* Phase 1.2 (A-1-2) v50 cycle 10 — Footer 광역 재구성.
+ * 정정 (Cycle 10):
+ * 1. 좌측 회사 정보 1줄 only ("대표 박형준 · 공인중개사 · 매수신청대리인." 광역 폐기)
+ * 2. 카테고리 4건 → 3건 (회사 first / 서비스 / 인사이트) + 법적 fine line paradigm 정합
+ * 3. SNS 4 inline SVG + SNS_LINKS + SNS rendering 광역 폐기
+ * 4. "서울보증보험 가입" 광역 폐기
+ * 5. Copyright + 약관 fine line (좌 © + 우 이용약관 · 개인정보처리방침)
+ * 6. 인사이트 4 카테고리 광역 (analysis / guide / glossary / data)
+ * 7. 어휘 정정: 콘텐츠 → 인사이트 / 대표 소개 → 회사 소개 / FAQ → 자주 묻는 질문 / 시장 인사이트 → 경매 빅데이터
+ * 8. /partners 신규 link (Stage 2 placeholder 영역) */
 
 const BUSINESS_REGISTERED =
   process.env.NEXT_PUBLIC_BUSINESS_REGISTERED === "true";
 
 const FOOTER_COLUMNS: { title: string; links: { href: string; label: string }[] }[] = [
   {
+    title: "회사",
+    links: [
+      { href: "/about", label: "회사 소개" },
+      { href: "/notice", label: "공지사항" },
+      { href: "/partners", label: "파트너 문의" },
+    ],
+  },
+  {
     title: "서비스",
     links: [
       { href: "/apply", label: "입찰 대리 신청" },
-      { href: "/service", label: "진행 절차" },
+      { href: "/service", label: "이용 절차" },
       { href: "/#pricing", label: "수수료" },
-      { href: "/faq", label: "FAQ" },
+      { href: "/faq", label: "자주 묻는 질문" },
     ],
   },
   {
-    title: "콘텐츠",
+    title: "인사이트",
     links: [
-      { href: "/analysis", label: "무료 물건분석" },
-      { href: "/guide", label: "경매 가이드" },
-      { href: "/news", label: "시장 인사이트" },
-    ],
-  },
-  {
-    title: "회사",
-    links: [
-      { href: "/about", label: "대표 소개" },
-      { href: "/notice", label: "공지사항" },
-    ],
-  },
-  {
-    title: "법적",
-    links: [
-      { href: "/terms", label: "이용약관" },
-      { href: "/privacy", label: "개인정보처리방침" },
+      { href: "/insight?cat=analysis", label: "무료 물건분석" },
+      { href: "/insight?cat=guide", label: "경매 가이드" },
+      { href: "/insight?cat=glossary", label: "경매 용어" },
+      { href: "/insight?cat=data", label: "경매 빅데이터" },
     ],
   },
 ];
-
-const SNS_LINKS = [
-  { href: "#", label: "Instagram", icon: IconInstagram },
-  { href: "#", label: "카카오톡 채널", icon: IconChat },
-  { href: "#", label: "블로그", icon: IconRss },
-  { href: "#", label: "YouTube", icon: IconYoutube },
-] as const;
 
 export function Footer() {
   return (
     <footer className="border-t border-[var(--border-1)] bg-[var(--bg-secondary)]">
       <div className="container-app px-5 py-14 lg:px-8 lg:py-20">
-        {/* Brand + tagline + 4 column (Top CTA section = TrustCTA 영구 흡수). */}
+        {/* Brand + tagline + 3 column. */}
         <div className="grid gap-10 lg:grid-cols-[1.2fr_3fr] lg:gap-12">
           <div>
             <Logo />
             <p className="mt-5 text-[14px] leading-[1.7] text-[var(--text-secondary)] lg:text-[15px]">
               빠르고 안전한 부동산 경매 입찰 대리 서비스.
-              <br />
-              대표 {COMPANY.ceo} · 공인중개사 · 매수신청대리인.
             </p>
           </div>
 
-          {/* 4 column. */}
-          <div className="grid grid-cols-2 gap-8 md:grid-cols-4 lg:gap-10">
+          {/* 3 column (회사 first / 서비스 / 인사이트). */}
+          <div className="grid grid-cols-2 gap-8 md:grid-cols-3 lg:gap-10">
             {FOOTER_COLUMNS.map((col) => (
               <nav key={col.title} aria-label={col.title}>
                 <h3 className="text-[12px] font-bold uppercase tracking-[0.06em] text-[var(--text-tertiary)]">
@@ -125,20 +82,6 @@ export function Footer() {
           </div>
         </div>
 
-        {/* 원형 SNS green (Manako 차용 본질). */}
-        <div className="mt-12 flex items-center gap-3">
-          {SNS_LINKS.map(({ href, label, icon: Icon }) => (
-            <Link
-              key={label}
-              href={href}
-              aria-label={label}
-              className="inline-flex h-11 w-11 items-center justify-center rounded-full bg-[var(--brand-green)] text-white shadow-[var(--shadow-glow-green-soft)] transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
-            >
-              <Icon size={18} />
-            </Link>
-          ))}
-        </div>
-
         {/* 사업자 conditional. */}
         {BUSINESS_REGISTERED && (
           <div className="mt-10 border-t border-[var(--divider)] pt-6 text-[12px] leading-[1.7] text-[var(--text-tertiary)]">
@@ -157,10 +100,24 @@ export function Footer() {
           </div>
         )}
 
-        {/* copyright. */}
-        <div className="mt-10 flex items-center justify-between border-t border-[var(--divider)] pt-6 text-[13px] text-[var(--text-tertiary)] lg:mt-12 lg:text-[14px]">
+        {/* Copyright 좌측 + 약관 fine line 우측. */}
+        <div className="mt-10 flex flex-col items-center justify-between gap-3 border-t border-[var(--divider)] pt-6 text-[13px] text-[var(--text-tertiary)] md:flex-row md:gap-0 lg:mt-12 lg:text-[14px]">
           <p>© {new Date().getFullYear()} {COMPANY.name}. All rights reserved.</p>
-          <p>서울보증보험 가입</p>
+          <p className="flex items-center gap-3">
+            <Link
+              href="/terms"
+              className="transition-colors duration-150 hover:text-[var(--text-primary)]"
+            >
+              이용약관
+            </Link>
+            <span className="text-[var(--text-quaternary)]">·</span>
+            <Link
+              href="/privacy"
+              className="transition-colors duration-150 hover:text-[var(--text-primary)]"
+            >
+              개인정보처리방침
+            </Link>
+          </p>
         </div>
       </div>
     </footer>
