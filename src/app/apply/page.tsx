@@ -1,10 +1,18 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { Suspense } from "react";
-import { ChevronRight } from "lucide-react";
 import { getAllAnalysisPosts } from "@/lib/content";
 import { ApplyClient } from "@/components/apply/ApplyClient";
 import { ApplyChecklist } from "@/components/apply/ApplyChecklist";
+import { ApplyHeroMotion } from "@/components/apply/ApplyHeroMotion";
+import { PageHero } from "@/components/common/PageHero";
+
+/* Stage 2 cycle 1-A — 헤더 광역 PageHero 차용 + ApplyChecklist 별개 section 즉시 노출.
+ * 보강 (cycle 1-A 1차 후속):
+ * 1. ApplyHeroMotion client wrapper 추출 (server component 광역 보존 + motion 광역 적용)
+ * 2. PageHero + ApplyChecklist section = ApplyHeroMotion children 광역 stagger 진입
+ * 3. breadcrumb 광역 폐기 (PageHero 차용 sub-page 광역 일관성 정합)
+ * 4. PageHero h1 size 88 정정 (별개 파일 / 광역 sub-page 일괄 정합) */
 
 // 로그인 상태에 따라 달라지는 페이지이므로 정적 캐싱 금지
 export const dynamic = "force-dynamic";
@@ -20,53 +28,33 @@ export default function ApplyPage() {
 
   return (
     <main className="flex flex-1 flex-col">
-      {/* 섹션 헤더 + 사전 안내 */}
-      <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
-        <div className="mx-auto w-full max-w-5xl px-4 pt-10 pb-8 sm:px-8 sm:pt-14 sm:pb-10">
-          <nav
-            aria-label="Breadcrumb"
-            className="flex items-center gap-1 text-xs font-semibold text-[var(--color-ink-500)]"
+      <ApplyHeroMotion>
+        <PageHero
+          eyebrow="STEP 1 신청서 작성"
+          title={
+            <>
+              신청부터 입찰까지,<br />
+              5분이면{" "}
+              <span style={{ color: "#FFD43B" }}>됩니다.</span>
+            </>
+          }
+          subtitle="사건번호만 있으면 5단계로 끝납니다. 작성 중 어려운 부분은 직접 도와드립니다."
+        >
+          <Link
+            href="/apply/guide"
+            className="inline-flex items-center gap-1 text-sm font-bold text-[#111418] underline decoration-[var(--color-ink-200)] underline-offset-2 hover:text-black"
           >
-            <Link href="/" className="hover:text-[var(--color-ink-900)]">
-              홈
-            </Link>
-            <ChevronRight size={12} aria-hidden="true" />
-            <span className="text-[var(--color-ink-700)]">입찰 대리 신청</span>
-          </nav>
+            처음이세요? 신청 가이드
+          </Link>
+        </PageHero>
 
-          <p className="mt-5 text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
-            입찰 대리 신청
-          </p>
-          <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
-            5분이면 끝나는 웹 접수
-          </h1>
-          <p className="mt-3 max-w-2xl text-[length:var(--text-body)] leading-7 text-[var(--color-ink-500)]">
-            사건번호 확인부터 서류 업로드, 확인·제출까지 이 페이지에서
-            완결됩니다. 접수 후 확인 연락은 카카오톡으로 드립니다.{" "}
-            <Link
-              href="/apply/guide"
-              className="font-bold text-[var(--color-ink-900)] underline decoration-[var(--color-ink-200)] underline-offset-2 hover:text-black"
-            >
-              처음이세요? 신청 가이드
-            </Link>
-          </p>
-
-          <details className="mt-8 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-5 open:pb-6">
-            <summary className="cursor-pointer list-none text-sm font-black text-[var(--color-ink-900)]">
-              신청 전 안심 근거 5가지 (펼쳐보기)
-              <span className="ml-2 text-xs font-semibold text-[var(--color-ink-500)]">
-                확인·제출 단계에서 다시 체크합니다
-              </span>
-            </summary>
-            <div className="mt-4">
-              <ApplyChecklist
-                values={[true, true, true, true, true]}
-                displayOnly
-              />
-            </div>
-          </details>
-        </div>
-      </section>
+        <section
+          aria-label="신청 전 안심 근거"
+          className="mx-auto w-full max-w-5xl px-4 py-10 sm:px-8 sm:py-12"
+        >
+          <ApplyChecklist values={[true, true, true, true, true]} displayOnly />
+        </section>
+      </ApplyHeroMotion>
 
       <Suspense fallback={<ApplyLoading />}>
         <ApplyClient posts={posts} />

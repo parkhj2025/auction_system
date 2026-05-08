@@ -22,7 +22,7 @@ export function PageHero({
           {eyebrow}
         </p>
         <h1
-          className="mt-2 text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[#111418] [text-wrap:balance] lg:text-[80px]"
+          className="mt-2 text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-[#111418] [text-wrap:balance] lg:text-[88px]"
           style={{ fontWeight: 800 }}
         >
           {title}
