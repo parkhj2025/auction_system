@@ -156,16 +156,16 @@ export function CompareBlock() {
         {/* 숫자 grid wrapper */}
         <div className="relative mb-10 lg:mb-20">
           {/* 박스 wrapper — border only */}
-          <div className="rounded-[28px] border border-gray-200 px-5 py-5 lg:rounded-[32px] lg:px-8 lg:py-8">
+          <div className="rounded-[28px] border border-gray-200 px-5 py-5 lg:min-h-[480px] lg:rounded-[32px] lg:px-8 lg:py-8">
             {/* 숫자 비교 — 모바일 flex-col gap-6 + CSS order / 데스크탑 lg:grid 3 col gap-8 */}
             <div className="flex flex-col items-center gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-8">
               {/* 좌측 (label + NumberFlow) — order-1 / lg:order-1 */}
-              <div className="order-1 flex flex-col items-center text-center lg:order-1">
+              <div className="order-1 flex flex-col items-center text-center lg:order-1 lg:justify-end">
                 <motion.div
                   variants={labelVariants}
                   initial="hidden"
                   animate={step >= 1 ? "visible" : "hidden"}
-                  className="mb-4 whitespace-nowrap text-[20px] font-medium tracking-tight text-gray-500 lg:mb-6 lg:text-[28px]"
+                  className="mb-2 whitespace-nowrap text-[20px] font-medium tracking-tight text-gray-500 lg:mb-2 lg:text-[28px]"
                 >
                   일반적인 방법
                 </motion.div>
@@ -221,12 +221,12 @@ export function CompareBlock() {
               </div>
 
               {/* 우측 (label + NumberFlow) — order-3 / lg:order-3 */}
-              <div className="order-3 flex flex-col items-center text-center lg:order-3">
+              <div className="order-3 flex flex-col items-center text-center lg:order-3 lg:justify-end">
                 <motion.div
                   variants={labelVariants}
                   initial="hidden"
                   animate={step >= 3 ? "visible" : "hidden"}
-                  className="mb-4 whitespace-nowrap text-[20px] font-medium tracking-tight text-[var(--brand-green)] lg:mb-6 lg:text-[28px]"
+                  className="mb-2 whitespace-nowrap text-[20px] font-medium tracking-tight text-[var(--brand-green)] lg:mb-2 lg:text-[28px]"
                 >
                   경매퀵을 이용하면
                 </motion.div>
