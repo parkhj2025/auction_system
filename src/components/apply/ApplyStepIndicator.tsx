@@ -51,7 +51,7 @@ export function ApplyStepIndicator({
           </div>
 
           {/* 중간 row — 5 step 원 + 라벨 (광역 노출) + progress line. */}
-          <ol className="mt-5 flex items-start justify-center gap-0">
+          <ol className="mt-5 flex items-start gap-0">
             {APPLY_STEPS.map((step, i) => {
               const isCompleted = completed.has(step.id);
               const isCurrent = step.id === current;
@@ -61,9 +61,9 @@ export function ApplyStepIndicator({
               return (
                 <li
                   key={step.id}
-                  className="flex flex-1 items-start"
+                  className={cn("flex items-start", !isLast && "flex-1")}
                 >
-                  <div className="flex flex-1 flex-col items-center gap-1.5 sm:gap-2">
+                  <div className="flex flex-col items-center gap-1.5 sm:gap-2">
                     <span
                       aria-current={isCurrent ? "step" : undefined}
                       className={cn(
@@ -83,7 +83,7 @@ export function ApplyStepIndicator({
                     </span>
                     <span
                       className={cn(
-                        "break-keep text-center leading-tight text-[12px] sm:text-[14px]",
+                        "whitespace-pre-line break-keep text-center leading-tight text-[12px] sm:text-[14px]",
                         isCurrent
                           ? "font-bold text-[#111418]"
                           : isCompleted || isPast
@@ -99,7 +99,7 @@ export function ApplyStepIndicator({
                       aria-hidden="true"
                       className={cn(
                         "mt-[18px] h-[2px] flex-1 rounded-full sm:mt-[20px]",
-                        isPast ? "bg-[#00C853]" : "bg-[var(--color-border)]"
+                        isPast ? "bg-[#00C853]" : "bg-gray-200"
                       )}
                     />
                   )}

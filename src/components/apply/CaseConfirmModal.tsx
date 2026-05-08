@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { ShieldCheck, Info } from "lucide-react";
+import { ShieldCheck, Info, X } from "lucide-react";
 import type { ApplyFormData } from "@/types/apply";
 import type { PropertyType } from "@/types/content";
 import {
@@ -144,18 +144,28 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
         className="relative flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white shadow-[var(--shadow-lift)]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center gap-2 border-b border-[var(--color-border)] px-6 py-4">
-          <ShieldCheck
-            size={18}
-            aria-hidden="true"
-            className="text-[var(--color-ink-900)]"
-          />
-          <h2
-            id="case-confirm-modal-title"
-            className="text-[length:var(--text-body)] font-black text-[var(--color-ink-900)]"
+        <div className="flex items-center justify-between gap-2 border-b border-gray-200 px-6 py-4">
+          <div className="flex items-center gap-2">
+            <ShieldCheck
+              size={18}
+              aria-hidden="true"
+              className="text-[var(--color-ink-900)]"
+            />
+            <h2
+              id="case-confirm-modal-title"
+              className="text-[length:var(--text-body)] font-black text-[var(--color-ink-900)]"
+            >
+              사건 정보 입력
+            </h2>
+          </div>
+          <button
+            type="button"
+            onClick={onReturn}
+            aria-label="사건번호 다시 입력"
+            className="inline-flex h-9 w-9 items-center justify-center rounded-full text-gray-500 transition-colors duration-150 hover:bg-gray-100 hover:text-[#111418] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
           >
-            사건 정보 입력
-          </h2>
+            <X size={18} aria-hidden="true" />
+          </button>
         </div>
 
         <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-5">

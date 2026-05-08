@@ -211,11 +211,11 @@ export const PAYMENT_PG_ENABLED = false;
 
 /** /apply 스텝 폼의 단계 목록. ApplyStepIndicator와 ApplyClient가 공유. */
 export const APPLY_STEPS = [
-  { id: "property", label: "물건 확인", hint: "사건번호로 물건을 확인합니다" },
-  { id: "bid-info", label: "입찰 정보", hint: "입찰가와 신청인 정보" },
-  { id: "documents", label: "서류 업로드", hint: "전자본인서명확인서·신분증" },
-  { id: "confirm", label: "확인·제출", hint: "수수료 확인 후 제출" },
-  { id: "complete", label: "접수 완료", hint: "전용계좌 안내" },
+  { id: "property", label: "물건\n확인", hint: "사건번호로 물건을 확인합니다" },
+  { id: "bid-info", label: "입찰\n정보", hint: "입찰가와 신청인 정보" },
+  { id: "documents", label: "서류\n업로드", hint: "전자본인서명확인서·신분증" },
+  { id: "confirm", label: "확인·\n제출", hint: "수수료 확인 후 제출" },
+  { id: "complete", label: "접수\n완료", hint: "전용계좌 안내" },
 ] as const;
 
 export type ApplyStepId = (typeof APPLY_STEPS)[number]["id"];

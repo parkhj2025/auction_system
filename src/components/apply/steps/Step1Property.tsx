@@ -11,7 +11,7 @@ import {
 import type { AnalysisFrontmatter } from "@/types/content";
 import type { ApplyFormData, CourtListingSummary } from "@/types/apply";
 import { BRAND_NAME, COURTS_ALL, groupCourtsByRegion } from "@/lib/constants";
-import { formatKoreanWon } from "@/lib/utils";
+import { cn, formatKoreanWon } from "@/lib/utils";
 import { PhotoGallery } from "../PhotoGallery";
 import { CaseConfirmCard } from "../CaseConfirmCard";
 import { CaseConfirmModal } from "../CaseConfirmModal";
@@ -248,7 +248,7 @@ export function Step1Property({
         </p>
       </header>
 
-      <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-5 shadow-[var(--shadow-card)]">
+      <div className="rounded-2xl border border-gray-200 bg-white p-5 lg:p-8">
         <div className="grid gap-2 sm:grid-cols-[minmax(0,14rem)_1fr]">
           <div>
             <label
@@ -288,7 +288,13 @@ export function Step1Property({
                 type="text"
                 placeholder="예: 2024타경12345"
                 value={data.caseNumber}
-                onChange={(e) => onChange({ caseNumber: e.target.value })}
+                onChange={(e) =>
+                  onChange({
+                    caseNumber: e.target.value,
+                    caseConfirmedByUser: false,
+                    caseConfirmedAt: null,
+                  })
+                }
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
                     e.preventDefault();
@@ -302,11 +308,22 @@ export function Step1Property({
                 type="button"
                 onClick={() => void triggerLookup()}
                 disabled={
-                  checking || !CASE_NUMBER_PATTERN.test(data.caseNumber.trim())
+                  checking ||
+                  !CASE_NUMBER_PATTERN.test(data.caseNumber.trim()) ||
+                  data.caseConfirmedByUser
                 }
-                className="inline-flex h-12 w-full items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-ink-900)] bg-white px-4 text-sm font-bold text-[var(--color-ink-900)] hover:bg-[var(--color-ink-50)] disabled:cursor-not-allowed disabled:border-[var(--color-border)] disabled:bg-[var(--color-ink-100)] disabled:text-[var(--color-ink-500)] sm:w-auto sm:shrink-0"
+                className={cn(
+                  "inline-flex h-12 w-full items-center justify-center rounded-full px-5 text-sm font-bold transition-colors duration-150 sm:w-auto sm:shrink-0",
+                  data.caseConfirmedByUser
+                    ? "cursor-default bg-gray-100 text-gray-500"
+                    : "bg-[#00C853] text-white hover:bg-[var(--brand-green-deep)] disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
+                )}
               >
-                {checking ? "확인 중..." : "사건번호 확인"}
+                {data.caseConfirmedByUser
+                  ? "확인 완료"
+                  : checking
+                    ? "확인 중..."
+                    : "사건번호 확인"}
               </button>
             </div>
           </div>
@@ -599,7 +616,12 @@ export function Step1Property({
           type="button"
           onClick={handleNext}
           disabled={!canProceed}
-          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-6 text-sm font-black text-white shadow-[var(--shadow-card)] transition hover:bg-black disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
+          className={cn(
+            "inline-flex min-h-12 items-center gap-2 rounded-full px-6 text-sm font-black transition-colors duration-150",
+            canProceed
+              ? "bg-[#00C853] text-white hover:bg-[var(--brand-green-deep)]"
+              : "cursor-not-allowed bg-gray-200 text-gray-400"
+          )}
         >
           다음: 입찰 정보 입력
           <ArrowRight size={16} aria-hidden="true" />
