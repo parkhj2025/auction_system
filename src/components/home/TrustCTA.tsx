@@ -6,24 +6,18 @@ import { useRef } from "react";
 import { motion, useInView, type Variants } from "motion/react";
 import { Briefcase, Shield, Lock } from "lucide-react";
 
-/* Phase 1.2 (A-1-2) v50 cycle 9 — TrustCTA Hero paradigm 광역 차용.
- * 정정 (Cycle 9):
- * 1. Hero 동영상 첫 frame poster bg (ffmpeg 추출 / hero-poster.jpg)
- * 2. section bg dark → poster jpg + light theme paradigm 정합
- * 3. green halo orb 3건 + trust-orb-float CSS 광역 폐기
- * 4. 큰 "0" + TextGenerateEffect 광역 폐기
- * 5. h2 1줄 통일 ("지금까지 사고 0건.") + Hero textShadow 차용 + "0건" yellow + 마침표 yellow
- * 6. Liquid Glass 박스 = Hero 박스 정확값 직접 차용 (3 trust + CTA + 캡션 단일 wrapper)
- * 7. 3 trust 카드 = Liquid Glass 박스 안 inline (별개 카드 bg 폐기 / icon white / label white/90)
- * 8. CTA shadow-2xl 폐기 + w-full + green primary 보존
- * 9. 캡션 색 white/70 + size 14·16
- * 10. motion + useInView + variants 5건 (fade / box / container / item / cta) 진입 paradigm
- * 11. aceternity TextGenerateEffect 광역 폐기 (사용처 0 정합) */
+/* Phase 1.2 (A-1-2) v50 cycle 9-2 — TrustCTA 카피 + 배경 + 모바일 줄바꿈 정정.
+ * 정정 (Cycle 9-2):
+ * 1. h2 카피 광역 정정 ("지금껏 그래왔듯, / 앞으로도 안전하게.") + "안전하게" yellow + 마침표 yellow
+ * 2. subtext 광역 폐기 (3 trust 카드 정수 중복)
+ * 3. CARDS 데이터 line1 + line2 분리 (모바일 + 데스크탑 광역 2줄 강제 / `<br />` 명시)
+ *    - 카드 2: "보증보험 가입" → "보증보험 / 지급보증" (가입 행위 → 지급보증 가치)
+ * 4. bg image src hero-poster.jpg → trust-bg.jpg (Gemini 3 Pro Image / 추상 black-green flow) */
 
 const CARDS = [
-  { Icon: Briefcase, label: "공인중개사 직접 입찰" },
-  { Icon: Shield, label: "보증보험 가입" },
-  { Icon: Lock, label: "전용 계좌 분리 보관" },
+  { Icon: Briefcase, line1: "공인중개사", line2: "직접 입찰" },
+  { Icon: Shield, line1: "보증보험", line2: "지급보증" },
+  { Icon: Lock, line1: "전용 계좌", line2: "분리 보관" },
 ] as const;
 
 const fadeVariants: Variants = {
@@ -61,9 +55,9 @@ export function TrustCTA() {
       aria-labelledby="trust-heading"
       className="relative isolate flex min-h-[calc(100dvh-64px)] flex-col justify-center overflow-hidden py-16 lg:min-h-[calc(100dvh-80px)] lg:py-20"
     >
-      {/* bg poster — Hero 동영상 첫 frame jpg (Next/Image fill / 정적 / 페이지 무거움 0). */}
+      {/* bg — Gemini 3 Pro Image / 추상 black-green flow (Next/Image fill / 정적 / 페이지 무거움 0). */}
       <Image
-        src="/images/hero-poster.jpg"
+        src="/images/trust-bg.jpg"
         alt=""
         aria-hidden="true"
         fill
@@ -73,7 +67,7 @@ export function TrustCTA() {
       />
 
       <div className="container-app relative z-10 flex w-full flex-col items-center gap-10 lg:gap-14">
-        {/* h2 1줄 통일 + Hero textShadow 차용. */}
+        {/* h2 2줄 + Hero textShadow 차용 + "안전하게" yellow + 마침표 yellow. */}
         <motion.h2
           id="trust-heading"
           variants={fadeVariants}
@@ -86,7 +80,9 @@ export function TrustCTA() {
               "0 4px 24px rgba(0, 0, 0, 0.6), 0 2px 8px rgba(0, 0, 0, 0.4)",
           }}
         >
-          지금까지 사고{" "}
+          지금껏 그래왔듯,
+          <br />
+          앞으로도{" "}
           <span
             style={{
               color: "#FFD43B",
@@ -94,21 +90,10 @@ export function TrustCTA() {
                 "0 0 32px rgba(255, 212, 59, 0.7), 0 0 64px rgba(255, 212, 59, 0.5), 0 4px 16px rgba(0, 0, 0, 0.5)",
             }}
           >
-            0건
+            안전하게
           </span>
           <span style={{ color: "#FFD43B" }}>.</span>
         </motion.h2>
-
-        {/* subtext. */}
-        <motion.p
-          variants={fadeVariants}
-          initial="hidden"
-          animate={sectionInView ? "visible" : "hidden"}
-          className="text-center text-[17px] font-medium leading-[1.6] text-white/80 lg:text-[24px]"
-          style={{ textShadow: "0 2px 12px rgba(0, 0, 0, 0.6), 0 1px 4px rgba(0, 0, 0, 0.5)" }}
-        >
-          매수신청대리인 등록 · 서울보증보험 가입 · 보증금 분리 보관
-        </motion.p>
 
         {/* Liquid Glass 박스 — Hero 정확값 직접 차용 (3 trust + CTA + 캡션 단일 wrapper). */}
         <motion.div
@@ -133,9 +118,9 @@ export function TrustCTA() {
             animate={sectionInView ? "visible" : "hidden"}
             className="grid w-full grid-cols-3 gap-3 lg:gap-6"
           >
-            {CARDS.map(({ Icon, label }) => (
+            {CARDS.map(({ Icon, line1, line2 }) => (
               <motion.div
-                key={label}
+                key={line1}
                 variants={itemVariants}
                 className="flex flex-col items-center text-center"
               >
@@ -145,8 +130,10 @@ export function TrustCTA() {
                   className="mb-2 text-white lg:mb-3 lg:h-8 lg:w-8"
                   aria-hidden="true"
                 />
-                <div className="text-[14px] font-medium text-white/90 lg:text-[18px]">
-                  {label}
+                <div className="text-[14px] font-medium leading-tight text-white/90 lg:text-[18px]">
+                  {line1}
+                  <br />
+                  {line2}
                 </div>
               </motion.div>
             ))}
