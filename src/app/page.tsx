@@ -20,7 +20,7 @@ export default function Home() {
     analysis: getFeaturedByCategory("analysis"),
     guide: getFeaturedByCategory("guide"),
     glossary: getFeaturedByCategory("glossary"),
-    news: getFeaturedByCategory("news"),
+    data: getFeaturedByCategory("data"),
   };
 
   return (

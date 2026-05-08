@@ -14,28 +14,28 @@ import { PageHero } from "@/components/common/PageHero";
  * - 본문 = Editor's Pick (전체 active 시) + 콘텐츠 list (active filter)
  * - 카드 paradigm = 모바일 1-col / 데스크탑 2-col + 썸네일 4:3 + 텍스트 광역. */
 
-type FilterKey = "all" | "analysis" | "guide" | "glossary" | "news";
+type FilterKey = "all" | "analysis" | "guide" | "glossary" | "data";
 
 const CHIPS: { key: FilterKey; label: string }[] = [
   { key: "all", label: "전체" },
   { key: "analysis", label: "무료 물건분석" },
   { key: "guide", label: "경매 가이드" },
   { key: "glossary", label: "경매 용어" },
-  { key: "news", label: "경매 뉴스" },
+  { key: "data", label: "경매 빅데이터" },
 ];
 
 const CATEGORY_BG_MAP: Record<string, string> = {
   analysis: "/images/insight/analysis.jpg",
   guide: "/images/insight/guide.jpg",
   glossary: "/images/insight/glossary.jpg",
-  news: "/images/insight/news.jpg",
+  data: "/images/insight/data.jpg",
 };
 
 const CATEGORY_LABEL_MAP: Record<string, string> = {
   analysis: "무료 물건분석",
   guide: "경매 가이드",
   glossary: "경매 용어",
-  news: "경매 뉴스",
+  data: "경매 빅데이터",
 };
 
 function filterPosts(posts: InsightItem[], chip: FilterKey): InsightItem[] {

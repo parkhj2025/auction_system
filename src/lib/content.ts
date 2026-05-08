@@ -5,6 +5,8 @@ import type {
   AnalysisFrontmatter,
   AnalysisMeta,
   AnalysisPost,
+  DataFrontmatter,
+  DataPost,
   GuideFrontmatter,
   GuidePost,
   NewsFrontmatter,
@@ -32,7 +34,7 @@ function normalizeDates(data: Record<string, unknown>): Record<string, unknown> 
 }
 
 function readCollection<FM>(
-  collection: "analysis" | "guide" | "news" | "notice"
+  collection: "analysis" | "guide" | "news" | "data" | "notice"
 ): Array<{ frontmatter: FM; content: string }> {
   const dir = path.join(CONTENT_ROOT, collection);
   if (!fs.existsSync(dir)) return [];
@@ -151,6 +153,20 @@ export function getNewsBySlug(slug: string): NewsPost | null {
   );
 }
 
+export function getAllDataPosts(): DataPost[] {
+  return readCollection<DataFrontmatter>("data")
+    .filter(isPublished)
+    .sort(sortByDateDesc);
+}
+
+export function getDataBySlug(slug: string): DataPost | null {
+  return (
+    readCollection<DataFrontmatter>("data").find(
+      (p) => p.frontmatter.slug === slug
+    ) ?? null
+  );
+}
+
 export function getAllNoticePosts(): NoticePost[] {
   return readCollection<NoticeFrontmatter>("notice")
     .filter(isPublished)
@@ -176,11 +192,12 @@ export function getActiveCaseNumbers(): string[] {
 
 /**
  * Phase 1.2 (A-1-2) v35 — InsightBlock 매거진 카드 Featured 자동 (publishedAt DESC 첫 1건).
- * Insight 카드 4건 (analysis · guide · glossary · news) 카테고리별 Featured 글 1건 fetch.
+ * Insight 카드 4건 (analysis · guide · glossary · data) 카테고리별 Featured 글 1건 fetch.
  * glossary = guide 흡수 (HREF_MAP 정합 / 별도 페이지 0).
+ * data = content/data 신규 (Cycle 8 / 빅데이터 콘텐츠 별개 영역 / 초기 0건 → fallback).
  * 콘텐츠 0건 = null 반환 (UI fallback 정적 카피).
  */
-export type InsightCardCategory = "analysis" | "guide" | "glossary" | "news";
+export type InsightCardCategory = "analysis" | "guide" | "glossary" | "data";
 
 export type InsightFeaturedPost = {
   title: string;
@@ -206,20 +223,21 @@ export function getFeaturedByCategory(
       href: `/guide/${post.frontmatter.slug}`,
     };
   }
-  const post = getAllNewsPosts()[0];
+  const post = getAllDataPosts()[0];
   if (!post) return null;
   return {
     title: post.frontmatter.title,
-    href: `/news/${post.frontmatter.slug}`,
+    href: `/data/${post.frontmatter.slug}`,
   };
 }
 
 /**
  * Phase 1.2 (A-1) — 메인 페이지 "경매 인사이트" 블록 본질.
- * analysis + guide + news 통합 + status="published" + publishedAt DESC.
- * chip 4건 navigator (무료 물건분석 / 시장 인사이트 / 뉴스 / 경매 기본정보).
+ * analysis + guide + data 통합 + status="published" + publishedAt DESC.
+ * chip 4건 navigator (무료 물건분석 / 경매 가이드 / 경매 빅데이터 / 경매 용어).
+ * Cycle 8: news → data 광역 정정. 기존 content/news/ 콘텐츠는 /news/[slug] 라우트로만 접근 가능 (Hub 출력 제외).
  */
-export type InsightChipKey = "analysis" | "insight" | "news" | "guide";
+export type InsightChipKey = "analysis" | "guide" | "glossary" | "data";
 
 export type InsightItem = {
   chip: InsightChipKey;
@@ -243,23 +261,23 @@ export function getActiveInsightPosts(): InsightItem[] {
   }));
   const guides: InsightItem[] = getAllGuidePosts().map((p) => ({
     chip: "guide",
-    chipLabel: "경매 기본정보",
+    chipLabel: "경매 가이드",
     slug: p.frontmatter.slug,
     title: p.frontmatter.title,
     subtitle: p.frontmatter.subtitle,
     href: `/guide/${p.frontmatter.slug}`,
     publishedAt: p.frontmatter.publishedAt,
   }));
-  const news: InsightItem[] = getAllNewsPosts().map((p) => ({
-    chip: "news",
-    chipLabel: "뉴스",
+  const data: InsightItem[] = getAllDataPosts().map((p) => ({
+    chip: "data",
+    chipLabel: "경매 빅데이터",
     slug: p.frontmatter.slug,
     title: p.frontmatter.title,
     subtitle: p.frontmatter.subtitle,
-    href: `/news/${p.frontmatter.slug}`,
+    href: `/data/${p.frontmatter.slug}`,
     publishedAt: p.frontmatter.publishedAt,
   }));
-  return [...analysis, ...guides, ...news].sort((a, b) =>
+  return [...analysis, ...guides, ...data].sort((a, b) =>
     String(b.publishedAt).localeCompare(String(a.publishedAt))
   );
 }

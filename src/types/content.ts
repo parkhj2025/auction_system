@@ -88,6 +88,16 @@ export interface NewsFrontmatter {
   status: PostStatus;
 }
 
+export interface DataFrontmatter {
+  type: "data";
+  slug: string;
+  title: string;
+  subtitle?: string;
+  region?: string;
+  publishedAt: string;
+  status: PostStatus;
+}
+
 export interface NoticeFrontmatter {
   type: "notice";
   slug: string;
@@ -104,6 +114,7 @@ export interface LoadedPost<T> {
 export type AnalysisPost = LoadedPost<AnalysisFrontmatter>;
 export type GuidePost = LoadedPost<GuideFrontmatter>;
 export type NewsPost = LoadedPost<NewsFrontmatter>;
+export type DataPost = LoadedPost<DataFrontmatter>;
 export type NoticePost = LoadedPost<NoticeFrontmatter>;
 
 /**

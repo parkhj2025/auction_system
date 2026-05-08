@@ -37,7 +37,9 @@ const nextConfig: NextConfig = {
     return [
       { source: "/analysis", destination: "/insight?cat=analysis", permanent: true },
       { source: "/guide", destination: "/insight?cat=guide", permanent: true },
-      { source: "/news", destination: "/insight?cat=news", permanent: true },
+      { source: "/glossary", destination: "/insight?cat=glossary", permanent: true },
+      { source: "/news", destination: "/insight?cat=data", permanent: true },
+      { source: "/data", destination: "/insight?cat=data", permanent: true },
     ];
   },
 };
