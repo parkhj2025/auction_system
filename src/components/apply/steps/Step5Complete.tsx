@@ -250,11 +250,10 @@ export function Step5Complete({
               1
             </span>
             <span>
-              접수 확인 연락이{" "}
               <strong className="text-[var(--color-ink-900)]">
-                카카오톡
+                접수 확인 연락
               </strong>
-              으로 전달됩니다. 접수번호 <strong>{applicationId}</strong>과 함께
+              이 직접 전달됩니다. 접수번호 <strong>{applicationId}</strong>과 함께
               서류·보증금 확인을 안내드립니다.
             </span>
           </li>
@@ -269,7 +268,7 @@ export function Step5Complete({
               3
             </span>
             <span>
-              입찰일 당일 법원에서 대리 입찰 수행. 낙찰/패찰 결과를 당일 카카오톡으로 통보합니다.
+              입찰일 당일 법원에서 대리 입찰 수행. 낙찰/패찰 결과를 당일 직접 통보합니다.
             </span>
           </li>
         </ol>

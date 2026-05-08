@@ -244,7 +244,7 @@ export function Step1Property({
         </h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
           선택하신 법원과 사건번호로 접수를 진행합니다. 물건의 상세 정보
-          (감정가·최저가·입찰일 등)는 접수 확인 시 카카오톡으로 안내드립니다.
+          (감정가·최저가·입찰일 등)는 접수 확인 시 직접 안내드립니다.
         </p>
       </header>
 
@@ -282,7 +282,7 @@ export function Step1Property({
             >
               사건번호
             </label>
-            <div className="flex gap-2">
+            <div className="flex flex-col gap-2 sm:flex-row">
               <input
                 id="step1-case"
                 type="text"
@@ -296,7 +296,7 @@ export function Step1Property({
                   }
                 }}
                 onBlur={() => void triggerLookup()}
-                className="h-12 flex-1 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-[length:var(--text-body)] tabular-nums text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]"
+                className="h-12 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-[length:var(--text-body)] tabular-nums text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] sm:flex-1"
               />
               <button
                 type="button"
@@ -304,7 +304,7 @@ export function Step1Property({
                 disabled={
                   checking || !CASE_NUMBER_PATTERN.test(data.caseNumber.trim())
                 }
-                className="inline-flex h-12 shrink-0 items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-ink-900)] bg-white px-4 text-sm font-bold text-[var(--color-ink-900)] hover:bg-[var(--color-ink-50)] disabled:cursor-not-allowed disabled:border-[var(--color-border)] disabled:bg-[var(--color-ink-100)] disabled:text-[var(--color-ink-500)]"
+                className="inline-flex h-12 w-full items-center justify-center rounded-[var(--radius-md)] border border-[var(--color-ink-900)] bg-white px-4 text-sm font-bold text-[var(--color-ink-900)] hover:bg-[var(--color-ink-50)] disabled:cursor-not-allowed disabled:border-[var(--color-border)] disabled:bg-[var(--color-ink-100)] disabled:text-[var(--color-ink-500)] sm:w-auto sm:shrink-0"
               >
                 {checking ? "확인 중..." : "사건번호 확인"}
               </button>
@@ -356,7 +356,7 @@ export function Step1Property({
               <p className="mt-1 text-xs leading-5 text-[var(--color-ink-700)]">
                 {BRAND_NAME}은 한 물건에 한 고객만 대리 접수합니다 (이해충돌 방지).
                 같은 사건번호의 회차가 끝난 뒤 다음 회차부터 다시 접수 가능합니다.
-                궁금하신 점은 카카오톡으로 문의해주세요.
+                궁금하신 점은 도움말을 확인해주세요.
               </p>
             </div>
           </div>
