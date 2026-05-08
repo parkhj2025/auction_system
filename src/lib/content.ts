@@ -191,47 +191,6 @@ export function getActiveCaseNumbers(): string[] {
 }
 
 /**
- * Phase 1.2 (A-1-2) v35 — InsightBlock 매거진 카드 Featured 자동 (publishedAt DESC 첫 1건).
- * Insight 카드 4건 (analysis · guide · glossary · data) 카테고리별 Featured 글 1건 fetch.
- * glossary = guide 흡수 (HREF_MAP 정합 / 별도 페이지 0).
- * data = content/data 신규 (Cycle 8 / 빅데이터 콘텐츠 별개 영역 / 초기 0건 → fallback).
- * 콘텐츠 0건 = null 반환 (UI fallback 정적 카피).
- */
-export type InsightCardCategory = "analysis" | "guide" | "glossary" | "data";
-
-export type InsightFeaturedPost = {
-  title: string;
-  href: string;
-} | null;
-
-export function getFeaturedByCategory(
-  category: InsightCardCategory
-): InsightFeaturedPost {
-  if (category === "analysis") {
-    const post = getAllAnalysisPosts()[0];
-    if (!post) return null;
-    return {
-      title: post.frontmatter.title,
-      href: `/analysis/${post.frontmatter.slug}`,
-    };
-  }
-  if (category === "guide" || category === "glossary") {
-    const post = getAllGuidePosts()[0];
-    if (!post) return null;
-    return {
-      title: post.frontmatter.title,
-      href: `/guide/${post.frontmatter.slug}`,
-    };
-  }
-  const post = getAllDataPosts()[0];
-  if (!post) return null;
-  return {
-    title: post.frontmatter.title,
-    href: `/data/${post.frontmatter.slug}`,
-  };
-}
-
-/**
  * Phase 1.2 (A-1) — 메인 페이지 "경매 인사이트" 블록 본질.
  * analysis + guide + data 통합 + status="published" + publishedAt DESC.
  * chip 4건 navigator (무료 물건분석 / 경매 가이드 / 경매 빅데이터 / 경매 용어).

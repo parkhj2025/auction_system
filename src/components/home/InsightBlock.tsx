@@ -8,30 +8,38 @@ import {
   type InsightFeatured,
   type InsightCategorySlug,
 } from "./InsightThumbnail";
-import type { InsightFeaturedPost } from "@/lib/content";
 
-/* Phase 1.2 (A-1-2) v50 cycle 8 — InsightBlock Magazine Editorial Poster Card paradigm.
- * 정정 (Cycle 8):
- * 1. motion + useInView 진입 애니메이션 (Pricing/Reviews 정합)
- * 2. h2 motion.h2 + fadeVariants (y:20 / duration:0.6 / easeOut)
- * 3. 카드 grid wrapper containerVariants (staggerChildren:0.1 / delayChildren:0.2)
- * 4. 각 카드 cardVariants (y:20 / duration:0.5 / easeOut)
- * 5. 칩 5건 + filter state 광역 폐기 (모든 카드 항상 4건 표시)
- * 6. FEATURED_BY_CATEGORY count + preview 필드 광역 폐기 (title fallback only)
- * 7. news → data slug 광역 정합 ("경매 빅데이터") */
+/* Phase 1.2 (A-1-2) v50 cycle 8-2 — InsightBlock Magazine Editorial split paradigm.
+ * 정정 (Cycle 8-2):
+ * 1. 카드 grid 모바일 1-col / 데스크탑 2-col (cycle 8 grid-cols-2 / lg:grid-cols-4 회수)
+ * 2. CATEGORIES color 필드 광역 폐기
+ * 3. FEATURED_BY_CATEGORY 4 카테고리 카피 광역 정정 (호기심 paradigm + preview 필드 부활)
+ * 4. featuredPost props 활용 광역 회수 (featured.title 직접) */
 
 const CATEGORIES: InsightCategory[] = [
-  { slug: "analysis", label: "무료 물건분석", color: "green" },
-  { slug: "guide", label: "경매 가이드", color: "blue" },
-  { slug: "glossary", label: "경매 용어", color: "orange" },
-  { slug: "data", label: "경매 빅데이터", color: "purple" },
+  { slug: "analysis", label: "무료 물건분석" },
+  { slug: "guide", label: "경매 가이드" },
+  { slug: "glossary", label: "경매 용어" },
+  { slug: "data", label: "경매 빅데이터" },
 ];
 
 const FEATURED_BY_CATEGORY: Record<InsightCategorySlug, InsightFeatured> = {
-  analysis: { title: "사건번호 하나면, 분석 끝" },
-  guide: { title: "처음부터 차근차근" },
-  glossary: { title: "헷갈리는 용어, 한눈에" },
-  data: { title: "공식 데이터, 가공해 드립니다" },
+  analysis: {
+    title: "이 물건, 왜 유찰됐을까",
+    preview: "권리·시세·수익률 한 눈에",
+  },
+  guide: {
+    title: "경매, 어디서부터 시작할까",
+    preview: "낙찰까지 한 흐름",
+  },
+  glossary: {
+    title: "이 단어, 무슨 뜻이지",
+    preview: "사례로 풀어쓴 경매 사전",
+  },
+  data: {
+    title: "지금 시장, 어디로 가나",
+    preview: "데이터가 보여주는 흐름",
+  },
 };
 
 const fadeVariants: Variants = {
@@ -49,11 +57,7 @@ const cardVariants: Variants = {
   visible: { opacity: 1, y: 0, transition: { duration: 0.5, ease: "easeOut" } },
 };
 
-export function InsightBlock({
-  featuredByCategory,
-}: {
-  featuredByCategory: Record<InsightCategorySlug, InsightFeaturedPost>;
-}) {
+export function InsightBlock() {
   const sectionRef = useRef<HTMLElement>(null);
   const sectionInView = useInView(sectionRef, { once: true, amount: 0.3 });
 
@@ -78,19 +82,18 @@ export function InsightBlock({
           <span style={{ color: "#FFD43B" }}>.</span>
         </motion.h2>
 
-        {/* 4 카드 균등 grid + stagger 진입. */}
+        {/* 4 카드 grid — 모바일 1-col 4-row / 데스크탑 2-col 2-row + stagger 진입. */}
         <motion.div
           variants={containerVariants}
           initial="hidden"
           animate={sectionInView ? "visible" : "hidden"}
-          className="grid grid-cols-2 gap-4 lg:grid-cols-4 lg:gap-6"
+          className="grid grid-cols-1 gap-4 lg:grid-cols-2 lg:gap-6"
         >
           {CATEGORIES.map((cat) => (
             <motion.div key={cat.slug} variants={cardVariants}>
               <InsightThumbnail
                 category={cat}
                 featured={FEATURED_BY_CATEGORY[cat.slug]}
-                featuredPost={featuredByCategory[cat.slug]}
               />
             </motion.div>
           ))}

@@ -4,7 +4,7 @@ import { CompareBlock } from "@/components/home/CompareBlock";
 import { PricingBlock } from "@/components/home/PricingBlock";
 import { ReviewsBlock } from "@/components/home/ReviewsBlock";
 import { TrustCTA } from "@/components/home/TrustCTA";
-import { getActiveCaseNumbers, getFeaturedByCategory } from "@/lib/content";
+import { getActiveCaseNumbers } from "@/lib/content";
 
 /* Phase 1.2 (A-1-2) Cycle B — Home 6 섹션 (Reviews 신규 + 사회적 증명 paradigm).
  *  1. Hero (동영상 + frosted glass + 1 viewport + 페이딩 #FAFAFA + 모바일 carousel 통합)
@@ -16,12 +16,6 @@ import { getActiveCaseNumbers, getFeaturedByCategory } from "@/lib/content";
  *  Cycle B: Reviews 5번째 신규 진입 / 광역 페이지 맥락 = 서비스 → 콘텐츠 → 사회적 증명 → 전환 */
 export default function Home() {
   const caseNumbers = getActiveCaseNumbers();
-  const featuredByCategory = {
-    analysis: getFeaturedByCategory("analysis"),
-    guide: getFeaturedByCategory("guide"),
-    glossary: getFeaturedByCategory("glossary"),
-    data: getFeaturedByCategory("data"),
-  };
 
   return (
     <main className="flex flex-1 flex-col">
@@ -29,7 +23,7 @@ export default function Home() {
       <CompareBlock />
       <PricingBlock />
       <ReviewsBlock />
-      <InsightBlock featuredByCategory={featuredByCategory} />
+      <InsightBlock />
       <TrustCTA />
     </main>
   );
