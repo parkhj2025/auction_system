@@ -58,21 +58,12 @@ export function HeroSearch({ caseNumbers }: { caseNumbers: string[] }) {
           법원에 가지 않고,<br />
           <span
             style={{
-              color: "#00C853",
-              textShadow:
-                "0 0 32px rgba(0, 200, 83, 0.7), 0 0 64px rgba(0, 200, 83, 0.5), 0 4px 16px rgba(0, 0, 0, 0.5)",
-            }}
-          >
-            경매를 시작하세요
-          </span>
-          <span
-            style={{
               color: "#FFD43B",
               textShadow:
                 "0 0 32px rgba(255, 212, 59, 0.7), 0 0 64px rgba(255, 212, 59, 0.5), 0 4px 16px rgba(0, 0, 0, 0.5)",
             }}
           >
-            .
+            경매를 시작하세요.
           </span>
         </h1>
 
