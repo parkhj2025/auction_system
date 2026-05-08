@@ -16,7 +16,7 @@ export function ApplyStepIndicator({
       aria-label="신청 진행 단계"
       className="border-b border-[var(--color-border)] bg-white"
     >
-      <ol className="mx-auto flex w-full max-w-5xl items-center gap-0 overflow-x-auto px-4 py-5 sm:px-8">
+      <ol className="container-app flex items-center gap-0 overflow-x-auto py-5">
         {APPLY_STEPS.map((step, i) => {
           const isCompleted = completed.has(step.id);
           const isCurrent = step.id === current;

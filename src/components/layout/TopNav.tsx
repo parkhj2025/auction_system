@@ -7,11 +7,10 @@ import { cn } from "@/lib/utils";
 import { UserMenu, type UserMenuProps } from "@/components/auth/UserMenu";
 import { Logo } from "@/components/Logo";
 
-/* Phase 1.2 (A-1-2) v6 — TopNav (CTA 광역 폐기 / nav 4 link 보존).
- * Brand 컴포넌트 + nav 4 link (서비스 소개 · 이용 절차 · 경매 인사이트 · FAQ) + user icon.
- * v6 paradigm: CTA 광역 2 영역 한정 (Hero + Pricing) → TopNav CTA 광역 폐기.
- * sticky bg-white/80 backdrop-blur + scroll>8 border (Linear paradigm).
- * 한국어 nav brkpt 1024px. */
+/* Stage 2 cycle 1-A 보강 1+ — TopNav "신청하기" CTA 신규 mount (conversion 파이프라인 강화).
+ * 모바일 = hamburger 좌측 inline (Logo·CTA·hamburger 3 column 정합)
+ * 데스크탑 = user/login 좌측 inline (광역 우측 CTA + user 정합)
+ * 광역 별개 2 Link (className 분기 lg:hidden / hidden lg:inline-flex). */
 
 /* TopNav 본질 nav links (v5 Q5 형준님 결정 — 낙찰사례 폐기 + 경매 인사이트 메인).
  * lib/navigation.ts PRIMARY_NAV (모바일 drawer 본질) 본질 보존. */
@@ -74,7 +73,20 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
         </nav>
 
         <div className="flex items-center gap-2">
-          {/* v6 — TopNav CTA 광역 폐기 (CTA 광역 2 영역 한정 paradigm). user icon만 보존. */}
+          {/* Stage 2 cycle 1-A 보강 1+ — 모바일 CTA (hamburger 좌측 inline). */}
+          <Link
+            href="/apply"
+            className="inline-flex h-9 items-center justify-center rounded-full bg-[var(--brand-green)] px-3 text-[13px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 lg:hidden"
+          >
+            신청하기
+          </Link>
+          {/* Stage 2 cycle 1-A 보강 1+ — 데스크탑 CTA (user/login 좌측 inline). */}
+          <Link
+            href="/apply"
+            className="hidden h-10 items-center justify-center rounded-full bg-[var(--brand-green)] px-5 text-[15px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 lg:inline-flex"
+          >
+            신청하기
+          </Link>
           {user ? (
             <div className="hidden lg:flex lg:items-center">
               <UserMenu {...user} />
