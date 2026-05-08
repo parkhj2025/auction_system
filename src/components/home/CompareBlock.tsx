@@ -158,14 +158,14 @@ export function CompareBlock() {
           {/* 박스 wrapper — border only */}
           <div className="rounded-[28px] border border-gray-200 px-5 py-5 lg:rounded-[32px] lg:px-8 lg:py-8">
             {/* 숫자 비교 — 모바일 flex-col gap-6 + CSS order / 데스크탑 lg:grid 3 col gap-8 */}
-            <div className="flex flex-col items-center gap-6 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-8">
+            <div className="flex flex-col items-center gap-4 lg:grid lg:grid-cols-[1fr_auto_1fr] lg:items-center lg:gap-8">
               {/* 좌측 (label + NumberFlow) — order-1 / lg:order-1 */}
               <div className="order-1 flex flex-col items-center text-center lg:order-1">
                 <motion.div
                   variants={labelVariants}
                   initial="hidden"
                   animate={step >= 1 ? "visible" : "hidden"}
-                  className="mb-10 whitespace-nowrap text-[20px] font-medium tracking-tight text-gray-500 lg:mb-16 lg:text-[28px]"
+                  className="mb-4 whitespace-nowrap text-[20px] font-medium tracking-tight text-gray-500 lg:mb-6 lg:text-[28px]"
                 >
                   일반적인 방법
                 </motion.div>
@@ -226,7 +226,7 @@ export function CompareBlock() {
                   variants={labelVariants}
                   initial="hidden"
                   animate={step >= 3 ? "visible" : "hidden"}
-                  className="mb-10 whitespace-nowrap text-[20px] font-medium tracking-tight text-[var(--brand-green)] lg:mb-16 lg:text-[28px]"
+                  className="mb-4 whitespace-nowrap text-[20px] font-medium tracking-tight text-[var(--brand-green)] lg:mb-6 lg:text-[28px]"
                 >
                   경매퀵을 이용하면
                 </motion.div>
