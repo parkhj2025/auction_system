@@ -60,21 +60,21 @@ export function InsightThumbnail({
         />
       </div>
 
-      {/* 우 텍스트 영역 (50%) — eyebrow + h3 + sub + 우하단 화살표. */}
-      <div className="flex w-1/2 flex-col justify-center gap-1.5 px-4 py-3 lg:gap-2 lg:px-5 lg:py-4">
-        <span className="text-[12px] font-medium tracking-[0.02em] text-gray-500 lg:text-[14px]">
+      {/* 우 텍스트 영역 (50%) — eyebrow + h3 + sub + 우하단 화살표 (cycle 8-3 size ↑). */}
+      <div className="flex w-1/2 flex-col justify-center gap-2 px-4 py-3 lg:gap-2.5 lg:px-5 lg:py-4">
+        <span className="text-[14px] font-medium tracking-[0.02em] text-gray-500 lg:text-[18px]">
           {category.label}
         </span>
-        <h3 className="line-clamp-2 text-[15px] font-bold leading-snug tracking-[-0.01em] text-[#111418] lg:text-[18px]">
+        <h3 className="line-clamp-2 text-[18px] font-bold leading-snug tracking-[-0.01em] text-[#111418] lg:text-[24px]">
           {featured.title}
         </h3>
         <div className="flex items-center justify-between gap-2">
-          <p className="line-clamp-1 text-[12px] font-medium text-gray-600 lg:text-[14px]">
+          <p className="line-clamp-1 text-[14px] font-medium text-gray-600 lg:text-[16px]">
             {featured.preview}
           </p>
           <span
             aria-hidden="true"
-            className="flex-shrink-0 text-[14px] text-gray-400 transition-transform duration-300 group-hover:translate-x-1"
+            className="flex-shrink-0 text-[18px] text-gray-400 transition-transform duration-300 group-hover:translate-x-1 lg:text-[20px]"
           >
             →
           </span>
