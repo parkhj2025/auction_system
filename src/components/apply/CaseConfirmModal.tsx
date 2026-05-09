@@ -9,6 +9,7 @@ import {
   USER_INPUT_LIABILITY_NOTICE,
 } from "@/lib/legal";
 import { getKSTDateTimeIso } from "@/lib/datetime";
+import { AddressSearch, type AddressSearchResult } from "./AddressSearch";
 
 const PROPERTY_TYPE_OPTIONS: PropertyType[] = [
   "아파트",
@@ -28,7 +29,7 @@ const ROUND_OPTIONS: number[] = [1, 2, 3, 4, 5];
 const ROUND_CUSTOM = "custom";
 
 const inputClass =
-  "h-12 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-sm text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)]";
+  "h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-base text-[#111418] placeholder:text-gray-400 transition-colors duration-150 focus:border-[var(--brand-green)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)]/20";
 
 interface Props {
   data: ApplyFormData;
@@ -75,6 +76,21 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
   const [customRound, setCustomRound] = useState<string>(() =>
     ROUND_OPTIONS.includes(data.auctionRound) ? "" : String(data.auctionRound),
   );
+  // Stage 2 cycle 1-A 보강 4 — AddressSearch + 원래 주소 복구 paradigm.
+  const [addressSearchOpen, setAddressSearchOpen] = useState(false);
+  const [originalAddress] = useState<string>(data.propertyAddress);
+
+  function handleAddressSelect(addr: AddressSearchResult) {
+    onChange({ propertyAddress: addr.full });
+    setAddressSearchOpen(false);
+  }
+
+  function handleAddressRestore() {
+    onChange({ propertyAddress: originalAddress });
+  }
+
+  const addressChanged =
+    !!originalAddress && data.propertyAddress !== originalAddress;
 
   useEffect(() => {
     const prev = document.body.style.overflow;
@@ -141,7 +157,7 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
       onClick={(e) => e.stopPropagation()}
     >
       <div
-        className="relative flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white shadow-[var(--shadow-lift)]"
+        className="relative flex max-h-[90vh] w-full max-w-lg flex-col overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-[var(--shadow-lift)]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-center justify-between gap-2 border-b border-gray-200 px-6 py-4">
@@ -168,17 +184,15 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
           </button>
         </div>
 
-        <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-5">
-          <p className="text-xs leading-5 text-[var(--color-ink-500)]">
-            법원, 사건번호, 매각기일, 물건 종류, 주소를 입력해주세요. 아래 정보가
-            본인이 의뢰하려는 사건과 일치하는지 확인 후 &ldquo;확인&rdquo; 버튼으로
-            진행해주세요.
+        <div className="flex flex-1 flex-col gap-4 overflow-y-auto px-6 py-6">
+          <p className="text-sm leading-6 text-gray-600">
+            사건 정보를 입력하고 일치 여부를 확인해주세요.
           </p>
 
           <div>
             <label
               htmlFor="modal-bid-date"
-              className="mb-1 block text-xs font-bold text-[var(--color-ink-700)]"
+              className="mb-2 block text-sm font-bold text-gray-700"
             >
               매각기일
             </label>
@@ -194,7 +208,7 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
           <div>
             <label
               htmlFor="modal-property-type"
-              className="mb-1 block text-xs font-bold text-[var(--color-ink-700)]"
+              className="mb-2 block text-sm font-bold text-gray-700"
             >
               물건 종류
             </label>
@@ -217,7 +231,7 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
             <div>
               <label
                 htmlFor="modal-property-type-other"
-                className="mb-1 block text-xs font-bold text-[var(--color-ink-700)]"
+                className="mb-2 block text-sm font-bold text-gray-700"
               >
                 물건 종류 (직접 입력)
               </label>
@@ -235,24 +249,54 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
           <div>
             <label
               htmlFor="modal-property-address"
-              className="mb-1 block text-xs font-bold text-[var(--color-ink-700)]"
+              className="mb-2 block text-sm font-bold text-gray-700"
             >
               물건 주소
             </label>
-            <input
-              id="modal-property-address"
-              type="text"
-              placeholder="예: 인천광역시 미추홀구 ..."
-              value={data.propertyAddress}
-              onChange={(e) => onChange({ propertyAddress: e.target.value })}
-              className={inputClass}
-            />
+            {addressSearchOpen ? (
+              <AddressSearch
+                onSelect={handleAddressSelect}
+                onCancel={() => setAddressSearchOpen(false)}
+              />
+            ) : (
+              <>
+                <div className="flex flex-col gap-2 sm:flex-row">
+                  <input
+                    id="modal-property-address"
+                    type="text"
+                    readOnly
+                    placeholder="검색 또는 직접 입력"
+                    value={data.propertyAddress}
+                    onChange={(e) =>
+                      onChange({ propertyAddress: e.target.value })
+                    }
+                    className={`${inputClass} cursor-default bg-gray-50 sm:flex-1`}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setAddressSearchOpen(true)}
+                    className="inline-flex h-12 w-full items-center justify-center rounded-full border border-gray-300 bg-white px-5 text-sm font-bold text-[#111418] transition-colors duration-150 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 sm:w-auto sm:shrink-0"
+                  >
+                    {data.propertyAddress ? "변경" : "주소 검색"}
+                  </button>
+                </div>
+                {addressChanged && (
+                  <button
+                    type="button"
+                    onClick={handleAddressRestore}
+                    className="mt-2 text-xs font-semibold text-gray-500 underline underline-offset-2 hover:text-[#111418]"
+                  >
+                    원래 주소로 복구
+                  </button>
+                )}
+              </>
+            )}
           </div>
 
           <div>
             <label
               htmlFor="modal-auction-round"
-              className="mb-1 block text-xs font-bold text-[var(--color-ink-700)]"
+              className="mb-2 block text-sm font-bold text-gray-700"
             >
               매각회차
             </label>
@@ -282,25 +326,23 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
                 />
               )}
             </div>
-            <p className="mt-1 text-[11px] text-[var(--color-ink-500)]">
+            <p className="mt-2 text-xs text-gray-500">
               같은 사건번호라도 회차가 다르면 별도 접수로 처리됩니다.
             </p>
           </div>
 
           {/* Phase 6 UX 수정: 빨간 경고 톤 → 슬레이트 뉴트럴 안내 톤.
               강제 모달 진입 시점이라 추가 주의 환기 불필요. legal.ts 단일 출처(USER_INPUT_LIABILITY_NOTICE) 유지. */}
-          <div className="rounded-[var(--radius-md)] border border-slate-200 bg-slate-50 p-4">
+          <div className="rounded-xl border border-gray-200 bg-gray-50 p-4">
             <div className="flex items-center gap-1.5">
               <Info
                 size={14}
                 aria-hidden="true"
-                className="shrink-0 text-slate-500"
+                className="shrink-0 text-gray-500"
               />
-              <p className="text-xs font-bold text-slate-700">
-                위임인 책임
-              </p>
+              <p className="text-sm font-bold text-gray-700">위임인 책임</p>
             </div>
-            <p className="mt-1 text-xs leading-5 text-[var(--color-ink-700)]">
+            <p className="mt-1 text-sm leading-6 text-gray-700">
               {USER_INPUT_LIABILITY_NOTICE}
             </p>
           </div>
@@ -310,37 +352,39 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
               type="checkbox"
               checked={agreed}
               onChange={(e) => setAgreed(e.target.checked)}
-              className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-[var(--color-ink-900)]"
+              className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-[#00C853]"
             />
-            <span className="flex-1 text-sm leading-6 text-[var(--color-ink-900)]">
+            <span className="flex-1 text-sm leading-6 text-[#111418]">
               {CASE_CONFIRM_CHECKBOX_LABEL}
             </span>
           </label>
         </div>
 
-        <div className="flex flex-col gap-2 border-t border-[var(--color-border)] bg-[var(--color-surface-muted)] px-6 py-4">
-          <div className="flex gap-2">
+        <div className="flex flex-col gap-3 border-t border-gray-200 bg-gray-50 px-6 py-5">
+          <div className="flex flex-col gap-3 sm:flex-row sm:gap-3">
             <button
               type="button"
               onClick={onReturn}
-              className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-sm font-bold text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)]"
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-gray-300 bg-white px-5 text-sm font-bold text-[#111418] transition-colors duration-150 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 sm:w-auto"
             >
-              사건번호 수정
+              사건번호 다시 입력
             </button>
             <button
               ref={submitRef}
               type="button"
               onClick={handleConfirm}
               disabled={!canConfirm}
-              className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-4 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-black disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--brand-green)] px-6 text-sm font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400 disabled:hover:bg-gray-200 sm:w-auto sm:flex-1"
             >
               확인
             </button>
           </div>
-          <p className="text-center text-[10px] leading-4 text-[var(--color-ink-500)]">
-            * 모든 항목을 입력하고 책임 조항에 동의해야 &ldquo;확인&rdquo;으로 진행할 수
-            있습니다. 사건번호 자체를 잘못 입력한 경우 좌측 &ldquo;사건번호 다시 입력&rdquo;
-            버튼으로 Step 1 입력 화면으로 돌아갈 수 있습니다.
+          <p className="text-center text-xs leading-5 text-gray-500">
+            * 모든 항목을 입력해야 진행할 수 있습니다. 사건번호가 잘못된 경우 좌측{" "}
+            <span className="font-bold text-[#111418]">
+              &ldquo;사건번호 다시 입력&rdquo;
+            </span>{" "}
+            버튼을 눌러주세요.
           </p>
         </div>
       </div>
