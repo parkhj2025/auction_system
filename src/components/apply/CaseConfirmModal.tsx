@@ -28,8 +28,26 @@ const OTHER_PREFIX = "기타 - ";
 const ROUND_OPTIONS: number[] = [1, 2, 3, 4, 5];
 const ROUND_CUSTOM = "custom";
 
-const inputClass =
-  "h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-base text-[#111418] placeholder:text-gray-400 transition-colors duration-150 focus:border-[var(--brand-green)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)]/20";
+// Stage 2 cycle 1-A 보강 5 — error state border/ring 분기.
+const inputBase =
+  "h-12 w-full rounded-xl bg-white px-4 text-base text-[#111418] placeholder:text-gray-400 transition-colors duration-150 focus:outline-none";
+const inputBorderNormal =
+  "border border-gray-200 focus:border-[var(--brand-green)] focus:ring-2 focus:ring-[var(--brand-green)]/20";
+const inputBorderError =
+  "border border-red-500 ring-2 ring-red-500/20";
+
+function fieldClass(hasError: boolean, extra = ""): string {
+  const border = hasError ? inputBorderError : inputBorderNormal;
+  return `${inputBase} ${border}${extra ? ` ${extra}` : ""}`;
+}
+
+function Required() {
+  return (
+    <span aria-hidden="true" className="ml-0.5 text-red-500">
+      *
+    </span>
+  );
+}
 
 interface Props {
   data: ApplyFormData;
@@ -62,12 +80,20 @@ function getOtherText(v: string): string {
  * - Esc 키 dismiss 차단 (preventDefault)
  * - "확인" 버튼만이 유일한 dismiss 경로
  * - "확인" 버튼은 입력 4종(bidDate/propertyType/propertyAddress/"기타"시 자유텍스트) +
- *   책임 조항 동의 체크박스 모두 만족 시에만 enabled
+ *   책임 조항 동의 체크박스 모두 만족 시에만 실제 진행 (보강 5: 미충족 클릭 시 error state 노출).
  *
  * caseConfirmedAt 기록 시점: "확인" 버튼 클릭 시 (체크박스 ON 단독으로는 set 안 함).
  */
 export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
   const submitRef = useRef<HTMLButtonElement>(null);
+  // Stage 2 cycle 1-A 보강 5 — first invalid scroll 대상 wrapper refs.
+  const bidDateRef = useRef<HTMLDivElement>(null);
+  const propertyTypeRef = useRef<HTMLDivElement>(null);
+  const propertyTypeOtherRef = useRef<HTMLDivElement>(null);
+  const propertyAddressRef = useRef<HTMLDivElement>(null);
+  const auctionRoundRef = useRef<HTMLDivElement>(null);
+  const agreedRef = useRef<HTMLDivElement>(null);
+
   const [agreed, setAgreed] = useState(false);
   // Phase 6.7.6 매각회차. ROUND_OPTIONS(1~5) 외 값은 "직접 입력" 모드.
   const [roundMode, setRoundMode] = useState<string>(() =>
@@ -76,17 +102,27 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
   const [customRound, setCustomRound] = useState<string>(() =>
     ROUND_OPTIONS.includes(data.auctionRound) ? "" : String(data.auctionRound),
   );
-  // Stage 2 cycle 1-A 보강 4 — AddressSearch + 원래 주소 복구 paradigm.
-  const [addressSearchOpen, setAddressSearchOpen] = useState(false);
+  // Stage 2 cycle 1-A 보강 5 — 단일 활성 모드 paradigm + 상세주소 + error state.
+  // 도로명 미선택(propertyAddress 빈 string) = AddressSearch default mount.
+  // 도로명 선택 후 = readonly box + "변경" 버튼.
   const [originalAddress] = useState<string>(data.propertyAddress);
+  const [addressDetail, setAddressDetail] = useState("");
+  const [showErrors, setShowErrors] = useState(false);
 
   function handleAddressSelect(addr: AddressSearchResult) {
     onChange({ propertyAddress: addr.full });
-    setAddressSearchOpen(false);
+    setAddressDetail("");
+  }
+
+  function handleAddressChange() {
+    // "변경" 버튼 클릭 = 활성 모드 복귀 + propertyAddress reset + addressDetail clear.
+    onChange({ propertyAddress: "" });
+    setAddressDetail("");
   }
 
   function handleAddressRestore() {
     onChange({ propertyAddress: originalAddress });
+    setAddressDetail("");
   }
 
   const addressChanged =
@@ -138,13 +174,45 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
     roundOk &&
     agreed;
 
+  // Stage 2 cycle 1-A 보강 5 — field-level error 분해 (showErrors 광역 toggle + 사용자 입력 시 자동 해제).
+  const errors = {
+    bidDate: !data.bidDate,
+    propertyType: selectValue === "",
+    propertyTypeOther: selectValue === "기타" && !otherText.trim(),
+    propertyAddress: !data.propertyAddress.trim(),
+    auctionRound: !roundOk,
+    agreed: !agreed,
+  };
+
   function handleConfirm() {
-    if (!canConfirm) return;
-    onChange({
+    if (!canConfirm) {
+      setShowErrors(true);
+      const order: Array<[boolean, React.RefObject<HTMLDivElement | null>]> = [
+        [errors.bidDate, bidDateRef],
+        [errors.propertyType, propertyTypeRef],
+        [errors.propertyTypeOther, propertyTypeOtherRef],
+        [errors.propertyAddress, propertyAddressRef],
+        [errors.auctionRound, auctionRoundRef],
+        [errors.agreed, agreedRef],
+      ];
+      for (const [hasError, ref] of order) {
+        if (hasError && ref.current) {
+          ref.current.scrollIntoView({ behavior: "smooth", block: "center" });
+          break;
+        }
+      }
+      return;
+    }
+    const detail = addressDetail.trim();
+    const patch: Partial<ApplyFormData> = {
       caseConfirmedByUser: true,
       caseConfirmedAt: getKSTDateTimeIso(),
       auctionRound: resolvedRound,
-    });
+    };
+    if (detail) {
+      patch.propertyAddress = `${data.propertyAddress} ${detail}`;
+    }
+    onChange(patch);
   }
 
   return (
@@ -189,34 +257,41 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
             사건 정보를 입력하고 일치 여부를 확인해주세요.
           </p>
 
-          <div>
+          <div ref={bidDateRef}>
             <label
               htmlFor="modal-bid-date"
               className="mb-2 block text-sm font-bold text-gray-700"
             >
               매각기일
+              <Required />
             </label>
             <input
               id="modal-bid-date"
               type="date"
               value={data.bidDate}
               onChange={(e) => onChange({ bidDate: e.target.value })}
-              className={inputClass}
+              className={fieldClass(showErrors && errors.bidDate)}
             />
+            {showErrors && errors.bidDate && (
+              <p className="mt-1.5 text-sm text-red-500">
+                매각기일을 입력해주세요.
+              </p>
+            )}
           </div>
 
-          <div>
+          <div ref={propertyTypeRef}>
             <label
               htmlFor="modal-property-type"
               className="mb-2 block text-sm font-bold text-gray-700"
             >
               물건 종류
+              <Required />
             </label>
             <select
               id="modal-property-type"
               value={selectValue}
               onChange={(e) => handleSelectPropertyType(e.target.value)}
-              className={inputClass}
+              className={fieldClass(showErrors && errors.propertyType)}
             >
               <option value="">선택해주세요</option>
               {PROPERTY_TYPE_OPTIONS.map((t) => (
@@ -225,15 +300,21 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
                 </option>
               ))}
             </select>
+            {showErrors && errors.propertyType && (
+              <p className="mt-1.5 text-sm text-red-500">
+                물건 종류를 선택해주세요.
+              </p>
+            )}
           </div>
 
           {selectValue === "기타" && (
-            <div>
+            <div ref={propertyTypeOtherRef}>
               <label
                 htmlFor="modal-property-type-other"
                 className="mb-2 block text-sm font-bold text-gray-700"
               >
-                물건 종류 (직접 입력)
+                직접 입력
+                <Required />
               </label>
               <input
                 id="modal-property-type-other"
@@ -241,23 +322,34 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
                 placeholder="예: 임야, 근린생활시설 등"
                 value={otherText}
                 onChange={(e) => handleOtherTextChange(e.target.value)}
-                className={inputClass}
+                className={fieldClass(showErrors && errors.propertyTypeOther)}
               />
+              {showErrors && errors.propertyTypeOther && (
+                <p className="mt-1.5 text-sm text-red-500">
+                  직접 입력 항목을 작성해주세요.
+                </p>
+              )}
             </div>
           )}
 
-          <div>
-            <label
-              htmlFor="modal-property-address"
-              className="mb-2 block text-sm font-bold text-gray-700"
-            >
+          <div ref={propertyAddressRef}>
+            <label className="mb-2 block text-sm font-bold text-gray-700">
               물건 주소
+              <Required />
             </label>
-            {addressSearchOpen ? (
-              <AddressSearch
-                onSelect={handleAddressSelect}
-                onCancel={() => setAddressSearchOpen(false)}
-              />
+            {!data.propertyAddress ? (
+              <>
+                <AddressSearch onSelect={handleAddressSelect} />
+                {addressChanged && (
+                  <button
+                    type="button"
+                    onClick={handleAddressRestore}
+                    className="mt-2 text-xs font-semibold text-gray-500 underline underline-offset-2 hover:text-[#111418]"
+                  >
+                    원래 주소로 복구
+                  </button>
+                )}
+              </>
             ) : (
               <>
                 <div className="flex flex-col gap-2 sm:flex-row">
@@ -265,20 +357,38 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
                     id="modal-property-address"
                     type="text"
                     readOnly
-                    placeholder="검색 또는 직접 입력"
                     value={data.propertyAddress}
-                    onChange={(e) =>
-                      onChange({ propertyAddress: e.target.value })
-                    }
-                    className={`${inputClass} cursor-default bg-gray-50 sm:flex-1`}
+                    className={fieldClass(
+                      showErrors && errors.propertyAddress,
+                      "cursor-default bg-gray-50 sm:flex-1",
+                    )}
                   />
                   <button
                     type="button"
-                    onClick={() => setAddressSearchOpen(true)}
+                    onClick={handleAddressChange}
                     className="inline-flex h-12 w-full items-center justify-center rounded-full border border-gray-300 bg-white px-5 text-sm font-bold text-[#111418] transition-colors duration-150 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 sm:w-auto sm:shrink-0"
                   >
-                    {data.propertyAddress ? "변경" : "주소 검색"}
+                    변경
                   </button>
+                </div>
+                <div className="mt-3">
+                  <label
+                    htmlFor="modal-address-detail"
+                    className="mb-1.5 block text-sm font-bold text-gray-700"
+                  >
+                    상세주소
+                    <span className="ml-1 text-xs font-normal text-gray-500">
+                      (선택)
+                    </span>
+                  </label>
+                  <input
+                    id="modal-address-detail"
+                    type="text"
+                    placeholder="예: 101동 1502호"
+                    value={addressDetail}
+                    onChange={(e) => setAddressDetail(e.target.value)}
+                    className={fieldClass(false)}
+                  />
                 </div>
                 {addressChanged && (
                   <button
@@ -291,21 +401,27 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
                 )}
               </>
             )}
+            {showErrors && errors.propertyAddress && (
+              <p className="mt-1.5 text-sm text-red-500">
+                물건 주소를 입력해주세요.
+              </p>
+            )}
           </div>
 
-          <div>
+          <div ref={auctionRoundRef}>
             <label
               htmlFor="modal-auction-round"
               className="mb-2 block text-sm font-bold text-gray-700"
             >
               매각회차
+              <Required />
             </label>
             <div className="flex items-center gap-2">
               <select
                 id="modal-auction-round"
                 value={roundMode}
                 onChange={(e) => setRoundMode(e.target.value)}
-                className={inputClass}
+                className={fieldClass(showErrors && errors.auctionRound)}
               >
                 {ROUND_OPTIONS.map((r) => (
                   <option key={r} value={String(r)}>
@@ -322,13 +438,21 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
                   placeholder="회차 숫자"
                   value={customRound}
                   onChange={(e) => setCustomRound(e.target.value.replace(/\D/g, ""))}
-                  className={`${inputClass} w-32 tabular-nums`}
+                  className={fieldClass(
+                    showErrors && errors.auctionRound,
+                    "w-32 tabular-nums",
+                  )}
                 />
               )}
             </div>
             <p className="mt-2 text-xs text-gray-500">
               같은 사건번호라도 회차가 다르면 별도 접수로 처리됩니다.
             </p>
+            {showErrors && errors.auctionRound && (
+              <p className="mt-1.5 text-sm text-red-500">
+                매각회차를 1 이상 입력해주세요.
+              </p>
+            )}
           </div>
 
           {/* Phase 6 UX 수정: 빨간 경고 톤 → 슬레이트 뉴트럴 안내 톤.
@@ -347,17 +471,30 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
             </p>
           </div>
 
-          <label className="flex cursor-pointer items-start gap-2">
-            <input
-              type="checkbox"
-              checked={agreed}
-              onChange={(e) => setAgreed(e.target.checked)}
-              className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-[#00C853]"
-            />
-            <span className="flex-1 text-sm leading-6 text-[#111418]">
-              {CASE_CONFIRM_CHECKBOX_LABEL}
-            </span>
-          </label>
+          <div ref={agreedRef}>
+            <label
+              className={`flex cursor-pointer items-start gap-2 transition-colors duration-150 ${
+                showErrors && errors.agreed
+                  ? "rounded-xl border border-red-500 bg-red-50/30 p-3"
+                  : ""
+              }`}
+            >
+              <input
+                type="checkbox"
+                checked={agreed}
+                onChange={(e) => setAgreed(e.target.checked)}
+                className="mt-1 h-4 w-4 shrink-0 cursor-pointer accent-[#00C853]"
+              />
+              <span className="flex-1 text-sm leading-6 text-[#111418]">
+                {CASE_CONFIRM_CHECKBOX_LABEL}
+              </span>
+            </label>
+            {showErrors && errors.agreed && (
+              <p className="mt-1.5 text-sm text-red-500">
+                위임 책임에 동의해주세요.
+              </p>
+            )}
+          </div>
         </div>
 
         <div className="flex flex-col gap-3 border-t border-gray-200 bg-gray-50 px-6 py-5">
@@ -373,8 +510,7 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
               ref={submitRef}
               type="button"
               onClick={handleConfirm}
-              disabled={!canConfirm}
-              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--brand-green)] px-6 text-sm font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400 disabled:hover:bg-gray-200 sm:w-auto sm:flex-1"
+              className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full bg-[var(--brand-green)] px-6 text-sm font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 sm:w-auto sm:flex-1"
             >
               확인
             </button>
