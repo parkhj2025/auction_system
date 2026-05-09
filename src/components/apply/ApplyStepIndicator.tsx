@@ -51,14 +51,14 @@ export function ApplyStepIndicator({
                 <span>{currentStep?.label.replace(/\n/g, " ") ?? ""}</span>
               </p>
               {showMeta && (
-                <p className="truncate text-xs text-gray-600 sm:text-sm">
+                <p className="inline-flex max-w-full items-center self-start truncate rounded-md bg-gray-50 px-3 py-1.5 text-xs text-gray-700 sm:text-sm">
                   <span className="font-semibold tabular-nums text-[#111418]">
                     {caseNumber || "-"}
                   </span>
                   <span className="mx-1.5 text-gray-300" aria-hidden="true">·</span>
                   <span>{court || "-"}</span>
                   <span className="mx-1.5 text-gray-300" aria-hidden="true">·</span>
-                  매각기일{" "}
+                  매각기일&nbsp;
                   <span className="font-semibold tabular-nums text-[#111418]">
                     {bidDate || "-"}
                   </span>

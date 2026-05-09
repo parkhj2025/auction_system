@@ -114,8 +114,60 @@ export function FeeCalculator({
 }
 
 /**
- * Hero variant — Step2 본 박스 진입 전 인라인 박스.
- * paradigm: 본 박스 정합 (rounded-2xl border-gray-200 p-5 lg:p-8 flat).
+ * Inline variant — Step2 본 박스 안 마지막 inner box (재경매·공동입찰 paradigm 정합).
+ * paradigm: rounded-md + bg-surface-muted + p-4 + 가격 = text-base font-bold (본 입력 흐름 우선).
+ */
+export function FeeCalculatorInline({ fm }: { fm: AnalysisFrontmatter | null }) {
+  const fee = fm
+    ? computeFee(fm.bidDate)
+    : {
+        tier: "earlybird" as const,
+        tierLabel: "사전 신청가",
+        baseFee: 50000,
+        successBonus: 50000,
+        daysUntilBid: 7,
+        description: "입찰일 7일 이상 전 신청",
+      };
+  const isPastBid = fee.daysUntilBid < 0;
+
+  return (
+    <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4">
+      <div className="flex items-start gap-3">
+        <Wallet
+          size={18}
+          aria-hidden="true"
+          className="mt-0.5 shrink-0 text-[var(--color-ink-700)]"
+        />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-baseline gap-x-2 gap-y-1">
+            <p className="text-xs font-bold uppercase tracking-wider text-[#00C853]">
+              {fee.tierLabel}
+            </p>
+            <p className="text-base font-bold tabular-nums text-[var(--color-ink-900)]">
+              {formatKoreanWon(fee.baseFee)}
+            </p>
+            {fm && !isPastBid && (
+              <span className="text-xs text-[var(--color-ink-500)]">
+                입찰일까지 {fee.daysUntilBid}일
+              </span>
+            )}
+          </div>
+          <p className="mt-1 text-xs leading-5 text-[var(--color-ink-700)]">
+            {fee.description} · 신청 시점에 확정. 낙찰 성공보수{" "}
+            <strong className="text-[var(--color-ink-900)]">
+              +{formatKoreanWon(fee.successBonus)}
+            </strong>
+            은 낙찰 시에만 청구되며, 패찰 시 보증금은 당일 즉시 반환됩니다.
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/**
+ * Hero variant — 본 박스 정합 독립 박스 (cycle 1-D 영역 가능성 / 현재 mount 0).
+ * paradigm: rounded-2xl border-gray-200 p-5 lg:p-8 flat.
  * 안내 영역 = tier 라벨 + 가격 + 신청 시점 + 성공보수 안내 (보증금 미노출).
  */
 export function FeeCalculatorHero({ fm }: { fm: AnalysisFrontmatter | null }) {

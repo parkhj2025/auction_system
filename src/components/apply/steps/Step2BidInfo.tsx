@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
 import type { ApplyFormData, ApplyBidInfo } from "@/types/apply";
 import { formatPhone } from "@/lib/apply";
 import { cn, formatKoreanWon } from "@/lib/utils";
-import { FeeCalculatorHero } from "../FeeCalculator";
+import { FeeCalculatorInline } from "../FeeCalculator";
 import { PhoneVerifyModal } from "../PhoneVerifyModal";
 import { VerifiedBadge } from "../VerifiedBadge";
 import type { PhoneVerifyResult } from "@/lib/auth/phoneVerify";
@@ -142,8 +142,6 @@ export function Step2BidInfo({
           </button>
         )}
       </header>
-
-      <FeeCalculatorHero fm={data.matchedPost} />
 
       <fieldset
         disabled={inputsDisabled}
@@ -408,6 +406,8 @@ export function Step2BidInfo({
               </div>
             )}
           </div>
+
+          <FeeCalculatorInline fm={data.matchedPost} />
       </fieldset>
 
       <div className="flex items-center justify-between gap-2 pt-2">
