@@ -84,7 +84,7 @@ export function Step5Complete({
         </p>
       </header>
 
-      <section className="rounded-2xl border border-[var(--color-border)] bg-white p-6">
+      <section className="rounded-2xl border border-gray-200 bg-white p-5 lg:p-8">
         <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
           01. 수수료 송금
         </h3>
@@ -105,7 +105,7 @@ export function Step5Complete({
       </section>
 
       {deposit !== null && (
-        <section className="rounded-2xl border border-[var(--color-border)] bg-white p-6">
+        <section className="rounded-2xl border border-gray-200 bg-white p-5 lg:p-8">
           <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
             02. 보증금 송금
           </h3>
@@ -215,7 +215,7 @@ export function Step5Complete({
 
       {/* 온라인 결제 (준비 중) — PAYMENT_PG_ENABLED 플래그 기반 */}
       {!PAYMENT_PG_ENABLED && (
-        <section className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface-muted)] p-6">
+        <section className="rounded-2xl border border-dashed border-gray-200 bg-[var(--color-surface-muted)] p-5 lg:p-8">
           <div className="flex items-start gap-4">
             <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-100)] text-[var(--color-ink-500)]">
               <CreditCard size={18} aria-hidden="true" />
@@ -240,7 +240,7 @@ export function Step5Complete({
         </section>
       )}
 
-      <section className="rounded-2xl border border-[var(--color-border)] bg-white p-6">
+      <section className="rounded-2xl border border-gray-200 bg-white p-5 lg:p-8">
         <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
           다음 단계
         </h3>

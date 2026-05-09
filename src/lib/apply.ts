@@ -38,7 +38,7 @@ export function computeFee(bidDateIso: string): FeeComputation {
 
   const tierMeta: Record<FeeTier, { label: string; description: string }> = {
     earlybird: {
-      label: "얼리버드",
+      label: "사전 신청가",
       description: "입찰일 7일 이상 전 신청",
     },
     standard: {

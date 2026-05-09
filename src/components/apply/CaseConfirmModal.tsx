@@ -515,13 +515,6 @@ export function CaseConfirmModal({ data, onChange, onReturn }: Props) {
               확인
             </button>
           </div>
-          <p className="text-center text-xs leading-5 text-gray-500">
-            * 모든 항목을 입력해야 진행할 수 있습니다. 사건번호가 잘못된 경우 좌측{" "}
-            <span className="font-bold text-[#111418]">
-              &ldquo;사건번호 다시 입력&rdquo;
-            </span>{" "}
-            버튼을 눌러주세요.
-          </p>
         </div>
       </div>
     </div>

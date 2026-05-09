@@ -5,7 +5,8 @@ import type { AnalysisFrontmatter } from "@/types/content";
 
 /**
  * 신청 시점 기준 수수료 + 보증금 안내 카드.
- * Step 2, Step 4, Step 5에서 재사용.
+ * - 기본(card) variant: 보증금 영역 포함. Step5 등에서 사용.
+ * - hero variant: Step body header 아래 인라인 박스. 보증금 영역 미노출.
  */
 export function FeeCalculator({
   fm,
@@ -14,12 +15,12 @@ export function FeeCalculator({
   fm: AnalysisFrontmatter | null;
   bidAmount?: number;
 }) {
-  // 매칭된 물건이 없으면 얼리버드 가격을 기본 안내로 표시 (대리 입찰 신청 가이드 용도)
+  // 매칭된 물건이 없으면 사전 신청가를 기본 안내로 표시 (대리 입찰 신청 가이드 용도)
   const fee = fm
     ? computeFee(fm.bidDate)
     : {
         tier: "earlybird" as const,
-        tierLabel: "얼리버드",
+        tierLabel: "사전 신청가",
         baseFee: 50000,
         successBonus: 50000,
         daysUntilBid: 7,
@@ -108,6 +109,75 @@ export function FeeCalculator({
           </div>
         </div>
       )}
+    </div>
+  );
+}
+
+/**
+ * Hero variant — Step2 본 박스 진입 전 인라인 박스.
+ * paradigm: 본 박스 정합 (rounded-2xl border-gray-200 p-5 lg:p-8 flat).
+ * 안내 영역 = tier 라벨 + 가격 + 신청 시점 + 성공보수 안내 (보증금 미노출).
+ */
+export function FeeCalculatorHero({ fm }: { fm: AnalysisFrontmatter | null }) {
+  const fee = fm
+    ? computeFee(fm.bidDate)
+    : {
+        tier: "earlybird" as const,
+        tierLabel: "사전 신청가",
+        baseFee: 50000,
+        successBonus: 50000,
+        daysUntilBid: 7,
+        description: "입찰일 7일 이상 전 신청",
+      };
+  const isPastBid = fee.daysUntilBid < 0;
+
+  return (
+    <div className="rounded-2xl border border-gray-200 bg-white p-5 lg:p-8">
+      <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-6">
+        {/* 좌측: tier + 가격 + 신청시점 */}
+        <div className="flex items-start gap-4 sm:flex-1">
+          <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-50)] text-[var(--color-ink-900)]">
+            <Wallet size={22} aria-hidden="true" />
+          </span>
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <p className="text-[11px] font-black uppercase tracking-wider text-[#00C853]">
+                {fee.tierLabel}
+              </p>
+              {fm && !isPastBid && (
+                <span className="text-[11px] text-[var(--color-ink-500)]">
+                  입찰일까지 {fee.daysUntilBid}일
+                </span>
+              )}
+            </div>
+            <p className="mt-1 text-h2 font-black tabular-nums text-[var(--color-ink-900)]">
+              {formatKoreanWon(fee.baseFee)}
+            </p>
+            <p className="mt-1 text-xs text-[var(--color-ink-500)]">
+              {fee.description} · 신청 시점에 확정
+            </p>
+          </div>
+        </div>
+        {/* 우측: 성공보수 안내 */}
+        <div className="flex items-start gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] px-4 py-3 text-xs sm:max-w-xs sm:shrink-0">
+          <Info
+            size={14}
+            className="mt-0.5 shrink-0 text-[var(--color-ink-500)]"
+            aria-hidden="true"
+          />
+          <p className="leading-5 text-[var(--color-ink-700)]">
+            낙찰 성공보수{" "}
+            <strong className="text-[var(--color-ink-900)]">
+              +{formatKoreanWon(fee.successBonus)}
+            </strong>
+            은 낙찰 시에만 청구됩니다. 패찰 시{" "}
+            <strong className="text-[var(--color-ink-900)]">
+              보증금 당일 즉시 반환
+            </strong>
+            됩니다.
+          </p>
+        </div>
+      </div>
     </div>
   );
 }

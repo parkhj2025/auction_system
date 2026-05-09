@@ -13,7 +13,7 @@
  */
 
 export const FEES = {
-  earlybird: 50_000, // 얼리버드 (입찰일 7일+ 전)
+  earlybird: 50_000, // 사전 신청가 (입찰일 7일+ 전)
   standard: 70_000, // 일반 (2~7일 전)
   rush: 100_000, // 급건 (2일 이내)
   successBonus: 50_000, // 낙찰 성공보수

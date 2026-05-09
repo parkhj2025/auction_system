@@ -6,43 +6,69 @@ import { APPLY_STEPS, type ApplyStepId } from "@/lib/constants";
 import { cn } from "@/lib/utils";
 import { ApplyGuideModal } from "./ApplyGuideModal";
 
-/* Stage 2 cycle 1-A 보강 2 — ApplyStepIndicator 광역 재구성.
- * 2-row paradigm:
- *   상단 row = 현재 단계 강조 (좌) + 도움말 버튼 (우)
- *   중간 row = 5 step 원 + 라벨 (광역 노출 / 모바일·데스크탑 광역) + progress line
+/* Stage 2 cycle 1-B 보강 1 — ApplyStepIndicator 광역 재구성.
+ * 2-row paradigm + sticky top + 매칭 메타 inline:
+ *   상단 row = STEP 강조 + 매칭 메타 (Step2~4 단독) (좌) + 도움말 버튼 (우)
+ *   중간 row = 5 step 원 + 라벨 + progress line (광역 노출)
+ * sticky top-0 z-30 = scroll 시 상단 고정.
  * 토큰 매핑 = #111418 charcoal + #00C853 green + gray-* (메인 정합).
- * client component 변환 (도움말 modal state 광역). */
+ * client component (도움말 modal state). */
 
 export function ApplyStepIndicator({
   current,
   completed,
+  caseNumber,
+  court,
+  bidDate,
 }: {
   current: ApplyStepId;
   completed: Set<ApplyStepId>;
+  caseNumber?: string;
+  court?: string;
+  bidDate?: string;
 }) {
   const [guideOpen, setGuideOpen] = useState(false);
   const currentIndex = APPLY_STEPS.findIndex((s) => s.id === current);
   const currentStep = APPLY_STEPS[currentIndex];
   const stepNumber = currentIndex + 1;
+  // 매칭 메타 = Step2 (bid-info) / Step3 (documents) / Step4 (confirm) 단독.
+  const showMeta =
+    current === "bid-info" || current === "documents" || current === "confirm";
 
   return (
     <>
       <nav
         aria-label="신청 진행 단계"
-        className="border-b border-[var(--color-border)] bg-white"
+        className="sticky top-0 z-30 border-b border-[var(--color-border)] bg-white"
       >
         <div className="container-app py-5">
-          {/* 상단 row — 현재 단계 강조 + 도움말 버튼. */}
-          <div className="flex items-center justify-between">
-            <p className="text-[15px] font-bold text-[#111418] sm:text-[17px]">
-              <span className="text-[#00C853]">STEP {stepNumber} / 5</span>
-              <span className="mx-2 text-gray-300" aria-hidden="true">·</span>
-              <span>{currentStep?.label ?? ""}</span>
-            </p>
+          {/* 상단 row — STEP 강조 + 매칭 메타 (조건부) + 도움말 버튼. */}
+          <div className="flex items-start justify-between gap-3">
+            <div className="flex min-w-0 flex-col gap-1">
+              <p className="text-[15px] font-bold text-[#111418] sm:text-[17px]">
+                <span className="text-[#00C853]">STEP {stepNumber} / 5</span>
+                <span className="mx-2 text-gray-300" aria-hidden="true">·</span>
+                <span>{currentStep?.label.replace(/\n/g, " ") ?? ""}</span>
+              </p>
+              {showMeta && (
+                <p className="truncate text-xs text-gray-600 sm:text-sm">
+                  <span className="font-semibold tabular-nums text-[#111418]">
+                    {caseNumber || "-"}
+                  </span>
+                  <span className="mx-1.5 text-gray-300" aria-hidden="true">·</span>
+                  <span>{court || "-"}</span>
+                  <span className="mx-1.5 text-gray-300" aria-hidden="true">·</span>
+                  매각기일{" "}
+                  <span className="font-semibold tabular-nums text-[#111418]">
+                    {bidDate || "-"}
+                  </span>
+                </p>
+              )}
+            </div>
             <button
               type="button"
               onClick={() => setGuideOpen(true)}
-              className="inline-flex h-8 items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-white px-3 text-[13px] font-medium text-gray-600 transition-colors duration-150 hover:bg-gray-50 hover:text-[#111418] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 sm:h-9 sm:px-4 sm:text-[14px]"
+              className="inline-flex h-8 shrink-0 items-center gap-1.5 rounded-full border border-[var(--color-border)] bg-white px-3 text-[13px] font-medium text-gray-600 transition-colors duration-150 hover:bg-gray-50 hover:text-[#111418] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 sm:h-9 sm:px-4 sm:text-[14px]"
               aria-label="신청 가이드 열기"
             >
               <HelpCircle size={16} aria-hidden="true" className="sm:h-[18px] sm:w-[18px]" />

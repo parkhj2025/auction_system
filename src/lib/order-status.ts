@@ -103,7 +103,7 @@ export const TIMELINE_STEPS = [
 export function getFeeTierLabel(tier: "earlybird" | "standard" | "rush"): string {
   switch (tier) {
     case "earlybird":
-      return "얼리버드";
+      return "사전 신청가";
     case "standard":
       return "일반";
     case "rush":

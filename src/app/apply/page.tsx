@@ -13,7 +13,7 @@ export const dynamic = "force-dynamic";
 export const metadata: Metadata = {
   title: "입찰 대리 신청",
   description:
-    "인천지방법원 경매 입찰 대리 웹 신청. 사건번호 확인 → 입찰 정보 → 서류 업로드 → 확인·제출 → 접수 완료. 얼리버드 5만원부터. 패찰 시 보증금 당일 즉시 반환.",
+    "인천지방법원 경매 입찰 대리 웹 신청. 사건번호 확인 → 입찰 정보 → 서류 업로드 → 확인·제출 → 접수 완료. 사전 신청가 5만원부터. 패찰 시 보증금 당일 즉시 반환.",
 };
 
 export default function ApplyPage() {

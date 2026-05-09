@@ -23,15 +23,12 @@ export function Step3Documents({
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
-            Step 3
-          </p>
+        <div className="flex items-start justify-between gap-3">
+          <h2 className="text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
+            서류를 업로드해주세요
+          </h2>
           <VerifiedBadge verified={data.verified} verifiedName={data.verifiedName} />
         </div>
-        <h2 className="mt-1 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
-          서류를 업로드해주세요
-        </h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
           대법원 전자민원에서 발급한 전자본인서명확인서와 신분증 사본이
           필요합니다. 두 서류는 위임장 작성과 본인 확인에 사용됩니다.
@@ -54,7 +51,7 @@ export function Step3Documents({
         </p>
       </div>
 
-      <div className="grid gap-4 rounded-2xl border border-[var(--color-border)] bg-white p-6 md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 rounded-2xl border border-gray-200 bg-white p-5 md:grid-cols-2 lg:grid-cols-3 lg:p-8">
         <FileUpload
           label="전자본인서명확인서"
           description="대법원 전자민원센터에서 발급한 PDF 파일을 올려주세요."

@@ -5,7 +5,7 @@ import { ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
 import type { ApplyFormData, ApplyBidInfo } from "@/types/apply";
 import { formatPhone } from "@/lib/apply";
 import { cn, formatKoreanWon } from "@/lib/utils";
-import { FeeCalculator } from "../FeeCalculator";
+import { FeeCalculatorHero } from "../FeeCalculator";
 import { PhoneVerifyModal } from "../PhoneVerifyModal";
 import { VerifiedBadge } from "../VerifiedBadge";
 import type { PhoneVerifyResult } from "@/lib/auth/phoneVerify";
@@ -121,22 +121,17 @@ export function Step2BidInfo({
 
   return (
     <div className="flex flex-col gap-6">
-      <header className="flex flex-col gap-2">
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
-            Step 2
-          </p>
-          <VerifiedBadge verified={data.verified} verifiedName={data.verifiedName} />
-        </div>
-        <div>
-          <h2 className="mt-1 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
+      <header className="flex flex-col gap-3">
+        <div className="flex items-start justify-between gap-3">
+          <h2 className="text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
             입찰 정보를 입력해주세요
           </h2>
-          <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
-            입찰 희망 금액과 신청인 정보는 위임 서류 작성에 사용됩니다.
-            입력하신 정보는 암호화되어 전달되며 접수 외 용도로 사용되지 않습니다.
-          </p>
+          <VerifiedBadge verified={data.verified} verifiedName={data.verifiedName} />
         </div>
+        <p className="text-sm leading-6 text-[var(--color-ink-500)]">
+          입찰 희망 금액과 신청인 정보는 위임 서류 작성에 사용됩니다.
+          입력하신 정보는 암호화되어 전달되며 접수 외 용도로 사용되지 않습니다.
+        </p>
         {!data.verified && (
           <button
             type="button"
@@ -148,11 +143,12 @@ export function Step2BidInfo({
         )}
       </header>
 
+      <FeeCalculatorHero fm={data.matchedPost} />
+
       <fieldset
         disabled={inputsDisabled}
-        className="grid gap-6 disabled:opacity-60 lg:grid-cols-[1.2fr_1fr]"
+        className="flex flex-col gap-6 rounded-2xl border border-gray-200 bg-white p-5 disabled:opacity-60 lg:p-8"
       >
-        <div className="flex flex-col gap-4 rounded-2xl border border-[var(--color-border)] bg-white p-6">
           {/* 입찰 금액 */}
           <div>
             <label
@@ -412,11 +408,6 @@ export function Step2BidInfo({
               </div>
             )}
           </div>
-        </div>
-
-        <aside>
-          <FeeCalculator fm={data.matchedPost} bidAmount={bidAmountNum} />
-        </aside>
       </fieldset>
 
       <div className="flex items-center justify-between gap-2 pt-2">

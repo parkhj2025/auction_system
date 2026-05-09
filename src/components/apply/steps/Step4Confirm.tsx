@@ -167,15 +167,12 @@ export function Step4Confirm({
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <div className="flex items-center justify-between gap-2">
-          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
-            Step 4
-          </p>
+        <div className="flex items-start justify-between gap-3">
+          <h2 className="text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
+            서명하고 위임에 동의해주세요
+          </h2>
           <VerifiedBadge verified={data.verified} verifiedName={data.verifiedName} />
         </div>
-        <h2 className="mt-1 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
-          서명하고 위임에 동의해주세요
-        </h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
           위임장에 서명하고 3가지 항목에 동의하시면 제출이 가능합니다. 제출 후
           접수번호가 발급되며, 전용계좌 정보를 안내드립니다.
@@ -185,7 +182,7 @@ export function Step4Confirm({
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <section className="flex flex-col gap-4">
           {/* 입력 요약 */}
-          <div className="rounded-2xl border border-[var(--color-border)] bg-white p-6">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 lg:p-8">
             <h3 className="text-sm font-black text-[var(--color-ink-900)]">
               입찰 정보 요약
             </h3>
@@ -239,7 +236,7 @@ export function Step4Confirm({
           </div>
 
           {/* 서명 영역 */}
-          <div className="rounded-2xl border border-[var(--color-border)] bg-white p-6">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 lg:p-8">
             <h3 className="text-sm font-black text-[var(--color-ink-900)]">
               위임인 서명
             </h3>
@@ -258,7 +255,7 @@ export function Step4Confirm({
           </div>
 
           {/* 3개 동의 + 미리보기 */}
-          <div className="rounded-2xl border border-[var(--color-border)] bg-white p-6">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5 lg:p-8">
             <h3 className="text-sm font-black text-[var(--color-ink-900)]">동의</h3>
             <ul className="mt-4 flex flex-col gap-2 text-sm leading-6 text-[var(--color-ink-700)]">
               <li className="flex items-start gap-2">

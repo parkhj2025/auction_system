@@ -236,10 +236,7 @@ export function Step1Property({
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
-          Step 1
-        </p>
-        <h2 className="mt-1 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
+        <h2 className="text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
           법원과 사건번호를 입력해주세요
         </h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
