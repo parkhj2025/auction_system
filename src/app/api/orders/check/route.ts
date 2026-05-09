@@ -1,9 +1,30 @@
+/**
+ * cycle 1-D-A-3-2 = 크롤링 paradigm 광역 전환 (mass 수집 → on-demand 단일 fetch).
+ *
+ * 흐름 광역:
+ *   1. auth 광역 (login 의무)
+ *   2. round 명시 시 = is_case_active RPC 광역 중복 체크
+ *   3. court_listings cache lookup (TTL 24h 광역 = `last_seen_at >= NOW() - 24h`)
+ *   4. cache HIT = 즉시 회신
+ *   5. cache MISS = 대법원 광역 fetch (search.ts) + mapper + upsert + 즉시 회신
+ *   6. fetch NG = listings [] 회신 (client manualEntry 자동 진입)
+ *
+ * bid_date filter 광역 폐기 (cycle 1-D-A-4 영역 통합 사전 정합).
+ * is_active filter 광역 보존 (종결 사건 광역 분기 = cycle 1-D-A-4 영역).
+ */
+
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { CourtListingSummary } from "@/types/apply";
+import { fetchSingleCase } from "@/lib/courtAuction/search";
+import { mapRecordToRow } from "@/lib/courtAuction/mapper";
 
 export const dynamic = "force-dynamic";
+export const runtime = "nodejs";
+export const maxDuration = 30;
+
+const CACHE_TTL_HOURS = 24;
 
 interface RawListing {
   docid: string;
@@ -26,6 +47,9 @@ interface RawListing {
   case_title: string | null;
 }
 
+const LISTING_SELECT =
+  "docid, court_name, case_number, address_display, appraisal_amount, min_bid_amount, bid_date, bid_time, usage_name, area_display, failed_count, item_sequence, mokmul_sequence, photos_fetched_at, sido, sigungu, dong, case_title";
+
 /**
  * mokmul 단위 row → item 단위로 그룹핑.
  * 같은 (case_number, item_sequence) 조합의 mokmul들을 통합.
@@ -41,10 +65,14 @@ function groupByItem(rows: RawListing[]): CourtListingSummary[] {
 
   const result: CourtListingSummary[] = [];
   for (const [, group] of map) {
-    // 대표 row 선택: 건물명이 있는 것 우선, 없으면 첫 번째
     const representative =
       group.find((r) => r.address_display?.includes("(")) ??
-      group.find((r) => r.usage_name && !r.usage_name.includes("대지") && !r.usage_name.includes("토지")) ??
+      group.find(
+        (r) =>
+          r.usage_name &&
+          !r.usage_name.includes("대지") &&
+          !r.usage_name.includes("토지"),
+      ) ??
       group[0];
 
     result.push({
@@ -54,7 +82,6 @@ function groupByItem(rows: RawListing[]): CourtListingSummary[] {
     });
   }
 
-  // bid_date → item_sequence 순 정렬 유지
   result.sort((a, b) => {
     const d = (a.bid_date ?? "").localeCompare(b.bid_date ?? "");
     if (d !== 0) return d;
@@ -64,12 +91,50 @@ function groupByItem(rows: RawListing[]): CourtListingSummary[] {
   return result;
 }
 
+type AdminClient = ReturnType<typeof createAdminClient>;
+
+/** cache lookup — TTL 24h 광역 + is_active=true + court_code/court_name filter. */
+async function lookupCache(
+  admin: AdminClient,
+  caseNumber: string,
+  courtCode: string,
+  courtName: string,
+): Promise<RawListing[]> {
+  const cutoffIso = new Date(
+    Date.now() - CACHE_TTL_HOURS * 60 * 60 * 1000,
+  ).toISOString();
+
+  let query = admin
+    .from("court_listings")
+    .select(LISTING_SELECT)
+    .eq("case_number", caseNumber)
+    .eq("is_active", true)
+    .gte("last_seen_at", cutoffIso);
+
+  if (courtCode) {
+    query = query.eq("court_code", courtCode);
+  } else if (courtName) {
+    query = query.eq("court_name", courtName);
+  }
+
+  const { data, error } = await query
+    .order("bid_date", { ascending: true })
+    .order("item_sequence", { ascending: true })
+    .order("mokmul_sequence", { ascending: true });
+
+  if (error) {
+    console.error("[orders/check] cache lookup failed", error);
+    return [];
+  }
+  return (data ?? []) as RawListing[];
+}
+
 /**
  * 사건번호 중복 확인 + court_listings 매칭 엔드포인트.
  *
  * Step1Property에서 사건번호 입력 후 호출.
  * - 중복 확인: `is_case_active()` RPC (기존)
- * - 매칭: court_listings 조회 → listings 배열 반환 (D2 court_code 필터, D3 복수 매칭)
+ * - 매칭: cache → on-demand fetch → upsert paradigm (cycle 1-D-A-3-2).
  */
 export async function POST(req: Request) {
   try {
@@ -81,26 +146,28 @@ export async function POST(req: Request) {
     if (!user) {
       return NextResponse.json(
         { available: null, error: "unauthenticated", listings: [] },
-        { status: 401 }
+        { status: 401 },
       );
     }
 
     const body = (await req.json().catch(() => null)) as
-      | { caseNumber?: string; courtCode?: string; courtName?: string; round?: number }
+      | {
+          caseNumber?: string;
+          courtCode?: string;
+          courtName?: string;
+          round?: number;
+        }
       | null;
     const caseNumber = body?.caseNumber?.trim() ?? "";
     const courtCode = body?.courtCode?.trim() ?? "";
     const courtName = body?.courtName?.trim() ?? "";
-    // Phase 6.7.6: 중복 체크는 round가 명시될 때만 수행.
-    // round 미제공(Step1 최초 lookup) → 체크 스킵 + listings만 리턴. 사용자가
-    // listing 선택 또는 CaseConfirmModal에서 round 확정한 후에 클라이언트가 재호출.
     const round =
       typeof body?.round === "number" && body.round >= 1 ? body.round : null;
 
     if (!caseNumber) {
       return NextResponse.json(
         { available: null, error: "invalid_input", listings: [] },
-        { status: 400 }
+        { status: 400 },
       );
     }
 
@@ -129,49 +196,61 @@ export async function POST(req: Request) {
       }
     }
 
-    // 2. court_listings 매칭 (D2: court_code 필터, D3: 배열 반환)
+    // 2. cache lookup (TTL 24h 광역 / cycle 1-D-A-3-2)
     const admin = createAdminClient();
-    let query = admin
-      .from("court_listings")
-      .select(
-        "docid, court_name, case_number, address_display, appraisal_amount, min_bid_amount, bid_date, bid_time, usage_name, area_display, failed_count, item_sequence, mokmul_sequence, photos_fetched_at, sido, sigungu, dong, case_title"
-      )
-      .eq("case_number", caseNumber)
-      .eq("is_active", true)
-      .gte("bid_date", new Date().toISOString().slice(0, 10));
+    let cached = await lookupCache(admin, caseNumber, courtCode, courtName);
 
-    // court_code 또는 court_name으로 필터 (D2)
-    // 둘 다 없으면 필터 없이 전체 검색 (typeahead에서 법원 무관 검색 시)
-    if (courtCode) {
-      query = query.eq("court_code", courtCode);
-    } else if (courtName) {
-      query = query.eq("court_name", courtName);
+    let cacheHit = cached.length > 0;
+    let fetchAttempted = false;
+    let fetchError: string | null = null;
+
+    // 3. cache MISS = 대법원 광역 on-demand fetch
+    if (!cacheHit && courtCode) {
+      fetchAttempted = true;
+      try {
+        const records = await fetchSingleCase({ courtCode, caseNumber });
+        if (records.length > 0) {
+          const rows = records.map((r) => mapRecordToRow(r, courtName));
+          // upsert (docid 기준)
+          const { error: upsertError } = await admin
+            .from("court_listings")
+            .upsert(rows, {
+              onConflict: "docid",
+              ignoreDuplicates: false,
+            });
+          if (upsertError) {
+            console.error("[orders/check] upsert failed", upsertError);
+          }
+          // 재조회 (upsert 사후 cache 광역 fresh)
+          cached = await lookupCache(
+            admin,
+            caseNumber,
+            courtCode,
+            courtName,
+          );
+          cacheHit = cached.length > 0;
+        }
+      } catch (err) {
+        fetchError = err instanceof Error ? err.message : "fetch_failed";
+        console.error("[orders/check] on-demand fetch failed", err);
+      }
     }
 
-    const { data: listings, error: listingsError } = await query.order(
-      "bid_date",
-      { ascending: true }
-    ).order("item_sequence", { ascending: true }).order(
-      "mokmul_sequence",
-      { ascending: true }
-    );
-
-    if (listingsError) {
-      console.error("[orders/check] listings query failed", listingsError);
-    }
-
-    // item 단위로 그룹핑 (같은 item의 mokmul들을 통합)
-    const grouped = groupByItem(listings ?? []);
+    const grouped = groupByItem(cached);
 
     return NextResponse.json({
       available: true,
       listings: grouped,
+      // 광역 진단 hint (client = manualEntry 분기 결정 영역 외 / 본 필드 단독 정보 단독)
+      cache_hit: cacheHit,
+      fetch_attempted: fetchAttempted,
+      fetch_error: fetchError,
     });
   } catch (err) {
     console.error("[orders/check]", err);
     return NextResponse.json(
       { available: null, error: "server_error", listings: [] },
-      { status: 500 }
+      { status: 500 },
     );
   }
 }

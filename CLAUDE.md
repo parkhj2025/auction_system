@@ -713,6 +713,30 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 
 ---
 
+## 19. cycle 1-D-A-3-2 — 크롤링 paradigm 광역 전환 (2026-05-09)
+
+**의도**: mass 수집 paradigm → **on-demand 단일 fetch + DB cache (TTL 24h)** 광역 전환.
+
+**사유**:
+- mass 수집 paradigm = cron 미활성 + 로컬 수동 실행 → DB stale 광역 영구 발생 (cycle 1-D-A-3 root cause 진단 정합)
+- 사업 paradigm 정수 = 단일 사건 정확 매칭 (바토너 검증 paradigm 정합) — 광역 리스트 자동완성 영역 0
+- 인프라 광역 부담 ↓ + 매번 fresh data 광역
+
+**광역 paradigm**:
+1. **DB cache (TTL 24h)** — court_listings.last_seen_at 광역 컬럼 분기 (`>= NOW() - 24h`)
+2. **대법원 광역 fetch** — `src/lib/courtAuction/search.ts` 광역 단독 (`fetchSingleCase({ courtCode, caseNumber })`)
+3. **Mapper + upsert** — `src/lib/courtAuction/mapper.ts` (case_title 4-fallback chain 보존)
+4. **/api/orders/check 광역 = cache → fetch → upsert paradigm**
+
+**mass 수집 paradigm 광역 폐기**:
+- `scripts/crawler/index.mjs` + `api.mjs` + `mapper.mjs` + `session.mjs` + `codes.mjs` + `upsert.mjs` + `probe-photos.mjs` 광역 폐기
+- `scripts/run-crawler.sh` + `.bat` 광역 폐기
+- `.github/workflows/crawler-probe.yml` = workflow_dispatch fetch source 광역 검수 단독 보존 (자동 schedule cron 영역 0)
+
+**다음 cycle (1-D-A-4)**: UX 안내 강화 + bid_date filter 영역 광역 분기 + is_active 종결 사건 광역 분기.
+
+---
+
 ## Changelog
 
 | 버전 | 날짜 | 변경 |
