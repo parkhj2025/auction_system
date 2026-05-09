@@ -64,7 +64,7 @@ export function FileUpload({
       <div className="mb-2 flex items-center justify-between gap-2">
         <label
           htmlFor={id}
-          className="text-sm font-bold text-[var(--color-ink-900)]"
+          className="text-[var(--label-fs-app)] font-bold text-[var(--color-ink-900)]"
         >
           {label}
         </label>

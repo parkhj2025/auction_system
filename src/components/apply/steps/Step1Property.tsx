@@ -1,5 +1,6 @@
 "use client";
 
+// cycle 1-D-A-2 = 모바일 앱 form 토큰 광역 (input 56 / 라벨 16 / CTA 56 / gap 28).
 import { useEffect, useRef, useState } from "react";
 import {
   AlertCircle,
@@ -7,6 +8,7 @@ import {
   ArrowRight,
   Info,
   ChevronDown,
+  Loader2,
 } from "lucide-react";
 import type { AnalysisFrontmatter } from "@/types/content";
 import type { ApplyFormData, CourtListingSummary } from "@/types/apply";
@@ -50,6 +52,11 @@ export function Step1Property({
   const [caseTaken, setCaseTaken] = useState(false);
   const [checking, setChecking] = useState(false);
   const [listings, setListings] = useState<CourtListingSummary[]>([]);
+  // cycle 1-D-A-2: 매칭 상태 banner (checking / nomatch 3초 노출 사후 manualEntry 자동 진입).
+  const [matchStatus, setMatchStatus] = useState<
+    "idle" | "checking" | "nomatch"
+  >("idle");
+  const nomatchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const latestPatchRef = useRef(onChange);
   latestPatchRef.current = onChange;
@@ -61,6 +68,12 @@ export function Step1Property({
   // 매칭 조회는 명시적 액션(Enter/Blur/"사건번호 확인" 버튼)에서만 발동 — onChange 실시간 조회 완전 제거.
   // 정규식 \d+가 1자리 이상 허용하여 타이핑 중 모든 중간값이 트리거되던 문제 본질적 해결.
   useEffect(() => {
+    // cycle 1-D-A-2: 사용자 입력 변경 시 nomatch 타이머 광역 cancel + matchStatus reset.
+    if (nomatchTimerRef.current) {
+      clearTimeout(nomatchTimerRef.current);
+      nomatchTimerRef.current = null;
+    }
+    setMatchStatus("idle");
     setCaseTaken(false);
     setListings([]);
     if (
@@ -98,6 +111,7 @@ export function Step1Property({
     if (checking) return;
 
     setChecking(true);
+    setMatchStatus("checking");
     try {
       const res = await fetch("/api/orders/check", {
         method: "POST",
@@ -108,6 +122,7 @@ export function Step1Property({
       if (res.status === 401) {
         setCaseTaken(false);
         setListings([]);
+        setMatchStatus("idle");
         return;
       }
 
@@ -124,6 +139,7 @@ export function Step1Property({
 
       if (resultListings.length === 1) {
         const l = resultListings[0];
+        setMatchStatus("idle");
         latestPatchRef.current({
           matchedListing: l,
           matchedPost: null,
@@ -143,6 +159,7 @@ export function Step1Property({
               p.caseNumber.replace(/\s/g, "") === q.replace(/\s/g, "")
           );
         if (fmMatch) {
+          setMatchStatus("idle");
           latestPatchRef.current({
             matchedPost: fmMatch,
             matchedListing: null,
@@ -156,21 +173,27 @@ export function Step1Property({
             auctionRound: 1,
           });
         } else {
-          // 매칭 0건 → manualEntry 자동 진입 → CaseConfirmModal 노출 트리거
-          latestPatchRef.current({
-            matchedPost: null,
-            matchedListing: null,
-            manualEntry: true,
-            bidDate: "",
-            propertyType: "",
-            propertyAddress: "",
-            caseConfirmedByUser: false,
-            caseConfirmedAt: null,
-            auctionRound: 1,
-          });
+          // cycle 1-D-A-2: 매칭 0건 → 3초 안내 사후 manualEntry 자동 진입.
+          setMatchStatus("nomatch");
+          nomatchTimerRef.current = setTimeout(() => {
+            latestPatchRef.current({
+              matchedPost: null,
+              matchedListing: null,
+              manualEntry: true,
+              bidDate: "",
+              propertyType: "",
+              propertyAddress: "",
+              caseConfirmedByUser: false,
+              caseConfirmedAt: null,
+              auctionRound: 1,
+            });
+            setMatchStatus("idle");
+            nomatchTimerRef.current = null;
+          }, 3000);
         }
       } else {
         // 복수 매칭 → 사용자가 selectListing으로 선택 대기
+        setMatchStatus("idle");
         latestPatchRef.current({
           matchedPost: null,
           matchedListing: null,
@@ -186,6 +209,7 @@ export function Step1Property({
     } catch {
       setCaseTaken(false);
       setListings([]);
+      setMatchStatus("idle");
     } finally {
       setChecking(false);
     }
@@ -250,7 +274,7 @@ export function Step1Property({
           <div>
             <label
               htmlFor="step1-court"
-              className="mb-1 block text-xs font-bold text-[var(--color-ink-700)]"
+              className="mb-2.5 block text-[var(--label-fs-app)] font-bold text-[var(--color-ink-700)]"
             >
               법원
             </label>
@@ -258,7 +282,7 @@ export function Step1Property({
               id="step1-court"
               value={data.court}
               onChange={(e) => onChange({ court: e.target.value })}
-              className="h-12 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-3 text-sm font-semibold text-[var(--color-ink-900)]"
+              className="h-[var(--input-h-app)] w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-3 text-[length:var(--text-body)] font-semibold text-[var(--color-ink-900)]"
             >
               {regionGroups.map((group) => (
                 <optgroup key={group.region} label={group.region}>
@@ -280,7 +304,7 @@ export function Step1Property({
           <div>
             <label
               htmlFor="step1-case"
-              className="mb-1 block text-xs font-bold text-[var(--color-ink-700)]"
+              className="mb-2.5 block text-[var(--label-fs-app)] font-bold text-[var(--color-ink-700)]"
             >
               사건번호
             </label>
@@ -304,7 +328,7 @@ export function Step1Property({
                   }
                 }}
                 onBlur={() => void triggerLookup()}
-                className="h-12 w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-[length:var(--text-body)] tabular-nums text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] sm:flex-1"
+                className="h-[var(--input-h-app)] w-full rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-[length:var(--text-body)] tabular-nums text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] transition-colors duration-150 focus:border-[var(--brand-green)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)]/20 sm:flex-1"
               />
               <button
                 type="button"
@@ -315,10 +339,10 @@ export function Step1Property({
                   data.caseConfirmedByUser
                 }
                 className={cn(
-                  "inline-flex h-12 w-full items-center justify-center rounded-full px-5 text-sm font-bold transition-colors duration-150 sm:w-auto sm:shrink-0",
+                  "inline-flex h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-full px-5 text-sm font-bold transition-colors duration-150 sm:w-auto sm:shrink-0",
                   data.caseConfirmedByUser
                     ? "cursor-default bg-gray-100 text-gray-500"
-                    : "bg-[#00C853] text-white hover:bg-[var(--brand-green-deep)] disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
+                    : "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)] disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
                 )}
               >
                 {data.caseConfirmedByUser
@@ -335,6 +359,28 @@ export function Step1Property({
           예정입니다.
         </p>
       </div>
+
+      {/* cycle 1-D-A-2: 매칭 상태 banner */}
+      {matchStatus === "checking" && (
+        <div
+          role="status"
+          className="flex items-center gap-2 rounded-xl border border-[var(--color-info)]/30 bg-[var(--color-info-soft)] px-4 py-3 text-sm font-medium text-[var(--color-info)]"
+        >
+          <Loader2 size={16} aria-hidden="true" className="animate-spin" />
+          사건 정보 조회 중...
+        </div>
+      )}
+      {matchStatus === "nomatch" && (
+        <div
+          role="alert"
+          className="flex items-start gap-2 rounded-xl border border-[var(--color-warning)]/30 bg-[var(--color-warning-soft)] px-4 py-3 text-sm leading-6 text-[var(--color-warning)]"
+        >
+          <Info size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
+          <p>
+            사건 정보를 자동으로 가져올 수 없습니다. 잠시 후 직접 입력 화면으로 이동합니다.
+          </p>
+        </div>
+      )}
 
       {/* 서비스 불가 지역 안내 (차단 아님) */}
       {isNonServicedCourt && (
@@ -638,9 +684,9 @@ export function Step1Property({
           onClick={handleNext}
           disabled={!canProceed}
           className={cn(
-            "inline-flex min-h-12 items-center gap-2 rounded-full px-6 text-sm font-black transition-colors duration-150",
+            "inline-flex min-h-[var(--cta-h-app)] items-center gap-2 rounded-full px-6 text-sm font-black transition-colors duration-150",
             canProceed
-              ? "bg-[#00C853] text-white hover:bg-[var(--brand-green-deep)]"
+              ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)]"
               : "cursor-not-allowed bg-gray-200 text-gray-400"
           )}
         >

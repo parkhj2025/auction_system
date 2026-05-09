@@ -277,14 +277,14 @@ export function Step5Complete({
       <div className="flex flex-col gap-2 sm:flex-row">
         <Link
           href="/analysis"
-          className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-900)] hover:bg-[var(--color-ink-100)]"
+          className="inline-flex min-h-[var(--cta-h-app)] flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-900)] hover:bg-[var(--color-ink-100)]"
         >
           <FileText size={16} aria-hidden="true" />
           다른 물건분석 보기
         </Link>
         <Link
           href="/"
-          className="inline-flex min-h-12 flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-5 text-sm font-bold text-white hover:bg-black"
+          className="inline-flex min-h-[var(--cta-h-app)] flex-1 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-5 text-sm font-bold text-white hover:bg-black"
         >
           <Home size={16} aria-hidden="true" />
           홈으로

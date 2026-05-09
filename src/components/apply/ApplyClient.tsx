@@ -38,7 +38,8 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
     ...(initialCourt ? { court: initialCourt } : {}),
   });
   const [currentStep, setCurrentStep] = useState<ApplyStepId>("property");
-  const [completed, setCompleted] = useState<Set<ApplyStepId>>(new Set());
+  // cycle 1-D-A-2: completed state는 setter만 사용 (5 step 원 paradigm 폐기 / 추후 진행 추적 영역).
+  const [, setCompleted] = useState<Set<ApplyStepId>>(new Set());
   const [submitting, setSubmitting] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const [applicationId, setApplicationId] = useState<string | null>(null);
@@ -320,15 +321,16 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
 
   return (
     <>
-      <ApplyStepIndicator
-        current={currentStep}
-        completed={completed}
-        caseNumber={data.caseNumber}
-        court={data.court}
-        bidDate={data.bidDate}
-        hasMatchedListing={!!data.matchedListing}
-      />
-      <section className="container-app py-10 lg:py-16">
+      {/* cycle 1-D-A-2 = 하단 fixed bar paradigm. completed/caseNumber/court/bidDate/hasMatchedListing
+          props 광역 폐기 정합 (5 step 원 + 매칭 메타 line 광역 폐기 정수). */}
+      <ApplyStepIndicator current={currentStep} />
+      <section
+        className="container-app pt-10 lg:pt-16"
+        style={{
+          paddingBottom:
+            "calc(var(--apply-bottom-bar-h) + env(safe-area-inset-bottom) + 24px)",
+        }}
+      >
         {showSidebar && data.matchedListing ? (
           <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
             <div className="min-w-0">{stepView}</div>

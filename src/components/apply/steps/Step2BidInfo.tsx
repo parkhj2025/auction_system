@@ -1,5 +1,6 @@
 "use client";
 
+// cycle 1-D-A-2 = 모바일 앱 form 토큰 광역 + minPrice fallback (matchedListing) + belowMin enforcement.
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
 import type { ApplyFormData, ApplyBidInfo } from "@/types/apply";
@@ -69,14 +70,22 @@ export function Step2BidInfo({
     if (Object.keys(patch).length > 0) onBidInfoChange(patch);
   }
   const bidAmountNum = Number(bid.bidAmount.replace(/[^\d]/g, "")) || 0;
-  const minPrice = data.matchedPost?.minPrice ?? 0;
-  const belowMin =
-    data.matchedPost !== null && bidAmountNum > 0 && bidAmountNum < minPrice;
+  // cycle 1-D-A-2: matchedListing.min_bid_amount fallback + matchedPost 보조.
+  const minPrice =
+    data.matchedListing?.min_bid_amount ??
+    data.matchedPost?.minPrice ??
+    0;
+  const hasMinPrice =
+    data.matchedListing !== null || data.matchedPost !== null;
+  const belowMin = hasMinPrice && bidAmountNum > 0 && bidAmountNum < minPrice;
 
   function validate(): { ok: boolean; errors: Record<string, string> } {
     const next: Record<string, string> = {};
     if (!bid.bidAmount.trim() || bidAmountNum <= 0)
       next.bidAmount = "입찰 희망 금액을 입력해주세요.";
+    // cycle 1-D-A-2: 최저가 미만 입찰 enforcement (단순 안내 → 차단).
+    else if (belowMin)
+      next.bidAmount = `최저가(${minPrice.toLocaleString("ko-KR")}원) 이상으로 입력해주세요.`;
     if (!bid.applicantName.trim()) next.applicantName = "성함을 입력해주세요.";
     if (!/^\d{3}-\d{3,4}-\d{4}$/.test(bid.phone))
       next.phone = "010-0000-0000 형식으로 입력해주세요.";
@@ -112,8 +121,9 @@ export function Step2BidInfo({
   }
 
   function inputClass(key: string) {
+    // cycle 1-D-A-2: input height = var(--input-h-app) (56px / 모바일 앱 표준).
     const base =
-      "h-12 w-full rounded-[var(--radius-md)] border bg-white px-4 text-[length:var(--text-body)] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] transition-colors duration-150 focus:outline-none";
+      "h-[var(--input-h-app)] w-full rounded-[var(--radius-md)] border bg-white px-4 text-[length:var(--text-body)] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] transition-colors duration-150 focus:outline-none";
     return errors[key]
       ? `${base} border-[var(--color-accent-red)] ring-2 ring-[var(--color-accent-red)]/20`
       : `${base} border-[var(--color-border)] focus:border-[var(--brand-green)] focus:ring-2 focus:ring-[var(--brand-green)]/20`;
@@ -151,7 +161,7 @@ export function Step2BidInfo({
           <div>
             <label
               htmlFor="bid-amount"
-              className="mb-2 block text-sm font-bold text-[var(--color-ink-900)]"
+              className="mb-2.5 block text-[var(--label-fs-app)] font-bold text-[var(--color-ink-900)]"
             >
               입찰 희망 금액 <span className="text-[var(--color-accent-red)]">*</span>
             </label>
@@ -161,7 +171,7 @@ export function Step2BidInfo({
                 type="text"
                 inputMode="numeric"
                 placeholder={
-                  minPrice > 0
+                  hasMinPrice && minPrice > 0
                     ? `최저가 ${minPrice.toLocaleString("ko-KR")}원 이상`
                     : "원 단위로 입력"
                 }
@@ -202,7 +212,7 @@ export function Step2BidInfo({
             <div>
               <label
                 htmlFor="applicant-name"
-                className="mb-2 block text-sm font-bold text-[var(--color-ink-900)]"
+                className="mb-2.5 block text-[var(--label-fs-app)] font-bold text-[var(--color-ink-900)]"
               >
                 성함 <span className="text-[var(--color-accent-red)]">*</span>
               </label>
@@ -231,7 +241,7 @@ export function Step2BidInfo({
             <div>
               <label
                 htmlFor="applicant-phone"
-                className="mb-2 block text-sm font-bold text-[var(--color-ink-900)]"
+                className="mb-2.5 block text-[var(--label-fs-app)] font-bold text-[var(--color-ink-900)]"
               >
                 연락처 <span className="text-[var(--color-accent-red)]">*</span>
               </label>
@@ -262,7 +272,7 @@ export function Step2BidInfo({
 
           {/* 주민번호 13자리 (앞 6 + 뒷 7) */}
           <div>
-            <label className="mb-2 block text-sm font-bold text-[var(--color-ink-900)]">
+            <label className="mb-2.5 block text-[var(--label-fs-app)] font-bold text-[var(--color-ink-900)]">
               주민등록번호 <span className="text-[var(--color-accent-red)]">*</span>
             </label>
             <div className="flex items-center gap-2">
@@ -358,7 +368,7 @@ export function Step2BidInfo({
                 <div>
                   <label
                     htmlFor="joint-name"
-                    className="mb-2 block text-sm font-bold text-[var(--color-ink-900)]"
+                    className="mb-2.5 block text-[var(--label-fs-app)] font-bold text-[var(--color-ink-900)]"
                   >
                     공동입찰인 성함
                   </label>
@@ -381,7 +391,7 @@ export function Step2BidInfo({
                 <div>
                   <label
                     htmlFor="joint-phone"
-                    className="mb-2 block text-sm font-bold text-[var(--color-ink-900)]"
+                    className="mb-2.5 block text-[var(--label-fs-app)] font-bold text-[var(--color-ink-900)]"
                   >
                     공동입찰인 연락처
                   </label>
@@ -414,7 +424,7 @@ export function Step2BidInfo({
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)]"
+          className="inline-flex min-h-[var(--cta-h-app)] items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)]"
         >
           <ArrowLeft size={16} aria-hidden="true" />
           이전
@@ -424,9 +434,9 @@ export function Step2BidInfo({
           onClick={handleNext}
           disabled={inputsDisabled || hasErrors}
           className={cn(
-            "inline-flex min-h-12 items-center gap-2 rounded-full px-6 text-sm font-black transition-colors duration-150",
+            "inline-flex min-h-[var(--cta-h-app)] items-center gap-2 rounded-full px-6 text-sm font-black transition-colors duration-150",
             !inputsDisabled && !hasErrors
-              ? "bg-[#00C853] text-white hover:bg-[var(--brand-green-deep)]"
+              ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)]"
               : "cursor-not-allowed bg-gray-200 text-gray-400",
           )}
         >

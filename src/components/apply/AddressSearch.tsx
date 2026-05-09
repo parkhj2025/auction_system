@@ -71,13 +71,13 @@ export function AddressSearch({ onSelect }: Props) {
               void search();
             }
           }}
-          className="h-12 w-full rounded-xl border border-gray-200 bg-white px-4 text-base text-[#111418] placeholder:text-gray-400 transition-colors duration-150 focus:border-[var(--brand-green)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)]/20 sm:flex-1"
+          className="h-[var(--input-h-app)] w-full rounded-xl border border-gray-200 bg-white px-4 text-base text-[var(--color-ink-900)] placeholder:text-gray-400 transition-colors duration-150 focus:border-[var(--brand-green)] focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)]/20 sm:flex-1"
         />
         <button
           type="button"
           onClick={() => void search()}
           disabled={searching}
-          className="inline-flex h-12 w-full items-center justify-center gap-2 rounded-full border border-[#111418] bg-white px-5 text-sm font-bold text-[#111418] transition-colors duration-150 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-400 sm:w-auto sm:shrink-0"
+          className="inline-flex h-[var(--input-h-app)] w-full items-center justify-center gap-2 rounded-full border border-[var(--color-ink-900)] bg-white px-5 text-sm font-bold text-[var(--color-ink-900)] transition-colors duration-150 hover:bg-gray-50 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:border-gray-300 disabled:text-gray-400 sm:w-auto sm:shrink-0"
         >
           {searching ? (
             <Loader2 size={16} aria-hidden="true" className="animate-spin" />
@@ -105,7 +105,7 @@ export function AddressSearch({ onSelect }: Props) {
                 onClick={() => onSelect(item)}
                 className="flex w-full flex-col items-start gap-0.5 rounded-lg border border-gray-200 bg-white p-3 text-left transition-colors duration-150 hover:border-[var(--brand-green)] hover:bg-[var(--brand-green)]/5 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
               >
-                <p className="text-sm font-bold text-[#111418]">{item.full}</p>
+                <p className="text-sm font-bold text-[var(--color-ink-900)]">{item.full}</p>
                 {item.jibun && (
                   <p className="text-xs text-gray-500">
                     [지번] {item.jibun}

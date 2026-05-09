@@ -124,6 +124,16 @@
   --color-muted: var(--color-surface-muted);
   --color-muted-foreground: var(--color-ink-500);
 
+  /* ─── /apply 모바일 앱 form 토큰 (Stage 2 cycle 1-D-A-2) ─────── */
+  /* 차용 source: 토스 송금 / 당근 채팅 / 카카오뱅크 계좌 개설.
+   * 정수: input·CTA 56px (thumb tap 친화) + 라벨 16px (모바일 가독성).
+   * literal hex 광역 NG (영구 룰 §29 후속 검토). 본 토큰 광역 사용 의무. */
+  --input-h-app: 56px;        /* 입력 필드 높이 (모바일 앱 표준 / 토스·카카오뱅크) */
+  --label-fs-app: 16px;       /* 라벨 폰트 크기 (모바일 가독성 / 데스크탑 동일) */
+  --cta-h-app: 56px;          /* CTA 버튼 높이 (하단 fixed 영역 + 인라인 광역) */
+  --field-gap-app: 28px;      /* 필드 ↔ 필드 gap (모바일 앱 표준) */
+  --apply-bottom-bar-h: 80px; /* /apply 하단 fixed bar 높이 (progress + step 명) */
+
   /* ─── 2. 보더 반경 (sub-phase 8.2 — Cohere ladder 추가, sub-phase 8.1 영역 보존) ─────── */
   --radius-xs: 4px;
   --radius-sm: 6px;

@@ -90,7 +90,7 @@ export function Step3Documents({
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)]"
+          className="inline-flex min-h-[var(--cta-h-app)] items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)]"
         >
           <ArrowLeft size={16} aria-hidden="true" />
           이전
@@ -100,9 +100,9 @@ export function Step3Documents({
           onClick={onNext}
           disabled={!canProceed}
           className={cn(
-            "inline-flex min-h-12 items-center gap-2 rounded-full px-6 text-sm font-black transition-colors duration-150",
+            "inline-flex min-h-[var(--cta-h-app)] items-center gap-2 rounded-full px-6 text-sm font-black transition-colors duration-150",
             canProceed
-              ? "bg-[#00C853] text-white hover:bg-[var(--brand-green-deep)]"
+              ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)]"
               : "cursor-not-allowed bg-gray-200 text-gray-400",
           )}
         >

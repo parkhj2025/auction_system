@@ -8,7 +8,9 @@ import { PhotoGallery } from "./PhotoGallery";
 
 /**
  * Stage 2 cycle 1-D-A — 사건 정보 사이드바.
- * - 데스크탑 (lg+) = 우측 column / sticky top.
+ * cycle 1-D-A-2 = 모바일 앱 form 토큰 광역 (TopNav sticky offset 정합 = lg:top-[80px]).
+ *
+ * - 데스크탑 (lg+) = 우측 column / sticky top (TopNav 64px + breathing 16px).
  * - 모바일 = inline + collapse paradigm (chevron toggle / 기본 펼침).
  * - mount 조건: data.matchedListing 있을 때만 (manualEntry = mount 0).
  * - Step1·2·3·4 노출 / Step5 mount 0 (ApplyClient 광역 분기).
@@ -46,7 +48,7 @@ export function ApplyPropertySidebar({ listing, isResale = false }: Props) {
   const depositRate = isResale ? "20%" : "10%";
 
   return (
-    <aside className="rounded-2xl border border-gray-200 bg-white p-5 lg:sticky lg:top-[160px] lg:p-6">
+    <aside className="rounded-2xl border border-gray-200 bg-white p-5 lg:sticky lg:top-[80px] lg:p-6">
       {/* 모바일 toggle (lg에서는 항상 펼침) */}
       <button
         type="button"

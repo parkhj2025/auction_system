@@ -696,6 +696,23 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 
 ---
 
+## 18. cycle 1-D-A-2 — /apply 모바일 앱 form paradigm 광역 전환 (2026-05-09)
+
+**의도**: /apply 광역 = 데스크탑 web form (input 48 / 라벨 12·14 / 5 step 원·라벨 / 상단 sticky / Modal 의존) → **모바일 앱 form** 정수 전환.
+
+**차용 source**: 토스 송금 / 당근 채팅 / 카카오뱅크 계좌 개설.
+
+**정수 5축**:
+1. **input 56 / 라벨 16 / CTA 56** — thumb tap 친화 + 모바일 가독성 (globals.css `--input-h-app` / `--label-fs-app` / `--cta-h-app` 토큰)
+2. **하단 fixed progress bar** — 5 step 원·라벨 광역 폐기 / 단순 progress + 현 step 명 단독 / safe-area-inset-bottom 정합
+3. **사건 정보 자동 채움 + 안내** — 매칭 OK 녹색 안내 / 매칭 NG 3초 안내 사후 manualEntry 자동 진입 / 스피너 광역
+4. **Token 광역 사용 의무** — literal hex (`#00C853` / `#111418`) 광역 NG / `var(--brand-green)` / `var(--color-ink-900)` 단독 (영구 룰 §29 후속 검토)
+5. **필드 ↔ 필드 gap = 28px** (`--field-gap-app`) — 모바일 앱 표준 (Step1·2·3·4·5 + CaseConfirmModal 광역)
+
+**다음 cycle (1-D-B)**: Step2 입찰가 paradigm (만원 단위 + belowMin 차단 paradigm 정정 + PhoneVerifyModal 폐기 + 입찰자 정보 광역 = 반환계좌 + 주소 + 차순위 매수 + 입찰 유형 3-way).
+
+---
+
 ## Changelog
 
 | 버전 | 날짜 | 변경 |
