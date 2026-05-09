@@ -10,7 +10,7 @@ import {
 } from "lucide-react";
 import type { AnalysisFrontmatter } from "@/types/content";
 import type { ApplyFormData, CourtListingSummary } from "@/types/apply";
-import { BRAND_NAME, COURTS_ALL, groupCourtsByRegion } from "@/lib/constants";
+import { COURTS_ALL, groupCourtsByRegion } from "@/lib/constants";
 import { cn, formatKoreanWon } from "@/lib/utils";
 import { PhotoGallery } from "../PhotoGallery";
 import { CaseConfirmCard } from "../CaseConfirmCard";
@@ -243,8 +243,8 @@ export function Step1Property({
           법원과 사건번호를 입력해주세요
         </h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
-          선택하신 법원과 사건번호로 접수를 진행합니다. 물건의 상세 정보
-          (감정가·최저가·입찰일 등)는 접수 확인 시 직접 안내드립니다.
+          입력하신 사건번호로 접수를 진행합니다. 감정가·최저가·입찰일 등 상세
+          정보는 접수 후 확인 메시지에 함께 안내드립니다.
         </p>
       </header>
 
@@ -375,9 +375,8 @@ export function Step1Property({
                 이미 접수가 진행 중인 물건입니다
               </p>
               <p className="mt-1 text-xs leading-5 text-[var(--color-ink-700)]">
-                {BRAND_NAME}은 한 물건에 한 고객만 대리 접수합니다 (이해충돌 방지).
-                같은 사건번호의 회차가 끝난 뒤 다음 회차부터 다시 접수 가능합니다.
-                궁금하신 점은 도움말을 확인해주세요.
+                한 물건당 한 분만 대리 접수합니다. 같은 사건번호라도 회차가
+                바뀌면 다시 접수하실 수 있습니다.
               </p>
             </div>
           </div>

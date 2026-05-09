@@ -14,7 +14,7 @@ const PDFPreviewModal = dynamic(
 );
 import { PrivacyPreviewModal } from "../PrivacyPreviewModal";
 import { TermsPreviewModal } from "../TermsPreviewModal";
-import { formatKoreanWon } from "@/lib/utils";
+import { cn, formatKoreanWon } from "@/lib/utils";
 import { getKSTDateTimeIso } from "@/lib/datetime";
 import { VerifiedBadge } from "../VerifiedBadge";
 import type { DelegationData } from "@/lib/pdf/delegationTemplate";
@@ -174,7 +174,7 @@ export function Step4Confirm({
           <VerifiedBadge verified={data.verified} verifiedName={data.verifiedName} />
         </div>
         <h2 className="mt-1 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
-          서명하고 위임에 동의해 주세요
+          서명하고 위임에 동의해주세요
         </h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
           위임장에 서명하고 3가지 항목에 동의하시면 제출이 가능합니다. 제출 후
@@ -185,7 +185,7 @@ export function Step4Confirm({
       <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         <section className="flex flex-col gap-4">
           {/* 입력 요약 */}
-          <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">
+          <div className="rounded-2xl border border-[var(--color-border)] bg-white p-6">
             <h3 className="text-sm font-black text-[var(--color-ink-900)]">
               입찰 정보 요약
             </h3>
@@ -199,7 +199,7 @@ export function Step4Confirm({
               <div>
                 <dt className="text-xs text-[var(--color-ink-500)]">입찰일</dt>
                 <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
-                  {data.bidDate || "상담원 확인 필요"}
+                  {data.bidDate || "확인 후 안내"}
                 </dd>
               </div>
               <div>
@@ -239,7 +239,7 @@ export function Step4Confirm({
           </div>
 
           {/* 서명 영역 */}
-          <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">
+          <div className="rounded-2xl border border-[var(--color-border)] bg-white p-6">
             <h3 className="text-sm font-black text-[var(--color-ink-900)]">
               위임인 서명
             </h3>
@@ -258,7 +258,7 @@ export function Step4Confirm({
           </div>
 
           {/* 3개 동의 + 미리보기 */}
-          <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">
+          <div className="rounded-2xl border border-[var(--color-border)] bg-white p-6">
             <h3 className="text-sm font-black text-[var(--color-ink-900)]">동의</h3>
             <ul className="mt-4 flex flex-col gap-2 text-sm leading-6 text-[var(--color-ink-700)]">
               <li className="flex items-start gap-2">
@@ -277,7 +277,7 @@ export function Step4Confirm({
                   위임장 내용을 확인하였으며, 위 서명으로 매수신청대리를 위임합니다.
                   {delegationPdfFetching && (
                     <span className="ml-2 text-xs text-[var(--color-ink-500)]">
-                      (위임장 PDF 불러오는 중...)
+                      (위임장 준비 중...)
                     </span>
                   )}
                   {!hasSignature && (
@@ -368,7 +368,12 @@ export function Step4Confirm({
           type="button"
           onClick={onSubmit}
           disabled={!canSubmit}
-          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-black disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
+          className={cn(
+            "inline-flex min-h-12 items-center gap-2 rounded-full px-6 text-sm font-black transition-colors duration-150",
+            canSubmit
+              ? "bg-[#00C853] text-white hover:bg-[var(--brand-green-deep)]"
+              : "cursor-not-allowed bg-gray-200 text-gray-400",
+          )}
         >
           {submitting ? "제출 중..." : "제출"}
           {!submitting && <Send size={16} aria-hidden="true" />}

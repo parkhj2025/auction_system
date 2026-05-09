@@ -84,7 +84,7 @@ export function Step5Complete({
         </p>
       </header>
 
-      <section className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">
+      <section className="rounded-2xl border border-[var(--color-border)] bg-white p-6">
         <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
           01. 수수료 송금
         </h3>
@@ -105,7 +105,7 @@ export function Step5Complete({
       </section>
 
       {deposit !== null && (
-        <section className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">
+        <section className="rounded-2xl border border-[var(--color-border)] bg-white p-6">
           <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
             02. 보증금 송금
           </h3>
@@ -119,7 +119,7 @@ export function Step5Complete({
             <p className="mt-3 text-xs leading-5 text-[var(--color-ink-500)]">
               {data.bidInfo.rebid
                 ? "재경매 사건으로 체크하셔서 보증금이 감정가의 20%로 계산되었습니다. "
-                : "일반 경매 기준 감정가의 10%로 계산되었습니다. 재경매 사건이면 접수 확인 시 안내 후 20%로 재계산됩니다. "}
+                : "일반 경매 기준 감정가의 10%로 적용되었습니다. 재경매 사건으로 확인되면 20%로 재계산하여 안내드립니다. "}
               <strong className="text-[var(--color-ink-900)]">
                 패찰 시 보증금은 당일 즉시 반환
               </strong>
@@ -215,7 +215,7 @@ export function Step5Complete({
 
       {/* 온라인 결제 (준비 중) — PAYMENT_PG_ENABLED 플래그 기반 */}
       {!PAYMENT_PG_ENABLED && (
-        <section className="rounded-[var(--radius-xl)] border border-dashed border-[var(--color-border)] bg-[var(--color-surface-muted)] p-6">
+        <section className="rounded-2xl border border-dashed border-[var(--color-border)] bg-[var(--color-surface-muted)] p-6">
           <div className="flex items-start gap-4">
             <span className="inline-flex h-10 w-10 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-100)] text-[var(--color-ink-500)]">
               <CreditCard size={18} aria-hidden="true" />
@@ -240,7 +240,7 @@ export function Step5Complete({
         </section>
       )}
 
-      <section className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6">
+      <section className="rounded-2xl border border-[var(--color-border)] bg-white p-6">
         <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
           다음 단계
         </h3>
@@ -253,7 +253,7 @@ export function Step5Complete({
               <strong className="text-[var(--color-ink-900)]">
                 접수 확인 연락
               </strong>
-              이 직접 전달됩니다. 접수번호 <strong>{applicationId}</strong>과 함께
+              을 안내드립니다. 접수번호 <strong>{applicationId}</strong>과 함께
               서류·보증금 확인을 안내드립니다.
             </span>
           </li>

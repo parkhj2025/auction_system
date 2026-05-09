@@ -4,7 +4,7 @@ import { useState } from "react";
 import { ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
 import type { ApplyFormData, ApplyBidInfo } from "@/types/apply";
 import { formatPhone } from "@/lib/apply";
-import { formatKoreanWon } from "@/lib/utils";
+import { cn, formatKoreanWon } from "@/lib/utils";
 import { FeeCalculator } from "../FeeCalculator";
 import { PhoneVerifyModal } from "../PhoneVerifyModal";
 import { VerifiedBadge } from "../VerifiedBadge";
@@ -112,11 +112,11 @@ export function Step2BidInfo({
   }
 
   function inputClass(key: string) {
-    return `h-12 w-full rounded-[var(--radius-md)] border bg-white px-4 text-[length:var(--text-body)] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] ${
-      errors[key]
-        ? "border-[var(--color-accent-red)]"
-        : "border-[var(--color-border)]"
-    }`;
+    const base =
+      "h-12 w-full rounded-[var(--radius-md)] border bg-white px-4 text-[length:var(--text-body)] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] transition-colors duration-150 focus:outline-none";
+    return errors[key]
+      ? `${base} border-[var(--color-accent-red)] ring-2 ring-[var(--color-accent-red)]/20`
+      : `${base} border-[var(--color-border)] focus:border-[var(--brand-green)] focus:ring-2 focus:ring-[var(--brand-green)]/20`;
   }
 
   return (
@@ -152,12 +152,12 @@ export function Step2BidInfo({
         disabled={inputsDisabled}
         className="grid gap-6 disabled:opacity-60 lg:grid-cols-[1.2fr_1fr]"
       >
-        <div className="flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">
+        <div className="flex flex-col gap-4 rounded-2xl border border-[var(--color-border)] bg-white p-6">
           {/* 입찰 금액 */}
           <div>
             <label
               htmlFor="bid-amount"
-              className="mb-2 block text-sm font-black text-[var(--color-ink-900)]"
+              className="mb-2 block text-sm font-bold text-[var(--color-ink-900)]"
             >
               입찰 희망 금액 <span className="text-[var(--color-accent-red)]">*</span>
             </label>
@@ -208,7 +208,7 @@ export function Step2BidInfo({
             <div>
               <label
                 htmlFor="applicant-name"
-                className="mb-2 block text-sm font-black text-[var(--color-ink-900)]"
+                className="mb-2 block text-sm font-bold text-[var(--color-ink-900)]"
               >
                 성함 <span className="text-[var(--color-accent-red)]">*</span>
               </label>
@@ -237,7 +237,7 @@ export function Step2BidInfo({
             <div>
               <label
                 htmlFor="applicant-phone"
-                className="mb-2 block text-sm font-black text-[var(--color-ink-900)]"
+                className="mb-2 block text-sm font-bold text-[var(--color-ink-900)]"
               >
                 연락처 <span className="text-[var(--color-accent-red)]">*</span>
               </label>
@@ -268,7 +268,7 @@ export function Step2BidInfo({
 
           {/* 주민번호 13자리 (앞 6 + 뒷 7) */}
           <div>
-            <label className="mb-2 block text-sm font-black text-[var(--color-ink-900)]">
+            <label className="mb-2 block text-sm font-bold text-[var(--color-ink-900)]">
               주민등록번호 <span className="text-[var(--color-accent-red)]">*</span>
             </label>
             <div className="flex items-center gap-2">
@@ -310,8 +310,8 @@ export function Step2BidInfo({
               />
             </div>
             <p className="mt-1 text-xs text-[var(--color-ink-500)]">
-              위임장 PDF 작성에만 사용됩니다. 뒷 7자리는 DB에 저장되지 않으며,
-              PDF 생성 직후 메모리에서 즉시 폐기됩니다.
+              위임장 작성에만 사용됩니다. 뒷 7자리는 저장되지 않으며, 서류 발급
+              직후 즉시 폐기됩니다.
             </p>
             {(errors.ssnFront || errors.ssnBack) && (
               <p className="mt-1 text-xs text-[var(--color-accent-red)]">
@@ -336,9 +336,9 @@ export function Step2BidInfo({
                   재경매 물건 (보증금 20%)
                 </span>
                 <p className="mt-0.5 text-xs leading-5 text-[var(--color-ink-500)]">
-                  법원이 지정한 재경매(대금미납 이력) 사건인 경우 체크하세요.
-                  보증금이 감정가의 20%로 계산됩니다. 잘 모르시면 체크하지
-                  말고 접수 후 확인 시 안내받으시면 됩니다.
+                  재경매(대금 미납 이력) 사건이면 체크해주세요. 보증금이 감정가의
+                  20%로 적용됩니다. 확실하지 않다면 비워두셔도 접수 후 확인하여
+                  안내드립니다.
                 </p>
               </div>
             </label>
@@ -364,7 +364,7 @@ export function Step2BidInfo({
                 <div>
                   <label
                     htmlFor="joint-name"
-                    className="mb-1 block text-xs font-bold text-[var(--color-ink-700)]"
+                    className="mb-2 block text-sm font-bold text-[var(--color-ink-900)]"
                   >
                     공동입찰인 성함
                   </label>
@@ -387,7 +387,7 @@ export function Step2BidInfo({
                 <div>
                   <label
                     htmlFor="joint-phone"
-                    className="mb-1 block text-xs font-bold text-[var(--color-ink-700)]"
+                    className="mb-2 block text-sm font-bold text-[var(--color-ink-900)]"
                   >
                     공동입찰인 연락처
                   </label>
@@ -432,7 +432,12 @@ export function Step2BidInfo({
           type="button"
           onClick={handleNext}
           disabled={inputsDisabled || hasErrors}
-          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-black disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
+          className={cn(
+            "inline-flex min-h-12 items-center gap-2 rounded-full px-6 text-sm font-black transition-colors duration-150",
+            !inputsDisabled && !hasErrors
+              ? "bg-[#00C853] text-white hover:bg-[var(--brand-green-deep)]"
+              : "cursor-not-allowed bg-gray-200 text-gray-400",
+          )}
         >
           다음: 서류 업로드
           <ArrowRight size={16} aria-hidden="true" />

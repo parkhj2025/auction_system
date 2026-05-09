@@ -2,6 +2,7 @@
 
 import { ArrowLeft, ArrowRight, Info } from "lucide-react";
 import type { ApplyFormData, ApplyDocuments } from "@/types/apply";
+import { cn } from "@/lib/utils";
 import { FileUpload } from "../FileUpload";
 import { VerifiedBadge } from "../VerifiedBadge";
 
@@ -53,7 +54,7 @@ export function Step3Documents({
         </p>
       </div>
 
-      <div className="grid gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)] md:grid-cols-2 lg:grid-cols-3">
+      <div className="grid gap-4 rounded-2xl border border-[var(--color-border)] bg-white p-6 md:grid-cols-2 lg:grid-cols-3">
         <FileUpload
           label="전자본인서명확인서"
           description="대법원 전자민원센터에서 발급한 PDF 파일을 올려주세요."
@@ -83,9 +84,9 @@ export function Step3Documents({
       </div>
 
       <p className="text-xs leading-5 text-[var(--color-ink-500)]">
-        업로드된 파일은 입찰 대리 업무 수행 목적으로만 사용되며, 법정 보관
-        기간(접수일로부터 3년) 경과 후 즉시 파기됩니다. 접수 완료 후 파일
-        저장은 보안이 확보된 내부 저장소에만 이루어집니다.
+        업로드된 파일은 입찰 대리 업무에만 사용되며, 법정 보관 기간(접수일 기준
+        3년) 이후 즉시 파기됩니다. 보관 중에는 보안 처리된 환경에서만
+        관리됩니다.
       </p>
 
       <div className="flex items-center justify-between gap-2 pt-2">
@@ -101,7 +102,12 @@ export function Step3Documents({
           type="button"
           onClick={onNext}
           disabled={!canProceed}
-          className="inline-flex min-h-12 items-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-6 text-sm font-black text-white shadow-[var(--shadow-card)] hover:bg-black disabled:cursor-not-allowed disabled:bg-[var(--color-ink-300)] disabled:shadow-none"
+          className={cn(
+            "inline-flex min-h-12 items-center gap-2 rounded-full px-6 text-sm font-black transition-colors duration-150",
+            canProceed
+              ? "bg-[#00C853] text-white hover:bg-[var(--brand-green-deep)]"
+              : "cursor-not-allowed bg-gray-200 text-gray-400",
+          )}
         >
           다음: 확인·제출
           <ArrowRight size={16} aria-hidden="true" />
