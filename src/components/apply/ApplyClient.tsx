@@ -16,6 +16,7 @@ import { Step2BidInfo } from "./steps/Step2BidInfo";
 import { Step3Documents } from "./steps/Step3Documents";
 import { Step4Confirm } from "./steps/Step4Confirm";
 import { Step5Complete } from "./steps/Step5Complete";
+import { ApplyPropertySidebar } from "./ApplyPropertySidebar";
 
 const STEP_ORDER: ApplyStepId[] = APPLY_STEPS.map((s) => s.id);
 
@@ -312,6 +313,11 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep, data, submitting, submitError, applicationId, posts]);
 
+  // 1-D-A: 사이드바 mount = 매칭 listing 있고 Step5(complete) 외 모든 step.
+  // manualEntry = matchedListing null → 사이드바 0 / ApplyStepIndicator 메타 line fallback.
+  const showSidebar =
+    !!data.matchedListing && currentStep !== "complete";
+
   return (
     <>
       <ApplyStepIndicator
@@ -320,8 +326,21 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
         caseNumber={data.caseNumber}
         court={data.court}
         bidDate={data.bidDate}
+        hasMatchedListing={!!data.matchedListing}
       />
-      <section className="container-app py-10 lg:py-16">{stepView}</section>
+      <section className="container-app py-10 lg:py-16">
+        {showSidebar && data.matchedListing ? (
+          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
+            <div className="min-w-0">{stepView}</div>
+            <ApplyPropertySidebar
+              listing={data.matchedListing}
+              isResale={data.bidInfo.rebid}
+            />
+          </div>
+        ) : (
+          stepView
+        )}
+      </section>
     </>
   );
 }

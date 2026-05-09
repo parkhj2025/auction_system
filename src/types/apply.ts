@@ -22,6 +22,12 @@ export interface CourtListingSummary {
   component_count: number;
   /** 매각회차 — failed_count + 1 (서버 주입). 신건은 1. Phase 6.7.6. */
   auction_round: number;
+  /** 사이드바 fallback 주소 — sido + sigungu + dong (1-D-A) */
+  sido: string | null;
+  sigungu: string | null;
+  dong: string | null;
+  /** 사건명 (raw_snapshot 광역 추출 / null 시 UI fallback). 1-D-A. */
+  case_title: string | null;
 }
 
 export type FeeTier = "earlybird" | "standard" | "rush";

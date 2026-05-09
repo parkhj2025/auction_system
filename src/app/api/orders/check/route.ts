@@ -20,6 +20,10 @@ interface RawListing {
   item_sequence: number;
   mokmul_sequence: number;
   photos_fetched_at: string | null;
+  sido: string | null;
+  sigungu: string | null;
+  dong: string | null;
+  case_title: string | null;
 }
 
 /**
@@ -130,7 +134,7 @@ export async function POST(req: Request) {
     let query = admin
       .from("court_listings")
       .select(
-        "docid, court_name, case_number, address_display, appraisal_amount, min_bid_amount, bid_date, bid_time, usage_name, area_display, failed_count, item_sequence, mokmul_sequence, photos_fetched_at"
+        "docid, court_name, case_number, address_display, appraisal_amount, min_bid_amount, bid_date, bid_time, usage_name, area_display, failed_count, item_sequence, mokmul_sequence, photos_fetched_at, sido, sigungu, dong, case_title"
       )
       .eq("case_number", caseNumber)
       .eq("is_active", true)

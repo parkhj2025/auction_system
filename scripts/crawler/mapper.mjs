@@ -108,6 +108,10 @@ export function mapRecordToRow(raw, { courtNameFallback } = {}) {
     photos_fetched_at: null,
     photos_count: 0,
 
+    // 1-D-A 메타 확장 (best-effort 추출 / 미발견 시 null → UI fallback)
+    case_title:
+      raw.csTit || raw.csTitNm || raw.caseHisNm || raw.dpslGdsCsNm || null,
+
     // 원본 보존
     raw_snapshot: raw,
 

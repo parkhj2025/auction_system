@@ -20,20 +20,23 @@ export function ApplyStepIndicator({
   caseNumber,
   court,
   bidDate,
+  hasMatchedListing = false,
 }: {
   current: ApplyStepId;
   completed: Set<ApplyStepId>;
   caseNumber?: string;
   court?: string;
   bidDate?: string;
+  hasMatchedListing?: boolean;
 }) {
   const [guideOpen, setGuideOpen] = useState(false);
   const currentIndex = APPLY_STEPS.findIndex((s) => s.id === current);
   const currentStep = APPLY_STEPS[currentIndex];
   const stepNumber = currentIndex + 1;
-  // 매칭 메타 = Step2 (bid-info) / Step3 (documents) / Step4 (confirm) 단독.
+  // 1-D-A: 매칭 메타 = Step2~4 + manualEntry 단독 (사이드바 mount 시 폐기 / 중복 회피).
   const showMeta =
-    current === "bid-info" || current === "documents" || current === "confirm";
+    !hasMatchedListing &&
+    (current === "bid-info" || current === "documents" || current === "confirm");
 
   return (
     <>

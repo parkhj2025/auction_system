@@ -93,6 +93,9 @@ export function PhotoGallery({ docid }: { docid: string }) {
           </button>
         ))}
       </div>
+      <p className="mt-1.5 text-[11px] text-gray-500">
+        사진 출처: 대법원 경매정보
+      </p>
 
       {/* Lightbox */}
       {lightboxIdx !== null && (

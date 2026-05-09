@@ -519,6 +519,10 @@ export function Step1Property({
               다른 물건 선택
             </button>
           )}
+          {/* 1-D-A 출처 표기 */}
+          <p className="mt-4 border-t border-[var(--color-ink-200)] pt-3 text-xs text-gray-500">
+            출처: 대법원 경매정보 (KOGL Type 1)
+          </p>
         </div>
       )}
 
@@ -574,6 +578,23 @@ export function Step1Property({
               </dd>
             </div>
           </dl>
+        </div>
+      )}
+
+      {/* 1-D-A 면책 alert — 사건 정보 영역 표시 시 노출 */}
+      {(showMatchedConfirm || showManualConfirm) && (
+        <div
+          role="note"
+          className="rounded-xl border border-red-500 bg-red-50/30 p-4"
+        >
+          <p className="text-sm font-bold leading-6 text-[var(--color-accent-red)]">
+            🚩 입찰 정보는 대법원 경매정보 원본을 직접 확인하셔야 합니다.
+          </p>
+          <ul className="mt-2 flex flex-col gap-1 text-xs leading-5 text-[var(--color-ink-700)]">
+            <li>· 경매 정보는 대법원 경매정보 사이트 기반으로 제공됩니다.</li>
+            <li>· 정보 오류로 인한 책임은 부담하지 않습니다.</li>
+            <li>· 입찰보증금은 안전한 입찰을 위해 100원 단위 올림 처리됩니다.</li>
+          </ul>
         </div>
       )}
 

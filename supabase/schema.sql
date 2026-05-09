@@ -500,6 +500,9 @@ CREATE TABLE IF NOT EXISTS public.court_listings (
   photos_fetched_at TIMESTAMPTZ,                -- 사진 수집 시점 (null = 미수집)
   photos_count INT DEFAULT 0,                   -- 업로드된 사진 개수
 
+  -- 1-D-A 메타 확장
+  case_title TEXT,                              -- 사건명 (raw_snapshot 광역 추출)
+
   -- 원본 보존 (스키마 변경 대응용)
   raw_snapshot JSONB NOT NULL,                  -- 크롤러 응답 record 전체
 
