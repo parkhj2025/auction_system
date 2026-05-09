@@ -70,13 +70,9 @@ export function Step2BidInfo({
     if (Object.keys(patch).length > 0) onBidInfoChange(patch);
   }
   const bidAmountNum = Number(bid.bidAmount.replace(/[^\d]/g, "")) || 0;
-  // cycle 1-D-A-2: matchedListing.min_bid_amount fallback + matchedPost 보조.
-  const minPrice =
-    data.matchedListing?.min_bid_amount ??
-    data.matchedPost?.minPrice ??
-    0;
-  const hasMinPrice =
-    data.matchedListing !== null || data.matchedPost !== null;
+  // cycle 1-D-A-4: matchedListing.min_bid_amount 단독 (matchedPost 광역 폐기 정합).
+  const minPrice = data.matchedListing?.min_bid_amount ?? 0;
+  const hasMinPrice = data.matchedListing != null;
   const belowMin = hasMinPrice && bidAmountNum > 0 && bidAmountNum < minPrice;
 
   function validate(): { ok: boolean; errors: Record<string, string> } {
@@ -417,7 +413,9 @@ export function Step2BidInfo({
             )}
           </div>
 
-          <FeeCalculatorInline fm={data.matchedPost} />
+          <FeeCalculatorInline
+            bidDate={data.matchedListing?.bid_date ?? null}
+          />
       </fieldset>
 
       <div className="flex items-center justify-between gap-2 pt-2">

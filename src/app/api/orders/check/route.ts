@@ -211,7 +211,6 @@ export async function POST(req: Request) {
         const records = await fetchSingleCase({ courtCode, caseNumber });
         if (records.length > 0) {
           const rows = records.map((r) => mapRecordToRow(r, courtName));
-          // upsert (docid 기준)
           const { error: upsertError } = await admin
             .from("court_listings")
             .upsert(rows, {
@@ -221,7 +220,6 @@ export async function POST(req: Request) {
           if (upsertError) {
             console.error("[orders/check] upsert failed", upsertError);
           }
-          // 재조회 (upsert 사후 cache 광역 fresh)
           cached = await lookupCache(
             admin,
             caseNumber,
@@ -236,12 +234,29 @@ export async function POST(req: Request) {
       }
     }
 
+    // 4. cycle 1-D-A-4: is_active 분기 — listings 0건 + 종결 record 광역 분기.
+    let caseStatus: "active" | "closed" | "not_found" = "active";
+    if (cached.length === 0) {
+      // 종결 record 광역 검수 (is_active=false / TTL 광역 무관 / court_code 단독)
+      const { data: inactive } = await admin
+        .from("court_listings")
+        .select("docid")
+        .eq("case_number", caseNumber)
+        .eq("is_active", false)
+        .limit(1);
+      if (inactive && inactive.length > 0) {
+        caseStatus = "closed";
+      } else {
+        caseStatus = "not_found";
+      }
+    }
+
     const grouped = groupByItem(cached);
 
     return NextResponse.json({
       available: true,
       listings: grouped,
-      // 광역 진단 hint (client = manualEntry 분기 결정 영역 외 / 본 필드 단독 정보 단독)
+      case_status: caseStatus,
       cache_hit: cacheHit,
       fetch_attempted: fetchAttempted,
       fetch_error: fetchError,

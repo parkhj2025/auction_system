@@ -55,15 +55,16 @@ export function ApplyStepIndicator({
           />
         </div>
 
-        {/* 현 step 명 + 도움말 */}
-        <div className="container-app flex items-center justify-between gap-3 py-3 lg:py-4">
-          <p className="min-w-0 truncate text-sm font-bold text-[var(--color-ink-900)] sm:text-base">
-            <span className="text-[var(--brand-green)]">
+        {/* 현 step 명 + 도움말 (cycle 1-D-A-4: 2-line paradigm 광역 강화). */}
+        <div className="container-app flex items-center justify-between gap-3 py-2.5 lg:py-3">
+          <div className="min-w-0 flex-1">
+            <p className="text-[10px] font-bold uppercase tracking-wider text-[var(--brand-green)] sm:text-[11px]">
               STEP {stepNumber} / {total}
-            </span>
-            <span className="mx-2 text-gray-300" aria-hidden="true">·</span>
-            <span>{currentStep?.label.replace(/\n/g, " ") ?? ""}</span>
-          </p>
+            </p>
+            <p className="truncate text-base font-bold text-[var(--color-ink-900)] sm:text-lg">
+              {currentStep?.label.replace(/\n/g, " ") ?? ""}
+            </p>
+          </div>
           <button
             type="button"
             onClick={() => setGuideOpen(true)}

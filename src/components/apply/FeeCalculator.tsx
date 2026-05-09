@@ -1,33 +1,42 @@
 import { Wallet, ShieldCheck, Info } from "lucide-react";
 import { computeFee, computeDeposit } from "@/lib/apply";
 import { formatKoreanWon } from "@/lib/utils";
-import type { AnalysisFrontmatter } from "@/types/content";
 
 /**
  * 신청 시점 기준 수수료 + 보증금 안내 카드.
- * - 기본(card) variant: 보증금 영역 포함. Step5 등에서 사용.
- * - hero variant: Step body header 아래 인라인 박스. 보증금 영역 미노출.
+ * cycle 1-D-A-4: matchedPost props 광역 폐기 → bidDate + appraisal 직접 props.
+ *
+ * - 기본 (FeeCalculator): 수수료 + 성공보수 + 보증금 (감정가 입력 시).
+ * - Inline (FeeCalculatorInline): Step2 본 박스 마지막 inner box 광역.
+ * - Hero (FeeCalculatorHero): 본 박스 정합 독립 박스 (cycle 1-D-A-2 영역 / 현 mount 0).
  */
+
+const DEFAULT_FEE = {
+  tier: "earlybird" as const,
+  tierLabel: "사전 신청가",
+  baseFee: 50000,
+  successBonus: 50000,
+  daysUntilBid: 7,
+  description: "입찰일 7일 이상 전 신청",
+};
+
+function resolveFee(bidDate?: string | null) {
+  if (bidDate) return computeFee(bidDate);
+  return DEFAULT_FEE;
+}
+
 export function FeeCalculator({
-  fm,
+  bidDate,
+  appraisal,
   bidAmount,
 }: {
-  fm: AnalysisFrontmatter | null;
+  bidDate?: string | null;
+  appraisal?: number | null;
   bidAmount?: number;
 }) {
-  // 매칭된 물건이 없으면 사전 신청가를 기본 안내로 표시 (대리 입찰 신청 가이드 용도)
-  const fee = fm
-    ? computeFee(fm.bidDate)
-    : {
-        tier: "earlybird" as const,
-        tierLabel: "사전 신청가",
-        baseFee: 50000,
-        successBonus: 50000,
-        daysUntilBid: 7,
-        description: "입찰일 7일 이상 전 신청",
-      };
-
-  const deposit = fm ? computeDeposit(fm.appraisal) : null;
+  const fee = resolveFee(bidDate);
+  const deposit =
+    appraisal != null ? computeDeposit(appraisal) : null;
   const isPastBid = fee.daysUntilBid < 0;
 
   return (
@@ -42,7 +51,7 @@ export function FeeCalculator({
             <p className="text-[11px] font-black uppercase tracking-wider text-[var(--color-ink-900)]">
               {fee.tierLabel}
             </p>
-            {fm && !isPastBid && (
+            {bidDate && !isPastBid && (
               <span className="text-[11px] text-[var(--color-ink-500)]">
                 입찰일까지 {fee.daysUntilBid}일
               </span>
@@ -116,18 +125,14 @@ export function FeeCalculator({
 /**
  * Inline variant — Step2 본 박스 안 마지막 inner box (재경매·공동입찰 paradigm 정합).
  * paradigm: rounded-md + bg-surface-muted + p-4 + 가격 = text-base font-bold (본 입력 흐름 우선).
+ * cycle 1-D-A-4: bidDate 직접 props.
  */
-export function FeeCalculatorInline({ fm }: { fm: AnalysisFrontmatter | null }) {
-  const fee = fm
-    ? computeFee(fm.bidDate)
-    : {
-        tier: "earlybird" as const,
-        tierLabel: "사전 신청가",
-        baseFee: 50000,
-        successBonus: 50000,
-        daysUntilBid: 7,
-        description: "입찰일 7일 이상 전 신청",
-      };
+export function FeeCalculatorInline({
+  bidDate,
+}: {
+  bidDate?: string | null;
+}) {
+  const fee = resolveFee(bidDate);
   const isPastBid = fee.daysUntilBid < 0;
 
   return (
@@ -146,7 +151,7 @@ export function FeeCalculatorInline({ fm }: { fm: AnalysisFrontmatter | null }) 
             <p className="text-base font-bold tabular-nums text-[var(--color-ink-900)]">
               {formatKoreanWon(fee.baseFee)}
             </p>
-            {fm && !isPastBid && (
+            {bidDate && !isPastBid && (
               <span className="text-xs text-[var(--color-ink-500)]">
                 입찰일까지 {fee.daysUntilBid}일
               </span>
@@ -166,27 +171,21 @@ export function FeeCalculatorInline({ fm }: { fm: AnalysisFrontmatter | null }) 
 }
 
 /**
- * Hero variant — 본 박스 정합 독립 박스 (cycle 1-D 영역 가능성 / 현재 mount 0).
+ * Hero variant — 본 박스 정합 독립 박스 (cycle 1-D-A-2 영역 / 현 mount 0).
  * paradigm: rounded-2xl border-gray-200 p-5 lg:p-8 flat.
- * 안내 영역 = tier 라벨 + 가격 + 신청 시점 + 성공보수 안내 (보증금 미노출).
+ * cycle 1-D-A-4: bidDate 직접 props.
  */
-export function FeeCalculatorHero({ fm }: { fm: AnalysisFrontmatter | null }) {
-  const fee = fm
-    ? computeFee(fm.bidDate)
-    : {
-        tier: "earlybird" as const,
-        tierLabel: "사전 신청가",
-        baseFee: 50000,
-        successBonus: 50000,
-        daysUntilBid: 7,
-        description: "입찰일 7일 이상 전 신청",
-      };
+export function FeeCalculatorHero({
+  bidDate,
+}: {
+  bidDate?: string | null;
+}) {
+  const fee = resolveFee(bidDate);
   const isPastBid = fee.daysUntilBid < 0;
 
   return (
     <div className="rounded-2xl border border-gray-200 bg-white p-5 lg:p-8">
       <div className="flex flex-col gap-5 sm:flex-row sm:items-center sm:gap-6">
-        {/* 좌측: tier + 가격 + 신청시점 */}
         <div className="flex items-start gap-4 sm:flex-1">
           <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-50)] text-[var(--color-ink-900)]">
             <Wallet size={22} aria-hidden="true" />
@@ -196,7 +195,7 @@ export function FeeCalculatorHero({ fm }: { fm: AnalysisFrontmatter | null }) {
               <p className="text-[11px] font-black uppercase tracking-wider text-[#00C853]">
                 {fee.tierLabel}
               </p>
-              {fm && !isPastBid && (
+              {bidDate && !isPastBid && (
                 <span className="text-[11px] text-[var(--color-ink-500)]">
                   입찰일까지 {fee.daysUntilBid}일
                 </span>
@@ -210,7 +209,6 @@ export function FeeCalculatorHero({ fm }: { fm: AnalysisFrontmatter | null }) {
             </p>
           </div>
         </div>
-        {/* 우측: 성공보수 안내 */}
         <div className="flex items-start gap-2 rounded-[var(--radius-md)] bg-[var(--color-surface-muted)] px-4 py-3 text-xs sm:max-w-xs sm:shrink-0">
           <Info
             size={14}

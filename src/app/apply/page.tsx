@@ -1,6 +1,5 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { getAllAnalysisPosts } from "@/lib/content";
 import { ApplyClient } from "@/components/apply/ApplyClient";
 
 /* Stage 2 cycle 1-A 보강 1+ — /apply 본론 직진 paradigm.
@@ -17,12 +16,10 @@ export const metadata: Metadata = {
 };
 
 export default function ApplyPage() {
-  const posts = getAllAnalysisPosts().map((p) => p.frontmatter);
-
   return (
     <main className="flex flex-1 flex-col">
       <Suspense fallback={<ApplyLoading />}>
-        <ApplyClient posts={posts} />
+        <ApplyClient />
       </Suspense>
     </main>
   );

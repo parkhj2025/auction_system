@@ -30,9 +30,12 @@ export function Step5Complete({
   const fee = data.bidDate
     ? computeFee(data.bidDate)
     : { baseFee: 70000, tierLabel: "일반", successBonus: 50000, daysUntilBid: 0, tier: "standard" as const, description: "" };
-  const deposit = data.matchedPost
-    ? computeDeposit(data.matchedPost.appraisal, data.bidInfo.rebid)
-    : null;
+  // cycle 1-D-A-4: matchedListing 단독 source (matchedPost 광역 폐기).
+  const appraisal = data.matchedListing?.appraisal_amount ?? null;
+  const deposit =
+    appraisal != null
+      ? computeDeposit(appraisal, data.bidInfo.rebid)
+      : null;
   const depositPercentLabel = data.bidInfo.rebid ? "20%" : "10%";
   // 수수료 + 보증금 합계 (송금 시 한 번에 보낼 금액)
   const totalToSend = deposit !== null ? fee.baseFee + deposit : fee.baseFee;

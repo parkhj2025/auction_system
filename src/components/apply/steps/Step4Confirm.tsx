@@ -68,7 +68,8 @@ export function Step4Confirm({
   // Phase 4-CONFIRM: data.bidDate non-null 승격으로 boundary throw 제거.
   // bidDate/propertyAddress는 매칭/manualEntry 모두 data.* 직접 사용 (Step1에서 채움).
   const previewData: DelegationData = useMemo(() => {
-    const appraisal = data.matchedPost?.appraisal ?? 0;
+    // cycle 1-D-A-4: matchedListing 단독 source (matchedPost 광역 폐기).
+    const appraisal = data.matchedListing?.appraisal_amount ?? 0;
     const depositRate = bid.rebid ? REBID_DEPOSIT_RATE : NORMAL_DEPOSIT_RATE;
     const deposit = Math.floor(appraisal * depositRate);
     return {
@@ -76,7 +77,10 @@ export function Step4Confirm({
         name: bid.applicantName,
         ssnFront: bid.ssnFront,
         ssnBack: bid.ssnBack,
-        address: data.propertyAddress || data.matchedPost?.address || "",
+        address:
+          data.propertyAddress ||
+          data.matchedListing?.address_display ||
+          "",
         phone: bid.phone,
       },
       caseNumber: data.caseNumber,
@@ -337,7 +341,11 @@ export function Step4Confirm({
         </section>
 
         <aside>
-          <FeeCalculator fm={data.matchedPost} bidAmount={bidAmount} />
+          <FeeCalculator
+            bidDate={data.matchedListing?.bid_date ?? null}
+            appraisal={data.matchedListing?.appraisal_amount ?? null}
+            bidAmount={bidAmount}
+          />
         </aside>
       </div>
 

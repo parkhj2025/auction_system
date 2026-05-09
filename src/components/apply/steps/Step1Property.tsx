@@ -10,7 +10,6 @@ import {
   ChevronDown,
   Loader2,
 } from "lucide-react";
-import type { AnalysisFrontmatter } from "@/types/content";
 import type { ApplyFormData, CourtListingSummary } from "@/types/apply";
 import { COURTS_ALL, groupCourtsByRegion } from "@/lib/constants";
 import { cn, formatKoreanWon } from "@/lib/utils";
@@ -40,16 +39,15 @@ const CASE_NUMBER_PATTERN = /^\d{4}타경\d+$/;
  */
 export function Step1Property({
   data,
-  posts,
   onChange,
   onNext,
 }: {
   data: ApplyFormData;
-  posts: AnalysisFrontmatter[];
   onChange: (patch: Partial<ApplyFormData>) => void;
   onNext: () => void;
 }) {
   const [caseTaken, setCaseTaken] = useState(false);
+  const [caseClosed, setCaseClosed] = useState(false);
   const [checking, setChecking] = useState(false);
   const [listings, setListings] = useState<CourtListingSummary[]>([]);
   // cycle 1-D-A-2: 매칭 상태 banner (checking / nomatch 3초 노출 사후 manualEntry 자동 진입).
@@ -75,9 +73,9 @@ export function Step1Property({
     }
     setMatchStatus("idle");
     setCaseTaken(false);
+    setCaseClosed(false);
     setListings([]);
     if (
-      data.matchedPost ||
       data.matchedListing ||
       data.manualEntry ||
       data.bidDate ||
@@ -86,7 +84,6 @@ export function Step1Property({
       data.caseConfirmedByUser
     ) {
       latestPatchRef.current({
-        matchedPost: null,
         matchedListing: null,
         manualEntry: false,
         bidDate: "",
@@ -130,6 +127,7 @@ export function Step1Property({
         available?: boolean | null;
         reason?: string;
         listings?: CourtListingSummary[];
+        case_status?: "active" | "closed" | "not_found";
       };
 
       setCaseTaken(json.available === false);
@@ -137,12 +135,18 @@ export function Step1Property({
       const resultListings = json.listings ?? [];
       setListings(resultListings);
 
+      // cycle 1-D-A-4: case_status="closed" 분기 (종결 사건 광역 안내 + 차단).
+      if (resultListings.length === 0 && json.case_status === "closed") {
+        setCaseClosed(true);
+        setMatchStatus("idle");
+        return;
+      }
+
       if (resultListings.length === 1) {
         const l = resultListings[0];
         setMatchStatus("idle");
         latestPatchRef.current({
           matchedListing: l,
-          matchedPost: null,
           manualEntry: false,
           bidDate: l.bid_date ?? "",
           propertyType: l.usage_name ?? "",
@@ -152,50 +156,27 @@ export function Step1Property({
           auctionRound: l.auction_round,
         });
       } else if (resultListings.length === 0) {
-        const fmMatch =
-          posts.find((p) => p.caseNumber === q) ??
-          posts.find(
-            (p) =>
-              p.caseNumber.replace(/\s/g, "") === q.replace(/\s/g, "")
-          );
-        if (fmMatch) {
-          setMatchStatus("idle");
+        // cycle 1-D-A-4: 대법원 fetch 단독 paradigm (Cowork 콘텐츠 매칭 광역 폐기).
+        // 매칭 0건 → 3초 안내 사후 manualEntry 자동 진입.
+        setMatchStatus("nomatch");
+        nomatchTimerRef.current = setTimeout(() => {
           latestPatchRef.current({
-            matchedPost: fmMatch,
             matchedListing: null,
-            caseNumber: fmMatch.caseNumber,
-            manualEntry: false,
-            bidDate: fmMatch.bidDate,
-            propertyType: fmMatch.propertyType,
-            propertyAddress: fmMatch.address,
+            manualEntry: true,
+            bidDate: "",
+            propertyType: "",
+            propertyAddress: "",
             caseConfirmedByUser: false,
             caseConfirmedAt: null,
             auctionRound: 1,
           });
-        } else {
-          // cycle 1-D-A-2: 매칭 0건 → 3초 안내 사후 manualEntry 자동 진입.
-          setMatchStatus("nomatch");
-          nomatchTimerRef.current = setTimeout(() => {
-            latestPatchRef.current({
-              matchedPost: null,
-              matchedListing: null,
-              manualEntry: true,
-              bidDate: "",
-              propertyType: "",
-              propertyAddress: "",
-              caseConfirmedByUser: false,
-              caseConfirmedAt: null,
-              auctionRound: 1,
-            });
-            setMatchStatus("idle");
-            nomatchTimerRef.current = null;
-          }, 3000);
-        }
+          setMatchStatus("idle");
+          nomatchTimerRef.current = null;
+        }, 3000);
       } else {
         // 복수 매칭 → 사용자가 selectListing으로 선택 대기
         setMatchStatus("idle");
         latestPatchRef.current({
-          matchedPost: null,
           matchedListing: null,
           manualEntry: false,
           bidDate: "",
@@ -223,6 +204,7 @@ export function Step1Property({
     !!data.caseNumber.trim() &&
     !!data.court &&
     !caseTaken &&
+    !caseClosed &&
     !checking &&
     !!data.bidDate &&
     !!data.caseConfirmedByUser;
@@ -235,7 +217,6 @@ export function Step1Property({
   function selectListing(listing: CourtListingSummary) {
     onChange({
       matchedListing: listing,
-      matchedPost: null,
       manualEntry: false,
       bidDate: listing.bid_date ?? "",
       propertyType: listing.usage_name ?? "",
@@ -247,14 +228,11 @@ export function Step1Property({
     });
   }
 
-  const post = data.matchedPost;
+  // cycle 1-D-A-4: matchedPost 광역 폐기 (대법원 fetch 단독 paradigm).
   const listing = data.matchedListing;
   const regionGroups = groupCourtsByRegion();
 
-  // CaseConfirmCard 표시 조건:
-  // - matched: listing 또는 post 매칭 성공 시
-  // - manual: manualEntry=true (매칭 0건으로 자동 전환) 시
-  const showMatchedConfirm = !caseTaken && (!!listing || !!post);
+  const showMatchedConfirm = !caseTaken && !!listing;
   const showManualConfirm = !caseTaken && data.manualEntry;
 
   return (
@@ -263,9 +241,8 @@ export function Step1Property({
         <h2 className="text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
           법원과 사건번호를 입력해주세요
         </h2>
-        <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
-          입력하신 사건번호로 접수를 진행합니다. 감정가·최저가·입찰일 등 상세
-          정보는 접수 후 확인 메시지에 함께 안내드립니다.
+        <p className="mt-2 text-base leading-6 text-[var(--color-ink-700)]">
+          사건번호로 접수를 진행합니다.
         </p>
       </header>
 
@@ -397,6 +374,31 @@ export function Step1Property({
             은(는) 현재 직접 대리 서비스 지역이 아닙니다. 접수하시면 관리자가
             확인 후 처리 가능 여부 또는 협력사 연결을 안내드립니다. 인천지방법원
             외 지역은 수임까지 시간이 더 걸릴 수 있습니다.
+          </div>
+        </div>
+      )}
+
+      {/* cycle 1-D-A-4: 종결 사건 안내 (차단) */}
+      {caseClosed && (
+        <div
+          role="alert"
+          className="rounded-[var(--radius-xl)] border-2 border-[var(--color-accent-red)] bg-red-50 p-5"
+        >
+          <div className="flex items-start gap-2">
+            <AlertCircle
+              size={20}
+              className="mt-0.5 shrink-0 text-[var(--color-accent-red)]"
+              aria-hidden="true"
+            />
+            <div>
+              <p className="text-sm font-black text-[var(--color-accent-red)]">
+                이 사건은 매각이 종결됐습니다
+              </p>
+              <p className="mt-1 text-xs leading-5 text-[var(--color-ink-700)]">
+                대법원 경매정보에 따르면 본 사건은 종결 또는 매각기일이 지났습니다.
+                다른 사건번호로 다시 검색해주세요.
+              </p>
+            </div>
           </div>
         </div>
       )}
@@ -550,7 +552,6 @@ export function Step1Property({
               onClick={() =>
                 onChange({
                   matchedListing: null,
-                  matchedPost: null,
                   manualEntry: false,
                   bidDate: "",
                   propertyType: "",
@@ -572,60 +573,8 @@ export function Step1Property({
         </div>
       )}
 
-      {/* frontmatter 매칭 (폴백, court_listings에 없을 때) */}
-      {post && !listing && !caseTaken && (
-        <div className="rounded-[var(--radius-xl)] border-2 border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/50 p-6">
-          <div className="flex items-center gap-2 text-[var(--color-ink-900)]">
-            <CheckCircle2 size={18} aria-hidden="true" />
-            <p className="text-xs font-black uppercase tracking-wider">
-              이 물건은 저희 분석 글에 소개되어 있습니다
-            </p>
-          </div>
-          <h3 className="mt-3 text-xl font-black tracking-tight text-[var(--color-ink-900)]">
-            {post.title}
-          </h3>
-          {post.subtitle && (
-            <p className="mt-1 text-sm text-[var(--color-ink-500)]">
-              {post.subtitle}
-            </p>
-          )}
-          <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-4 text-sm sm:grid-cols-3">
-            <div>
-              <dt className="text-xs text-[var(--color-ink-500)]">입찰일</dt>
-              <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
-                {post.bidDate}
-                {post.bidTime ? ` ${post.bidTime}` : ""}
-              </dd>
-            </div>
-            <div className="col-span-2">
-              <dt className="text-xs text-[var(--color-ink-500)]">주소</dt>
-              <dd className="mt-1 text-sm text-[var(--color-ink-700)]">
-                {post.address}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs text-[var(--color-ink-500)]">감정가</dt>
-              <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
-                {post.appraisalDisplay ?? formatKoreanWon(post.appraisal)}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs text-[var(--color-ink-500)]">
-                {post.round}차 최저가
-              </dt>
-              <dd className="mt-1 font-black tabular-nums text-[var(--color-accent-red)]">
-                {post.minPriceDisplay ?? formatKoreanWon(post.minPrice)}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs text-[var(--color-ink-500)]">유형</dt>
-              <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
-                {post.propertyType} · {post.auctionType}
-              </dd>
-            </div>
-          </dl>
-        </div>
-      )}
+      {/* cycle 1-D-A-4: frontmatter 매칭 (Cowork 콘텐츠) 카드 광역 폐기.
+          대법원 fetch 단독 paradigm → matchedListing 카드 단독. */}
 
       {/* 1-D-A 면책 alert — 사건 정보 영역 표시 시 노출 */}
       {(showMatchedConfirm || showManualConfirm) && (
@@ -665,7 +614,6 @@ export function Step1Property({
             // 강제 모달의 X/배경/Esc 차단 원칙은 유지.
             onChange({
               caseNumber: "",
-              matchedPost: null,
               matchedListing: null,
               manualEntry: false,
               bidDate: "",

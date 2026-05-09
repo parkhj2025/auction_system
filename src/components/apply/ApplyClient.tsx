@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+// cycle 1-D-A-4: matchedPost 광역 폐기 (Cowork 콘텐츠 source 광역 폐기 / 대법원 fetch 단독).
+import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type {
   ApplyFormData,
@@ -8,7 +9,6 @@ import type {
   ApplyDocuments,
 } from "@/types/apply";
 import { INITIAL_APPLY_DATA } from "@/types/apply";
-import type { AnalysisFrontmatter } from "@/types/content";
 import { APPLY_STEPS, COURTS_ALL, type ApplyStepId } from "@/lib/constants";
 import { ApplyStepIndicator } from "./ApplyStepIndicator";
 import { Step1Property } from "./steps/Step1Property";
@@ -20,7 +20,7 @@ import { ApplyPropertySidebar } from "./ApplyPropertySidebar";
 
 const STEP_ORDER: ApplyStepId[] = APPLY_STEPS.map((s) => s.id);
 
-export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
+export function ApplyClient() {
   const searchParams = useSearchParams();
   const initialCase = searchParams.get("case") ?? "";
   // Phase 6.5-POST 작업 1: court 영문/courtCode/한글 무엇이 와도 한글 label로 정규화.
@@ -48,26 +48,8 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
   // PDF 성공 시 null clear. /api/apply 실패 시 lastOrderId 미set 상태 유지.
   const [lastOrderId, setLastOrderId] = useState<string | null>(null);
 
-  // URL ?case= 로 들어왔을 때 자동 매칭 (Phase 4-CONFIRM: bidDate 등 자동 복사 포함)
-  useEffect(() => {
-    if (initialCase && !data.matchedPost) {
-      const match = posts.find((p) => p.caseNumber === initialCase);
-      if (match) {
-        setData((d) => ({
-          ...d,
-          matchedPost: match,
-          caseNumber: match.caseNumber,
-          court: match.court,
-          bidDate: match.bidDate,
-          propertyType: match.propertyType,
-          propertyAddress: match.address,
-          caseConfirmedByUser: false,
-          caseConfirmedAt: null,
-        }));
-      }
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
+  // cycle 1-D-A-4: initialCase 자동 매칭 광역 폐기 (Cowork 콘텐츠 source paradigm 광역 폐기).
+  // URL ?case= 광역 = caseNumber state 광역 단독 prefill (위 useState 정합).
 
   const merge = (patch: Partial<ApplyFormData>) =>
     setData((d) => ({ ...d, ...patch }));
@@ -165,10 +147,7 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
         form.set("caseNumber", data.caseNumber);
         form.set("court", data.court);
         form.set("manualEntry", String(data.manualEntry));
-        if (data.matchedPost) {
-          form.set("matchedSlug", data.matchedPost.slug);
-          form.set("matchedTitle", data.matchedPost.title);
-        }
+        // cycle 1-D-A-4: matchedSlug/Title 광역 폐기 (Cowork 콘텐츠 source 광역 분리).
         form.set("bidDate", data.bidDate);
         form.set("propertyType", data.propertyType);
         form.set("propertyAddress", data.propertyAddress);
@@ -268,12 +247,7 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
     switch (currentStep) {
       case "property":
         return (
-          <Step1Property
-            data={data}
-            posts={posts}
-            onChange={merge}
-            onNext={goNext}
-          />
+          <Step1Property data={data} onChange={merge} onNext={goNext} />
         );
       case "bid-info":
         return (
@@ -312,7 +286,7 @@ export function ApplyClient({ posts }: { posts: AnalysisFrontmatter[] }) {
         ) : null;
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentStep, data, submitting, submitError, applicationId, posts]);
+  }, [currentStep, data, submitting, submitError, applicationId]);
 
   // 1-D-A: 사이드바 mount = 매칭 listing 있고 Step5(complete) 외 모든 step.
   // manualEntry = matchedListing null → 사이드바 0 / ApplyStepIndicator 메타 line fallback.
