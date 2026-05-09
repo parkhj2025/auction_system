@@ -266,7 +266,12 @@ export function Step1Property({
               {regionGroups.map((group) => (
                 <optgroup key={group.region} label={group.region}>
                   {group.courts.map((c) => (
-                    <option key={c.label} value={c.label}>
+                    <option
+                      key={c.label}
+                      value={c.label}
+                      disabled={!c.isServiced}
+                      className={c.isServiced ? "" : "text-gray-400"}
+                    >
                       {c.label}
                       {c.isServiced ? " \u2713" : ""}
                     </option>
@@ -329,9 +334,8 @@ export function Step1Property({
           </div>
         </div>
         <p className="mt-3 text-xs text-[var(--color-ink-500)]">
-          법원은 전국 어느 법원이든 선택할 수 있습니다. 사건번호는 법원 고유 포맷
-          (예: 2024타경12345)으로 입력 후 <strong>Enter 키 또는 &ldquo;사건번호 확인&rdquo;
-          버튼</strong>으로 매칭을 확인해주세요.
+          현재 인천지방법원 본원만 신청 가능합니다. 서비스 지역은 점차 확대될
+          예정입니다.
         </p>
       </div>
 
