@@ -1,294 +1,263 @@
 # 경매퀵 웹사이트 핸드오프 문서
 
 > **용도**: 다음 세션 진입 시 본 문서 단일 영역 광역 컨텍스트 영역.
-> **최종 업데이트**: 2026-05-09 (Stage 2 cycle 1-A 보강 5 dump 회신 / Opus 검수 대기)
-> **현재 빌드 상태**: HEAD = `ab4b66b` (Stage 2 cycle 1-A 보강 4 - CaseConfirmModal 메인 paradigm 정합 + 행안부 검색 API 통합 / production 시각 검증 OK)
-> **production URL**: https://auctionsystem-green.vercel.app/
-> **다음 세션 진입 트리거**: **형준님 = 보강 5 dump 5건 Opus 검수 회신 송부 + 정정 markdown 산출 + push GO**
-> **함께 읽을 문서**: `CLAUDE.md`, `BUILD_GUIDE.md`, `docs/roadmap.md`
+> **최종 업데이트**: 2026-05-10 (cycle 1-D-A-4-3 보강 1 정정 2 종료 / 형준님 production 시각 검증 광역 수정사항 대기)
+> **현재 빌드 상태**: HEAD = `3a87632` (cycle 1-D-A-4-3 보강 1 정정 2: BidConfirmModal 신규 + Step2 강제 모달 paradigm / push 완료)
+> **production URL**: https://auctionsystem-green.vercel.app/apply
+> **다음 세션 진입 트리거**: **형준님 = production 시각 검증 광역 수정사항 회신 → 추가 정정 paradigm 진입**
+> **함께 읽을 문서**: `CLAUDE.md` (section 18~27 광역 / §31·§32 영구 룰 광역), 모달 3개 (`ConfirmCaseModal.tsx` + `BidConfirmModal.tsx` + `IssueGuideModal.tsx`)
 
 ---
 
-## 🔥 2026-05-09 핫 스냅샷 — 다음 세션 시작 시 여기부터
+## 🔥 핫 스냅샷 — 다음 세션 시작 시 여기부터
 
 ### 지금 어디인가
 
-**Phase 1.2 (A-1-2)** / **Stage 2 cycle 1-A 보강 5** 진행 중.
+**Stage 2 cycle 1-D-A-4-3 보강 1 정정 2 종료** = `/apply` Step1·2·3 광역 paradigm 광역 정수 정합 cycle.
 
-Stage 1 (메인 페이지) 광역 종료 (cycle 1~10-3 / production OK / 카피 v4 SoT v42.4 확정).
+광역 진행 history:
+- cycle 1-D-A-4-2 (사이드바 폐기 + 단일 카드 + 톤앤매너 일관성 + 4 step 일괄 정정) ✅ push
+- cycle 1-D-A-4-3 (Step3 paradigm 정정 + 발급증 폐기 + IssueGuideModal 신규) ✅ push
+- cycle 1-D-A-4-3 정정 (첨부 서류 회수 + IssueGuideModal 갱신 + §32 신규) ✅ push
+- cycle 1-D-A-4-3 보강 1 (전자본인서명확인서 단독 + 합니다체 + Step3 톤앤매너 일관성) ✅ push
+- cycle 1-D-A-4-3 보강 1 정정 (검증 시점 paradigm + 입찰가 onChange raw 단독) ✅ push
+- **cycle 1-D-A-4-3 보강 1 정정 2 (BidConfirmModal 신규 + Step2 강제 모달 paradigm)** ✅ push (commit `3a87632`)
+- 다음 = **production 시각 검증 광역 수정사항 정정 paradigm** 🔥
 
-Stage 2 cycle 1 = `/apply` 페이지 톤앤매너 적용 cycle 진행 중. 보강 1~4 광역 push 완료 / 보강 5 = dump 회신 단독 (정정 0) / Opus 검수 대기.
+### 본 세션 광역 push history (18 commit)
 
-### 다음 세션 진입 단계
-
-1. **보강 5 dump 5건 회신 = Code 송부 완료** (정정 0 / push 0):
-   - dump 1: canConfirm 광역 정수 (5 필드 검증 paradigm + handleConfirm silent return ⚠️)
-   - dump 2: `--color-accent-red` 토큰 (#dc2626) + 광역 사용처 16건+ + **영구 룰 §9 광역 mismatch 검출**
-   - dump 3: AddressSearch onSelect callback (보강 4 결과 / `addr.full` 단독 set)
-   - dump 4: ApplyFormData propertyAddress = 단일 string + DB orders schema = `property_snapshot JSONB` 단독 / **propertyAddressDetail 컬럼 0**
-   - dump 5: 매각기일 input type=date / min·max 광역 0 / placeholder native paradigm
-
-2. **다음 세션 시작 = Opus 검수 회신 정리본 송부 받기**:
-   - Code 추천 영역 검수 결과 (옵션 i 단일 string 통합 / 영구 룰 §9 갱신 안 / error state paradigm)
-   - 형준님 결정 (propertyAddress paradigm + 영구 룰 §9 갱신 텍스트 + 추가 정정 영역)
-   - Opus 산출 정정 markdown (push GO 통합)
-
-3. **Code = 정정 + commit + push + 회신** (Opus 정정 markdown 송부 후 진입).
-
----
-
-## Stage 2 cycle 1-A 보강 5 (현재 / dump 회신 단독)
-
-### 의뢰 정수
-1. **상세주소 (동·호·층) 입력 + 확정 단계 신규 도입** (현재 광역 0 검출)
-2. **필수 항목 시각 안내 (* 별표) + 미입력 시 error state paradigm 신규**
-3. **영구 룰 §9 갱신**: "red = Pricing rush+endpoint + form error state 한정 추가"
-
-### Code dump 회신 핵심 진단 (회신 완료 / push 0)
-
-#### dump 1 — canConfirm 분해 5 필드
-```ts
-canConfirm =
-  !!data.bidDate &&
-  !!data.propertyType && selectValue !== "" && otherTextOk &&
-  !!data.propertyAddress.trim() &&
-  roundOk &&
-  agreed
-```
-- handleConfirm 광역 = **invalid 시 silent return** ⚠️ → error state paradigm 신규 도입 영역
-
-#### dump 2 — 영구 룰 §9 광역 mismatch 검출
-- 룰 §9 명시 = "red Pricing rush+endpoint 한정"
-- 광역 코드 검출 = Step2BidInfo / FileUpload / PhoneVerifyModal / Step1 caseTaken / AddressSearch / login error 등 **이미 광역 사용**
-- **갱신 추천 텍스트**:
-  ```
-  pink·red·coral 0 (red 한정 예외:
-    - Pricing rush+endpoint
-    - form error state (필수 *별표 + invalid border + 안내 메시지)
-    - 사용자 행동 차단 알림 (이미 접수 진행 중 / 본인인증 실패 등)
-  )
-  ```
-
-#### dump 3 — AddressSearch.onSelect callback type
-```ts
-type AddressSearchResult = {
-  full: string;          // 도로명주소 (set 대상)
-  jibun: string;         // 지번 (참고)
-  zipCode: string;       // 우편번호
-  sido / sigungu / eupmyeondong: string;
-  buildingName: string;  // 옵션
-};
-```
-- 현 paradigm = `addr.full` 단독 set / 다른 필드 미사용
-
-#### dump 4 — propertyAddress 광역 paradigm
-- ApplyFormData = `propertyAddress: string` **단일 string 광역**
-- DB orders schema = `property_snapshot JSONB` 단독 / **propertyAddressDetail 별개 컬럼 0**
-- API route = form fetch → property_snapshot.address set
-- **Code 추천 = 옵션 (i) 단일 string 통합** (DB·API·type 변동 0 / modal local state addressDetail 신규 / "확인" 클릭 시 통합)
-- 옵션 (ii) 분리 = DB 마이그레이션 의무 (광역 변동 ↑ / 보존 의무 충돌)
-
-#### dump 5 — 매각기일 input
-- type=date / placeholder native / **min·max 광역 0** (auction 검증 0 / 후속 cycle 영역)
-- 빈 값 = `data.bidDate === ""` / canConfirm `!!data.bidDate` false
-
-### 정정 정수 사전 명시 (Opus 결정 후 진입)
-- **A. 상세주소 단계 신규**: modal local useState addressDetail / 도로명 set 후 input 노출 / 광역 (β) 선택 paradigm 추천 (단독주택 등 case 정합)
-- **B. 필수 표시**: 5 필드 + checkbox 광역 `*` 별표 (text-red-500 또는 var(--color-accent-red))
-- **C. error state**: useState showErrors + errors object + invalid border red + 안내 메시지 + 자동 reset onChange
-- **D. scroll to first invalid**: `document.getElementById("modal-${field}")?.scrollIntoView({ behavior: "smooth", block: "center" })`
-- **E. 영구 룰 §9 갱신**: 위 추천 텍스트
+| commit | 영역 |
+|---|---|
+| `10ce64e` | cycle 1-D-A-4: /api/orders/check icn1 region 추가 (한국 IP source 정합) |
+| `0f3d1ba` | cycle 1-D-A-4 진단: triggerLookup + ApplyClient console.log 추가 |
+| `ecf3b82` | cycle 1-D-A-4 정정: ApplyClient JSX 구조 안정화 + Step1Property first-mount 가드 |
+| `802b1d4` | cycle 1-D-A-4-2: 모바일 앱 form 정합 + 카피 정제 + 인증/manualEntry 광역 폐기 |
+| `7093ad7` | cycle 1-D-A-4-2 paradigm 회수: 사이드바 폐기 + 단일 카드 + 4 step 일괄 정정 |
+| `55a2372` | cycle 1-D-A-4-2: 톤앤매너 일관성 + 사진 4-col + amber 통합 + CTA rounded-xl |
+| `658d468` | cycle 1-D-A-4-2: 텍스트 hierarchy + amber 박스 폐기 + word-break + single column |
+| `b456262` | cycle 1-D-A-4-2 보강 1: ConfirmCaseModal + 확인 시각 UI 폐기 + Step1 CTA 폐기 |
+| `78ebcf6` | cycle 1-D-A-4-2 보강 1: Step1 h2 + 카드 헤더 폐기 + 본문 CTA 폐기 |
+| `2bb4029` | Step2 박스 paradigm 단순화 + 카피 차별화 |
+| `a8d330d` | Step2 보강 2: 재경매 ? tooltip + 가격 inline 명료화 |
+| `53b58e5` | cycle 1-D-A-4-2 final: modal 흐름 정정 + 가격 inline 정식 어휘 |
+| `3fe7620` | cycle 1-D-A-4-3: Step3 paradigm 정정 + 발급증 폐기 + IssueGuideModal + Step2 h2 동시 정정 |
+| `c23a05b` | cycle 1-D-A-4-3 정정: 첨부 서류 paradigm 회수 + IssueGuideModal 갱신 + §32 신규 |
+| `8afeff2` | cycle 1-D-A-4-3 보강 1: 전자본인서명확인서 단독 + 합니다체 + Step3 톤앤매너 일관성 |
+| `56de90d` | cycle 1-D-A-4-3 보강 1 정정: 입찰가 onBlur truncate + section 23/24 신규 |
+| `5f0d2a5` | cycle 1-D-A-4-3 보강 1 정정: 검증 시점 paradigm 회수 + 입찰가 onChange raw 단독 |
+| **`3a87632`** | **cycle 1-D-A-4-3 보강 1 정정 2: BidConfirmModal 신규 + Step2 강제 모달 paradigm** |
 
 ---
 
-## Stage 2 cycle 1-A 광역 흐름 (전체 사이클 history)
+## 광역 paradigm 변동 정수 (본 세션 광역 정합 영구 명문화)
 
-### Stage 1 → Stage 2 전환 (2026-05-08)
+### 1. /apply 광역 구조 paradigm (cycle 1-D-A-4-2 paradigm 회수)
 
-Stage 1 cycle 1~10-3 광역 종료 (메인 페이지 광역 paradigm 확정 / production OK).
+- **사이드바 영구 폐기** (ApplyPropertySidebar.tsx 광역 영구 삭제)
+- **단일 카드 paradigm** = max-w-[640px] mx-auto + rounded-2xl + border-gray-200 + bg-white + p-5
+- **모바일 + 데스크탑 동일 paradigm** (§A-12 정합)
+- **4 step 일괄 정합** (Step1·Step2·Step3·Step4 광역 톤앤매너 일관성)
 
-Stage 2 진입 = sub-page 광역 톤앤매너 적용. 시작 = `/apply` (사업 핵심 conversion 페이지).
+### 2. Step1 동의 step paradigm (cycle 1-D-A-4-2 보강 1)
 
-### cycle 1-A 보강 history (총 5 cycle / 4 push 완료 / 1 dump 대기)
+- h2 페이지 헤더 = "사건 정보 확인" + sub "의뢰하실 사건 정보가 맞는지 확인해주세요"
+- 단일 매칭 카드 = 카드 헤더 dom 영구 폐기 (sub로 흡수)
+- 체크박스 = ConfirmCaseModal trigger 단독 paradigm
+- modal "확인" → Step1 머무름 (setStep(2) 영구 폐기) / 사용자 직접 본문 CTA click → setStep(2)
+- modal "취소" → checked 회복 + Step1 머무름
+- backdrop·ESC 닫기 = 영구 폐기 (강제 모달 paradigm 정수)
+- form.confirmedAt 백엔드 timestamp 보존 / "확인 시각 기록됨" UI 영구 폐기
 
-| Cycle | commit | 정정 영역 |
+### 3. Step2 입찰가 paradigm (cycle 1-D-A-4-3 보강 1 정정 + 정정 2)
+
+- **검증 시점 paradigm** = 다음 CTA click 시점 단독 (mount + onChange + onBlur 자동 검증 영구 폐기)
+- **attemptedNext state** = Step2BidInfo internal (다음 CTA click 시점 setAttemptedNext(true))
+- **error 광역 표시** = `showErrors && errors[key]` 분기 (mount 시점 error 표시 0)
+- **입찰가 input** = onChange raw 보관 단독 (truncate 영역 0) + onBlur handler 영구 폐기
+- **truncateBidAmount utility** = `Math.floor(value / 10000) * 10000` (천원 이하 0 자동 절삭)
+- **다음 CTA click 시점** = truncate + 검증 + (정합 시) BidConfirmModal pop paradigm
+- **BidConfirmModal** = 입찰 금액 24px 강조 + 한글 표기 sub + "확인" → setStep(3) / "수정" → modal 닫힘 + bidAmount 보존
+
+### 4. Step3 첨부 서류 paradigm (cycle 1-D-A-4-3 보강 1)
+
+- **전자본인서명확인서 단독 paradigm** (인감증명서 + 본인서명사실확인서 양 서류 paradigm 영구 폐기)
+- FileUpload 1개 (label "전자본인서명확인서" + description "정부24에서 발급한 PDF") + 신분증 사본 보존
+- info 박스 = 첫 진입 사전 인지 paradigm (1줄 + button "발급 방법" → IssueGuideModal trigger)
+- IssueGuideModal = 4단계 ol (주민센터 등록 + 정부24 PC 접속 + 발급 + 업로드) + PC 웹 안내 paragraph
+- 어미 = 합니다체 단독 paradigm (~합니다 / ~돼요 → 영구 폐기)
+- form field name `eSignFile` 변동 0 (백엔드 단독 paradigm)
+
+### 5. 모달 3개 paradigm 분류 (§31 영구 룰 / cycle 1-D-A-4-3 보강 1 정정 2)
+
+| 모달 | 영역 | paradigm |
 |---|---|---|
-| **cycle 1-A 1차** | `4093b62` | /apply 헤더 PageHero 차용 + ApplyHeroMotion + 카피 정정 + 토큰 매핑 + PageHero size 80→88 |
-| **cycle 1-A 보강** | `3985fe4` | ApplyChecklist 광역 dom 폐기 (안심 5건 광역 0 / 형준님 진의 정합) |
-| **cycle 1-A 보강 1+** | `4e3ed95` | TopNav "신청하기" CTA 신규 + /apply 본론 직진 (PageHero 광역 폐기 + ApplyHeroMotion 폐기 + 데스크탑 layout container-app 정합) |
-| **cycle 1-A 보강 2** | `73fb86c` | ApplyStepIndicator 재구성 (2-row + 도움말 버튼) + ApplyGuideModal 신규 + Step1 사건번호 버튼 모바일 overflow 정정 + 카톡 어휘 정정 (/apply 영역 한정) |
-| **cycle 1-A 보강 3** | `456f104` | ApplyStepIndicator 원·선 직접 연결 + 라벨 줄바꿈 통일 (`\n` 광역) + Step1 CTA state 분기 (green primary 활성/gray 비활성) + 박스 메인 정합 (rounded-2xl + flat) + CaseConfirmModal X 버튼 (onReturn callback) |
-| **cycle 1-A 보강 4** | `ab4b66b` | CaseConfirmModal 메인 paradigm 정합 + 행안부 검색 API 통합 (/api/address proxy + AddressSearch) + 카피 마케터 검수 (4건) + 버튼 광역 정합 (좌측 outline + 우측 green primary / 룰 33 transition·focus-visible 정합) + .env.example JUSO_API_KEY 추가 |
-| **cycle 1-A 보강 5** | (dump 회신 단독 / push 0) | 상세주소 단계 신규 + 필수 표시 + error state + 영구 룰 §9 갱신 (Opus 검수 대기) |
+| **ConfirmCaseModal** (Step1 / 동의) | 강제 paradigm | backdrop·ESC 닫기 영구 폐기 / "확인" + "취소" CTA |
+| **BidConfirmModal** (Step2 / 검증) | 강제 paradigm | backdrop·ESC 닫기 영구 폐기 / "확인" + "수정" CTA |
+| **IssueGuideModal** (Step3 / 정보) | 정보 paradigm | backdrop·ESC 닫기 보존 / "확인" 단독 CTA |
+
+**Modal 토큰 광역 정합 (양 paradigm 공통)**:
+- max-w-[480px] + rounded-2xl + p-6 + bg-white
+- backdrop bg-black/50 + backdrop-blur-sm + px-5
+- 헤더 18 black ink-900
+- CTA 56 rounded-xl + brand-green text-white
+
+### 6. 톤앤매너 일관성 paradigm (CLAUDE.md section 22)
+
+- h2 광역 통일 = `text-2xl font-black tracking-[-0.015em] leading-[1.2] ink-900`
+- 카드 paradigm 광역 통일 = rounded-2xl + border-gray-200 + bg-white + p-5
+- 시각 위계 SCALE = 카드 16 ⊃ alert/info 12 ⊃ input/dropzone 10
+- form 라벨 = `--label-fs-app` (16px) font-bold ink-900
+- description = text-xs (12px) leading-5 ink-500
+- 라벨 ↔ input gap = mb-2.5 (10px)
+
+### 7. §32 백엔드 표현 프론트엔드 노출 0 paradigm (영구 룰)
+
+- 내부 백엔드 표현 (timestamp / column name / status code / API code / 분류 코드 / field name) UI 노출 NG
+- 어미 = 합니다체 단독 paradigm (요체 ~예요 / ~돼요 영구 폐기)
+- 사용자 노출 어휘 = 마케터 paradigm 단독 + 평이한 한국어
+- 자가 검증 = grep paradigm 의무
 
 ---
 
-## Stage 2 cycle 1-A 광역 결과 (production 광역 적용)
+## CLAUDE.md 광역 명문화 영역 (section 18~27)
 
-### 영향 파일 광역 inventory
-
-**신규 생성:**
-- `src/components/apply/ApplyGuideModal.tsx` (보강 2)
-- `src/components/apply/AddressSearch.tsx` (보강 4)
-- `src/app/api/address/route.ts` (보강 4 / 행안부 proxy)
-
-**광역 정정:**
-- `src/app/apply/page.tsx` (헤더 광역 폐기 / ApplyClient 직진)
-- `src/components/apply/ApplyClient.tsx` (max-w container-app + lg:py-16)
-- `src/components/apply/ApplyStepIndicator.tsx` (2-row + 라벨 광역 + line 직접 연결)
-- `src/components/apply/ApplyChecklist.tsx` (5건 카피 + 토큰 매핑 / /apply 광역 mount 0 / /service 광역 보존)
-- `src/components/apply/CaseConfirmModal.tsx` (광역 메인 정합 + AddressSearch 통합)
-- `src/components/apply/steps/Step1Property.tsx` (사건번호 버튼 모바일 overflow + CTA state 분기 + 박스 디자인 + 카톡 카피 정정)
-- `src/components/apply/steps/Step5Complete.tsx` (카톡 카피 정정 2건)
-- `src/components/layout/TopNav.tsx` (CTA "신청하기" 신규 mount 모바일+데스크탑)
-- `src/components/common/PageHero.tsx` (h1 size 80→88)
-- `src/lib/constants.ts` (APPLY_STEPS label `\n` 광역 강제 줄바꿈)
-- `.env.example` (JUSO_API_KEY 영역 추가)
-
-**광역 폐기 (파일 삭제):**
-- `src/components/apply/ApplyHeroMotion.tsx` (보강 1+ / 신규 후 폐기)
-
-### 광역 paradigm 정수 (production 광역 적용)
-
-#### TopNav 광역
-- "신청하기" CTA 신규 (모바일 hamburger 좌측 + 데스크탑 user/login 좌측 / 별개 2 Link mount / className 분기)
-- bg `var(--brand-green)` + rounded-full + transition-colors duration-150 + focus-visible:ring
-
-#### /apply page.tsx 광역 (본론 직진)
-- TopNav 직접 → ApplyClient 직진 paradigm
-- 헤더 영역 광역 폐기 (PageHero · ApplyHeroMotion · breadcrumb · 미니 헤더 · 신청 가이드 link 광역)
-- ApplyClient section = `container-app py-10 lg:py-16` 메인 정합
-
-#### ApplyStepIndicator 광역 (2-row + 도움말)
-- 상단 row: "STEP {n} / 5 · {label}" (green + charcoal) + "도움말" 버튼 (HelpCircle icon)
-- 중간 row: 5 step 원 (h-9/h-10 + ring-4 ring-#00C853/20 활성) + 라벨 광역 노출 (`\n` 강제 줄바꿈) + progress line (h-[2px] flex-1 / 원 직접 연결 / bg-gray-200)
-- 토큰 매핑: `--color-ink-*` → `#111418` + `#00C853` + gray-* (메인 정합)
-- ApplyGuideModal mount + state 광역 (client component 변환)
-
-#### ApplyGuideModal 광역 신규
-- PhoneVerifyModal paradigm 정합 (fixed inset-0 + bg-black/50 + p-4)
-- backdrop dismiss + ESC + X + 닫기 버튼 4-way dismiss
-- 5단계 광역 안내 (물건 확인 / 입찰 정보 / 서류 업로드 / 확인·제출 / 접수 완료)
-
-#### CaseConfirmModal 광역 (보강 3·4 결과)
-- 디자인 메인 정합: rounded-2xl + border-gray-200 + body px-6 py-6 + footer bg-gray-50 + py-5
-- inputClass 메인 정합: h-12 + rounded-xl + border-gray-200 + text-base (모바일 zoom 방지) + transition-colors + focus:ring-#00C853/20
-- 라벨·안내 메인 정합: gray-* 토큰 + text-sm/text-base 광역
-- header 광역: ShieldCheck + 제목 + X 버튼 (onReturn callback / 강제 paradigm 보존)
-- footer 버튼 광역:
-  - 좌측 ("사건번호 다시 입력"): outline white + rounded-full + border-gray-300 + transition + focus-visible
-  - 우측 ("확인"): green primary `var(--brand-green)` + rounded-full + flat + transition + focus-visible + disabled gray-200
-  - layout: flex flex-col gap-3 sm:flex-row
-- 카피 마케터 검수: 본문 안내 단순화 + 좌측 버튼 통일 + 하단 안내 강조 inline
-- 강제 paradigm 보존 (backdrop dismiss 차단 + ESC 차단)
-
-#### 행안부 검색 API 통합 (보강 4)
-- `/api/address` server-side proxy (process.env.JUSO_API_KEY 단독 / 클라이언트 노출 0)
-- AddressSearch.tsx client (검색 input + list + 선택 paradigm)
-- CaseConfirmModal 안 주소 input paradigm:
-  - 사건 매칭 OK = readonly + bg-gray-50 + "변경" 버튼
-  - 사건 매칭 0 = "주소 검색" 버튼 (AddressSearch 직접)
-  - addressChanged 검출 시 "원래 주소로 복구" link
-
-#### Step1Property 광역 (보강 2·3)
-- 사건번호 input + 버튼 모바일 vertical stack (sm:flex-row)
-- 사건조회 CTA state 분기: green primary 활성 / gray-100 비활성 (caseConfirmedByUser 시 "확인 완료")
-- 다음 버튼: green primary 활성 / gray-200 비활성 (canProceed 분기 / shadow 폐기)
-- 박스 디자인: rounded-2xl + border-gray-200 + bg-white + p-5 lg:p-8 + flat
-- caseConfirmedByUser 자동 reset paradigm (input onChange 광역에서 caseConfirmedByUser=false + caseConfirmedAt=null 동시 set)
-- 카톡 어휘 광역 폐기 ("직접 안내" / "도움말 확인")
-
-#### Step5Complete 카톡 어휘 광역 폐기
-
-#### ApplyChecklist 광역 (보강 1·1+)
-- /apply page.tsx 광역 mount 0 (보강 1 결과)
-- /service 광역 사용 보존 (다른 sub-page 변동 0 정합)
-- CHECKLIST_ITEMS 5건 카피 마케터 검수 + 토큰 메인 정합 (광역 영향 = /service 광역 자동 적용 / 사업 정수 정합 ✓)
-
-#### PageHero size 88 광역 (보강 1+)
-- h1 lg:text-[80px] → lg:text-[88px] (메인 v53 §5 정수 정합)
-- 광역 sub-page 영향: /about · /partners · /insight 자동 일관성 (의도된 광역 변동)
+| section | 영역 |
+|---|---|
+| 18 | cycle 1-D-A-2 — /apply 모바일 앱 form paradigm 광역 전환 |
+| 19 | cycle 1-D-A-3-2 — 크롤링 paradigm 광역 전환 |
+| 20 | Step1 동의 step paradigm |
+| 21 | Step3 첨부 서류 paradigm + 모달 분리 paradigm |
+| 22 | Step1·Step2·Step3 광역 톤앤매너 일관성 paradigm |
+| 23 | §32 백엔드 표현 프론트엔드 노출 0 paradigm (영구 룰) |
+| 24 | Step2 입찰가 input paradigm |
+| 25 | Step 광역 검증 시점 paradigm |
+| 26 | §31 모달 paradigm 분류 광역 (영구 룰) |
+| 27 | Step2 BidConfirmModal paradigm |
 
 ---
 
-## ⚠️ 형준님 영역 의뢰 (production 광역 동작 정합 의무)
+## 다음 세션 진입 paradigm 광역
 
-### JUSO_API_KEY 발급 + 설정 (보강 4 / 미완)
-- data.go.kr 행안부 도로명주소 검색 API 승인키 발급 (즉시 + 무료)
-- `.env.local` JUSO_API_KEY 추가 (로컬 dev)
-- Vercel Dashboard → Settings → Environment Variables → JUSO_API_KEY 추가 (production)
-- **광역 미설정 시 `/api/address` → 500 에러** (CaseConfirmModal AddressSearch 광역 동작 NG)
+### 진입 트리거
 
----
+**형준님 = production 시각 검증 광역 수정사항 회신** → Code 광역 추가 정정 paradigm 진입.
 
-## 광역 보존 의무 (Stage 2 cycle 1-A 광역)
+### production 시각 검증 5단계 (직전 push `3a87632` 광역)
 
-### 변동 0 영역 (회귀 검증 의무)
-- **메인 페이지 광역** (Hero / Compare / Pricing / Reviews / Insight / TrustCTA / Footer): Stage 1 결과 광역 보존 ✓
-- **다른 sub-page**: /about, /partners, /service, /faq, /notice, /insight, /apply/guide, /contact, /my, /refund, /admin, legal 광역 변동 0 (단 PageHero 차용 sub-page = h1 size 88 자동 일관성 / ApplyChecklist /service = 카피·토큰 자동 적용 / 의도된 광역 변동)
-- **ApplyClient stepView · StickyPropertyBar · showStickyBar 분기 광역 보존**
-- **Step2~5 dom 광역 변동 0** (cycle 1-B 영역 / Step1Property는 보강 2·3에서 정정 / Step5Complete는 카톡 카피만 정정)
-- **/api/apply · Supabase orders·storage·documents 광역 변동 0**
-- **TopNav 기존 메뉴 4건 + sticky + hamburger + drawer 광역 보존** (CTA 신규 추가 단독)
-- **다른 modal (PhoneVerifyModal · ApplyGuideModal) 광역 변동 0** (charcoal primary paradigm 보존 / CaseConfirmModal green primary와 정수 분리)
-- **ApplyChecklist props (values·displayOnly) 광역 보존**
-- **APPLY_STEPS hint 필드 광역 보존** (다른 sub-page /apply/guide:126 광역 step.hint 사용 / 폐기 시 tsc error 검출 / 광역 보존 결정)
-- **CaseConfirmModal 강제 paradigm 보존**: backdrop dismiss 차단 (e.stopPropagation) + ESC 차단 (e.preventDefault) + X 버튼 = onReturn callback 단독
-- **사건 매칭 paradigm 정수 보존** (matchedListing/matchedPost fetch + propertyAddress 자동 set + manualEntry fallback)
-- **Cowork v2.7.1 (raw-content) 광역 변동 0**
+1. **Step2 진입 시점 = placeholder 노출 정합** ("최저가 39,200,000원 이상" 회색 paradigm)
+2. **Step2 입찰가 사용자 입력 시점 = placeholder 영역 0 + 시각 보존** ("249990000" → "249,990,000" display)
+3. **Step2 다음 CTA click 시점 = BidConfirmModal pop** ("249,990,000원" + "한글 표기: 2억 4,999만원" + "위 금액으로 입찰합니다." paragraph)
+4. **BidConfirmModal "확인" → setStep(3) / "수정" → modal 닫힘 + bidAmount 보존 / backdrop·ESC 닫기 영구 폐기** 정합
+5. **BidConfirmModal 토큰 광역 = ConfirmCaseModal paradigm 정합** (max-w + rounded + p-6 + bg + 헤더 18 black + CTA 56 rounded-xl + "수정" ghost paradigm)
 
-### 카톡 어휘 광역 정정 영역 (cycle 1-A 보강 2 / 한정)
-- /apply 광역 4건 정정 (Step1Property × 2 / Step5Complete × 2)
-- 다른 sub-page 광역 12+건 보존 (/service, /apply/guide, /my, /contact, /refund, /faq, legal, analysis 광역 / 후속 cycle 영역)
+### 다음 세션 paradigm 광역
+
+1. 형준님 광역 production 시각 검증 광역 회수 + 수정사항 회신
+2. Code 광역 분기 paradigm 식별 + 추가 정정 markdown 산출
+3. push GO + production 시각 검증 재진입
+4. 정합 시 = cycle 1-D-A-4-3 종료 + cycle 1-D-A-4-4 진입 paradigm
+
+### cycle 1-D-A-4-4 영역 (후속 cycle 광역 / 작업 금지 영역 보존)
+
+- Step4 §A-9 정합 4건 (체크박스 accent ink-900 → brand-green / dl grid-cols-2 → flex flex-col / dt 12 → 14 / dd 14 → 16)
+- ApplyGuideModal:21 + Step4Confirm:233 광역 "전자본인서명확인서" 어휘 정합 (인감증명서 + 본인서명사실확인서 광역 폐기 사후 정합)
+- 다른 sub-page 광역 요체 어미 → 합니다체 회수 paradigm
+- Step1 sub / Step2 sub / Step2 tooltip / Step2 helper 광역 어미 paradigm 정합
 
 ---
 
-## Stage 2 cycle 1 후속 영역 예상 진행 순서
+## 작업 금지 영역 (영구 보존)
 
-| Cycle | 영역 | 정정 정수 |
-|---|---|---|
-| **1-A 보강 5** | CaseConfirmModal | 상세주소 단계 + 필수 표시 + error state + 영구 룰 §9 갱신 (현재 / dump 회신 / Opus 검수 대기) |
-| **1-A 보강 6+** | (Opus 후속 결정) | 시각 검증 NG 시 추가 정정 |
-| **1-B** | Step body 광역 | Step2 BidInfo / Step3 Documents / Step4 Confirm / Step5 Complete 광역 톤앤매너 정합 |
-| **1-C** | CTA · error · 약관 광역 | 광역 form error state 일괄 + 약관 미리보기 modal 정합 |
-| **2** | /about | sub-page 톤앤매너 |
-| **3** | /service | sub-page 톤앤매너 + ApplyChecklist /service 영역 |
-| **4** | /faq | sub-page 톤앤매너 |
-| **5** | /notice | sub-page 톤앤매너 |
-| **6** | /pricing 검토 | (홈 #pricing anchor 광역) |
-| **7** | /partners | sub-page 톤앤매너 |
-| **8** | /terms + /privacy | legal 광역 |
-
----
-
-## 메모리 영구 룰 갱신 의무 (다음 세션 / Opus 영역)
-
-### v42.4 → v42.5 후속 (보강 5 종료 시)
-- Hero h1 강조 paradigm 광역 보존 (yellow `#FFD43B` 광역 / cycle 10-2 결과)
-- /apply h1 광역 paradigm: PageHero 차용 + h1 88 + yellow 마침표 (cycle 1-A 1차)
-- /apply 본론 직진 paradigm (보강 1+ 결과)
-- 영구 룰 §9 갱신: red form error state 한정 추가 (보강 5 결정 후)
+- 영구 룰 §9 / §29 / §31 / §32 / §A-9 / §A-12 위반
+- court_listings schema 변동
+- form field name eSignFile / bidAmount 광역 변동 (백엔드 단독 paradigm 보존)
+- ConfirmCaseModal + BidConfirmModal + IssueGuideModal 광역 토큰 paradigm 변동
+- backdrop·ESC 닫기 paradigm 변동 (모달 분류 paradigm 정수)
+- truncateBidAmount utility 변동 (`Math.floor(value / 10000) * 10000` paradigm)
+- formatKoreanWon utility 변동
+- COURTS_ALL + isServiced 플래그 변동
+- 사진 fetch paradigm 변동
+- ApplyStepIndicator 하단 fixed bar paradigm 변동
+- 신규 npm
+- 매수신청 대리 규칙 §18 위반
+- force push paradigm
+- git revert paradigm
 
 ---
 
-## 직전 세션 흐름 (2026-05-08 ~ 2026-05-09)
+## 보존 영역 (paradigm 정수)
 
-### Stage 1 광역 종료 (cycle 7~10-3)
-- cycle 7-2/7-3/7-4: Compare 박스 안 vertical balance 정정 (mb·gap·layout 광역)
-- cycle 8/8-2/8-3: Insight Magazine Editorial Card paradigm + glossary.jpg 재생성 + 텍스트 size ↑
-- cycle 9/9-2: TrustCTA Hero paradigm 광역 차용 (Liquid Glass 박스 + h2 1줄 통일 + motion + 카피·배경·줄바꿈)
-- cycle 10/10-2/10-3: Hero h1 size 88 + 강조 yellow 회수 + TrustCTA 박스 진입 강화 + Footer 광역 재구성 + /partners 신규
-
-### Stage 2 진입 (cycle 1-A 광역)
-- 1차 + 보강 1~4 광역 push 완료 (위 history table 정합)
-- 보강 5 = dump 회신 단독 / Opus 검수 대기 / **다음 세션 진입 영역**
+- 단일 카드 paradigm + max-w-[640px] mx-auto
+- 시각 위계 SCALE (카드 16 ⊃ alert/info 12 ⊃ input/dropzone 10)
+- 모바일 앱 form 토큰 5건 (--label-fs-app + --field-gap-app + --input-h-app + --cta-h-app + ink scale)
+- ApplyClient JSX 구조 안정화 (cycle 1-D-A-4)
+- Step1Property isFirstMountRef 가드 (cycle 1-D-A-4)
+- attemptedNext state paradigm (검증 시점 paradigm)
+- 다음 CTA click 시점 단독 검증 paradigm
+- onChange raw 보관 + 다음 CTA click 시점 truncate paradigm
+- BidConfirmModal pop paradigm (Step2 강제 모달 paradigm 정수)
+- form.caseConfirmedAt 백엔드 timestamp 보존 (UI 노출 영구 폐기)
+- manualEntry + PhoneVerifyModal 영구 폐기 paradigm
+- 인감증명서 + 본인서명사실확인서 양 서류 paradigm 영구 폐기 (전자본인서명확인서 단독)
+- 합니다체 단독 paradigm (요체 영구 폐기)
+- formatKoreanWon + daysUntilBid + tierLabel 동적 logic
+- 카드 wrapper paradigm (rounded-2xl + border-gray-200 + bg-white + p-5)
 
 ---
 
-## 다음 세션 시작 첫 단계 정리
+## 파일 변동 회수 (본 세션 광역)
 
-1. **형준님 = 보강 5 dump 5건 Opus 검수 회신 (Code 답변 정리본) 송부**
-2. **Code = 회신 검수 + propertyAddress paradigm 결정 (옵션 i 단일 string 통합 추천) + 영구 룰 §9 갱신 텍스트 결정 + 정정 markdown 산출 의뢰 (push 0 / 정정 사전 명시 단계)**
-3. Opus 정정 markdown 산출 → 형준님 송부 → Code 정정 + commit + push + 회신
-4. 형준님 production 시각 검증 (모바일 + 데스크탑 + CaseConfirmModal 광역)
-5. OK 시 = 보강 5 종료 / cycle 1-A 광역 종료 / cycle 1-B (Step body 광역) 진입
+### 신규 파일 (6 신규)
+
+- `src/components/apply/ConfirmCaseModal.tsx` (Step1 강제 모달)
+- `src/components/apply/IssueGuideModal.tsx` (Step3 정보 모달)
+- `src/components/apply/BidConfirmModal.tsx` (Step2 강제 모달 / 본 push 신규)
+- `src/lib/utils.ts` 광역 `truncateBidAmount` utility 신규
+
+### 영구 삭제 파일 (5 삭제)
+
+- `src/components/apply/ApplyPropertySidebar.tsx`
+- `src/components/apply/PhoneVerifyModal.tsx`
+- `src/components/apply/VerifiedBadge.tsx`
+- `src/components/apply/CaseConfirmModal.tsx`
+- `src/components/apply/CaseConfirmCard.tsx`
+- `src/lib/auth/phoneVerify.ts` (+ src/lib/auth/ 디렉토리)
+
+### 광역 정정 파일 (광역 변동)
+
+- `src/components/apply/ApplyClient.tsx` (사이드바 폐기 + handleVerified 폐기 + max-w-[640px] wrapper)
+- `src/components/apply/steps/Step1Property.tsx` (단일 카드 + 모달 trigger + 본문 CTA paradigm)
+- `src/components/apply/steps/Step2BidInfo.tsx` (입찰가 paradigm + 검증 paradigm + BidConfirmModal mount)
+- `src/components/apply/steps/Step3Documents.tsx` (전자본인서명확인서 단독 + info 박스 layered + 합니다체)
+- `src/components/apply/steps/Step4Confirm.tsx` (h2 + dl paradigm + 카드 paradigm 정합 영역)
+- `src/components/apply/steps/Step5Complete.tsx` (comment 정합)
+- `src/components/apply/PhotoGallery.tsx` (4-col grid paradigm + variant props 폐기)
+- `src/components/apply/FileUpload.tsx` (mb-2.5 + text-base + text-xs 정합)
+- `src/components/apply/ApplyGuideModal.tsx` (comment 정합)
+- `src/types/apply.ts` (manualEntry + verified 3종 + eSignCertFile 폐기)
+- `src/app/api/orders/check/route.ts` (icn1 region + comment)
+- `src/app/globals.css` (word-break: keep-all body level)
+- `vercel.json` (icn1 region)
+- `CLAUDE.md` (section 18~27 광역 명문화 + §31 + §32 영구 룰)
+
+---
+
+## 참조 문서
+
+- `CLAUDE.md` (section 18~27 광역) — 본 세션 paradigm 광역 영구 명문화
+- `src/components/apply/ConfirmCaseModal.tsx` — Step1 강제 모달
+- `src/components/apply/BidConfirmModal.tsx` — Step2 강제 모달 (본 push 신규)
+- `src/components/apply/IssueGuideModal.tsx` — Step3 정보 모달
+- `src/components/apply/steps/Step1Property.tsx` — Step1 단일 카드 + 동의 step paradigm
+- `src/components/apply/steps/Step2BidInfo.tsx` — Step2 입찰가 + 검증 시점 paradigm
+- `src/components/apply/steps/Step3Documents.tsx` — Step3 전자본인서명확인서 단독 + layered paradigm
+
+---
+
+## 다음 세션 시작 paradigm
+
+1. 형준님 광역 production 시각 검증 광역 수정사항 회신 회수
+2. Code 광역 = 분기 paradigm 식별 + 검토 + 추천 paradigm 단독 (즉시 정정 NG)
+3. Opus + 형준님 결정 lock 사후 = 정정 markdown 산출 + push GO paradigm
+4. push 사후 production 시각 검증 재진입
+5. 정합 시 = cycle 1-D-A-4-3 종료 + cycle 1-D-A-4-4 진입 paradigm
