@@ -84,7 +84,7 @@ export function Step4Confirm({
         <h2 className="text-2xl font-black leading-[1.2] tracking-[-0.015em] text-[var(--color-ink-900)]">
           위임 계약을 확인하고 서명해주세요
         </h2>
-        <p className="mt-3 text-sm leading-relaxed text-[var(--color-ink-500)]">
+        <p className="mt-3 text-sm leading-6 text-[var(--color-ink-500)]">
           위임장 내용을 확인하시고, 동의 후 서명해주세요. 서명은 위임장에 그대로 담깁니다.
         </p>
       </header>

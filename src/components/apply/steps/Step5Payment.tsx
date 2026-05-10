@@ -4,19 +4,23 @@ import { useEffect, useState } from "react";
 import { ArrowLeft, AlertCircle, Send, Copy, Check } from "lucide-react";
 import type { ApplyFormData } from "@/types/apply";
 import { computeFee } from "@/lib/apply";
+import { formatPaymentDeadline } from "@/lib/calendar";
 import { cn, formatKoreanWon } from "@/lib/utils";
-import { BANK_ACCOUNT } from "@/lib/constants";
+import { DISPLAY_BANK } from "@/lib/constants";
 
 /**
- * cycle 1-D-A-4-5 신규 — 결제·접수 단계.
+ * cycle 1-D-A-4-6 정정 — 결제·접수 단계 (mockup default + 카피 정정 + 입금 마감 자동 표기).
  *
- * conditional render paradigm (BANK_ACCOUNT.isConfigured 분기):
- * - 사업자등록 사전 (env 미설정) = "카카오톡 직접 안내" 카피 단독 render
- * - 사업자등록 사후 (env 설정) = 입금 안내 카드 광역 render (자동 분기)
+ * 직전 cycle 1-D-A-4-5 conditional render paradigm 회수:
+ * - 사업자등록 사전 = "카카오톡 직접 안내" 카피 단독 render → mockup 입금 안내 카드 광역 render 단독
+ * - DISPLAY_BANK = BANK_ACCOUNT.isConfigured ? env source : MOCKUP_BANK paradigm 정수
  *
- * env 갱신 = 코드 영역 0 / 형준님 .env.local + Vercel env 단일 갱신 paradigm.
- *
- * 입금자명 input = bidInfo.applicantName default + 사용자 수정 가능 paradigm.
+ * 카피 정정:
+ * - h2 = "신청 정보를 확인해주세요"
+ * - sub = "아래 계좌로 입찰 대리 수수료를 입금하시면 접수가 완료됩니다."
+ * - 입금 마감 = "2026년 5월 19일 (월) 오후 8시" (calendar utility 자동 계산)
+ * - "카카오톡 또는 SMS" → "카카오톡 알림" 단독 paradigm
+ * - 안내 paragraph 분리 (입금 사후 + 카카오톡 알림)
  */
 
 type Props = {
@@ -41,6 +45,7 @@ export function Step5Payment({
   const bid = data.bidInfo;
   const bidAmount = Number(bid.bidAmount.replace(/[^\d]/g, "")) || 0;
   const fee = data.bidDate ? computeFee(data.bidDate) : null;
+  const paymentDeadline = formatPaymentDeadline(data.bidDate);
 
   // 입금자명 default = applicantName (mount 시점 단독 / 사용자 수정 우선 paradigm).
   useEffect(() => {
@@ -51,9 +56,8 @@ export function Step5Payment({
   }, []);
 
   async function copyAccount() {
-    if (!BANK_ACCOUNT.isConfigured) return;
     try {
-      await navigator.clipboard.writeText(BANK_ACCOUNT.accountNumber);
+      await navigator.clipboard.writeText(DISPLAY_BANK.accountNumber);
       setCopied(true);
       setTimeout(() => setCopied(false), 2000);
     } catch {
@@ -67,12 +71,10 @@ export function Step5Payment({
     <div className="flex flex-col gap-6">
       <header>
         <h2 className="text-2xl font-black leading-[1.2] tracking-[-0.015em] text-[var(--color-ink-900)]">
-          신청 완료까지 한 단계 남았어요
+          신청 정보를 확인해주세요
         </h2>
-        <p className="mt-3 text-sm leading-relaxed text-[var(--color-ink-500)]">
-          {BANK_ACCOUNT.isConfigured
-            ? "입찰 대리 수수료를 입금하시면 신청이 접수됩니다. 입금 확인 사후 대리인이 직접 연락드립니다."
-            : "입찰 대리 수수료 입금 안내는 신청 사후 대리인이 카카오톡으로 직접 안내드립니다. 신청자 정보를 확인하시고 접수해주세요."}
+        <p className="mt-3 text-sm leading-6 text-[var(--color-ink-500)]">
+          아래 계좌로 입찰 대리 수수료를 입금하시면 접수가 완료됩니다.
         </p>
       </header>
 
@@ -127,7 +129,7 @@ export function Step5Payment({
         </dl>
       </div>
 
-      {/* 입금자명 input (광역) */}
+      {/* 입금자명 input */}
       <div className="rounded-2xl border border-gray-200 bg-white p-5">
         <label
           htmlFor="depositor-name"
@@ -148,70 +150,69 @@ export function Step5Payment({
         />
       </div>
 
-      {/* conditional render: 사업자등록 사전 = 카카오톡 안내 / 사후 = 입금 안내 카드 */}
-      {BANK_ACCOUNT.isConfigured ? (
-        <div className="rounded-2xl border border-gray-200 bg-white p-5">
-          <h3 className="text-base font-black text-[var(--color-ink-900)]">
-            입금 안내
-          </h3>
-          <dl className="mt-4 space-y-3 text-sm">
+      {/* 입금 안내 카드 (mockup default + env 정합 시점 단독 분기) */}
+      <div className="rounded-2xl border border-gray-200 bg-white p-5">
+        <h3 className="text-base font-black text-[var(--color-ink-900)]">
+          입금 안내
+        </h3>
+        <dl className="mt-4 space-y-3 text-sm">
+          <div className="flex flex-col gap-1">
+            <dt className="text-xs text-[var(--color-ink-500)]">은행</dt>
+            <dd className="font-bold text-[var(--color-ink-900)]">
+              {DISPLAY_BANK.bankName}
+            </dd>
+          </div>
+          <div className="flex flex-col gap-1">
+            <dt className="text-xs text-[var(--color-ink-500)]">계좌번호</dt>
+            <dd className="flex items-center justify-between gap-2">
+              <span className="font-bold tabular-nums text-[var(--color-ink-900)]">
+                {DISPLAY_BANK.accountNumber}
+              </span>
+              <button
+                type="button"
+                onClick={copyAccount}
+                className="inline-flex items-center gap-1.5 rounded-md border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-bold text-[var(--color-ink-900)] hover:bg-[var(--color-ink-50)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]"
+              >
+                {copied ? (
+                  <>
+                    <Check size={12} aria-hidden="true" />
+                    복사됨
+                  </>
+                ) : (
+                  <>
+                    <Copy size={12} aria-hidden="true" />
+                    복사
+                  </>
+                )}
+              </button>
+            </dd>
+          </div>
+          <div className="flex flex-col gap-1">
+            <dt className="text-xs text-[var(--color-ink-500)]">예금주</dt>
+            <dd className="font-bold text-[var(--color-ink-900)]">
+              {DISPLAY_BANK.accountHolder}
+            </dd>
+          </div>
+          {fee && (
             <div className="flex flex-col gap-1">
-              <dt className="text-xs text-[var(--color-ink-500)]">은행</dt>
-              <dd className="font-bold text-[var(--color-ink-900)]">
-                {BANK_ACCOUNT.bankName}
+              <dt className="text-xs text-[var(--color-ink-500)]">입금 금액</dt>
+              <dd className="text-lg font-black tabular-nums text-[var(--color-accent-red)]">
+                {formatKoreanWon(fee.baseFee)}
               </dd>
             </div>
-            <div className="flex flex-col gap-1">
-              <dt className="text-xs text-[var(--color-ink-500)]">계좌번호</dt>
-              <dd className="flex items-center justify-between gap-2">
-                <span className="font-bold tabular-nums text-[var(--color-ink-900)]">
-                  {BANK_ACCOUNT.accountNumber}
-                </span>
-                <button
-                  type="button"
-                  onClick={copyAccount}
-                  className="inline-flex items-center gap-1.5 rounded-md border border-[var(--color-border)] bg-white px-3 py-1.5 text-xs font-bold text-[var(--color-ink-900)] hover:bg-[var(--color-ink-50)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]"
-                >
-                  {copied ? (
-                    <>
-                      <Check size={12} aria-hidden="true" />
-                      복사됨
-                    </>
-                  ) : (
-                    <>
-                      <Copy size={12} aria-hidden="true" />
-                      복사
-                    </>
-                  )}
-                </button>
-              </dd>
-            </div>
-            <div className="flex flex-col gap-1">
-              <dt className="text-xs text-[var(--color-ink-500)]">예금주</dt>
-              <dd className="font-bold text-[var(--color-ink-900)]">
-                {BANK_ACCOUNT.accountHolder}
-              </dd>
-            </div>
-            {fee && (
-              <div className="flex flex-col gap-1">
-                <dt className="text-xs text-[var(--color-ink-500)]">입금 금액</dt>
-                <dd className="text-lg font-black tabular-nums text-[var(--color-accent-red)]">
-                  {formatKoreanWon(fee.baseFee)}
-                </dd>
-              </div>
-            )}
-          </dl>
-          <p className="mt-4 rounded-md bg-gray-50 p-3.5 text-xs leading-6 text-[var(--color-ink-700)]">
-            입금 사후 카카오톡 또는 SMS로 접수 완료 안내드립니다. 입금 확인은 영업일 기준 30분 안에 처리됩니다.
-          </p>
+          )}
+          <div className="flex flex-col gap-1">
+            <dt className="text-xs text-[var(--color-ink-500)]">입금 마감</dt>
+            <dd className="font-bold text-[var(--color-ink-900)]">
+              {paymentDeadline}
+            </dd>
+          </div>
+        </dl>
+        <div className="mt-4 space-y-2 rounded-md bg-gray-50 p-3.5 text-sm leading-6 text-[var(--color-ink-700)]">
+          <p>입금 사후 접수가 자동으로 완료됩니다.</p>
+          <p>접수 완료 시점에 카카오톡으로 알림을 보내드립니다.</p>
         </div>
-      ) : (
-        <div className="rounded-2xl border border-gray-200 bg-white p-5">
-          <p className="text-sm leading-7 text-[var(--color-ink-700)]">
-            신청 접수 사후 대리인 박형준 (공인중개사)이 카카오톡 또는 SMS로 입금 계좌를 직접 안내드립니다. 입금 사후 접수가 완료됩니다.
-          </p>
-        </div>
-      )}
+      </div>
 
       {submitError && (
         <div

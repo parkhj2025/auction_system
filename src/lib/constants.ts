@@ -201,16 +201,23 @@ export const BANK_INFO = {
 } as const;
 
 /**
- * cycle 1-D-A-4-5 신규 — 입금 계좌 env 단일 source paradigm.
+ * cycle 1-D-A-4-6 정정 — mockup default + env 단독 분기 paradigm.
  *
- * 사업자등록 사전 (현재 Phase 1) = env 미설정 → isConfigured === false
- *   → Step5Payment + Step5Complete 광역 = "카카오톡 직접 안내" 카피 단독 render
- * 사업자등록 사후 = env 설정 → isConfigured === true
- *   → Step5Payment + Step5Complete 광역 = 입금 안내 카드 광역 render (자동 분기)
+ * 직전 cycle 1-D-A-4-5 conditional render paradigm 회수 → mockup default 광역 paradigm.
+ *
+ * 사업자등록 사전 (현재 Phase 1) = env 미설정 → MOCKUP_BANK 단독 render
+ *   → Step5Payment + Step5Complete = mockup 입금 안내 카드 광역 (영역 0 zeros 명확 mockup paradigm)
+ * 사업자등록 사후 = env 설정 → BANK_ACCOUNT.isConfigured === true → env source 단독 render
+ *   → 코드 영역 0 / 형준님 .env.local + Vercel env 단일 갱신 paradigm
  *
  * NEXT_PUBLIC_ prefix 의무 = client component env 접근 paradigm (Next.js 정합).
- * env 갱신 = 코드 영역 0 / 형준님 .env.local + Vercel env 단일 갱신 paradigm.
  */
+export const MOCKUP_BANK = {
+  bankName: "우리은행",
+  accountNumber: "0000-000-000000",
+  accountHolder: "경매퀵 (박형준)",
+} as const;
+
 export const BANK_ACCOUNT = {
   bankName: process.env.NEXT_PUBLIC_BANK_NAME ?? "",
   accountNumber: process.env.NEXT_PUBLIC_BANK_ACCOUNT_NUMBER ?? "",
@@ -221,6 +228,14 @@ export const BANK_ACCOUNT = {
     process.env.NEXT_PUBLIC_BANK_ACCOUNT_HOLDER
   ),
 } as const;
+
+/**
+ * Step5Payment + Step5Complete render source 광역 단일 paradigm.
+ * isConfigured 분기 = env 정합 시점 단독 / mockup default = Phase 1 paradigm 정수.
+ */
+export const DISPLAY_BANK = BANK_ACCOUNT.isConfigured
+  ? BANK_ACCOUNT
+  : MOCKUP_BANK;
 
 /**
  * 온라인 결제(PG) 기능 플래그 (legacy / Step5Complete 잔존 사용 영역).

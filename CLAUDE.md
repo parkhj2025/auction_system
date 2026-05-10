@@ -1097,7 +1097,50 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 
 ---
 
-## 29. Step5Payment + Step5Complete paradigm (cycle 1-D-A-4-5 신규, 2026-05-10)
+## 29. Step5Payment + Step5Complete paradigm (cycle 1-D-A-4-6 정정, 2026-05-10)
+
+**cycle 1-D-A-4-6 광역 회수 사항**:
+- conditional render paradigm (사업자등록 사전 = "카카오톡 직접 안내" / 사후 = 입금 안내 카드) 회수
+- mockup default + env 정합 시점 단독 분기 paradigm 정수
+- DISPLAY_BANK = BANK_ACCOUNT.isConfigured ? env source : MOCKUP_BANK 단일 paradigm
+- Step5Payment + Step5Complete = mockup 입금 안내 카드 광역 render 단독 (사용자 시점 시각 정합)
+- 입금 마감 자동 표기 paradigm 즉시 진입 (영업일 -1 + 오후 8시 + 요일 광역 표기)
+- "카카오톡 또는 SMS" → "카카오톡 알림" 단독 paradigm (7건 광역 정정)
+- 마이페이지 link (/my/orders) 폐기 → "홈으로" link 단독 (Phase 1 영역 0 paradigm 정합)
+
+**MOCKUP_BANK paradigm**:
+```ts
+export const MOCKUP_BANK = {
+  bankName: "우리은행",
+  accountNumber: "0000-000-000000",  // 영역 0 zeros = 명확 mockup paradigm 정수
+  accountHolder: "경매퀵 (박형준)",
+} as const;
+
+export const DISPLAY_BANK = BANK_ACCOUNT.isConfigured
+  ? BANK_ACCOUNT
+  : MOCKUP_BANK;
+```
+
+**영업일 계산 utility (`src/lib/calendar.ts`)**:
+- `getBusinessDayBefore(date, days)` = 주말 (토·일) skip 단독 paradigm (Phase 1)
+- `formatBusinessDayKorean(date)` = "2026년 5월 19일 (월) 오후 8시" 광역 표기
+- `formatPaymentDeadline(bidDateIso)` = 매각기일 -1 영업일 KST 자동 계산
+- Phase 2 영역 = 한국 공휴일 정합 (별개 cycle paradigm / data source 의무)
+
+**카피 정수 (정정 사후)**:
+- Step5 h2 = "신청 정보를 확인해주세요"
+- Step5 sub = "아래 계좌로 입찰 대리 수수료를 입금하시면 접수가 완료됩니다."
+- Step5 안내 paragraph 분리 = "입금 사후 접수가 자동으로 완료됩니다." + "접수 완료 시점에 카카오톡으로 알림을 보내드립니다."
+- Step6 h2 = "신청이 접수되었습니다" (leading-[1.2] 정정)
+- Step6 sub 분리 = "접수번호: GQ-..." + "입금 사후 접수가 완료됩니다."
+- Step6 안내 paragraph 분리 = "입금 마감까지 위 계좌로 수수료를 입금해주세요." + "입금이 확인되면 카카오톡으로 알림을 보내드립니다."
+- Step6 CTA = "홈으로" 단독 (마이페이지 link 폐기)
+
+**시각 토큰 광역 정합**:
+- h2 = text-2xl + font-black + leading-[1.2] + tracking-[-0.015em] (Step1·2·3·4·5·6 광역 단일 paradigm)
+- 본문 sub paragraph (h2 직후) = text-sm leading-6 (Step1·2·3 paradigm 정합)
+- 본문 paragraph 분리 = space-y-2 + text-sm leading-6
+- 카드 padding p-5 단일 + rounded-2xl + border-gray-200 + bg-white
 
 **의도**: 신청 4-step (property·bid-info·documents·confirm) → **5-step (+ payment)** 광역 전환. "제출 = 끝" paradigm NG (사용자 인지 = "접수만 됐을 뿐 액션 NG") → "결제 = 신청 접수 사후" paradigm 정수.
 
