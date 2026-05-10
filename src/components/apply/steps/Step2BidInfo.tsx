@@ -152,14 +152,20 @@ export function Step2BidInfo({
                 }
                 value={bid.bidAmount}
                 onChange={(e) => {
-                  // cycle 1-D-A-4-3 보강 1: 천원 이하 단위 = 0 자동 절삭 paradigm.
+                  // cycle 1-D-A-4-3 보강 1: onChange = raw 보관 단독 (사용자 입력 시점 시각 영역 보존).
                   const cleaned = e.target.value.replace(/[^\d]/g, "");
                   const num = parseInt(cleaned, 10) || 0;
-                  const truncated = truncateBidAmount(num);
+                  onBidInfoChange({
+                    bidAmount: num > 0 ? num.toLocaleString("ko-KR") : "",
+                  });
+                  clearError("bidAmount");
+                }}
+                onBlur={() => {
+                  // cycle 1-D-A-4-3 보강 1: onBlur = truncateBidAmount 적용 (천원 이하 0 자동 절삭).
+                  const truncated = truncateBidAmount(bidAmountNum);
                   onBidInfoChange({
                     bidAmount: truncated > 0 ? truncated.toLocaleString("ko-KR") : "",
                   });
-                  clearError("bidAmount");
                 }}
                 className={`${inputClass("bidAmount")} pr-12 tabular-nums`}
               />
@@ -167,6 +173,9 @@ export function Step2BidInfo({
                 원
               </span>
             </div>
+            <p className="mt-1.5 text-xs leading-5 text-[var(--color-ink-500)]">
+              만원 단위로 자동 정리됩니다.
+            </p>
             {bidAmountNum > 0 && (
               <p className="mt-1 text-xs text-[var(--color-ink-500)]">
                 한글 표기: {formatKoreanWon(bidAmountNum)}

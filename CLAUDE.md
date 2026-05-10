@@ -842,7 +842,7 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 
 ---
 
-## 22. §32 백엔드 표현 프론트엔드 노출 0 paradigm (영구 룰 / cycle 1-D-A-4-3 재진입, 2026-05-10)
+## 23. §32 백엔드 표현 프론트엔드 노출 0 paradigm (영구 룰 / cycle 1-D-A-4-3 재진입, 2026-05-10)
 
 **원칙 정수**:
 - 내부 백엔드 표현 (timestamp / column name / status code / API code / 분류 코드 / field name) UI 노출 NG
@@ -869,6 +869,31 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 - (cycle 1-D-A-4-2 보강 1) "확인 시각 기록됨" UI 노출 = 백엔드 표현 paradigm NG → 영구 폐기 사례
 - (cycle 1-D-A-4-3 재진입) 정부24 "수요기관 입력" 어휘 = 백엔드/행정 paradigm → 영구 폐기 사례
 - (cycle 1-D-A-4-3 보강 1) 요체 어미 비전문 paradigm NG → 합니다체 단독 회수 사례
+
+---
+
+## 24. Step2 입찰가 input paradigm (cycle 1-D-A-4-3 보강 1 신규, 2026-05-10)
+
+**onChange + onBlur 분리 paradigm 정수**:
+- onChange 시점 = raw 광역 보관 단독 (truncate 영역 0) → 사용자 입력 시점 시각 영역 보존 paradigm
+- onBlur 시점 = truncateBidAmount(bidAmount) 적용 paradigm → 천원 이하 단위 0 자동 절삭
+
+**helper text paradigm**:
+- "만원 단위로 자동 정리됩니다" + text-xs (12px) leading-5 ink-500 + mt-1.5 (6px)
+- 사용자 인지 paradigm 강화
+
+**utility paradigm**:
+- truncateBidAmount: Math.floor(value / 10000) * 10000
+- client 단독 paradigm (백엔드 영향 0)
+
+**사용자 입력 흐름 paradigm**:
+- "1" 입력 → display "1" (시각 보존)
+- "12345" 입력 → display "12,345" (comma 적용 / truncate 0)
+- 입력 완료 사후 blur → "12,000" 자동 절삭 paradigm
+
+**학습**:
+- onChange 시점 truncate paradigm = 첫 자리 입력 시점 시각 영역 0 NG (cycle 1-D-A-4-3 보강 1 정정)
+- onBlur 시점 truncate paradigm = 사용자 입력 자유 + 자동 정리 paradigm 단독 정수
 
 ---
 
