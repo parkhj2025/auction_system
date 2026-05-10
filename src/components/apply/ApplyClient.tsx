@@ -51,8 +51,16 @@ export function ApplyClient() {
   // cycle 1-D-A-4: initialCase 자동 매칭 광역 폐기 (Cowork 콘텐츠 source paradigm 광역 폐기).
   // URL ?case= 광역 = caseNumber state 광역 단독 prefill (위 useState 정합).
 
-  const merge = (patch: Partial<ApplyFormData>) =>
+  const merge = (patch: Partial<ApplyFormData>) => {
+    // cycle 1-D-A-4 진단: merge 호출 시점 + patch keys 광역 추적.
+    console.log("[ApplyClient merge]", {
+      keys: Object.keys(patch),
+      matchedListing_in_patch:
+        "matchedListing" in patch ? !!patch.matchedListing : "—",
+      bidDate_in_patch: "bidDate" in patch ? patch.bidDate : "—",
+    });
     setData((d) => ({ ...d, ...patch }));
+  };
 
   const mergeBidInfo = (patch: Partial<ApplyBidInfo>) =>
     setData((d) => ({ ...d, bidInfo: { ...d.bidInfo, ...patch } }));
@@ -315,17 +323,24 @@ export function ApplyClient() {
             "calc(var(--apply-bottom-bar-h) + env(safe-area-inset-bottom) + 24px)",
         }}
       >
-        {showSidebar && data.matchedListing ? (
-          <div className="grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]">
-            <div className="min-w-0">{stepView}</div>
+          {/* cycle 1-D-A-4 정정 1: stepView 광역 = 항상 동일 JSX 위치 (section > div > div) 영구 보존.
+            showSidebar 분기 = parent div className + sidebar conditional render 광역 단독 (구조 미변동).
+            React reconciliation 광역 = unmount/remount 영역 0 → useEffect cascade reset 차단 paradigm. */}
+        <div
+          className={
+            showSidebar
+              ? "grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]"
+              : ""
+          }
+        >
+          <div className="min-w-0">{stepView}</div>
+          {showSidebar && data.matchedListing && (
             <ApplyPropertySidebar
               listing={data.matchedListing}
               isResale={data.bidInfo.rebid}
             />
-          </div>
-        ) : (
-          stepView
-        )}
+          )}
+        </div>
       </section>
     </>
   );

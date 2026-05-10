@@ -59,6 +59,10 @@ export function Step1Property({
   const latestPatchRef = useRef(onChange);
   latestPatchRef.current = onChange;
 
+  // cycle 1-D-A-4 정정 2: 첫 mount 시점 광역 reset skip (이중 방어 paradigm).
+  // ApplyClient JSX 구조 광역 미래 변동 광역 회귀 시점 광역 reset cascade 영구 차단.
+  const isFirstMountRef = useRef(true);
+
   const selectedCourt = COURTS_ALL.find((c) => c.label === data.court);
   const courtCode = selectedCourt?.courtCode ?? "";
 
@@ -66,6 +70,22 @@ export function Step1Property({
   // 매칭 조회는 명시적 액션(Enter/Blur/"사건번호 확인" 버튼)에서만 발동 — onChange 실시간 조회 완전 제거.
   // 정규식 \d+가 1자리 이상 허용하여 타이핑 중 모든 중간값이 트리거되던 문제 본질적 해결.
   useEffect(() => {
+    // cycle 1-D-A-4 진단: useEffect 진입 + reset 광역 trigger 추적.
+    console.log("[Step1Property useEffect] enter", {
+      caseNumber: data.caseNumber,
+      courtCode,
+      has_matchedListing: !!data.matchedListing,
+      bidDate: data.bidDate,
+      propertyType: data.propertyType,
+      caseConfirmedByUser: data.caseConfirmedByUser,
+      isFirstMount: isFirstMountRef.current,
+    });
+    // cycle 1-D-A-4 정정 2: 첫 mount 시점 광역 reset 광역 skip (이중 방어 paradigm).
+    if (isFirstMountRef.current) {
+      isFirstMountRef.current = false;
+      console.log("[Step1Property useEffect] first-mount skip");
+      return;
+    }
     // cycle 1-D-A-2: 사용자 입력 변경 시 nomatch 타이머 광역 cancel + matchStatus reset.
     if (nomatchTimerRef.current) {
       clearTimeout(nomatchTimerRef.current);
@@ -83,6 +103,7 @@ export function Step1Property({
       data.propertyAddress ||
       data.caseConfirmedByUser
     ) {
+      console.warn("[Step1Property useEffect] RESET trigger — clearing matchedListing/bidDate/propertyType/propertyAddress");
       latestPatchRef.current({
         matchedListing: null,
         manualEntry: false,
