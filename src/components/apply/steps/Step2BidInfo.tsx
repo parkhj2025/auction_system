@@ -400,20 +400,24 @@ export function Step2BidInfo({
             )}
           </div>
 
-          {/* 수수료 inline 압축 paradigm (FeeCalculatorInline dom 영구 폐기 / 보강 2 = tier 단독 명료화).
-              현재 구간 단독 큰 가격 + 성공보수 sub paradigm 정수. */}
+          {/* 수수료 inline 정식 어휘 + 위계 paradigm (cycle 1-D-A-4-2 final).
+              "신청가" 어휘 영구 폐기 → "입찰대리 수수료" 정식 단독.
+              메인 가격 + 성공보수 = 동등 크기 (18px) + 색상 분리 paradigm 정합. */}
           {fee && (
             <div className="border-t border-[var(--color-ink-200)] pt-4">
-              <div className="flex items-baseline gap-2">
-                <span className="text-sm font-medium text-[var(--color-ink-500)]">
-                  {fee.tierLabel} 신청가
-                </span>
+              <div className="text-sm font-medium text-[var(--color-ink-500)]">
+                입찰대리 수수료
+              </div>
+              <div className="mt-1.5 flex flex-wrap items-baseline gap-x-3 gap-y-1">
                 <span className="text-lg font-bold text-[var(--color-ink-900)]">
                   {formatKoreanWon(fee.baseFee)}
                 </span>
+                <span className="text-lg font-bold text-[var(--color-ink-500)]">
+                  낙찰 시 성공보수 +5만원
+                </span>
               </div>
-              <p className="mt-1 text-xs text-[var(--color-ink-500)]">
-                낙찰 시 성공보수 +5만원
+              <p className="mt-1.5 text-xs text-[var(--color-ink-500)]">
+                {fee.tierLabel} · 입찰일까지 {Math.max(0, fee.daysUntilBid)}일 남음
               </p>
             </div>
           )}

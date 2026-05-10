@@ -9,6 +9,7 @@
 import { useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
+  ArrowRight,
   Info,
   ChevronDown,
   Loader2,
@@ -185,9 +186,9 @@ export function Step1Property({
   }
 
   function handleModalConfirm() {
-    // checked 보존 + Step2 자동 진입.
+    // cycle 1-D-A-4-2 final: setStep(2) 자동 진입 영구 폐기 → Step1 머무름 + 체크 paradigm.
+    // 체크박스 = checked 보존 / form.caseConfirmedAt 백엔드 기록 보존 / 사용자 직접 본문 CTA 클릭 시점 광역 setStep(2).
     setConfirmModalOpen(false);
-    onNext();
   }
 
   function handleModalCancel() {
@@ -576,6 +577,27 @@ export function Step1Property({
               {CASE_CONFIRM_CHECKBOX_LABEL}
             </span>
           </label>
+        </div>
+      )}
+
+      {/* cycle 1-D-A-4-2 final: 본문 "다음: 입찰 정보 입력" CTA 부활 paradigm.
+          사용자 직접 진입 paradigm = modal "확인" 사후 Step1 머무름 + 사용자 CTA 클릭 시점 광역 setStep(2). */}
+      {listing && !caseTaken && (
+        <div className="mt-2 flex flex-col gap-3 lg:flex-row lg:justify-end">
+          <button
+            type="button"
+            onClick={onNext}
+            disabled={!data.caseConfirmedByUser}
+            className={cn(
+              "inline-flex h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-xl px-8 text-base font-black transition-colors duration-150 lg:w-auto lg:px-10",
+              data.caseConfirmedByUser
+                ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)] active:scale-[0.98] active:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]"
+                : "cursor-not-allowed bg-gray-200 text-gray-400",
+            )}
+          >
+            다음: 입찰 정보 입력
+            <ArrowRight size={16} aria-hidden="true" />
+          </button>
         </div>
       )}
 
