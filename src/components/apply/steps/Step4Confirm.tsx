@@ -179,14 +179,14 @@ export function Step4Confirm({
         </p>
       </header>
 
-      <div className="grid gap-6 lg:grid-cols-[1.4fr_1fr]">
+      <div className="flex flex-col gap-4">
         <section className="flex flex-col gap-4">
           {/* 입력 요약 */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 lg:p-8">
-            <h3 className="text-sm font-black text-[var(--color-ink-900)]">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <h3 className="text-base font-black text-[var(--color-ink-900)]">
               입찰 정보 요약
             </h3>
-            <dl className="mt-4 grid gap-x-6 gap-y-3 text-sm sm:grid-cols-2">
+            <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-4 text-sm">
               <div>
                 <dt className="text-xs text-[var(--color-ink-500)]">법원 · 사건번호</dt>
                 <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
@@ -226,7 +226,7 @@ export function Step4Confirm({
                 </div>
               )}
             </dl>
-            <h3 className="mt-6 text-sm font-black text-[var(--color-ink-900)]">
+            <h3 className="mt-6 text-base font-black text-[var(--color-ink-900)]">
               제출 서류
             </h3>
             <ul className="mt-3 flex flex-col gap-2 text-sm text-[var(--color-ink-700)]">
@@ -236,8 +236,8 @@ export function Step4Confirm({
           </div>
 
           {/* 서명 영역 */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 lg:p-8">
-            <h3 className="text-sm font-black text-[var(--color-ink-900)]">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <h3 className="text-base font-black text-[var(--color-ink-900)]">
               위임인 서명
             </h3>
             <p className="mt-1 text-xs text-[var(--color-ink-500)]">
@@ -255,8 +255,8 @@ export function Step4Confirm({
           </div>
 
           {/* 3개 동의 + 미리보기 */}
-          <div className="rounded-2xl border border-gray-200 bg-white p-5 lg:p-8">
-            <h3 className="text-sm font-black text-[var(--color-ink-900)]">동의</h3>
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <h3 className="text-base font-black text-[var(--color-ink-900)]">동의</h3>
             <ul className="mt-4 flex flex-col gap-2 text-sm leading-6 text-[var(--color-ink-700)]">
               <li className="flex items-start gap-2">
                 <input
@@ -355,12 +355,12 @@ export function Step4Confirm({
         </div>
       )}
 
-      <div className="flex items-center justify-between gap-2 pt-2">
+      <div className="flex flex-col items-stretch gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
         <button
           type="button"
           onClick={onBack}
           disabled={submitting || delegationPdfFetching}
-          className="inline-flex min-h-[var(--cta-h-app)] items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)] disabled:opacity-50"
+          className="inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-base font-bold text-[var(--color-ink-700)] transition-colors duration-150 hover:bg-[var(--color-ink-100)] disabled:opacity-50 sm:w-auto"
         >
           <ArrowLeft size={16} aria-hidden="true" />
           이전
@@ -370,9 +370,9 @@ export function Step4Confirm({
           onClick={onSubmit}
           disabled={!canSubmit}
           className={cn(
-            "inline-flex min-h-[var(--cta-h-app)] items-center gap-2 rounded-full px-6 text-sm font-black transition-colors duration-150",
+            "inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-full px-8 text-base font-black transition-colors duration-150 sm:w-auto sm:px-10",
             canSubmit
-              ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)]"
+              ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)] active:scale-[0.98] active:bg-[var(--brand-green-deep)]"
               : "cursor-not-allowed bg-gray-200 text-gray-400",
           )}
         >

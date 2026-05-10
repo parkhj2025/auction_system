@@ -113,7 +113,7 @@ export function Step2BidInfo({
       </header>
 
       <fieldset
-        className="flex flex-col gap-6 rounded-2xl border border-gray-200 bg-white p-5 lg:p-8"
+        className="flex flex-col gap-6 rounded-2xl border border-gray-200 bg-white p-5"
       >
           {/* 입찰 금액 */}
           <div>
@@ -165,8 +165,8 @@ export function Step2BidInfo({
             )}
           </div>
 
-          {/* 신청인 */}
-          <div className="grid gap-4 sm:grid-cols-2">
+          {/* 신청인 (cycle 1-D-A-4-2 paradigm 회수: sm:grid 영구 폐기 → flex flex-col gap-4 단독) */}
+          <div className="flex flex-col gap-4">
             <div>
               <label
                 htmlFor="applicant-name"
@@ -281,7 +281,7 @@ export function Step2BidInfo({
                 onChange={(e) =>
                   onBidInfoChange({ rebid: e.target.checked })
                 }
-                className="mt-0.5 h-5 w-5 rounded border-[var(--color-border)] accent-[var(--color-ink-900)]"
+                className="mt-0.5 h-5 w-5 rounded border-[var(--color-border)] accent-[var(--brand-green)]"
               />
               <div>
                 <span className="text-sm font-bold text-[var(--color-ink-900)]">
@@ -305,14 +305,14 @@ export function Step2BidInfo({
                 onChange={(e) =>
                   onBidInfoChange({ jointBidding: e.target.checked })
                 }
-                className="h-5 w-5 rounded border-[var(--color-border)] accent-[var(--color-ink-900)]"
+                className="h-5 w-5 rounded border-[var(--color-border)] accent-[var(--brand-green)]"
               />
               <span className="text-sm font-bold text-[var(--color-ink-900)]">
                 공동입찰로 진행합니다
               </span>
             </label>
             {bid.jointBidding && (
-              <div className="mt-4 grid gap-4 sm:grid-cols-2">
+              <div className="mt-4 flex flex-col gap-4">
                 <div>
                   <label
                     htmlFor="joint-name"
@@ -370,11 +370,11 @@ export function Step2BidInfo({
           />
       </fieldset>
 
-      <div className="flex items-center justify-between gap-2 pt-2">
+      <div className="flex flex-col items-stretch gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex min-h-[var(--cta-h-app)] items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)]"
+          className="inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-base font-bold text-[var(--color-ink-700)] transition-colors duration-150 hover:bg-[var(--color-ink-100)] sm:w-auto"
         >
           <ArrowLeft size={16} aria-hidden="true" />
           이전
@@ -384,9 +384,9 @@ export function Step2BidInfo({
           onClick={handleNext}
           disabled={hasErrors}
           className={cn(
-            "inline-flex min-h-[var(--cta-h-app)] items-center gap-2 rounded-full px-6 text-sm font-black transition-colors duration-150",
+            "inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-full px-8 text-base font-black transition-colors duration-150 sm:w-auto sm:px-10",
             !hasErrors
-              ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)]"
+              ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)] active:scale-[0.98] active:bg-[var(--brand-green-deep)]"
               : "cursor-not-allowed bg-gray-200 text-gray-400",
           )}
         >

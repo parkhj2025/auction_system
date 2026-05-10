@@ -47,7 +47,7 @@ export function Step3Documents({
         </p>
       </div>
 
-      <div className="grid gap-4 rounded-2xl border border-gray-200 bg-white p-5 md:grid-cols-2 lg:grid-cols-3 lg:p-8">
+      <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-5">
         <FileUpload
           label="전자본인서명확인서"
           description="대법원 전자민원센터에서 발급한 PDF 파일을 올려주세요."
@@ -82,11 +82,11 @@ export function Step3Documents({
         관리됩니다.
       </p>
 
-      <div className="flex items-center justify-between gap-2 pt-2">
+      <div className="flex flex-col items-stretch gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex min-h-[var(--cta-h-app)] items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-700)] hover:bg-[var(--color-ink-100)]"
+          className="inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-base font-bold text-[var(--color-ink-700)] transition-colors duration-150 hover:bg-[var(--color-ink-100)] sm:w-auto"
         >
           <ArrowLeft size={16} aria-hidden="true" />
           이전
@@ -96,9 +96,9 @@ export function Step3Documents({
           onClick={onNext}
           disabled={!canProceed}
           className={cn(
-            "inline-flex min-h-[var(--cta-h-app)] items-center gap-2 rounded-full px-6 text-sm font-black transition-colors duration-150",
+            "inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-full px-8 text-base font-black transition-colors duration-150 sm:w-auto sm:px-10",
             canProceed
-              ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)]"
+              ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)] active:scale-[0.98] active:bg-[var(--brand-green-deep)]"
               : "cursor-not-allowed bg-gray-200 text-gray-400",
           )}
         >

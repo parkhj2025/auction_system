@@ -1,7 +1,11 @@
 "use client";
 
 // cycle 1-D-A-2 = 모바일 앱 form 토큰 (input 56 / 라벨 16 / CTA 56 / gap 28).
-// cycle 1-D-A-4-2 = manualEntry/CaseConfirmCard/CaseConfirmModal 영구 폐기 + amber alert + 인라인 카드 통합 paradigm.
+// cycle 1-D-A-4-2 = manualEntry/CaseConfirmCard/CaseConfirmModal 영구 폐기 + amber alert + 인라인 카드 통합.
+// cycle 1-D-A-4-2 paradigm 회수 = 사이드바 영구 폐기 + 단일 카드 paradigm + 모바일/데스크탑 일관성 + 입력 form §A-9 정합.
+//   - 카드 padding p-5 단독 (lg:p-7/p-8 영구 폐기) / bg-white 통일 / sm:grid 광역 영구 폐기 → flex flex-col gap-4.
+//   - 데이터 row grid grid-cols-2 gap-x-4 gap-y-4 / 최저가 + 보증금 col-span-2 typography 단독 강조 (박스 폐기).
+//   - 사진 grid = hero + thumbnail strip paradigm (모바일 + 데스크탑 동일).
 import { useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
@@ -18,26 +22,8 @@ import { CASE_CONFIRM_CHECKBOX_LABEL } from "@/lib/legal";
 import { getKSTDateTimeIso } from "@/lib/datetime";
 import { PhotoGallery } from "../PhotoGallery";
 
-/**
- * 사건번호 정규식 — `2024타경12345` 형식 (Phase 6.3 회귀 수정 — 2026-04-19).
- * 매칭 조회는 정규식 통과 시점에만 발동.
- */
 const CASE_NUMBER_PATTERN = /^\d{4}타경\d+$/;
 
-/**
- * Step 1 — 법원 + 사건번호 입력 + 사건 정보 확인.
- *
- * cycle 1-D-A-4-2 paradigm:
- * - manualEntry 영구 폐기 → 매칭 성공 단독 경로.
- * - CaseConfirmCard / CaseConfirmModal 광역 영구 폐기 → 인라인 매칭 카드 통합 (1 카드 paradigm).
- * - 사건번호 NG 분기:
- *   - case_status="not_found" → amber alert "사건번호를 다시 확인해주세요" + input focus 자동.
- *   - case_status="closed" → amber alert "이 사건은 매각이 종결됐습니다".
- *   - case_status="active" → 인라인 카드 + 사이드바 mount.
- * - 영역 분리: desktop 사이드바 단독 데이터 hub / 인라인 = action focus.
- *   mobile 인라인 = 풀 데이터 + 사진 + 체크박스 통합.
- * - 색상 paradigm: amber 광역 (--color-warning + --color-warning-soft) / red = caseTaken 한정 (행동차단).
- */
 export function Step1Property({
   data,
   onChange,
@@ -60,14 +46,11 @@ export function Step1Property({
   // cycle 1-D-A-4 정정 2: 첫 mount 시점 reset skip (이중 방어 paradigm).
   const isFirstMountRef = useRef(true);
 
-  // 사건번호 input ref — case_status="not_found" 광역 자동 focus paradigm.
   const caseNumberInputRef = useRef<HTMLInputElement>(null);
 
   const selectedCourt = COURTS_ALL.find((c) => c.label === data.court);
   const courtCode = selectedCourt?.courtCode ?? "";
 
-  // Phase 6 회귀 수정 (P0): 사용자 caseNumber 변경 시 매칭 state reset만 처리.
-  // 매칭 조회는 명시적 액션(Enter/Blur/"사건번호 확인" 버튼)에서만 발동.
   useEffect(() => {
     if (isFirstMountRef.current) {
       isFirstMountRef.current = false;
@@ -97,11 +80,6 @@ export function Step1Property({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [data.caseNumber, courtCode]);
 
-  /**
-   * 사건번호 매칭 조회 — 명시적 액션 트리거.
-   * 트리거 3곳: input onKeyDown(Enter), input onBlur, "사건번호 확인" 버튼.
-   * cycle 1-D-A-4-2: nomatch 3초 timer + manualEntry 자동 진입 paradigm 광역 폐기.
-   */
   async function triggerLookup() {
     const q = data.caseNumber.trim();
     if (!q) return;
@@ -138,18 +116,15 @@ export function Step1Property({
       const resultListings = json.listings ?? [];
       setListings(resultListings);
 
-      // case_status="closed" 분기 (종결 사건 amber 안내 + 차단).
       if (resultListings.length === 0 && json.case_status === "closed") {
         setCaseClosed(true);
         setMatchStatus("idle");
         return;
       }
 
-      // case_status="not_found" 분기 (manualEntry 폐기 / 재시도 paradigm).
       if (resultListings.length === 0 && json.case_status !== "closed") {
         setCaseNotFound(true);
         setMatchStatus("idle");
-        // 사건번호 input 광역 자동 focus paradigm (재입력 유도).
         caseNumberInputRef.current?.focus();
         return;
       }
@@ -167,7 +142,6 @@ export function Step1Property({
           auctionRound: l.auction_round,
         });
       } else {
-        // 복수 매칭 → 사용자가 selectListing으로 선택 대기
         setMatchStatus("idle");
         latestPatchRef.current({
           matchedListing: null,
@@ -190,7 +164,6 @@ export function Step1Property({
 
   const isNonServicedCourt = selectedCourt && !selectedCourt.isServiced;
 
-  // Phase 4-CONFIRM 게이트: bidDate + caseConfirmedByUser 둘 다 truthy 필수.
   const canProceed =
     !!data.caseNumber.trim() &&
     !!data.court &&
@@ -214,7 +187,6 @@ export function Step1Property({
       propertyAddress: listing.address_display ?? "",
       caseConfirmedByUser: false,
       caseConfirmedAt: null,
-      // Phase 6.7.6: 매칭 경로는 listing.auction_round 자동 결정.
       auctionRound: listing.auction_round,
     });
   }
@@ -229,8 +201,15 @@ export function Step1Property({
   const listing = data.matchedListing;
   const regionGroups = groupCourtsByRegion();
 
+  // 입찰보증금 = 최저가 × (재경매 20% / 일반 10%) — Step2 rebid 광역 사용자 입력 사후 정정 paradigm.
+  const depositRate = data.bidInfo.rebid ? "20%" : "10%";
+  const deposit =
+    listing && listing.min_bid_amount != null
+      ? Math.round(listing.min_bid_amount * (data.bidInfo.rebid ? 0.2 : 0.1))
+      : null;
+
   return (
-    <div className="flex flex-col gap-6 lg:gap-8">
+    <div className="flex flex-col gap-6">
       <header>
         <h2 className="text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
           법원과 사건번호를 입력해주세요
@@ -240,8 +219,9 @@ export function Step1Property({
         </p>
       </header>
 
-      <div className="rounded-2xl border border-gray-200 bg-white p-5 lg:p-8">
-        <div className="grid gap-2 sm:grid-cols-[minmax(0,14rem)_1fr]">
+      {/* 입력 form 카드 (§A-9 정합 = sm:grid 폐기 + p-5 단독 + bg-white) */}
+      <div className="rounded-2xl border border-gray-200 bg-white p-5">
+        <div className="flex flex-col gap-4">
           <div>
             <label
               htmlFor="step1-court"
@@ -326,7 +306,7 @@ export function Step1Property({
             </div>
           </div>
         </div>
-        <p className="mt-3 text-xs text-[var(--color-ink-500)]">
+        <p className="mt-4 text-xs text-[var(--color-ink-500)]">
           현재 인천지방법원 본원만 신청 가능합니다. 서비스 지역은 점차 확대될
           예정입니다.
         </p>
@@ -413,14 +393,14 @@ export function Step1Property({
 
       {/* 복수 물건 선택 UI (listings 2건 이상) */}
       {listings.length >= 2 && !caseTaken && !listing && (
-        <div className="rounded-[var(--radius-xl)] border-2 border-[var(--color-ink-200)] bg-[var(--color-ink-50)]/40 p-5">
+        <div className="rounded-2xl border-2 border-[var(--color-ink-200)] bg-white p-5">
           <div className="flex items-center gap-2 text-[var(--color-ink-900)]">
             <ChevronDown size={18} aria-hidden="true" />
-            <p className="text-xs font-black uppercase tracking-wider">
+            <p className="text-sm font-bold text-[var(--color-ink-900)]">
               이 사건에 {listings.length}개 물건이 있습니다. 선택해주세요
             </p>
           </div>
-          <div className="mt-4 grid gap-2">
+          <div className="mt-4 flex flex-col gap-2">
             {listings.map((l) => (
               <button
                 key={l.docid}
@@ -449,84 +429,104 @@ export function Step1Property({
         </div>
       )}
 
-      {/* 인라인 매칭 카드 (CaseConfirmCard 통합 / 1 카드 paradigm).
-          desktop = action focus 단독 (헤더 + h3 + sub line + 체크박스)
-          mobile = 풀 데이터 dl + photos + 체크박스 통합 */}
+      {/* 단일 카드 paradigm — 모바일 + 데스크탑 광역 동일 dom (§A-9 + §A-12 정합).
+          헤더 + 주소 h2 + 사진 (hero + thumbnail strip) + 데이터 grid-cols-2 + 체크박스 통합. */}
       {listing && !caseTaken && (
-        <div className="rounded-[var(--radius-xl)] border-2 border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/50 p-5 lg:p-7">
-          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
+        <div className="rounded-2xl border-2 border-[var(--color-ink-900)] bg-white p-5">
+          {/* 헤더 */}
+          <p className="text-sm font-bold text-[var(--color-ink-900)]">
             의뢰하실 사건 정보가 맞는지 확인해주세요
           </p>
-          <h3 className="mt-3 text-lg font-black tracking-tight text-[var(--color-ink-900)] lg:text-xl">
-            {listing.address_display}
-          </h3>
-          <p className="mt-2 text-sm tabular-nums text-[var(--color-ink-700)] lg:text-base">
-            {listing.bid_date ?? "-"}
-            {listing.min_bid_amount != null && (
-              <>
-                {" · 최저가 "}
-                <span className="font-black text-[var(--color-accent-red)]">
-                  {formatKoreanWon(listing.min_bid_amount)}
-                </span>
-              </>
-            )}
-          </p>
 
-          {/* 모바일 단독: 풀 데이터 dl + 사진 (사이드바 영역 0 시점 대체 paradigm) */}
-          <div className="lg:hidden">
-            <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
-              <div>
-                <dt className="text-xs text-[var(--color-ink-500)]">감정가</dt>
-                <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
-                  {listing.appraisal_amount != null
-                    ? formatKoreanWon(listing.appraisal_amount)
-                    : "-"}
+          {/* 주소 h2 */}
+          <h2 className="mt-3 text-lg font-black tracking-tight text-[var(--color-ink-900)]">
+            {listing.address_display}
+          </h2>
+
+          {/* 사진 hero + thumbnail strip (모바일 + 데스크탑 동일 paradigm) */}
+          <PhotoGallery docid={listing.docid} />
+
+          {/* 데이터 grid-cols-2 + 최저가/보증금 typography 단독 강조 paradigm */}
+          <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-4">
+            <div>
+              <dt className="text-xs text-[var(--color-ink-500)]">입찰일</dt>
+              <dd className="mt-1 text-sm font-bold tabular-nums text-[var(--color-ink-900)]">
+                {listing.bid_date ?? "-"}
+              </dd>
+            </div>
+            <div>
+              <dt className="text-xs text-[var(--color-ink-500)]">감정가</dt>
+              <dd className="mt-1 text-sm font-bold tabular-nums text-[var(--color-ink-900)]">
+                {listing.appraisal_amount != null
+                  ? formatKoreanWon(listing.appraisal_amount)
+                  : "-"}
+              </dd>
+            </div>
+
+            {/* 최저가 = col-span-2 + border-t divider + text-2xl typography 단독 강조 (박스 폐기) */}
+            <div className="col-span-2 border-t border-[var(--color-ink-200)] pt-4">
+              <dt className="text-xs text-[var(--color-ink-500)]">최저가</dt>
+              <dd className="mt-1 text-2xl font-black tabular-nums text-[var(--color-accent-red)]">
+                {listing.min_bid_amount != null
+                  ? formatKoreanWon(listing.min_bid_amount)
+                  : "-"}
+              </dd>
+            </div>
+
+            {/* 입찰보증금 = col-span-2 + text-lg typography 단독 강조 (박스 폐기) */}
+            {deposit !== null && (
+              <div className="col-span-2">
+                <dt className="text-xs text-[var(--color-ink-500)]">
+                  입찰보증금 · 최저가 {depositRate}
+                </dt>
+                <dd className="mt-1 text-lg font-black tabular-nums text-[var(--color-ink-900)]">
+                  {formatKoreanWon(deposit)}
                 </dd>
               </div>
-              <div>
-                <dt className="text-xs text-[var(--color-ink-500)]">매각회차</dt>
-                <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
-                  {listing.failed_count === 0
-                    ? "신건"
-                    : `${listing.failed_count + 1}차 매각`}
-                </dd>
+            )}
+
+            <div className="col-span-2 border-t border-[var(--color-ink-200)] pt-4">
+              <dt className="text-xs text-[var(--color-ink-500)]">매각회차</dt>
+              <dd className="mt-1 text-sm font-bold text-[var(--color-ink-900)]">
+                {listing.failed_count === 0
+                  ? "신건"
+                  : `${listing.failed_count + 1}차 매각`}
                 {listing.failed_count >= 1 && (
-                  <p className="mt-0.5 text-[11px] text-[var(--color-ink-500)]">
+                  <span className="ml-2 text-xs font-medium text-[var(--color-ink-500)]">
                     유찰 {listing.failed_count}회
-                  </p>
+                  </span>
                 )}
-              </div>
-              <div>
-                <dt className="text-xs text-[var(--color-ink-500)]">용도</dt>
-                <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
-                  {listing.usage_name ?? "-"}
+              </dd>
+            </div>
+            <div className="border-t border-[var(--color-ink-200)] pt-4">
+              <dt className="text-xs text-[var(--color-ink-500)]">용도</dt>
+              <dd className="mt-1 text-sm font-bold text-[var(--color-ink-900)]">
+                {listing.usage_name ?? "-"}
+              </dd>
+            </div>
+            {listing.area_display && (
+              <div className="border-t border-[var(--color-ink-200)] pt-4">
+                <dt className="text-xs text-[var(--color-ink-500)]">면적</dt>
+                <dd className="mt-1 text-sm font-bold text-[var(--color-ink-900)]">
+                  {listing.area_display}
                 </dd>
               </div>
-              {listing.area_display && (
-                <div>
-                  <dt className="text-xs text-[var(--color-ink-500)]">면적</dt>
-                  <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
-                    {listing.area_display}
-                  </dd>
-                </div>
-              )}
-              <div>
-                <dt className="text-xs text-[var(--color-ink-500)]">법원</dt>
-                <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
-                  {listing.court_name}
+            )}
+            <div className="col-span-2">
+              <dt className="text-xs text-[var(--color-ink-500)]">법원</dt>
+              <dd className="mt-1 text-sm font-bold text-[var(--color-ink-900)]">
+                {listing.court_name}
+              </dd>
+            </div>
+            {listing.component_count > 1 && (
+              <div className="col-span-2">
+                <dt className="text-xs text-[var(--color-ink-500)]">구성</dt>
+                <dd className="mt-1 text-sm font-bold text-[var(--color-ink-900)]">
+                  {listing.component_count}개 필지 일괄 매각
                 </dd>
               </div>
-              {listing.component_count > 1 && (
-                <div>
-                  <dt className="text-xs text-[var(--color-ink-500)]">구성</dt>
-                  <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
-                    {listing.component_count}개 필지 일괄 매각
-                  </dd>
-                </div>
-              )}
-            </dl>
-            <PhotoGallery docid={listing.docid} variant="hero" />
-          </div>
+            )}
+          </dl>
 
           {/* 복수 물건 사건에서 다른 물건 선택 가능 */}
           {listings.length >= 2 && (
@@ -543,14 +543,14 @@ export function Step1Property({
                   auctionRound: 1,
                 })
               }
-              className="mt-3 text-xs font-semibold text-[var(--color-ink-500)] underline underline-offset-2 hover:text-[var(--color-ink-700)]"
+              className="mt-4 text-xs font-semibold text-[var(--color-ink-500)] underline underline-offset-2 hover:text-[var(--color-ink-700)]"
             >
               다른 물건 선택
             </button>
           )}
 
-          {/* 체크박스 (CaseConfirmCard 통합 paradigm) */}
-          <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-[var(--radius-md)] px-3 py-3 hover:bg-white/50">
+          {/* 체크박스 + 라벨 (CaseConfirmCard 통합 paradigm) */}
+          <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-[var(--radius-md)] py-3">
             <input
               type="checkbox"
               checked={data.caseConfirmedByUser}

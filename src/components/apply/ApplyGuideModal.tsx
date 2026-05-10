@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { X } from "lucide-react";
 
 /* Stage 2 cycle 1-A 보강 2 — 신청 가이드 modal.
- * paradigm = PhoneVerifyModal 정합 (fixed inset-0 + bg-black/50 + p-4 + dismiss).
+ * paradigm = fixed inset-0 + bg-black/50 + p-4 + dismiss.
  * ApplyStepIndicator 안 도움말 버튼 클릭 trigger. */
 
 const STEPS = [

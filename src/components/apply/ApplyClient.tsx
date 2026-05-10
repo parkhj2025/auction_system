@@ -2,6 +2,8 @@
 
 // cycle 1-D-A-4: matchedPost 폐기 (Cowork 콘텐츠 source / 대법원 fetch 단독).
 // cycle 1-D-A-4-2: handleVerified + onVerified prop + manualEntry + console.log 광역 영구 폐기.
+// cycle 1-D-A-4-2 paradigm 회수: ApplyPropertySidebar 영구 폐기 + max-w-[640px] wrapper paradigm
+//   (모바일 + 데스크탑 광역 동일 paradigm / §A-9 + §A-12 정합).
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type {
@@ -17,7 +19,6 @@ import { Step2BidInfo } from "./steps/Step2BidInfo";
 import { Step3Documents } from "./steps/Step3Documents";
 import { Step4Confirm } from "./steps/Step4Confirm";
 import { Step5Complete } from "./steps/Step5Complete";
-import { ApplyPropertySidebar } from "./ApplyPropertySidebar";
 
 const STEP_ORDER: ApplyStepId[] = APPLY_STEPS.map((s) => s.id);
 
@@ -272,15 +273,9 @@ export function ApplyClient() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [currentStep, data, submitting, submitError, applicationId]);
 
-  // 1-D-A: 사이드바 mount = 매칭 listing 있고 Step5(complete) 외 모든 step.
-  // cycle 1-D-A-4-2: manualEntry 폐기 → matchedListing null 시점 = 사건번호 NG / 미입력 / 매칭 0건 단독.
-  const showSidebar =
-    !!data.matchedListing && currentStep !== "complete";
-
   return (
     <>
-      {/* cycle 1-D-A-2 = 하단 fixed bar paradigm. completed/caseNumber/court/bidDate/hasMatchedListing
-          props 광역 폐기 정합 (5 step 원 + 매칭 메타 line 광역 폐기 정수). */}
+      {/* cycle 1-D-A-2 = 하단 fixed bar paradigm. */}
       <ApplyStepIndicator current={currentStep} />
       <section
         className="container-app pt-10 lg:pt-16"
@@ -289,24 +284,10 @@ export function ApplyClient() {
             "calc(var(--apply-bottom-bar-h) + env(safe-area-inset-bottom) + 24px)",
         }}
       >
-        {/* cycle 1-D-A-4 정정 1: stepView 광역 = 항상 동일 JSX 위치 (section > div > div) 영구 보존.
-            showSidebar 분기 = parent div className + sidebar conditional render 단독 (구조 미변동).
-            React reconciliation 광역 = unmount/remount 영역 0 → useEffect cascade reset 차단 paradigm. */}
-        <div
-          className={
-            showSidebar
-              ? "grid gap-8 lg:grid-cols-[minmax(0,1fr)_320px]"
-              : ""
-          }
-        >
-          <div className="min-w-0">{stepView}</div>
-          {showSidebar && data.matchedListing && (
-            <ApplyPropertySidebar
-              listing={data.matchedListing}
-              isResale={data.bidInfo.rebid}
-            />
-          )}
-        </div>
+        {/* cycle 1-D-A-4-2 paradigm 회수: 사이드바 영구 폐기 + max-w-[640px] mx-auto wrapper paradigm.
+            모바일 + 데스크탑 광역 동일 dom (§A-9 + §A-12 정합).
+            모바일 = full width minus padding / 데스크탑 = narrow column 광역 중앙 정렬. */}
+        <div className="mx-auto w-full max-w-[640px]">{stepView}</div>
       </section>
     </>
   );
