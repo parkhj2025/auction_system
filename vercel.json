@@ -4,6 +4,10 @@
     "src/app/api/court-listings/[docid]/photos/route.ts": {
       "maxDuration": 30,
       "regions": ["sin1"]
+    },
+    "src/app/api/orders/check/route.ts": {
+      "maxDuration": 30,
+      "regions": ["icn1"]
     }
   },
   "crons": [
