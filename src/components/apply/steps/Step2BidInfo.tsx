@@ -1,37 +1,27 @@
 "use client";
 
-// cycle 1-D-A-2 = 모바일 앱 form 토큰 광역 + minPrice fallback (matchedListing) + belowMin enforcement.
+// cycle 1-D-A-2 = 모바일 앱 form 토큰 + minPrice fallback (matchedListing) + belowMin enforcement.
+// cycle 1-D-A-4-2 = PhoneVerifyModal + VerifiedBadge + verifyModalOpen + inputsDisabled + handleVerified 광역 영구 폐기 (form fields 보존 / cycle 1-D-B 영역 정합).
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
 import type { ApplyFormData, ApplyBidInfo } from "@/types/apply";
 import { formatPhone } from "@/lib/apply";
 import { cn, formatKoreanWon } from "@/lib/utils";
 import { FeeCalculatorInline } from "../FeeCalculator";
-import { PhoneVerifyModal } from "../PhoneVerifyModal";
-import { VerifiedBadge } from "../VerifiedBadge";
-import type { PhoneVerifyResult } from "@/lib/auth/phoneVerify";
 
 export function Step2BidInfo({
   data,
   onBidInfoChange,
-  onVerified,
   onNext,
   onBack,
 }: {
   data: ApplyFormData;
   onBidInfoChange: (patch: Partial<ApplyBidInfo>) => void;
-  // 상위 ApplyClient.handleVerified는 기존 2인자 (result, name) 시그니처 유지.
-  // phone prefill은 handleVerified 내부에서 bid state 직접 업데이트.
-  onVerified: (result: PhoneVerifyResult, verifiedName: string) => void;
   onNext: () => void;
   onBack: () => void;
 }) {
   const [errors, setErrors] = useState<Record<string, string>>({});
-  // Step2 mount 시 미인증이면 모달 자동 오픈. verified=true면 처음부터 닫힘.
-  // 인증 후 닫힌 모달은 "본인인증 시작하기" 버튼으로 재오픈 가능 (verified=false인 경우).
-  const [verifyModalOpen, setVerifyModalOpen] = useState(!data.verified);
   const bid = data.bidInfo;
-  const inputsDisabled = !data.verified;
   const hasErrors = Object.keys(errors).length > 0;
 
   // Phase 6.4 회귀 수정: 입력 필드 → 에러 메시지 ID 매핑 (handleNext scrollIntoView 대상).
@@ -54,21 +44,6 @@ export function Step2BidInfo({
     });
   }
 
-  function handleVerified(
-    result: PhoneVerifyResult,
-    verifiedName: string,
-    verifiedPhone: string,
-  ) {
-    onVerified(result, verifiedName);
-    setVerifyModalOpen(false);
-    // Phase 6.7.6: 이름 + 전화번호 모두 prefill (빈 상태일 때만 — 사용자가 본인인증 전
-    // 이미 수동 입력한 값은 덮어쓰지 않음). formatPhone 재적용 불필요 — modal state는
-    // 이미 "010-1234-5678" 포맷.
-    const patch: Partial<ApplyBidInfo> = {};
-    if (!bid.applicantName.trim()) patch.applicantName = verifiedName;
-    if (!bid.phone.trim()) patch.phone = verifiedPhone;
-    if (Object.keys(patch).length > 0) onBidInfoChange(patch);
-  }
   const bidAmountNum = Number(bid.bidAmount.replace(/[^\d]/g, "")) || 0;
   // cycle 1-D-A-4: matchedListing.min_bid_amount 단독 (matchedPost 광역 폐기 정합).
   const minPrice = data.matchedListing?.min_bid_amount ?? 0;
@@ -128,30 +103,17 @@ export function Step2BidInfo({
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-3">
-        <div className="flex items-start justify-between gap-3">
-          <h2 className="text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
-            입찰 정보를 입력해주세요
-          </h2>
-          <VerifiedBadge verified={data.verified} verifiedName={data.verifiedName} />
-        </div>
+        <h2 className="text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
+          입찰 정보를 입력해주세요
+        </h2>
         <p className="text-sm leading-6 text-[var(--color-ink-500)]">
           입찰 희망 금액과 신청인 정보는 위임 서류 작성에 사용됩니다.
           입력하신 정보는 암호화되어 전달되며 접수 외 용도로 사용되지 않습니다.
         </p>
-        {!data.verified && (
-          <button
-            type="button"
-            onClick={() => setVerifyModalOpen(true)}
-            className="inline-flex w-fit items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-ink-900)] bg-[var(--color-ink-50)] px-4 py-2 text-xs font-bold text-[var(--color-ink-900)] hover:bg-[var(--color-ink-100)]"
-          >
-            본인인증 시작하기
-          </button>
-        )}
       </header>
 
       <fieldset
-        disabled={inputsDisabled}
-        className="flex flex-col gap-6 rounded-2xl border border-gray-200 bg-white p-5 disabled:opacity-60 lg:p-8"
+        className="flex flex-col gap-6 rounded-2xl border border-gray-200 bg-white p-5 lg:p-8"
       >
           {/* 입찰 금액 */}
           <div>
@@ -223,11 +185,6 @@ export function Step2BidInfo({
                 }}
                 className={inputClass("applicantName")}
               />
-              {data.verified && bid.applicantName.trim() && (
-                <p className="mt-1 text-xs text-[var(--color-ink-500)]">
-                  본인인증 완료 정보로 자동 입력됨
-                </p>
-              )}
               {errors.applicantName && (
                 <p className="mt-1 text-xs text-[var(--color-accent-red)]">
                   {errors.applicantName}
@@ -253,11 +210,6 @@ export function Step2BidInfo({
                 }}
                 className={inputClass("phone")}
               />
-              {data.verified && bid.phone.trim() && (
-                <p className="mt-1 text-xs text-[var(--color-ink-500)]">
-                  본인인증 완료 정보로 자동 입력됨
-                </p>
-              )}
               {errors.phone && (
                 <p className="mt-1 text-xs text-[var(--color-accent-red)]">
                   {errors.phone}
@@ -430,10 +382,10 @@ export function Step2BidInfo({
         <button
           type="button"
           onClick={handleNext}
-          disabled={inputsDisabled || hasErrors}
+          disabled={hasErrors}
           className={cn(
             "inline-flex min-h-[var(--cta-h-app)] items-center gap-2 rounded-full px-6 text-sm font-black transition-colors duration-150",
-            !inputsDisabled && !hasErrors
+            !hasErrors
               ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)]"
               : "cursor-not-allowed bg-gray-200 text-gray-400",
           )}
@@ -442,15 +394,6 @@ export function Step2BidInfo({
           <ArrowRight size={16} aria-hidden="true" />
         </button>
       </div>
-
-      {verifyModalOpen && (
-        <PhoneVerifyModal
-          initialName={bid.applicantName}
-          initialSsnFront={bid.ssnFront}
-          onVerified={handleVerified}
-          onClose={() => setVerifyModalOpen(false)}
-        />
-      )}
     </div>
   );
 }

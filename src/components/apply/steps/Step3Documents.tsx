@@ -4,7 +4,6 @@ import { ArrowLeft, ArrowRight, Info } from "lucide-react";
 import type { ApplyFormData, ApplyDocuments } from "@/types/apply";
 import { cn } from "@/lib/utils";
 import { FileUpload } from "../FileUpload";
-import { VerifiedBadge } from "../VerifiedBadge";
 
 export function Step3Documents({
   data,
@@ -23,12 +22,9 @@ export function Step3Documents({
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <div className="flex items-start justify-between gap-3">
-          <h2 className="text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
-            서류를 업로드해주세요
-          </h2>
-          <VerifiedBadge verified={data.verified} verifiedName={data.verifiedName} />
-        </div>
+        <h2 className="text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
+          서류를 업로드해주세요
+        </h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
           대법원 전자민원에서 발급한 전자본인서명확인서와 신분증 사본이
           필요합니다. 두 서류는 위임장 작성과 본인 확인에 사용됩니다.

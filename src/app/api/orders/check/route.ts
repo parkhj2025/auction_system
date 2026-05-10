@@ -7,7 +7,7 @@
  *   3. court_listings cache lookup (TTL 24h 광역 = `last_seen_at >= NOW() - 24h`)
  *   4. cache HIT = 즉시 회신
  *   5. cache MISS = 대법원 광역 fetch (search.ts) + mapper + upsert + 즉시 회신
- *   6. fetch NG = listings [] 회신 (client manualEntry 자동 진입)
+ *   6. fetch NG = listings [] + case_status="not_found" 회신 (client amber alert + 사건번호 input focus 자동 paradigm / cycle 1-D-A-4-2)
  *
  * bid_date filter 광역 폐기 (cycle 1-D-A-4 영역 통합 사전 정합).
  * is_active filter 광역 보존 (종결 사건 광역 분기 = cycle 1-D-A-4 영역).

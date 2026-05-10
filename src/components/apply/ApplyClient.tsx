@@ -1,6 +1,7 @@
 "use client";
 
-// cycle 1-D-A-4: matchedPost 광역 폐기 (Cowork 콘텐츠 source 광역 폐기 / 대법원 fetch 단독).
+// cycle 1-D-A-4: matchedPost 폐기 (Cowork 콘텐츠 source / 대법원 fetch 단독).
+// cycle 1-D-A-4-2: handleVerified + onVerified prop + manualEntry + console.log 광역 영구 폐기.
 import { useMemo, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import type {
@@ -48,19 +49,11 @@ export function ApplyClient() {
   // PDF 성공 시 null clear. /api/apply 실패 시 lastOrderId 미set 상태 유지.
   const [lastOrderId, setLastOrderId] = useState<string | null>(null);
 
-  // cycle 1-D-A-4: initialCase 자동 매칭 광역 폐기 (Cowork 콘텐츠 source paradigm 광역 폐기).
-  // URL ?case= 광역 = caseNumber state 광역 단독 prefill (위 useState 정합).
+  // cycle 1-D-A-4: initialCase 자동 매칭 폐기 (Cowork 콘텐츠 source paradigm 폐기).
+  // URL ?case= = caseNumber state 단독 prefill (위 useState 정합).
 
-  const merge = (patch: Partial<ApplyFormData>) => {
-    // cycle 1-D-A-4 진단: merge 호출 시점 + patch keys 광역 추적.
-    console.log("[ApplyClient merge]", {
-      keys: Object.keys(patch),
-      matchedListing_in_patch:
-        "matchedListing" in patch ? !!patch.matchedListing : "—",
-      bidDate_in_patch: "bidDate" in patch ? patch.bidDate : "—",
-    });
+  const merge = (patch: Partial<ApplyFormData>) =>
     setData((d) => ({ ...d, ...patch }));
-  };
 
   const mergeBidInfo = (patch: Partial<ApplyBidInfo>) =>
     setData((d) => ({ ...d, bidInfo: { ...d.bidInfo, ...patch } }));
@@ -76,30 +69,12 @@ export function ApplyClient() {
     value: boolean,
   ) => setData((d) => ({ ...d, [key]: value }));
 
-  const handleVerified = (
-    result: import("@/lib/auth/phoneVerify").PhoneVerifyResult,
-    verifiedName: string,
-    // Phase 6.7.6: optional phone 파라미터 수용. 본 Phase에서는 사용 안 하지만
-    // 향후 ApplyClient 상위 로직에서 phone 활용 필요 시 시그니처 재수정 회피 목적.
-    verifiedPhone?: string,
-  ) => {
-    void verifiedPhone;
-    setData((d) => ({
-      ...d,
-      verified: result.ok,
-      verifiedName: result.ok ? verifiedName : null,
-      verifiedAt: result.ok ? (result.mockedAt ?? null) : null,
-    }));
-  };
-
   function goNext() {
     const i = STEP_ORDER.indexOf(currentStep);
     if (i < 0 || i >= STEP_ORDER.length - 1) return;
     const nextStep = STEP_ORDER[i + 1];
     // Phase 4-CONFIRM 회귀 수정: property → 이후 모든 step 전환 시 bidDate + caseConfirmedByUser 게이트 적용.
-    // 기존(Phase 4-CONFIRM 1차)는 nextStep === "confirm"에서만 발동했으나,
-    // Step1 → Step2 race condition으로 manualEntry 경로가 무방비 진입 가능 → 이중 방어.
-    // Step1Property 강제 모달이 1차 방어선, 본 가드가 2차 방어선.
+    // Step1 → Step2 race condition 무방비 진입 차단 — 이중 방어.
     if (
       currentStep === "property" &&
       (!data.bidDate || !data.caseConfirmedByUser)
@@ -154,12 +129,14 @@ export function ApplyClient() {
         const form = new FormData();
         form.set("caseNumber", data.caseNumber);
         form.set("court", data.court);
-        form.set("manualEntry", String(data.manualEntry));
-        // cycle 1-D-A-4: matchedSlug/Title 광역 폐기 (Cowork 콘텐츠 source 광역 분리).
+        // cycle 1-D-A-4-2: manualEntry paradigm 영구 폐기 → server backward compat 영구 false 강제.
+        // server route + DB column 정리는 후속 cycle 영역.
+        form.set("manualEntry", "false");
+        // cycle 1-D-A-4: matchedSlug/Title 폐기 (Cowork 콘텐츠 source 분리).
         form.set("bidDate", data.bidDate);
         form.set("propertyType", data.propertyType);
         form.set("propertyAddress", data.propertyAddress);
-        // Phase 6.7.6 — 매각회차 (default 1, listing 매칭 시 failed_count+1 자동, manualEntry 시 사용자 선택)
+        // Phase 6.7.6 — 매각회차 (listing 매칭 시 listing.auction_round 자동 / 매칭 단독 paradigm)
         form.set("auctionRound", String(data.auctionRound));
         if (data.caseConfirmedAt) {
           form.set("caseConfirmedAt", data.caseConfirmedAt);
@@ -262,7 +239,6 @@ export function ApplyClient() {
           <Step2BidInfo
             data={data}
             onBidInfoChange={mergeBidInfo}
-            onVerified={handleVerified}
             onNext={goNext}
             onBack={goBack}
           />
@@ -297,19 +273,9 @@ export function ApplyClient() {
   }, [currentStep, data, submitting, submitError, applicationId]);
 
   // 1-D-A: 사이드바 mount = 매칭 listing 있고 Step5(complete) 외 모든 step.
-  // manualEntry = matchedListing null → 사이드바 0 / ApplyStepIndicator 메타 line fallback.
+  // cycle 1-D-A-4-2: manualEntry 폐기 → matchedListing null 시점 = 사건번호 NG / 미입력 / 매칭 0건 단독.
   const showSidebar =
     !!data.matchedListing && currentStep !== "complete";
-
-  // cycle 1-D-A-4 진단: parent state 광역 변동 추적 (production 회신 사후 광역 정정 paradigm).
-  console.log("[ApplyClient] render", {
-    has_matchedListing: !!data.matchedListing,
-    matchedListing_docid: data.matchedListing?.docid,
-    bidDate: data.bidDate,
-    propertyType: data.propertyType,
-    showSidebar,
-    currentStep,
-  });
 
   return (
     <>
@@ -323,8 +289,8 @@ export function ApplyClient() {
             "calc(var(--apply-bottom-bar-h) + env(safe-area-inset-bottom) + 24px)",
         }}
       >
-          {/* cycle 1-D-A-4 정정 1: stepView 광역 = 항상 동일 JSX 위치 (section > div > div) 영구 보존.
-            showSidebar 분기 = parent div className + sidebar conditional render 광역 단독 (구조 미변동).
+        {/* cycle 1-D-A-4 정정 1: stepView 광역 = 항상 동일 JSX 위치 (section > div > div) 영구 보존.
+            showSidebar 분기 = parent div className + sidebar conditional render 단독 (구조 미변동).
             React reconciliation 광역 = unmount/remount 영역 0 → useEffect cascade reset 차단 paradigm. */}
         <div
           className={

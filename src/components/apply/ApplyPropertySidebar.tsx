@@ -8,11 +8,12 @@ import { PhotoGallery } from "./PhotoGallery";
 
 /**
  * Stage 2 cycle 1-D-A — 사건 정보 사이드바.
- * cycle 1-D-A-2 = 모바일 앱 form 토큰 광역 (TopNav sticky offset 정합 = lg:top-[80px]).
+ * cycle 1-D-A-2 = 모바일 앱 form 토큰 (TopNav sticky offset = lg:top-[80px]).
+ * cycle 1-D-A-4-2 = 사이즈/간격 정합 + 출처 footer 폐기 + 입찰보증금 hint 정제.
  *
- * - 데스크탑 (lg+) = 우측 column / sticky top (TopNav 64px + breathing 16px).
+ * - 데스크탑 (lg+) = 우측 column / sticky top (TopNav 64px + breathing 16px) / 데이터 hub 단독.
  * - 모바일 = inline + collapse paradigm (chevron toggle / 기본 펼침).
- * - mount 조건: data.matchedListing 있을 때만 (manualEntry = mount 0).
+ * - mount 조건: data.matchedListing 있을 때만.
  * - Step1·2·3·4 노출 / Step5 mount 0 (ApplyClient 광역 분기).
  */
 
@@ -72,26 +73,26 @@ export function ApplyPropertySidebar({ listing, isResale = false }: Props) {
       </p>
 
       <div className={collapsed ? "hidden lg:mt-4 lg:block" : "mt-4"}>
-        {/* 사진 thumbnail 영역 */}
-        <PhotoGallery docid={listing.docid} />
+        {/* 사진 그리드 (사이드바 광역 = grid variant 단독) */}
+        <PhotoGallery docid={listing.docid} variant="grid" />
 
         {/* 사건 메타 */}
-        <dl className="mt-4 flex flex-col gap-3">
+        <dl className="mt-4 flex flex-col gap-4">
           <div>
             <dt className="text-xs text-gray-500">사건번호 · 법원</dt>
-            <dd className="mt-0.5 text-sm font-bold tabular-nums text-[var(--color-ink-900)]">
+            <dd className="mt-1 text-sm font-bold tabular-nums text-[var(--color-ink-900)]">
               {listing.case_number} · {listing.court_name}
             </dd>
           </div>
           <div>
             <dt className="text-xs text-gray-500">매각기일</dt>
-            <dd className="mt-0.5 text-sm font-bold tabular-nums text-[var(--color-ink-900)]">
+            <dd className="mt-1 text-sm font-bold tabular-nums text-[var(--color-ink-900)]">
               {listing.bid_date ?? "-"}
             </dd>
           </div>
           <div>
             <dt className="text-xs text-gray-500">감정가</dt>
-            <dd className="mt-0.5 text-sm font-bold tabular-nums text-[var(--color-ink-900)]">
+            <dd className="mt-1 text-sm font-bold tabular-nums text-[var(--color-ink-900)]">
               {listing.appraisal_amount != null
                 ? formatKoreanWon(listing.appraisal_amount)
                 : "-"}
@@ -99,7 +100,7 @@ export function ApplyPropertySidebar({ listing, isResale = false }: Props) {
           </div>
           <div>
             <dt className="text-xs text-gray-500">최저가</dt>
-            <dd className="mt-0.5 text-base font-black tabular-nums text-red-500">
+            <dd className="mt-1 text-lg font-black tabular-nums text-[var(--color-accent-red)]">
               {listing.min_bid_amount != null
                 ? formatKoreanWon(listing.min_bid_amount)
                 : "-"}
@@ -108,16 +109,16 @@ export function ApplyPropertySidebar({ listing, isResale = false }: Props) {
           {deposit !== null && (
             <div className="rounded-md bg-yellow-50 px-3 py-2">
               <dt className="text-xs text-gray-700">
-                입찰보증금 · {depositRate} 자동 계산
+                입찰보증금 · 최저가 {depositRate}
               </dt>
-              <dd className="mt-0.5 text-base font-bold tabular-nums text-[var(--color-ink-900)]">
+              <dd className="mt-1 text-base font-bold tabular-nums text-[var(--color-ink-900)]">
                 {formatKoreanWon(deposit)}
               </dd>
             </div>
           )}
           <div>
             <dt className="text-xs text-gray-500">유찰</dt>
-            <dd className="mt-0.5 text-sm font-bold text-[var(--color-ink-900)]">
+            <dd className="mt-1 text-sm font-bold text-[var(--color-ink-900)]">
               {listing.failed_count === 0
                 ? "신건"
                 : `${listing.failed_count}회`}
@@ -126,7 +127,7 @@ export function ApplyPropertySidebar({ listing, isResale = false }: Props) {
           {listing.area_display && (
             <div>
               <dt className="text-xs text-gray-500">면적</dt>
-              <dd className="mt-0.5 text-sm font-bold text-[var(--color-ink-900)]">
+              <dd className="mt-1 text-sm font-bold text-[var(--color-ink-900)]">
                 {listing.area_display}
               </dd>
             </div>
@@ -134,17 +135,12 @@ export function ApplyPropertySidebar({ listing, isResale = false }: Props) {
           {listing.usage_name && (
             <div>
               <dt className="text-xs text-gray-500">용도</dt>
-              <dd className="mt-0.5 text-sm font-bold text-[var(--color-ink-900)]">
+              <dd className="mt-1 text-sm font-bold text-[var(--color-ink-900)]">
                 {listing.usage_name}
               </dd>
             </div>
           )}
         </dl>
-
-        {/* 출처 footer */}
-        <p className="mt-5 border-t border-gray-100 pt-4 text-xs text-gray-500">
-          공공저작물 · 대법원 경매정보
-        </p>
       </div>
     </aside>
   );

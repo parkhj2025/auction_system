@@ -1,41 +1,42 @@
 "use client";
 
-// cycle 1-D-A-2 = 모바일 앱 form 토큰 광역 (input 56 / 라벨 16 / CTA 56 / gap 28).
+// cycle 1-D-A-2 = 모바일 앱 form 토큰 (input 56 / 라벨 16 / CTA 56 / gap 28).
+// cycle 1-D-A-4-2 = manualEntry/CaseConfirmCard/CaseConfirmModal 영구 폐기 + amber alert + 인라인 카드 통합 paradigm.
 import { useEffect, useRef, useState } from "react";
 import {
-  AlertCircle,
-  CheckCircle2,
+  AlertTriangle,
   ArrowRight,
   Info,
   ChevronDown,
   Loader2,
+  CheckCircle2,
 } from "lucide-react";
 import type { ApplyFormData, CourtListingSummary } from "@/types/apply";
 import { COURTS_ALL, groupCourtsByRegion } from "@/lib/constants";
 import { cn, formatKoreanWon } from "@/lib/utils";
+import { CASE_CONFIRM_CHECKBOX_LABEL } from "@/lib/legal";
+import { getKSTDateTimeIso } from "@/lib/datetime";
 import { PhotoGallery } from "../PhotoGallery";
-import { CaseConfirmCard } from "../CaseConfirmCard";
-import { CaseConfirmModal } from "../CaseConfirmModal";
 
 /**
  * 사건번호 정규식 — `2024타경12345` 형식 (Phase 6.3 회귀 수정 — 2026-04-19).
- * 매칭 조회 + manualEntry 자동 진입은 정규식 통과 시점에만 발동.
- * 부분 입력(예: "2099타경") 상태에서는 fetch/manualEntry/모달 모두 차단되어
- * 사용자가 끝까지 타이핑할 수 있다.
+ * 매칭 조회는 정규식 통과 시점에만 발동.
  */
 const CASE_NUMBER_PATTERN = /^\d{4}타경\d+$/;
 
 /**
  * Step 1 — 법원 + 사건번호 입력 + 사건 정보 확인.
  *
- * 설계 원칙 (2026-04-19 Phase 4-CONFIRM 확정):
- * - /api/orders/check → listings 배열 반환. court_listings DB 매칭 우선.
- * - listings 1건 → 자동 매칭 카드. 2건+ → 선택 UI. 0건 → frontmatter 폴백.
- * - 매칭 성공/실패 무관 모든 경로에서 CaseConfirmCard 통일 UX 적용.
- * - 매칭 성공 시 bidDate/propertyType/propertyAddress 자동 복사,
- *   manualEntry 시 사용자 직접 입력 (네이티브 input[type=date], select, text).
- * - data.bidDate && data.caseConfirmedByUser 둘 다 truthy일 때만 다음 Step 진입.
- * - case 변경 시 매칭/입력값 + caseConfirmedByUser/caseConfirmedAt 모두 reset.
+ * cycle 1-D-A-4-2 paradigm:
+ * - manualEntry 영구 폐기 → 매칭 성공 단독 경로.
+ * - CaseConfirmCard / CaseConfirmModal 광역 영구 폐기 → 인라인 매칭 카드 통합 (1 카드 paradigm).
+ * - 사건번호 NG 분기:
+ *   - case_status="not_found" → amber alert "사건번호를 다시 확인해주세요" + input focus 자동.
+ *   - case_status="closed" → amber alert "이 사건은 매각이 종결됐습니다".
+ *   - case_status="active" → 인라인 카드 + 사이드바 mount.
+ * - 영역 분리: desktop 사이드바 단독 데이터 hub / 인라인 = action focus.
+ *   mobile 인라인 = 풀 데이터 + 사진 + 체크박스 통합.
+ * - 색상 paradigm: amber 광역 (--color-warning + --color-warning-soft) / red = caseTaken 한정 (행동차단).
  */
 export function Step1Property({
   data,
@@ -48,65 +49,44 @@ export function Step1Property({
 }) {
   const [caseTaken, setCaseTaken] = useState(false);
   const [caseClosed, setCaseClosed] = useState(false);
+  const [caseNotFound, setCaseNotFound] = useState(false);
   const [checking, setChecking] = useState(false);
   const [listings, setListings] = useState<CourtListingSummary[]>([]);
-  // cycle 1-D-A-2: 매칭 상태 banner (checking / nomatch 3초 노출 사후 manualEntry 자동 진입).
-  const [matchStatus, setMatchStatus] = useState<
-    "idle" | "checking" | "nomatch"
-  >("idle");
-  const nomatchTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const [matchStatus, setMatchStatus] = useState<"idle" | "checking">("idle");
 
   const latestPatchRef = useRef(onChange);
   latestPatchRef.current = onChange;
 
-  // cycle 1-D-A-4 정정 2: 첫 mount 시점 광역 reset skip (이중 방어 paradigm).
-  // ApplyClient JSX 구조 광역 미래 변동 광역 회귀 시점 광역 reset cascade 영구 차단.
+  // cycle 1-D-A-4 정정 2: 첫 mount 시점 reset skip (이중 방어 paradigm).
   const isFirstMountRef = useRef(true);
+
+  // 사건번호 input ref — case_status="not_found" 광역 자동 focus paradigm.
+  const caseNumberInputRef = useRef<HTMLInputElement>(null);
 
   const selectedCourt = COURTS_ALL.find((c) => c.label === data.court);
   const courtCode = selectedCourt?.courtCode ?? "";
 
   // Phase 6 회귀 수정 (P0): 사용자 caseNumber 변경 시 매칭 state reset만 처리.
-  // 매칭 조회는 명시적 액션(Enter/Blur/"사건번호 확인" 버튼)에서만 발동 — onChange 실시간 조회 완전 제거.
-  // 정규식 \d+가 1자리 이상 허용하여 타이핑 중 모든 중간값이 트리거되던 문제 본질적 해결.
+  // 매칭 조회는 명시적 액션(Enter/Blur/"사건번호 확인" 버튼)에서만 발동.
   useEffect(() => {
-    // cycle 1-D-A-4 진단: useEffect 진입 + reset 광역 trigger 추적.
-    console.log("[Step1Property useEffect] enter", {
-      caseNumber: data.caseNumber,
-      courtCode,
-      has_matchedListing: !!data.matchedListing,
-      bidDate: data.bidDate,
-      propertyType: data.propertyType,
-      caseConfirmedByUser: data.caseConfirmedByUser,
-      isFirstMount: isFirstMountRef.current,
-    });
-    // cycle 1-D-A-4 정정 2: 첫 mount 시점 광역 reset 광역 skip (이중 방어 paradigm).
     if (isFirstMountRef.current) {
       isFirstMountRef.current = false;
-      console.log("[Step1Property useEffect] first-mount skip");
       return;
-    }
-    // cycle 1-D-A-2: 사용자 입력 변경 시 nomatch 타이머 광역 cancel + matchStatus reset.
-    if (nomatchTimerRef.current) {
-      clearTimeout(nomatchTimerRef.current);
-      nomatchTimerRef.current = null;
     }
     setMatchStatus("idle");
     setCaseTaken(false);
     setCaseClosed(false);
+    setCaseNotFound(false);
     setListings([]);
     if (
       data.matchedListing ||
-      data.manualEntry ||
       data.bidDate ||
       data.propertyType ||
       data.propertyAddress ||
       data.caseConfirmedByUser
     ) {
-      console.warn("[Step1Property useEffect] RESET trigger — clearing matchedListing/bidDate/propertyType/propertyAddress");
       latestPatchRef.current({
         matchedListing: null,
-        manualEntry: false,
         bidDate: "",
         propertyType: "",
         propertyAddress: "",
@@ -118,9 +98,9 @@ export function Step1Property({
   }, [data.caseNumber, courtCode]);
 
   /**
-   * 사건번호 매칭 조회 — 명시적 액션 트리거 (Phase 6 회귀 수정 P0).
+   * 사건번호 매칭 조회 — 명시적 액션 트리거.
    * 트리거 3곳: input onKeyDown(Enter), input onBlur, "사건번호 확인" 버튼.
-   * 빈 입력 / 정규식 미통과 / 이미 조회 중 → 즉시 return.
+   * cycle 1-D-A-4-2: nomatch 3초 timer + manualEntry 자동 진입 paradigm 광역 폐기.
    */
   async function triggerLookup() {
     const q = data.caseNumber.trim();
@@ -130,20 +110,18 @@ export function Step1Property({
 
     setChecking(true);
     setMatchStatus("checking");
-    // cycle 1-D-A-4 진단: stage 단위 console 광역 (production 광역 회신 사후 광역 정정 paradigm).
-    console.log("[triggerLookup] start", { caseNumber: q, courtCode, courtName: data.court });
+    setCaseTaken(false);
+    setCaseClosed(false);
+    setCaseNotFound(false);
+
     try {
       const res = await fetch("/api/orders/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ caseNumber: q, courtCode, courtName: data.court }),
       });
-      console.log("[triggerLookup] res.status", res.status);
 
       if (res.status === 401) {
-        console.warn("[triggerLookup] 401 unauthenticated — silent return");
-        setCaseTaken(false);
-        setListings([]);
         setMatchStatus("idle");
         return;
       }
@@ -154,38 +132,33 @@ export function Step1Property({
         listings?: CourtListingSummary[];
         case_status?: "active" | "closed" | "not_found";
       };
-      console.log("[triggerLookup] json", {
-        available: json.available,
-        case_status: json.case_status,
-        listings_length: json.listings?.length ?? 0,
-        listings_first: json.listings?.[0],
-      });
 
       setCaseTaken(json.available === false);
 
       const resultListings = json.listings ?? [];
       setListings(resultListings);
 
-      // cycle 1-D-A-4: case_status="closed" 분기 (종결 사건 광역 안내 + 차단).
+      // case_status="closed" 분기 (종결 사건 amber 안내 + 차단).
       if (resultListings.length === 0 && json.case_status === "closed") {
-        console.log("[triggerLookup] branch=closed");
         setCaseClosed(true);
         setMatchStatus("idle");
         return;
       }
 
+      // case_status="not_found" 분기 (manualEntry 폐기 / 재시도 paradigm).
+      if (resultListings.length === 0 && json.case_status !== "closed") {
+        setCaseNotFound(true);
+        setMatchStatus("idle");
+        // 사건번호 input 광역 자동 focus paradigm (재입력 유도).
+        caseNumberInputRef.current?.focus();
+        return;
+      }
+
       if (resultListings.length === 1) {
         const l = resultListings[0];
-        console.log("[triggerLookup] branch=D (single match)", {
-          docid: l.docid,
-          case_number: l.case_number,
-          bid_date: l.bid_date,
-          auction_round: l.auction_round,
-        });
         setMatchStatus("idle");
         latestPatchRef.current({
           matchedListing: l,
-          manualEntry: false,
           bidDate: l.bid_date ?? "",
           propertyType: l.usage_name ?? "",
           propertyAddress: l.address_display ?? "",
@@ -193,33 +166,11 @@ export function Step1Property({
           caseConfirmedAt: null,
           auctionRound: l.auction_round,
         });
-        console.log("[triggerLookup] D branch patch applied");
-      } else if (resultListings.length === 0) {
-        // cycle 1-D-A-4: 대법원 fetch 단독 paradigm (Cowork 콘텐츠 매칭 광역 폐기).
-        // 매칭 0건 → 3초 안내 사후 manualEntry 자동 진입.
-        console.log("[triggerLookup] branch=nomatch (0건 → 3초 → manualEntry)");
-        setMatchStatus("nomatch");
-        nomatchTimerRef.current = setTimeout(() => {
-          latestPatchRef.current({
-            matchedListing: null,
-            manualEntry: true,
-            bidDate: "",
-            propertyType: "",
-            propertyAddress: "",
-            caseConfirmedByUser: false,
-            caseConfirmedAt: null,
-            auctionRound: 1,
-          });
-          setMatchStatus("idle");
-          nomatchTimerRef.current = null;
-        }, 3000);
       } else {
         // 복수 매칭 → 사용자가 selectListing으로 선택 대기
-        console.log("[triggerLookup] branch=multiple", { count: resultListings.length });
         setMatchStatus("idle");
         latestPatchRef.current({
           matchedListing: null,
-          manualEntry: false,
           bidDate: "",
           propertyType: "",
           propertyAddress: "",
@@ -228,8 +179,7 @@ export function Step1Property({
           auctionRound: 1,
         });
       }
-    } catch (err) {
-      console.error("[triggerLookup] catch silent path", err);
+    } catch {
       setCaseTaken(false);
       setListings([]);
       setMatchStatus("idle");
@@ -241,12 +191,12 @@ export function Step1Property({
   const isNonServicedCourt = selectedCourt && !selectedCourt.isServiced;
 
   // Phase 4-CONFIRM 게이트: bidDate + caseConfirmedByUser 둘 다 truthy 필수.
-  // manualEntry/매칭 두 경로 모두 동일 게이트 적용.
   const canProceed =
     !!data.caseNumber.trim() &&
     !!data.court &&
     !caseTaken &&
     !caseClosed &&
+    !caseNotFound &&
     !checking &&
     !!data.bidDate &&
     !!data.caseConfirmedByUser;
@@ -259,26 +209,28 @@ export function Step1Property({
   function selectListing(listing: CourtListingSummary) {
     onChange({
       matchedListing: listing,
-      manualEntry: false,
       bidDate: listing.bid_date ?? "",
       propertyType: listing.usage_name ?? "",
       propertyAddress: listing.address_display ?? "",
       caseConfirmedByUser: false,
       caseConfirmedAt: null,
-      // Phase 6.7.6: 매칭 경로는 listing.auction_round 자동 결정 (사용자 변경 불가).
+      // Phase 6.7.6: 매칭 경로는 listing.auction_round 자동 결정.
       auctionRound: listing.auction_round,
     });
   }
 
-  // cycle 1-D-A-4: matchedPost 광역 폐기 (대법원 fetch 단독 paradigm).
+  function handleConfirmCheck(checked: boolean) {
+    onChange({
+      caseConfirmedByUser: checked,
+      caseConfirmedAt: checked ? getKSTDateTimeIso() : null,
+    });
+  }
+
   const listing = data.matchedListing;
   const regionGroups = groupCourtsByRegion();
 
-  const showMatchedConfirm = !caseTaken && !!listing;
-  const showManualConfirm = !caseTaken && data.manualEntry;
-
   return (
-    <div className="flex flex-col gap-6">
+    <div className="flex flex-col gap-6 lg:gap-8">
       <header>
         <h2 className="text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
           법원과 사건번호를 입력해주세요
@@ -313,7 +265,7 @@ export function Step1Property({
                       className={c.isServiced ? "" : "text-gray-400"}
                     >
                       {c.label}
-                      {c.isServiced ? " \u2713" : ""}
+                      {c.isServiced ? " ✓" : ""}
                     </option>
                   ))}
                 </optgroup>
@@ -329,6 +281,7 @@ export function Step1Property({
             </label>
             <div className="flex flex-col gap-2 sm:flex-row">
               <input
+                ref={caseNumberInputRef}
                 id="step1-case"
                 type="text"
                 placeholder="예: 2024타경12345"
@@ -358,10 +311,10 @@ export function Step1Property({
                   data.caseConfirmedByUser
                 }
                 className={cn(
-                  "inline-flex h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-full px-5 text-sm font-bold transition-colors duration-150 sm:w-auto sm:shrink-0",
+                  "inline-flex h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-full px-5 text-base font-bold transition-colors duration-150 sm:w-auto sm:shrink-0",
                   data.caseConfirmedByUser
                     ? "cursor-default bg-gray-100 text-gray-500"
-                    : "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)] disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400"
+                    : "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)] active:scale-[0.98] active:bg-[var(--brand-green-deep)] disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400",
                 )}
               >
                 {data.caseConfirmedByUser
@@ -379,7 +332,7 @@ export function Step1Property({
         </p>
       </div>
 
-      {/* cycle 1-D-A-2: 매칭 상태 banner */}
+      {/* 매칭 상태 banner (info / amber) */}
       {matchStatus === "checking" && (
         <div
           role="status"
@@ -387,17 +340,6 @@ export function Step1Property({
         >
           <Loader2 size={16} aria-hidden="true" className="animate-spin" />
           사건 정보 조회 중...
-        </div>
-      )}
-      {matchStatus === "nomatch" && (
-        <div
-          role="alert"
-          className="flex items-start gap-2 rounded-xl border border-[var(--color-warning)]/30 bg-[var(--color-warning-soft)] px-4 py-3 text-sm leading-6 text-[var(--color-warning)]"
-        >
-          <Info size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
-          <p>
-            사건 정보를 자동으로 가져올 수 없습니다. 잠시 후 직접 입력 화면으로 이동합니다.
-          </p>
         </div>
       )}
 
@@ -420,57 +362,56 @@ export function Step1Property({
         </div>
       )}
 
-      {/* cycle 1-D-A-4: 종결 사건 안내 (차단) */}
+      {/* 사건번호 NG — 종결 분기 (amber) */}
       {caseClosed && (
         <div
           role="alert"
-          className="rounded-[var(--radius-xl)] border-2 border-[var(--color-accent-red)] bg-red-50 p-5"
+          className="flex items-start gap-2 rounded-xl border border-[var(--color-warning)]/30 bg-[var(--color-warning-soft)] px-4 py-3 text-sm leading-6 text-[var(--color-warning)]"
         >
-          <div className="flex items-start gap-2">
-            <AlertCircle
-              size={20}
-              className="mt-0.5 shrink-0 text-[var(--color-accent-red)]"
-              aria-hidden="true"
-            />
-            <div>
-              <p className="text-sm font-black text-[var(--color-accent-red)]">
-                이 사건은 매각이 종결됐습니다
-              </p>
-              <p className="mt-1 text-xs leading-5 text-[var(--color-ink-700)]">
-                대법원 경매정보에 따르면 본 사건은 종결 또는 매각기일이 지났습니다.
-                다른 사건번호로 다시 검색해주세요.
-              </p>
-            </div>
+          <AlertTriangle size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
+          <div>
+            <p className="font-bold">이 사건은 매각이 종결됐습니다</p>
+            <p className="mt-1 text-xs leading-5">
+              매각기일이 지났거나 절차가 종료되었습니다. 다른 사건번호로 다시 검색해주세요.
+            </p>
           </div>
         </div>
       )}
 
-      {/* 이미 접수 진행 중 배너 (차단) */}
+      {/* 사건번호 NG — 미발견 분기 (amber + input focus 자동) */}
+      {caseNotFound && (
+        <div
+          role="alert"
+          className="flex items-start gap-2 rounded-xl border border-[var(--color-warning)]/30 bg-[var(--color-warning-soft)] px-4 py-3 text-sm leading-6 text-[var(--color-warning)]"
+        >
+          <AlertTriangle size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
+          <div>
+            <p className="font-bold">사건번호를 다시 확인해주세요</p>
+            <p className="mt-1 text-xs leading-5">
+              입력하신 사건번호로 매물을 찾지 못했습니다. 사건번호와 법원이 정확한지 확인 후 다시 시도해주세요.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* 이미 접수 진행 중 (red — 영구 룰 §9 행동차단 한정 정합) */}
       {caseTaken && (
         <div
           role="alert"
-          className="rounded-[var(--radius-xl)] border-2 border-[var(--color-accent-red)] bg-red-50 p-5"
+          className="flex items-start gap-2 rounded-xl border border-[var(--color-accent-red)]/30 bg-red-50 px-4 py-3 text-sm leading-6 text-[var(--color-accent-red)]"
         >
-          <div className="flex items-start gap-2">
-            <AlertCircle
-              size={20}
-              className="mt-0.5 shrink-0 text-[var(--color-accent-red)]"
-              aria-hidden="true"
-            />
-            <div>
-              <p className="text-sm font-black text-[var(--color-accent-red)]">
-                이미 접수가 진행 중인 물건입니다
-              </p>
-              <p className="mt-1 text-xs leading-5 text-[var(--color-ink-700)]">
-                한 물건당 한 분만 대리 접수합니다. 같은 사건번호라도 회차가
-                바뀌면 다시 접수하실 수 있습니다.
-              </p>
-            </div>
+          <AlertTriangle size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
+          <div>
+            <p className="font-bold">이미 접수가 진행 중인 물건입니다</p>
+            <p className="mt-1 text-xs leading-5 text-[var(--color-ink-700)]">
+              한 물건당 한 분만 대리 접수합니다. 같은 사건번호라도 회차가
+              바뀌면 다시 접수하실 수 있습니다.
+            </p>
           </div>
         </div>
       )}
 
-      {/* 복수 물건 선택 UI (D3: listings 2건 이상) */}
+      {/* 복수 물건 선택 UI (listings 2건 이상) */}
       {listings.length >= 2 && !caseTaken && !listing && (
         <div className="rounded-[var(--radius-xl)] border-2 border-[var(--color-ink-200)] bg-[var(--color-ink-50)]/40 p-5">
           <div className="flex items-center gap-2 text-[var(--color-ink-900)]">
@@ -485,7 +426,7 @@ export function Step1Property({
                 key={l.docid}
                 type="button"
                 onClick={() => selectListing(l)}
-                className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white p-4 text-left transition hover:border-[var(--color-ink-700)] hover:shadow-[var(--shadow-card)]"
+                className="rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white p-4 text-left transition-colors duration-150 hover:border-[var(--color-ink-700)] hover:shadow-[var(--shadow-card)]"
               >
                 <p className="text-sm font-bold text-[var(--color-ink-900)]">
                   {l.address_display}
@@ -508,85 +449,85 @@ export function Step1Property({
         </div>
       )}
 
-      {/* court_listings 매칭 카드 (단일 매칭 또는 선택 후) */}
+      {/* 인라인 매칭 카드 (CaseConfirmCard 통합 / 1 카드 paradigm).
+          desktop = action focus 단독 (헤더 + h3 + sub line + 체크박스)
+          mobile = 풀 데이터 dl + photos + 체크박스 통합 */}
       {listing && !caseTaken && (
-        <div className="rounded-[var(--radius-xl)] border-2 border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/50 p-6">
-          <div className="flex items-center gap-2 text-[var(--color-ink-900)]">
-            <CheckCircle2 size={18} aria-hidden="true" />
-            <p className="text-xs font-black uppercase tracking-wider">
-              대법원 경매정보에서 물건을 확인했습니다
-            </p>
-          </div>
-          <h3 className="mt-3 text-xl font-black tracking-tight text-[var(--color-ink-900)]">
+        <div className="rounded-[var(--radius-xl)] border-2 border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/50 p-5 lg:p-7">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
+            의뢰하실 사건 정보가 맞는지 확인해주세요
+          </p>
+          <h3 className="mt-3 text-lg font-black tracking-tight text-[var(--color-ink-900)] lg:text-xl">
             {listing.address_display}
           </h3>
-          <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-4 text-sm sm:grid-cols-3">
-            <div>
-              <dt className="text-xs text-[var(--color-ink-500)]">입찰일</dt>
-              <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
-                {listing.bid_date ?? "-"}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs text-[var(--color-ink-500)]">감정가</dt>
-              <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
-                {listing.appraisal_amount != null
-                  ? formatKoreanWon(listing.appraisal_amount)
-                  : "-"}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs text-[var(--color-ink-500)]">최저가</dt>
-              <dd className="mt-1 font-black tabular-nums text-[var(--color-accent-red)]">
-                {listing.min_bid_amount != null
-                  ? formatKoreanWon(listing.min_bid_amount)
-                  : "-"}
-              </dd>
-            </div>
-            <div>
-              <dt className="text-xs text-[var(--color-ink-500)]">매각회차</dt>
-              <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
-                {listing.failed_count === 0
-                  ? "신건"
-                  : `${listing.failed_count + 1}차 매각`}
-              </dd>
-              {listing.failed_count >= 1 && (
-                <p className="mt-0.5 text-[11px] text-[var(--color-ink-500)]">
-                  유찰 {listing.failed_count}회
-                </p>
+          <p className="mt-2 text-sm tabular-nums text-[var(--color-ink-700)] lg:text-base">
+            {listing.bid_date ?? "-"}
+            {listing.min_bid_amount != null && (
+              <>
+                {" · 최저가 "}
+                <span className="font-black text-[var(--color-accent-red)]">
+                  {formatKoreanWon(listing.min_bid_amount)}
+                </span>
+              </>
+            )}
+          </p>
+
+          {/* 모바일 단독: 풀 데이터 dl + 사진 (사이드바 영역 0 시점 대체 paradigm) */}
+          <div className="lg:hidden">
+            <dl className="mt-5 grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
+              <div>
+                <dt className="text-xs text-[var(--color-ink-500)]">감정가</dt>
+                <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
+                  {listing.appraisal_amount != null
+                    ? formatKoreanWon(listing.appraisal_amount)
+                    : "-"}
+                </dd>
+              </div>
+              <div>
+                <dt className="text-xs text-[var(--color-ink-500)]">매각회차</dt>
+                <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
+                  {listing.failed_count === 0
+                    ? "신건"
+                    : `${listing.failed_count + 1}차 매각`}
+                </dd>
+                {listing.failed_count >= 1 && (
+                  <p className="mt-0.5 text-[11px] text-[var(--color-ink-500)]">
+                    유찰 {listing.failed_count}회
+                  </p>
+                )}
+              </div>
+              <div>
+                <dt className="text-xs text-[var(--color-ink-500)]">용도</dt>
+                <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
+                  {listing.usage_name ?? "-"}
+                </dd>
+              </div>
+              {listing.area_display && (
+                <div>
+                  <dt className="text-xs text-[var(--color-ink-500)]">면적</dt>
+                  <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
+                    {listing.area_display}
+                  </dd>
+                </div>
               )}
-            </div>
-            <div>
-              <dt className="text-xs text-[var(--color-ink-500)]">용도</dt>
-              <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
-                {listing.usage_name ?? "-"}
-              </dd>
-            </div>
-            {listing.area_display && (
               <div>
-                <dt className="text-xs text-[var(--color-ink-500)]">면적</dt>
+                <dt className="text-xs text-[var(--color-ink-500)]">법원</dt>
                 <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
-                  {listing.area_display}
+                  {listing.court_name}
                 </dd>
               </div>
-            )}
-            <div>
-              <dt className="text-xs text-[var(--color-ink-500)]">법원</dt>
-              <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
-                {listing.court_name}
-              </dd>
-            </div>
-            {listing.component_count > 1 && (
-              <div>
-                <dt className="text-xs text-[var(--color-ink-500)]">구성</dt>
-                <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
-                  {listing.component_count}개 필지 일괄 매각
-                </dd>
-              </div>
-            )}
-          </dl>
-          {/* 사진 갤러리 (온디맨드 로드) */}
-          <PhotoGallery docid={listing.docid} />
+              {listing.component_count > 1 && (
+                <div>
+                  <dt className="text-xs text-[var(--color-ink-500)]">구성</dt>
+                  <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
+                    {listing.component_count}개 필지 일괄 매각
+                  </dd>
+                </div>
+              )}
+            </dl>
+            <PhotoGallery docid={listing.docid} variant="hero" />
+          </div>
+
           {/* 복수 물건 사건에서 다른 물건 선택 가능 */}
           {listings.length >= 2 && (
             <button
@@ -594,7 +535,6 @@ export function Step1Property({
               onClick={() =>
                 onChange({
                   matchedListing: null,
-                  manualEntry: false,
                   bidDate: "",
                   propertyType: "",
                   propertyAddress: "",
@@ -603,69 +543,45 @@ export function Step1Property({
                   auctionRound: 1,
                 })
               }
-              className="mt-2 ml-3 text-xs font-semibold text-[var(--color-ink-500)] underline underline-offset-2 hover:text-[var(--color-ink-700)]"
+              className="mt-3 text-xs font-semibold text-[var(--color-ink-500)] underline underline-offset-2 hover:text-[var(--color-ink-700)]"
             >
               다른 물건 선택
             </button>
           )}
-          {/* 1-D-A 출처 표기 */}
-          <p className="mt-4 border-t border-[var(--color-ink-200)] pt-3 text-xs text-gray-500">
-            출처: 대법원 경매정보 (KOGL Type 1)
-          </p>
+
+          {/* 체크박스 (CaseConfirmCard 통합 paradigm) */}
+          <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-[var(--radius-md)] px-3 py-3 hover:bg-white/50">
+            <input
+              type="checkbox"
+              checked={data.caseConfirmedByUser}
+              onChange={(e) => handleConfirmCheck(e.target.checked)}
+              className="mt-1 h-5 w-5 shrink-0 cursor-pointer accent-[var(--brand-green)]"
+            />
+            <span className="flex-1 text-base leading-7 text-[var(--color-ink-900)]">
+              {CASE_CONFIRM_CHECKBOX_LABEL}
+              {data.caseConfirmedByUser && data.caseConfirmedAt && (
+                <span className="ml-2 inline-flex items-center gap-1 text-xs text-[var(--color-ink-500)]">
+                  <CheckCircle2 size={12} aria-hidden="true" />
+                  확인 시각 기록됨
+                </span>
+              )}
+            </span>
+          </label>
         </div>
       )}
 
-      {/* cycle 1-D-A-4: frontmatter 매칭 (Cowork 콘텐츠) 카드 광역 폐기.
-          대법원 fetch 단독 paradigm → matchedListing 카드 단독. */}
-
-      {/* 1-D-A 면책 alert — 사건 정보 영역 표시 시 노출 */}
-      {(showMatchedConfirm || showManualConfirm) && (
+      {/* 면책 alert (amber 3줄 / 매칭 카드 노출 시 단독) */}
+      {listing && !caseTaken && (
         <div
           role="note"
-          className="rounded-xl border border-red-500 bg-red-50/30 p-4"
+          className="rounded-xl border border-[var(--color-warning)]/30 bg-[var(--color-warning-soft)] px-4 py-3 text-sm leading-6 text-[var(--color-warning)]"
         >
-          <p className="text-sm font-bold leading-6 text-[var(--color-accent-red)]">
-            🚩 입찰 정보는 대법원 경매정보 원본을 직접 확인하셔야 합니다.
-          </p>
-          <ul className="mt-2 flex flex-col gap-1 text-xs leading-5 text-[var(--color-ink-700)]">
-            <li>· 경매 정보는 대법원 경매정보 사이트 기반으로 제공됩니다.</li>
-            <li>· 정보 오류로 인한 책임은 부담하지 않습니다.</li>
-            <li>· 입찰보증금은 안전한 입찰을 위해 100원 단위 올림 처리됩니다.</li>
+          <ul className="flex flex-col gap-1">
+            <li>· 입찰 전 사건 정보를 한 번 더 확인해주세요</li>
+            <li>· 정보 오류로 인한 책임은 부담하지 않습니다</li>
+            <li>· 입찰가는 만원 단위로 올림 처리됩니다</li>
           </ul>
         </div>
-      )}
-
-      {/* Phase 4-CONFIRM: 사건 정보 확인 카드 + 강제 모달.
-          - matched: 인라인 카드 + 인라인 체크박스
-          - manual: 강제 모달(미확인 상태) → "확인" 클릭 후 인라인 읽기 전용 카드 + "정보 수정" 버튼 */}
-      {showMatchedConfirm && (
-        <CaseConfirmCard data={data} onChange={onChange} mode="matched" />
-      )}
-      {showManualConfirm && (
-        <CaseConfirmCard data={data} onChange={onChange} mode="manual" />
-      )}
-      {showManualConfirm && !data.caseConfirmedByUser && (
-        <CaseConfirmModal
-          data={data}
-          onChange={onChange}
-          onReturn={() => {
-            // Phase 6.3 회귀 수정: 모달에서 명시적 dismiss 경로.
-            // 단일 onChange 호출로 9개 필드 일괄 reset (race condition 차단 + 가독성).
-            // useEffect 빈 처리 분기에 의존하지 않고 onReturn 자신이 제어하는 모든 상태 명시.
-            // 본인인증 정보(verified/verifiedName/verifiedAt)는 의도적 미포함 — 재입력 시 유지.
-            // 강제 모달의 X/배경/Esc 차단 원칙은 유지.
-            onChange({
-              caseNumber: "",
-              matchedListing: null,
-              manualEntry: false,
-              bidDate: "",
-              propertyType: "",
-              propertyAddress: "",
-              caseConfirmedByUser: false,
-              caseConfirmedAt: null,
-            });
-          }}
-        />
       )}
 
       <div className="flex items-center justify-end gap-2 pt-2">
@@ -674,10 +590,10 @@ export function Step1Property({
           onClick={handleNext}
           disabled={!canProceed}
           className={cn(
-            "inline-flex min-h-[var(--cta-h-app)] items-center gap-2 rounded-full px-6 text-sm font-black transition-colors duration-150",
+            "inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-full px-8 text-base font-black transition-colors duration-150 sm:w-auto sm:px-10",
             canProceed
-              ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)]"
-              : "cursor-not-allowed bg-gray-200 text-gray-400"
+              ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)] active:scale-[0.98] active:bg-[var(--brand-green-deep)]"
+              : "cursor-not-allowed bg-gray-200 text-gray-400",
           )}
         >
           다음: 입찰 정보 입력

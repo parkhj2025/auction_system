@@ -16,7 +16,6 @@ import { PrivacyPreviewModal } from "../PrivacyPreviewModal";
 import { TermsPreviewModal } from "../TermsPreviewModal";
 import { cn, formatKoreanWon } from "@/lib/utils";
 import { getKSTDateTimeIso } from "@/lib/datetime";
-import { VerifiedBadge } from "../VerifiedBadge";
 import type { DelegationData } from "@/lib/pdf/delegationTemplate";
 
 type AgreementKey = "agreedDelegation" | "agreedPrivacy" | "agreedTerms";
@@ -66,7 +65,7 @@ export function Step4Confirm({
 
   // 미리보기 모달용 DelegationData 구성. ssnBack과 signatureDataUrl은 placeholder.
   // Phase 4-CONFIRM: data.bidDate non-null 승격으로 boundary throw 제거.
-  // bidDate/propertyAddress는 매칭/manualEntry 모두 data.* 직접 사용 (Step1에서 채움).
+  // bidDate/propertyAddress는 Step1 매칭 경로에서 listing 자동 복사 (cycle 1-D-A-4-2 manualEntry 폐기 정합).
   const previewData: DelegationData = useMemo(() => {
     // cycle 1-D-A-4: matchedListing 단독 source (matchedPost 광역 폐기).
     const appraisal = data.matchedListing?.appraisal_amount ?? 0;
@@ -171,12 +170,9 @@ export function Step4Confirm({
   return (
     <div className="flex flex-col gap-6">
       <header>
-        <div className="flex items-start justify-between gap-3">
-          <h2 className="text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
-            서명하고 위임에 동의해주세요
-          </h2>
-          <VerifiedBadge verified={data.verified} verifiedName={data.verifiedName} />
-        </div>
+        <h2 className="text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
+          서명하고 위임에 동의해주세요
+        </h2>
         <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
           위임장에 서명하고 3가지 항목에 동의하시면 제출이 가능합니다. 제출 후
           접수번호가 발급되며, 전용계좌 정보를 안내드립니다.

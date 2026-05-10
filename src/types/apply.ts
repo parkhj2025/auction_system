@@ -72,27 +72,23 @@ export interface ApplyFormData {
   court: string;
   /** court_listings에서 매칭된 물건 (대법원 fetch 단독 source / cycle 1-D-A-4 정합) */
   matchedListing?: CourtListingSummary | null;
-  /** matchedListing 없이 사용자가 수동으로 입력했는지 */
-  manualEntry: boolean;
   /**
    * 매각기일 (YYYY-MM-DD).
-   * 매칭 성공 시 matchedListing.bid_date에서 자동 복사,
-   * manualEntry 시 사용자가 직접 입력. 빈 문자열 ""이 미입력 상태.
-   * cycle 1-D-A-4: matchedPost (Cowork 콘텐츠 source) 광역 폐기 (대법원 단독 paradigm).
+   * cycle 1-D-A-4-2: manualEntry paradigm 광역 영구 폐기 → 매칭 성공 시 listing.bid_date 자동 복사 단독.
+   * 빈 문자열 ""이 미입력 상태.
    */
   bidDate: string;
-  /** 물건 종류 — PropertyType 9종 + 자유 텍스트 합성("기타: ..."). 매칭 시 자동 복사. */
+  /** 물건 종류 — 매칭 시 listing.usage_name에서 자동 복사. cycle 1-D-A-4-2: manualEntry 폐기. */
   propertyType: string;
-  /** 물건 주소. 매칭 시 자동 복사, manualEntry 시 사용자 직접 입력. */
+  /** 물건 주소. 매칭 시 listing.address_display에서 자동 복사. cycle 1-D-A-4-2: manualEntry 폐기. */
   propertyAddress: string;
-  /** 사건 정보 확인 체크박스 동의 여부 (매칭 성공/실패 두 경로 공통 게이트). */
+  /** 사건 정보 확인 체크박스 동의 여부 (매칭 성공 경로 게이트). */
   caseConfirmedByUser: boolean;
   /** 사건 정보 확인 시점 KST ISO timestamp. 분쟁 시 위임인의 정보 입력·확인 시각 입증 근거. */
   caseConfirmedAt: string | null;
   /**
    * 매각회차 (Phase 6.7.6). 같은 사건번호의 다른 회차는 별도 접수로 허용.
-   * 매칭 성공 경로: listing.auction_round 자동 복사, UI 변경 불가.
-   * manualEntry 경로: CaseConfirmModal 드롭다운 사용자 선택, default 1.
+   * cycle 1-D-A-4-2: manualEntry 폐기 → 매칭 성공 경로 listing.auction_round 자동 복사 단독.
    */
   auctionRound: number;
   bidInfo: ApplyBidInfo;
@@ -105,12 +101,6 @@ export interface ApplyFormData {
   agreedPrivacy: boolean;
   /** 서비스 이용약관 동의 */
   agreedTerms: boolean;
-  /** 휴대폰 본인인증 완료 여부 (Phase 5 — Stage 2C에서 실 SDK 결과로 대체) */
-  verified: boolean;
-  /** 본인인증 시점에 입력된 성명. 배지 표기용. */
-  verifiedName: string | null;
-  /** 본인인증 완료 KST ISO timestamp. */
-  verifiedAt: string | null;
 }
 
 export interface ApplySubmissionResult {
@@ -122,7 +112,6 @@ export interface ApplySubmissionResult {
 export const INITIAL_APPLY_DATA: ApplyFormData = {
   caseNumber: "",
   court: "인천지방법원",
-  manualEntry: false,
   bidDate: "",
   propertyType: "",
   propertyAddress: "",
@@ -148,7 +137,4 @@ export const INITIAL_APPLY_DATA: ApplyFormData = {
   agreedDelegation: false,
   agreedPrivacy: false,
   agreedTerms: false,
-  verified: false,
-  verifiedName: null,
-  verifiedAt: null,
 };
