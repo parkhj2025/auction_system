@@ -9,9 +9,15 @@ interface SignatureCanvasProps {
   onChange: (dataUrl: string | null) => void;
   /** true이면 입력 차단. 기본 false. */
   disabled?: boolean;
+  /** Canvas height Tailwind class. 기본 "h-40". cycle 1-D-A-4-4 = SignatureModal h-48 차용 paradigm. */
+  heightClass?: string;
 }
 
-export function SignatureCanvas({ onChange, disabled = false }: SignatureCanvasProps) {
+export function SignatureCanvas({
+  onChange,
+  disabled = false,
+  heightClass = "h-40",
+}: SignatureCanvasProps) {
   const padRef = useRef<SignaturePad>(null);
 
   function handleEnd() {
@@ -39,7 +45,7 @@ export function SignatureCanvas({ onChange, disabled = false }: SignatureCanvasP
           ref={padRef}
           onEnd={handleEnd}
           canvasProps={{
-            className: "block w-full h-40 touch-none",
+            className: `block w-full ${heightClass} touch-none`,
             "aria-label": "서명 입력 영역",
           }}
         />

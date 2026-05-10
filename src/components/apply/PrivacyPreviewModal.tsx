@@ -8,7 +8,7 @@ import { PrivacyContent } from "@/components/legal/PrivacyContent";
 /**
  * 개인정보처리방침 모달 — Step4Confirm 동의 라벨에서 호출 (Phase 6.5-POST 작업 7).
  * /privacy 페이지와 동일한 PrivacyContent 컴포넌트 소비 (단일 소스).
- * 강제 모달 X — X/배경/Esc 모두 dismiss 허용 (DelegationPreviewModal 패턴).
+ * 강제 모달 X — X/배경/Esc 모두 dismiss 허용 (정보 모달 paradigm 정합 / 영구 룰 §31).
  */
 interface Props {
   isOpen: boolean;

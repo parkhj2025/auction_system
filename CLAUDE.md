@@ -1021,6 +1021,68 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 
 ---
 
+## 28. Step4 광역 재구성 paradigm (cycle 1-D-A-4-4 신규, 2026-05-10)
+
+**의도**: Step4 = 입찰 정보 요약 + 위임인 서명 (별도) + 동의 + 수수료 + 제출 (양식 분리 + 아마추어) → **매수신청 대리 이용 계약서 (formal) + 서명 자리 inline + 동의 카드 + 수수료 inline + CTA** 정수 전환.
+
+**원칙 정수**:
+- ContractAgreement (formal 5조) = 당사자·사건·보수·위임·계약 광역 inline + 서명 자리 inline image 표기
+- 입찰 정보 요약 / 위임인 서명 별도 카드 영구 폐기 (ContractAgreement 안 흡수)
+- 동의 체크박스 3건 = 광역 정합 시점 SignatureModal 자동 pop paradigm (강제 모달 §31 정합)
+- "취소" click = lastCheckedAgreement 단독 회복 paradigm + 서명 image 회수
+- DelegationPreviewModal + PDFPreviewModal + /api/preview-delegation route + FeeCalculator 광역 폐기
+
+**ContractAgreement 카피 단일 source**: `src/lib/legal/contract.ts` 신규 (Lessons Learned [A] 정합).
+
+**5조 paradigm**:
+1. 당사자 정보 (입찰의뢰인 + 매수신청대리인 박형준 / 공인중개사 단독)
+2. 경매 사건 정보 (집행법원·사건번호·매각기일·입찰 희망 금액)
+3. 매수신청 대리 보수 (확정 보수액 dynamic + 낙찰 성공보수 50,000원 + 보수지급 시기)
+4. 위임 내용 (5조 / web search 정합):
+   - 가. 민사집행법 제113조 (매수신청 보증의 제공)
+   - 나. 「공인중개사의 매수신청대리인 등록 등에 관한 규칙」 제2조 (입찰표의 작성 및 제출)
+   - 다. 민사집행법 제114조 (차순위매수신고)
+   - 라. 민사집행법 제115조 제3항 + 제142조 제6항 (매수신청 보증의 회수)
+   - 마. 민사집행법 제140조 (공유자 우선매수 신고)
+5. 계약 내용 (가·나·다·라 4영역 / 의무 + 책임 관계 + 회사 사항)
+
+**SignatureModal paradigm**:
+- 강제 모달 (영구 룰 §31 정합 / backdrop·ESC 닫기 영구 폐기)
+- 헤더 "서명을 진행해주세요" 18 black + 안내 paragraph + canvas h-48 + 취소·서명 완료 CTA 56
+- "서명 완료" disabled gate = 서명 영역 비어있음 시점 단독 (bg-gray-200 text-gray-400 cursor-not-allowed)
+- mount paradigm = 부모 조건부 mount (`{signatureModalOpen && <SignatureModal />}`) → 매 open fresh state (lint rule react-hooks/set-state-in-effect 정합)
+
+**lastCheckedAgreement state paradigm**:
+- Step4Confirm 내부 useState<AgreementKey | null>(null)
+- 마지막 동의 click 시점 = setLastCheckedAgreement(key) + setSignatureModalOpen(true)
+- "취소" click 시점 = onAgreementChange(lastCheckedAgreement, false) + setLastCheckedAgreement(null) + onSignatureChange(null)
+
+**시각 토큰 광역 정합** (Step1·2·3 일관성):
+- 카드 = rounded-2xl + border-gray-200 + bg-white + p-5 (광역 통일)
+- ContractAgreement h3 = text-base + font-black + ink-900
+- ContractAgreement 본문 = text-base + leading-7 + ink-700 (가독성 + 접근성 정합)
+- 면책 paragraph = text-sm + ink-700 + bg-gray-50 + p-4 + rounded-md
+- 서명 자리 = 사전 dashed border-2 border-gray-300 h-16 + 사후 solid border border-ink-900 h-16 + image object-contain
+- 제출 CTA = bg-brand-green text-white font-black + 카피 "신청 제출" + Send icon
+- yellow 강조 영역 0 (영구 룰 §8 정합)
+
+**사용자 광역 흐름 paradigm 6단계**:
+1. Step4 진입 → ContractAgreement (formal) + 동의 3 unchecked + 수수료 inline + 제출 disabled
+2. 사용자 체크박스 1·2 click → 진행 (allAgreed === false / 제출 disabled 보존)
+3. 마지막 체크박스 click → setLastCheckedAgreement(key) + allAgreed === true → SignatureModal 자동 pop (강제 모달)
+4. 서명 + "서명 완료" → onSignatureChange(dataUrl) + modal 닫힘 → 서명 자리 image 표기 + 제출 CTA enable
+5. "취소" click → modal 닫힘 + 직전 체크박스 unchecked + 서명 image 회수 + 제출 disabled 회귀
+6. 제출 CTA click → onSubmit (canSubmit logic 보존) → /api/apply + /api/orders/{id}/generate-delegation → Step5 진입
+
+**학습**:
+- formal 계약서 paradigm = 바토너 차용 + web search 정합 정정 (사용자 prompt §115 → 규칙 §2 / §142 → §115③+§142⑥ 정정)
+- 단일 source paradigm (legal/contract.ts) = HTML inline + 향후 PDF 양 source 일관성 보장 (Lessons [A] 정합)
+- mount paradigm 단순화 = 부모 조건부 mount 정수 (key prop + setState-in-effect 광역 회피)
+- 등록번호 영역 dom 폐기 paradigm = "Phase 10" 어휘 사용자 노출 NG (§32 정합) + 사업자등록 사후 신규 추가 paradigm
+- 광역 폐기 영역 (DelegationPreviewModal + PDFPreviewModal + /api/preview-delegation + FeeCalculator) = 신규 paradigm 사용처 0 사후 즉시 정리 (사용처 0 dead code 광역 회피)
+
+---
+
 ## Changelog
 
 | 버전 | 날짜 | 변경 |
