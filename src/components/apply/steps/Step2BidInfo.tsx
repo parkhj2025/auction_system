@@ -2,8 +2,8 @@
 
 // cycle 1-D-A-2 = 모바일 앱 form 토큰 + minPrice fallback (matchedListing) + belowMin enforcement.
 // cycle 1-D-A-4-2 = PhoneVerifyModal + VerifiedBadge + verifyModalOpen + inputsDisabled + handleVerified 광역 영구 폐기 (form fields 보존 / cycle 1-D-B 영역 정합).
-import { useState } from "react";
-import { ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { ArrowLeft, ArrowRight, AlertCircle, HelpCircle } from "lucide-react";
 import type { ApplyFormData, ApplyBidInfo } from "@/types/apply";
 import { computeFee, formatPhone } from "@/lib/apply";
 import { cn, formatKoreanWon } from "@/lib/utils";
@@ -22,6 +22,21 @@ export function Step2BidInfo({
   const [errors, setErrors] = useState<Record<string, string>>({});
   const bid = data.bidInfo;
   const hasErrors = Object.keys(errors).length > 0;
+
+  // cycle 1-D-A-4-2 보강 2: 재경매 ? icon → tooltip on-demand paradigm.
+  const [tooltipOpen, setTooltipOpen] = useState(false);
+  const tooltipRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!tooltipOpen) return;
+    function handleClickOutside(e: MouseEvent) {
+      if (tooltipRef.current && !tooltipRef.current.contains(e.target as Node)) {
+        setTooltipOpen(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [tooltipOpen]);
 
   // Phase 6.4 회귀 수정: 입력 필드 → 에러 메시지 ID 매핑 (handleNext scrollIntoView 대상).
   const ERROR_FIELD_TO_ID: Record<string, string> = {
@@ -273,26 +288,47 @@ export function Step2BidInfo({
             )}
           </div>
 
-          {/* 재경매 물건 = alert paradigm 정수 (보증금 20% / amber 박스 단독 보존) */}
-          <div className="rounded-[var(--radius-md)] border border-[var(--color-warning)]/30 bg-[var(--color-warning-soft)] p-4">
-            <label className="flex cursor-pointer items-start gap-2">
-              <input
-                type="checkbox"
-                checked={bid.rebid}
-                onChange={(e) =>
-                  onBidInfoChange({ rebid: e.target.checked })
-                }
-                className="mt-0.5 h-5 w-5 rounded border-[var(--color-border)] accent-[var(--brand-green)]"
-              />
-              <div>
-                <span className="text-sm font-bold text-[var(--color-ink-900)]">
-                  재경매 물건 (보증금 20%)
-                </span>
-                <p className="mt-0.5 text-xs leading-5 text-[var(--color-ink-500)]">
-                  이전 낙찰자가 잔금을 미납한 사건이면 보증금이 20%로 올라가요. 확실하지 않으면 비워두세요
-                </p>
-              </div>
+          {/* 재경매 = 일반 체크박스 + ? icon → tooltip on-demand paradigm.
+              노란색 박스 dom 영구 폐기 (시각 분리 ↓ + 텍스트 위계 정합). */}
+          <div ref={tooltipRef} className="relative flex items-center gap-2">
+            <input
+              id="rebid-checkbox"
+              type="checkbox"
+              checked={bid.rebid}
+              onChange={(e) =>
+                onBidInfoChange({ rebid: e.target.checked })
+              }
+              className="h-5 w-5 rounded border-[var(--color-border)] accent-[var(--brand-green)]"
+            />
+            <label
+              htmlFor="rebid-checkbox"
+              className="cursor-pointer text-base font-bold leading-7 text-[var(--color-ink-900)]"
+            >
+              재경매 물건 (보증금 20%)
             </label>
+            <button
+              type="button"
+              aria-label="재경매 물건 안내"
+              aria-expanded={tooltipOpen}
+              onClick={() => setTooltipOpen((prev) => !prev)}
+              onMouseEnter={() => setTooltipOpen(true)}
+              onMouseLeave={() => setTooltipOpen(false)}
+              className="rounded-full text-[var(--color-ink-500)] transition-colors duration-150 hover:text-[var(--color-ink-700)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]"
+            >
+              <HelpCircle size={18} aria-hidden="true" />
+            </button>
+            {tooltipOpen && (
+              <div
+                role="tooltip"
+                className="absolute left-0 top-full z-10 mt-2 max-w-[280px] rounded-md bg-[var(--color-ink-900)] p-3 text-xs leading-5 text-white shadow-lg"
+              >
+                이전 낙찰자가 잔금을 미납한 사건이면 보증금이 20%로 올라가요. 확실하지 않으면 비워두세요.
+                <span
+                  className="absolute -top-1 left-4 h-2 w-2 rotate-45 bg-[var(--color-ink-900)]"
+                  aria-hidden="true"
+                />
+              </div>
+            )}
           </div>
 
           {/* 공동입찰 = 일반 체크박스 paradigm (박스 dom 영구 폐기 / 시각 노이즈 ↓) */}
@@ -364,20 +400,20 @@ export function Step2BidInfo({
             )}
           </div>
 
-          {/* 수수료 inline 압축 paradigm (FeeCalculatorInline dom 영구 폐기 / border-t footer paradigm).
-              차용 source: 토스 송금 결과 footer inline paradigm 정수. */}
+          {/* 수수료 inline 압축 paradigm (FeeCalculatorInline dom 영구 폐기 / 보강 2 = tier 단독 명료화).
+              현재 구간 단독 큰 가격 + 성공보수 sub paradigm 정수. */}
           {fee && (
-            <div className="border-t border-[var(--color-ink-200)] pt-4 text-sm leading-6 text-[var(--color-ink-500)]">
-              <p>
-                사전 신청가{" "}
-                <span className="font-bold text-[var(--color-ink-900)]">5만원부터</span>
-                {" · 낙찰 시 +5만원"}
-              </p>
-              <p className="mt-1">
-                D-{Math.max(0, fee.daysUntilBid)} · {fee.tierLabel}{" "}
-                <span className="font-bold text-[var(--color-ink-900)]">
+            <div className="border-t border-[var(--color-ink-200)] pt-4">
+              <div className="flex items-baseline gap-2">
+                <span className="text-sm font-medium text-[var(--color-ink-500)]">
+                  {fee.tierLabel} 신청가
+                </span>
+                <span className="text-lg font-bold text-[var(--color-ink-900)]">
                   {formatKoreanWon(fee.baseFee)}
                 </span>
+              </div>
+              <p className="mt-1 text-xs text-[var(--color-ink-500)]">
+                낙찰 시 성공보수 +5만원
               </p>
             </div>
           )}
