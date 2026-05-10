@@ -761,6 +761,38 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 
 ---
 
+## 21. Step3 service 안내 paradigm + 모달 분리 paradigm (cycle 1-D-A-4-3, 2026-05-10)
+
+**layered paradigm 정수**:
+- info 박스 = 사용자 첫 진입 사전 인지 paradigm (1줄 단독)
+- IssueGuideModal = on-demand 상세 paradigm (5단계 ol)
+- 정보 광역 layered = 첫 진입 인지 + 능동 click 상세
+
+**모달 분리 paradigm**:
+- ConfirmCaseModal = 강제 모달 paradigm (Step1 / backdrop·ESC 닫기 영구 폐기)
+- IssueGuideModal = 정보 모달 paradigm (Step3 / backdrop·ESC 닫기 보존)
+- 분리 정수 = 사용자 자유 영역 분리 paradigm
+
+**발급증 영역 폐기 paradigm**:
+- 매수신청 대리 광역 = 본인서명확인서 단독 정합 (사업 paradigm 정수)
+- 발급증 = 일반 행정 paradigm / 본 사업 광역 무관
+- 백엔드 영향 0 (form.set 영역 0 + Supabase column 영역 0)
+
+**광역 확장 paradigm**:
+- IssueGuideModal courtName props 동적 paradigm
+- COURTS_ALL + isServiced 플래그 광역 = 미래 확장 시점 광역 정정 부담 0
+- Phase 1 default = "인천지방법원" / 미래 cycle = isServiced 플래그 단독 갱신
+
+**곡률 위계 SCALE**:
+- 카드 rounded-2xl (16px) ⊃ info 박스 rounded-xl (12px) ⊃ input rounded-md (10px)
+
+**h2 paradigm 광역 통일** (cycle 1-D-A-4-2 final 누락 회복):
+- Step1·Step2·Step3 광역 = `text-2xl font-black tracking-[-0.015em] leading-[1.2] ink-900` 단독 paradigm
+
+**다음 cycle (1-D-A-4-4)**: Step4 §A-9 정합 4건 (체크박스 accent ink-900 → brand-green / dl grid-cols-2 → single column / dt 12 → 14 medium ink-500 / dd 14 → 16 bold ink-900).
+
+---
+
 ## Changelog
 
 | 버전 | 날짜 | 변경 |

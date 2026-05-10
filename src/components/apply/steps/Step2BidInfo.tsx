@@ -121,7 +121,7 @@ export function Step2BidInfo({
   return (
     <div className="flex flex-col gap-6">
       <header className="flex flex-col gap-3">
-        <h2 className="text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
+        <h2 className="text-2xl font-black leading-[1.2] tracking-[-0.015em] text-[var(--color-ink-900)]">
           입찰 정보를 입력해주세요
         </h2>
         <p className="text-sm leading-6 text-[var(--color-ink-500)]">

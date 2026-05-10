@@ -63,8 +63,6 @@ export interface ApplyBidInfo {
 export interface ApplyDocuments {
   eSignFile: File | null;
   idFile: File | null;
-  /** 전자본인서명확인서 발급증 (정부24 발급) */
-  eSignCertFile?: File | null;
 }
 
 export interface ApplyFormData {
