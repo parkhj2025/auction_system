@@ -965,7 +965,37 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 
 ---
 
-## 27. Step2 BidConfirmModal paradigm (cycle 1-D-A-4-3 보강 1 정정 4 갱신, 2026-05-10)
+## 27. Step2 BidConfirmModal paradigm (cycle 1-D-A-4-7 정정 / bidConfirmed drilling, 2026-05-10)
+
+**cycle 1-D-A-4-7 정정 사항**:
+- bidConfirmed state 위치 = Step2BidInfo internal `useState` 회수 → **ApplyClient drilling paradigm 갱신**
+- 직전 cycle 1-D-A-4-3 internal state paradigm = Step navigation 회귀 시점 false 회귀 NG 식별
+- 신규 paradigm = `data.bidConfirmed` field 광역 (ApplyFormData) + Step2BidInfo `data.bidConfirmed` read 단독 + `onBidConfirmedChange` prop drilling
+- Step navigation 회귀 시점 보존 정수 (Step2 → Step3·4·5·6 → Step2 회귀 시점 = bidConfirmed 보존 + "확정 완료 ✓" 시각 보존 + 다음 CTA enable 보존)
+
+**state shape paradigm 광역**:
+```ts
+// src/types/apply.ts
+interface ApplyFormData {
+  // ...
+  bidConfirmed: boolean;  // cycle 1-D-A-4-7 신규 (ApplyClient drilling)
+}
+
+// Step2BidInfo props
+{
+  data: ApplyFormData;
+  onBidInfoChange: (patch) => void;
+  onBidConfirmedChange: (value: boolean) => void;  // 신규 prop
+  onNext: () => void;
+  onBack: () => void;
+}
+
+// Step2BidInfo 내부
+const bidConfirmed = data.bidConfirmed;          // read
+const setBidConfirmed = onBidConfirmedChange;    // write
+```
+
+
 
 **원칙 정수** (정정 4 정수):
 - 다음 CTA + "입찰가 확정" CTA = 별개 action 분리 paradigm 정수
@@ -1097,7 +1127,25 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 
 ---
 
-## 29. Step5Payment + Step5Complete paradigm (cycle 1-D-A-4-6 정정, 2026-05-10)
+## 29. Step5Payment + Step5Complete paradigm (cycle 1-D-A-4-7 정정 / 카피 + red 색감, 2026-05-10)
+
+**cycle 1-D-A-4-7 정정 사항**:
+- "입금 사후" → "입금이 확인되면" 광역 정정 (직역 paradigm → 자연 paradigm 정수)
+- "카카오톡으로 알림" → "알림을 보내드립니다" 단독 (channel 명시 어휘 영역 0 paradigm)
+- 입금 금액 dd = red color → ink-900 + font-black + text-2xl 정정 (영구 룰 §9 정합 / 정보 paradigm)
+- 입찰 희망 금액 = red 보존 (가격 한정 paradigm 정수 정합)
+
+**red 색감 영역 paradigm 정수 (영구 룰 §9 정합)**:
+
+| 영역 | red 정합 | 사유 |
+|---|---|---|
+| 입찰 희망 금액 (Step4·5 dd) | ✓ red OK | 가격 한정 paradigm 정수 |
+| 입금 금액 (수수료 / Step5·6 dd) | ✗ red NG → ink-900 정정 | 정보 paradigm |
+| required marker (* / *필수) | ✓ red OK | required marker 정합 |
+| submit error alert | ✓ red OK | error paradigm 정합 |
+| 차단 / endpoint / Pricing rush | ✓ red OK | 영구 룰 §9 단독 영역 |
+
+
 
 **cycle 1-D-A-4-6 광역 회수 사항**:
 - conditional render paradigm (사업자등록 사전 = "카카오톡 직접 안내" / 사후 = 입금 안내 카드) 회수

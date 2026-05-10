@@ -105,6 +105,14 @@ export interface ApplyFormData {
    * 사업자등록 사후 = 입금자명 매칭 paradigm 백엔드 검증 영역 (admin 영역).
    */
   depositorName: string;
+  /**
+   * 입찰가 확정 사후 true paradigm (cycle 1-D-A-4-7 신규).
+   * 직전 cycle 1-D-A-4-3 = Step2BidInfo internal state → Step navigation 회귀 시점 false 회귀 NG 식별.
+   * cycle 1-D-A-4-7 = ApplyClient drilling paradigm 갱신 → Step navigation 회귀 시점 보존 정수.
+   * input bidAmount onChange 시점 = false 자동 회귀 paradigm (사용자 갱신 시점 재확인 의무).
+   * BidConfirmModal "확인" click 시점 = true paradigm.
+   */
+  bidConfirmed: boolean;
 }
 
 export interface ApplySubmissionResult {
@@ -142,4 +150,5 @@ export const INITIAL_APPLY_DATA: ApplyFormData = {
   agreedPrivacy: false,
   agreedTerms: false,
   depositorName: "",
+  bidConfirmed: false,
 };

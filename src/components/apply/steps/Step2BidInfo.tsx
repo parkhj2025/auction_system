@@ -12,11 +12,13 @@ import { BidConfirmModal } from "../BidConfirmModal";
 export function Step2BidInfo({
   data,
   onBidInfoChange,
+  onBidConfirmedChange,
   onNext,
   onBack,
 }: {
   data: ApplyFormData;
   onBidInfoChange: (patch: Partial<ApplyBidInfo>) => void;
+  onBidConfirmedChange: (value: boolean) => void;
   onNext: () => void;
   onBack: () => void;
 }) {
@@ -26,9 +28,10 @@ export function Step2BidInfo({
   const [attemptedNext, setAttemptedNext] = useState(false);
   // cycle 1-D-A-4-3 보강 1 정정 2: BidConfirmModal pop paradigm (강제 모달 정수).
   const [bidConfirmOpen, setBidConfirmOpen] = useState(false);
-  // cycle 1-D-A-4-3 보강 1 정정 4: bidConfirmed state 광역 = "입찰가 확정" CTA + modal "확인" 사후 true paradigm.
-  // input onChange 시점 = false 자동 회귀 paradigm = 사용자 광역 갱신 시점 재확인 의무.
-  const [bidConfirmed, setBidConfirmed] = useState(false);
+  // cycle 1-D-A-4-7 정정: bidConfirmed = ApplyClient drilling paradigm (data.bidConfirmed read 단독).
+  // 직전 cycle = useState internal → Step navigation 회귀 시점 false 회귀 NG 식별 → ApplyClient drilling 보존 paradigm.
+  const bidConfirmed = data.bidConfirmed;
+  const setBidConfirmed = onBidConfirmedChange;
   const bid = data.bidInfo;
   const hasErrors = Object.keys(errors).length > 0;
   const showErrors = attemptedNext;

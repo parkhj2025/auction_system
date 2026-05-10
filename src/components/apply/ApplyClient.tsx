@@ -74,6 +74,11 @@ export function ApplyClient() {
   const setDepositorName = (depositorName: string) =>
     setData((d) => ({ ...d, depositorName }));
 
+  // cycle 1-D-A-4-7 신규: bidConfirmed ApplyClient drilling paradigm.
+  // 직전 cycle Step2BidInfo internal state → Step navigation 회귀 시점 false 회귀 NG 식별 → drilling 정정.
+  const setBidConfirmed = (bidConfirmed: boolean) =>
+    setData((d) => ({ ...d, bidConfirmed }));
+
   function goNext() {
     const i = STEP_ORDER.indexOf(currentStep);
     if (i < 0 || i >= STEP_ORDER.length - 1) return;
@@ -262,6 +267,7 @@ export function ApplyClient() {
           <Step2BidInfo
             data={data}
             onBidInfoChange={mergeBidInfo}
+            onBidConfirmedChange={setBidConfirmed}
             onNext={goNext}
             onBack={goBack}
           />

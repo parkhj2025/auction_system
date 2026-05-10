@@ -9,18 +9,18 @@ import { cn, formatKoreanWon } from "@/lib/utils";
 import { DISPLAY_BANK } from "@/lib/constants";
 
 /**
- * cycle 1-D-A-4-6 정정 — 결제·접수 단계 (mockup default + 카피 정정 + 입금 마감 자동 표기).
+ * cycle 1-D-A-4-7 정정 — 결제·접수 단계 (카피 정수 + red 색감 정수 + channel 영역 0 paradigm).
  *
- * 직전 cycle 1-D-A-4-5 conditional render paradigm 회수:
- * - 사업자등록 사전 = "카카오톡 직접 안내" 카피 단독 render → mockup 입금 안내 카드 광역 render 단독
- * - DISPLAY_BANK = BANK_ACCOUNT.isConfigured ? env source : MOCKUP_BANK paradigm 정수
+ * cycle 1-D-A-4-6 정정 사항 (보존):
+ * - mockup default + DISPLAY_BANK paradigm
+ * - 입금 마감 자동 표기 (calendar utility)
+ * - h2 / sub 카피
  *
- * 카피 정정:
- * - h2 = "신청 정보를 확인해주세요"
- * - sub = "아래 계좌로 입찰 대리 수수료를 입금하시면 접수가 완료됩니다."
- * - 입금 마감 = "2026년 5월 19일 (월) 오후 8시" (calendar utility 자동 계산)
- * - "카카오톡 또는 SMS" → "카카오톡 알림" 단독 paradigm
- * - 안내 paragraph 분리 (입금 사후 + 카카오톡 알림)
+ * cycle 1-D-A-4-7 신규 정정:
+ * - "입금 사후" → "입금이 확인되면" 정정 (직역 → 자연 paradigm)
+ * - "카카오톡으로 알림" → "알림을 보내드립니다" 단독 (channel 명시 영역 0)
+ * - 입금 금액 dd = red color → ink-900 + font-black + text-2xl 정정 (영구 룰 §9 정합 / 정보 paradigm)
+ * - 입찰 희망 금액 = red 보존 (가격 한정 paradigm 정수 정합)
  */
 
 type Props = {
@@ -196,7 +196,7 @@ export function Step5Payment({
           {fee && (
             <div className="flex flex-col gap-1">
               <dt className="text-xs text-[var(--color-ink-500)]">입금 금액</dt>
-              <dd className="text-lg font-black tabular-nums text-[var(--color-accent-red)]">
+              <dd className="text-2xl font-black tabular-nums text-[var(--color-ink-900)]">
                 {formatKoreanWon(fee.baseFee)}
               </dd>
             </div>
@@ -209,8 +209,8 @@ export function Step5Payment({
           </div>
         </dl>
         <div className="mt-4 space-y-2 rounded-md bg-gray-50 p-3.5 text-sm leading-6 text-[var(--color-ink-700)]">
-          <p>입금 사후 접수가 자동으로 완료됩니다.</p>
-          <p>접수 완료 시점에 카카오톡으로 알림을 보내드립니다.</p>
+          <p>입금이 확인되면 접수가 완료됩니다.</p>
+          <p>접수가 완료되면 알림을 보내드립니다.</p>
         </div>
       </div>
 
