@@ -378,6 +378,12 @@ body {
   -webkit-text-size-adjust: 100%;
   text-size-adjust: 100%;
   -webkit-tap-highlight-color: transparent;
+  /* cycle 1-D-A-4-2 paradigm 회수: 한국어 web 표준 word-break paradigm 정수.
+   * keep-all = 한국어 어절 단독 줄바꿈 (어절 중간 줄바꿈 차단).
+   * overflow-wrap: break-word = 긴 영어 단어/URL 광역 escape hatch (container 초과 시 broken paradigm).
+   * 차용 source: 토스 / 카카오뱅크 / 당근 / 네이버 / 쿠팡 광역 정합. */
+  word-break: keep-all;
+  overflow-wrap: break-word;
 }
 
 /* Phase 0.4: Font Loading API class toggle 분기 본질.

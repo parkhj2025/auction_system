@@ -447,17 +447,18 @@ export function Step1Property({
           {/* 사진 4-col 동등 grid (모바일 + 데스크탑 동일 paradigm) */}
           <PhotoGallery docid={listing.docid} />
 
-          {/* 데이터 grid-cols-2 + 최저가/보증금 typography 단독 강조 paradigm.
-              라벨 paradigm = dt 14 font-bold ink-700 / dd 16 font-bold ink-900 (form 라벨 paradigm 정합). */}
-          <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-4">
+          {/* 데이터 single column paradigm (grid-cols-2 영구 폐기 / 모바일 + 데스크탑 동일).
+              텍스트 hierarchy = dt 14 font-medium ink-500 (subtle) / dd 16 font-bold ink-900.
+              차용 source: 카카오뱅크 거래 상세 paradigm 정수. */}
+          <dl className="mt-5 flex flex-col gap-4">
             <div>
-              <dt className="text-sm font-bold text-[var(--color-ink-700)]">입찰일</dt>
+              <dt className="text-sm font-medium text-[var(--color-ink-500)]">입찰일</dt>
               <dd className="mt-1 text-base font-bold tabular-nums text-[var(--color-ink-900)]">
                 {listing.bid_date ?? "-"}
               </dd>
             </div>
             <div>
-              <dt className="text-sm font-bold text-[var(--color-ink-700)]">감정가</dt>
+              <dt className="text-sm font-medium text-[var(--color-ink-500)]">감정가</dt>
               <dd className="mt-1 text-base font-bold tabular-nums text-[var(--color-ink-900)]">
                 {listing.appraisal_amount != null
                   ? formatKoreanWon(listing.appraisal_amount)
@@ -465,30 +466,30 @@ export function Step1Property({
               </dd>
             </div>
 
-            {/* 최저가 = col-span-2 + text-xl typography 단독 강조 (변동 폭 ↓ paradigm) */}
-            <div className="col-span-2">
-              <dt className="text-sm font-bold text-[var(--color-ink-700)]">최저가</dt>
-              <dd className="mt-1 text-xl font-black tabular-nums text-[var(--color-accent-red)]">
+            {/* 최저가 = border-t divider + text-2xl typography 단독 강조 paradigm */}
+            <div className="border-t border-[var(--color-ink-200)] pt-4">
+              <dt className="text-sm font-medium text-[var(--color-ink-500)]">최저가</dt>
+              <dd className="mt-1 text-2xl font-black tabular-nums text-[var(--color-accent-red)]">
                 {listing.min_bid_amount != null
                   ? formatKoreanWon(listing.min_bid_amount)
                   : "-"}
               </dd>
             </div>
 
-            {/* 입찰보증금 = col-span-2 + text-base typography 단독 강조 (변동 폭 ↓ paradigm) */}
+            {/* 입찰보증금 = text-lg typography 단독 강조 paradigm */}
             {deposit !== null && (
-              <div className="col-span-2">
-                <dt className="text-sm font-bold text-[var(--color-ink-700)]">
+              <div>
+                <dt className="text-sm font-medium text-[var(--color-ink-500)]">
                   입찰보증금 · 최저가 {depositRate}
                 </dt>
-                <dd className="mt-1 text-base font-bold tabular-nums text-[var(--color-ink-900)]">
+                <dd className="mt-1 text-lg font-black tabular-nums text-[var(--color-ink-900)]">
                   {formatKoreanWon(deposit)}
                 </dd>
               </div>
             )}
 
-            <div>
-              <dt className="text-sm font-bold text-[var(--color-ink-700)]">매각회차</dt>
+            <div className="border-t border-[var(--color-ink-200)] pt-4">
+              <dt className="text-sm font-medium text-[var(--color-ink-500)]">매각회차</dt>
               <dd className="mt-1 text-base font-bold text-[var(--color-ink-900)]">
                 {listing.failed_count === 0
                   ? "신건"
@@ -501,28 +502,28 @@ export function Step1Property({
               </dd>
             </div>
             <div>
-              <dt className="text-sm font-bold text-[var(--color-ink-700)]">용도</dt>
+              <dt className="text-sm font-medium text-[var(--color-ink-500)]">용도</dt>
               <dd className="mt-1 text-base font-bold text-[var(--color-ink-900)]">
                 {listing.usage_name ?? "-"}
               </dd>
             </div>
             {listing.area_display && (
               <div>
-                <dt className="text-sm font-bold text-[var(--color-ink-700)]">면적</dt>
+                <dt className="text-sm font-medium text-[var(--color-ink-500)]">면적</dt>
                 <dd className="mt-1 text-base font-bold text-[var(--color-ink-900)]">
                   {listing.area_display}
                 </dd>
               </div>
             )}
             <div>
-              <dt className="text-sm font-bold text-[var(--color-ink-700)]">법원</dt>
+              <dt className="text-sm font-medium text-[var(--color-ink-500)]">법원</dt>
               <dd className="mt-1 text-base font-bold text-[var(--color-ink-900)]">
                 {listing.court_name}
               </dd>
             </div>
             {listing.component_count > 1 && (
-              <div className="col-span-2">
-                <dt className="text-sm font-bold text-[var(--color-ink-700)]">구성</dt>
+              <div>
+                <dt className="text-sm font-medium text-[var(--color-ink-500)]">구성</dt>
                 <dd className="mt-1 text-base font-bold text-[var(--color-ink-900)]">
                   {listing.component_count}개 필지 일괄 매각
                 </dd>
@@ -551,15 +552,13 @@ export function Step1Property({
             </button>
           )}
 
-          {/* 면책 alert (amber 3줄 / 단일 카드 안 footer 영역 통합 paradigm) */}
-          <div
-            role="note"
-            className="mt-5 rounded-xl border border-[var(--color-warning)]/30 bg-[var(--color-warning-soft)] px-4 py-3 text-sm leading-6 text-[var(--color-warning)]"
-          >
-            <ul className="flex flex-col gap-1">
-              <li>· 입찰 전 사건 정보를 한 번 더 확인해주세요</li>
-              <li>· 정보 오류로 인한 책임은 부담하지 않습니다</li>
-              <li>· 입찰가는 만원 단위로 올림 처리됩니다</li>
+          {/* 면책 footer (amber 박스 영구 폐기 / border-t divider + inline 텍스트 단독 paradigm).
+              차용 source: 토스 거래 상세 footer paradigm 정수. */}
+          <div className="mt-5 border-t border-[var(--color-ink-200)] pt-4" role="note">
+            <ul className="space-y-1.5 text-sm leading-6 text-[var(--color-ink-500)]">
+              <li>입찰 전 사건 정보를 한 번 더 확인해주세요</li>
+              <li>정보 오류로 인한 책임은 부담하지 않습니다</li>
+              <li>입찰가는 만원 단위로 올림 처리됩니다</li>
             </ul>
           </div>
 
