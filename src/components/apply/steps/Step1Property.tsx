@@ -9,11 +9,9 @@
 import { useEffect, useRef, useState } from "react";
 import {
   AlertTriangle,
-  ArrowRight,
   Info,
   ChevronDown,
   Loader2,
-  CheckCircle2,
 } from "lucide-react";
 import type { ApplyFormData, CourtListingSummary } from "@/types/apply";
 import { COURTS_ALL, groupCourtsByRegion } from "@/lib/constants";
@@ -21,6 +19,7 @@ import { cn, formatKoreanWon } from "@/lib/utils";
 import { CASE_CONFIRM_CHECKBOX_LABEL } from "@/lib/legal";
 import { getKSTDateTimeIso } from "@/lib/datetime";
 import { PhotoGallery } from "../PhotoGallery";
+import { ConfirmCaseModal } from "../ConfirmCaseModal";
 
 const CASE_NUMBER_PATTERN = /^\d{4}타경\d+$/;
 
@@ -39,6 +38,8 @@ export function Step1Property({
   const [checking, setChecking] = useState(false);
   const [listings, setListings] = useState<CourtListingSummary[]>([]);
   const [matchStatus, setMatchStatus] = useState<"idle" | "checking">("idle");
+  // cycle 1-D-A-4-2 보강 1: 체크박스 click → modal trigger paradigm.
+  const [confirmModalOpen, setConfirmModalOpen] = useState(false);
 
   const latestPatchRef = useRef(onChange);
   latestPatchRef.current = onChange;
@@ -164,19 +165,38 @@ export function Step1Property({
 
   const isNonServicedCourt = selectedCourt && !selectedCourt.isServiced;
 
-  const canProceed =
-    !!data.caseNumber.trim() &&
-    !!data.court &&
-    !caseTaken &&
-    !caseClosed &&
-    !caseNotFound &&
-    !checking &&
-    !!data.bidDate &&
-    !!data.caseConfirmedByUser;
+  // cycle 1-D-A-4-2 보강 1: 체크박스 click → modal trigger / "확인" → Step2 / "취소" → 회복.
+  // Step1 = 동의 step paradigm = 본문 CTA dom 영구 폐기 (Step2~4 = CTA 보존 / §A-12 톤앤매너 일관성 정합).
+  function handleCheckboxChange(checked: boolean) {
+    if (checked) {
+      // 체크 즉시 시각 반영 + caseConfirmedAt 백엔드 timestamp 기록 (UI 노출 영역 0).
+      onChange({
+        caseConfirmedByUser: true,
+        caseConfirmedAt: getKSTDateTimeIso(),
+      });
+      setConfirmModalOpen(true);
+    } else {
+      // re-uncheck (사용자 광역 직접 해제)
+      onChange({
+        caseConfirmedByUser: false,
+        caseConfirmedAt: null,
+      });
+    }
+  }
 
-  function handleNext() {
-    if (!canProceed) return;
+  function handleModalConfirm() {
+    // checked 보존 + Step2 자동 진입.
+    setConfirmModalOpen(false);
     onNext();
+  }
+
+  function handleModalCancel() {
+    // checked 회복 (uncheck) + Step1 머무름.
+    onChange({
+      caseConfirmedByUser: false,
+      caseConfirmedAt: null,
+    });
+    setConfirmModalOpen(false);
   }
 
   function selectListing(listing: CourtListingSummary) {
@@ -188,13 +208,6 @@ export function Step1Property({
       caseConfirmedByUser: false,
       caseConfirmedAt: null,
       auctionRound: listing.auction_round,
-    });
-  }
-
-  function handleConfirmCheck(checked: boolean) {
-    onChange({
-      caseConfirmedByUser: checked,
-      caseConfirmedAt: checked ? getKSTDateTimeIso() : null,
     });
   }
 
@@ -552,53 +565,30 @@ export function Step1Property({
             </button>
           )}
 
-          {/* 면책 footer (amber 박스 영구 폐기 / border-t divider + inline 텍스트 단독 paradigm).
-              차용 source: 토스 거래 상세 footer paradigm 정수. */}
-          <div className="mt-5 border-t border-[var(--color-ink-200)] pt-4" role="note">
-            <ul className="space-y-1.5 text-sm leading-6 text-[var(--color-ink-500)]">
-              <li>입찰 전 사건 정보를 한 번 더 확인해주세요</li>
-              <li>정보 오류로 인한 책임은 부담하지 않습니다</li>
-              <li>입찰가는 만원 단위로 올림 처리됩니다</li>
-            </ul>
-          </div>
-
-          {/* 체크박스 + 라벨 (CaseConfirmCard 통합 paradigm) */}
-          <label className="mt-5 flex cursor-pointer items-start gap-3 py-2">
+          {/* 체크박스 + 라벨 (footer ul 영구 폐기 / 3 항목 카피 = ConfirmCaseModal 안 광역 이전).
+              체크 click → modal open trigger paradigm.
+              "확인 시각 기록됨" UI dom 영구 폐기 (백엔드 timestamp 단독 보존). */}
+          <label className="mt-6 flex cursor-pointer items-start gap-3 border-t border-[var(--color-ink-200)] pt-5">
             <input
               type="checkbox"
               checked={data.caseConfirmedByUser}
-              onChange={(e) => handleConfirmCheck(e.target.checked)}
+              onChange={(e) => handleCheckboxChange(e.target.checked)}
               className="mt-1 h-5 w-5 shrink-0 cursor-pointer accent-[var(--brand-green)]"
             />
             <span className="flex-1 text-base leading-7 text-[var(--color-ink-900)]">
               {CASE_CONFIRM_CHECKBOX_LABEL}
-              {data.caseConfirmedByUser && data.caseConfirmedAt && (
-                <span className="ml-2 inline-flex items-center gap-1 text-xs text-[var(--color-ink-500)]">
-                  <CheckCircle2 size={12} aria-hidden="true" />
-                  확인 시각 기록됨
-                </span>
-              )}
             </span>
           </label>
         </div>
       )}
 
-      <div className="flex items-center justify-end gap-2 pt-2">
-        <button
-          type="button"
-          onClick={handleNext}
-          disabled={!canProceed}
-          className={cn(
-            "inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-xl px-8 text-base font-black transition-colors duration-150 sm:w-auto sm:px-10",
-            canProceed
-              ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)] active:scale-[0.98] active:bg-[var(--brand-green-deep)]"
-              : "cursor-not-allowed bg-gray-200 text-gray-400",
-          )}
-        >
-          다음: 입찰 정보 입력
-          <ArrowRight size={16} aria-hidden="true" />
-        </button>
-      </div>
+      {/* cycle 1-D-A-4-2 보강 1: 사건 정보 이중 확인 modal */}
+      <ConfirmCaseModal
+        isOpen={confirmModalOpen}
+        onConfirm={handleModalConfirm}
+        onCancel={handleModalCancel}
+      />
+
     </div>
   );
 }
