@@ -86,7 +86,7 @@ export function Step3Documents({
         <button
           type="button"
           onClick={onBack}
-          className="inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-base font-bold text-[var(--color-ink-700)] transition-colors duration-150 hover:bg-[var(--color-ink-100)] sm:w-auto"
+          className="inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-white px-5 text-base font-bold text-[var(--color-ink-700)] transition-colors duration-150 hover:bg-[var(--color-ink-100)] sm:w-auto"
         >
           <ArrowLeft size={16} aria-hidden="true" />
           이전
@@ -96,7 +96,7 @@ export function Step3Documents({
           onClick={onNext}
           disabled={!canProceed}
           className={cn(
-            "inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-full px-8 text-base font-black transition-colors duration-150 sm:w-auto sm:px-10",
+            "inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-xl px-8 text-base font-black transition-colors duration-150 sm:w-auto sm:px-10",
             canProceed
               ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)] active:scale-[0.98] active:bg-[var(--brand-green-deep)]"
               : "cursor-not-allowed bg-gray-200 text-gray-400",

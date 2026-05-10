@@ -291,7 +291,7 @@ export function Step1Property({
                   data.caseConfirmedByUser
                 }
                 className={cn(
-                  "inline-flex h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-full px-5 text-base font-bold transition-colors duration-150 sm:w-auto sm:shrink-0",
+                  "inline-flex h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-xl px-5 text-base font-bold transition-colors duration-150 sm:w-auto sm:shrink-0",
                   data.caseConfirmedByUser
                     ? "cursor-default bg-gray-100 text-gray-500"
                     : "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)] active:scale-[0.98] active:bg-[var(--brand-green-deep)] disabled:cursor-not-allowed disabled:bg-gray-200 disabled:text-gray-400",
@@ -393,7 +393,7 @@ export function Step1Property({
 
       {/* 복수 물건 선택 UI (listings 2건 이상) */}
       {listings.length >= 2 && !caseTaken && !listing && (
-        <div className="rounded-2xl border-2 border-[var(--color-ink-200)] bg-white p-5">
+        <div className="rounded-2xl border border-gray-200 bg-white p-5">
           <div className="flex items-center gap-2 text-[var(--color-ink-900)]">
             <ChevronDown size={18} aria-hidden="true" />
             <p className="text-sm font-bold text-[var(--color-ink-900)]">
@@ -430,11 +430,12 @@ export function Step1Property({
       )}
 
       {/* 단일 카드 paradigm — 모바일 + 데스크탑 광역 동일 dom (§A-9 + §A-12 정합).
-          헤더 + 주소 h2 + 사진 (hero + thumbnail strip) + 데이터 grid-cols-2 + 체크박스 통합. */}
+          톤앤매너 일관성 광역 회수 = form 카드 paradigm 정합 (border border-gray-200 / bg-white / p-5).
+          헤더 + 주소 h2 + 사진 4-col + 데이터 grid-cols-2 + amber alert 통합 + 체크박스. */}
       {listing && !caseTaken && (
-        <div className="rounded-2xl border-2 border-[var(--color-ink-900)] bg-white p-5">
+        <div className="rounded-2xl border border-gray-200 bg-white p-5">
           {/* 헤더 */}
-          <p className="text-sm font-bold text-[var(--color-ink-900)]">
+          <p className="text-base font-bold text-[var(--color-ink-900)]">
             의뢰하실 사건 정보가 맞는지 확인해주세요
           </p>
 
@@ -443,51 +444,52 @@ export function Step1Property({
             {listing.address_display}
           </h2>
 
-          {/* 사진 hero + thumbnail strip (모바일 + 데스크탑 동일 paradigm) */}
+          {/* 사진 4-col 동등 grid (모바일 + 데스크탑 동일 paradigm) */}
           <PhotoGallery docid={listing.docid} />
 
-          {/* 데이터 grid-cols-2 + 최저가/보증금 typography 단독 강조 paradigm */}
+          {/* 데이터 grid-cols-2 + 최저가/보증금 typography 단독 강조 paradigm.
+              라벨 paradigm = dt 14 font-bold ink-700 / dd 16 font-bold ink-900 (form 라벨 paradigm 정합). */}
           <dl className="mt-5 grid grid-cols-2 gap-x-4 gap-y-4">
             <div>
-              <dt className="text-xs text-[var(--color-ink-500)]">입찰일</dt>
-              <dd className="mt-1 text-sm font-bold tabular-nums text-[var(--color-ink-900)]">
+              <dt className="text-sm font-bold text-[var(--color-ink-700)]">입찰일</dt>
+              <dd className="mt-1 text-base font-bold tabular-nums text-[var(--color-ink-900)]">
                 {listing.bid_date ?? "-"}
               </dd>
             </div>
             <div>
-              <dt className="text-xs text-[var(--color-ink-500)]">감정가</dt>
-              <dd className="mt-1 text-sm font-bold tabular-nums text-[var(--color-ink-900)]">
+              <dt className="text-sm font-bold text-[var(--color-ink-700)]">감정가</dt>
+              <dd className="mt-1 text-base font-bold tabular-nums text-[var(--color-ink-900)]">
                 {listing.appraisal_amount != null
                   ? formatKoreanWon(listing.appraisal_amount)
                   : "-"}
               </dd>
             </div>
 
-            {/* 최저가 = col-span-2 + border-t divider + text-2xl typography 단독 강조 (박스 폐기) */}
-            <div className="col-span-2 border-t border-[var(--color-ink-200)] pt-4">
-              <dt className="text-xs text-[var(--color-ink-500)]">최저가</dt>
-              <dd className="mt-1 text-2xl font-black tabular-nums text-[var(--color-accent-red)]">
+            {/* 최저가 = col-span-2 + text-xl typography 단독 강조 (변동 폭 ↓ paradigm) */}
+            <div className="col-span-2">
+              <dt className="text-sm font-bold text-[var(--color-ink-700)]">최저가</dt>
+              <dd className="mt-1 text-xl font-black tabular-nums text-[var(--color-accent-red)]">
                 {listing.min_bid_amount != null
                   ? formatKoreanWon(listing.min_bid_amount)
                   : "-"}
               </dd>
             </div>
 
-            {/* 입찰보증금 = col-span-2 + text-lg typography 단독 강조 (박스 폐기) */}
+            {/* 입찰보증금 = col-span-2 + text-base typography 단독 강조 (변동 폭 ↓ paradigm) */}
             {deposit !== null && (
               <div className="col-span-2">
-                <dt className="text-xs text-[var(--color-ink-500)]">
+                <dt className="text-sm font-bold text-[var(--color-ink-700)]">
                   입찰보증금 · 최저가 {depositRate}
                 </dt>
-                <dd className="mt-1 text-lg font-black tabular-nums text-[var(--color-ink-900)]">
+                <dd className="mt-1 text-base font-bold tabular-nums text-[var(--color-ink-900)]">
                   {formatKoreanWon(deposit)}
                 </dd>
               </div>
             )}
 
-            <div className="col-span-2 border-t border-[var(--color-ink-200)] pt-4">
-              <dt className="text-xs text-[var(--color-ink-500)]">매각회차</dt>
-              <dd className="mt-1 text-sm font-bold text-[var(--color-ink-900)]">
+            <div>
+              <dt className="text-sm font-bold text-[var(--color-ink-700)]">매각회차</dt>
+              <dd className="mt-1 text-base font-bold text-[var(--color-ink-900)]">
                 {listing.failed_count === 0
                   ? "신건"
                   : `${listing.failed_count + 1}차 매각`}
@@ -498,30 +500,30 @@ export function Step1Property({
                 )}
               </dd>
             </div>
-            <div className="border-t border-[var(--color-ink-200)] pt-4">
-              <dt className="text-xs text-[var(--color-ink-500)]">용도</dt>
-              <dd className="mt-1 text-sm font-bold text-[var(--color-ink-900)]">
+            <div>
+              <dt className="text-sm font-bold text-[var(--color-ink-700)]">용도</dt>
+              <dd className="mt-1 text-base font-bold text-[var(--color-ink-900)]">
                 {listing.usage_name ?? "-"}
               </dd>
             </div>
             {listing.area_display && (
-              <div className="border-t border-[var(--color-ink-200)] pt-4">
-                <dt className="text-xs text-[var(--color-ink-500)]">면적</dt>
-                <dd className="mt-1 text-sm font-bold text-[var(--color-ink-900)]">
+              <div>
+                <dt className="text-sm font-bold text-[var(--color-ink-700)]">면적</dt>
+                <dd className="mt-1 text-base font-bold text-[var(--color-ink-900)]">
                   {listing.area_display}
                 </dd>
               </div>
             )}
-            <div className="col-span-2">
-              <dt className="text-xs text-[var(--color-ink-500)]">법원</dt>
-              <dd className="mt-1 text-sm font-bold text-[var(--color-ink-900)]">
+            <div>
+              <dt className="text-sm font-bold text-[var(--color-ink-700)]">법원</dt>
+              <dd className="mt-1 text-base font-bold text-[var(--color-ink-900)]">
                 {listing.court_name}
               </dd>
             </div>
             {listing.component_count > 1 && (
               <div className="col-span-2">
-                <dt className="text-xs text-[var(--color-ink-500)]">구성</dt>
-                <dd className="mt-1 text-sm font-bold text-[var(--color-ink-900)]">
+                <dt className="text-sm font-bold text-[var(--color-ink-700)]">구성</dt>
+                <dd className="mt-1 text-base font-bold text-[var(--color-ink-900)]">
                   {listing.component_count}개 필지 일괄 매각
                 </dd>
               </div>
@@ -549,8 +551,20 @@ export function Step1Property({
             </button>
           )}
 
+          {/* 면책 alert (amber 3줄 / 단일 카드 안 footer 영역 통합 paradigm) */}
+          <div
+            role="note"
+            className="mt-5 rounded-xl border border-[var(--color-warning)]/30 bg-[var(--color-warning-soft)] px-4 py-3 text-sm leading-6 text-[var(--color-warning)]"
+          >
+            <ul className="flex flex-col gap-1">
+              <li>· 입찰 전 사건 정보를 한 번 더 확인해주세요</li>
+              <li>· 정보 오류로 인한 책임은 부담하지 않습니다</li>
+              <li>· 입찰가는 만원 단위로 올림 처리됩니다</li>
+            </ul>
+          </div>
+
           {/* 체크박스 + 라벨 (CaseConfirmCard 통합 paradigm) */}
-          <label className="mt-6 flex cursor-pointer items-start gap-3 rounded-[var(--radius-md)] py-3">
+          <label className="mt-5 flex cursor-pointer items-start gap-3 py-2">
             <input
               type="checkbox"
               checked={data.caseConfirmedByUser}
@@ -570,27 +584,13 @@ export function Step1Property({
         </div>
       )}
 
-      {/* 면책 alert (amber 3줄 / 매칭 카드 노출 시 단독) */}
-      {listing && !caseTaken && (
-        <div
-          role="note"
-          className="rounded-xl border border-[var(--color-warning)]/30 bg-[var(--color-warning-soft)] px-4 py-3 text-sm leading-6 text-[var(--color-warning)]"
-        >
-          <ul className="flex flex-col gap-1">
-            <li>· 입찰 전 사건 정보를 한 번 더 확인해주세요</li>
-            <li>· 정보 오류로 인한 책임은 부담하지 않습니다</li>
-            <li>· 입찰가는 만원 단위로 올림 처리됩니다</li>
-          </ul>
-        </div>
-      )}
-
       <div className="flex items-center justify-end gap-2 pt-2">
         <button
           type="button"
           onClick={handleNext}
           disabled={!canProceed}
           className={cn(
-            "inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-full px-8 text-base font-black transition-colors duration-150 sm:w-auto sm:px-10",
+            "inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-xl px-8 text-base font-black transition-colors duration-150 sm:w-auto sm:px-10",
             canProceed
               ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)] active:scale-[0.98] active:bg-[var(--brand-green-deep)]"
               : "cursor-not-allowed bg-gray-200 text-gray-400",

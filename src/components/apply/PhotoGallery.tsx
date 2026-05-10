@@ -12,11 +12,11 @@ interface PhotoItem {
 
 /**
  * 인라인 사진 갤러리.
- * cycle 1-D-A-4-2 paradigm 회수: variant props 광역 영구 폐기 + hero paradigm 단독.
- *   - hero 1장 (aspect-[4/3]) + thumbnail strip 4장 row paradigm.
+ * cycle 1-D-A-4-2 paradigm 회수: hero+strip paradigm 영구 폐기 → 4-col 동등 grid 단독 paradigm.
  *   - 모바일 + 데스크탑 광역 동일 paradigm (§A-9 + §A-12 정합).
- *   - 차용 source: 직방 / 다방 매물 상세 paradigm 정합.
- *   - 클릭 시 lightbox (5+ 사진 광역 = "+N" 타일 + lightbox 광역 단독).
+ *   - 4장 광역 단독 표시 (5+ 사진 = 마지막 thumbnail "+N" overlay paradigm).
+ *   - 클릭 시 lightbox 광역 전체 사진 영역 보존.
+ *   - variant props 영구 폐기.
  */
 export function PhotoGallery({ docid }: { docid: string }) {
   const [photos, setPhotos] = useState<PhotoItem[]>([]);
@@ -73,63 +73,42 @@ export function PhotoGallery({ docid }: { docid: string }) {
 
   if (photos.length === 0) return null;
 
-  const hero = photos[0];
-  const stripPhotos = photos.slice(1, 4);
+  // 4장 단독 표시 (5+ = 마지막 thumbnail "+N" overlay paradigm).
+  const visible = photos.slice(0, 4);
   const remaining = Math.max(0, photos.length - 4);
-  const hasStrip = stripPhotos.length > 0 || remaining > 0;
+  const lastIdx = visible.length - 1;
 
   return (
     <>
-      {/* hero 1장 (4:3) — 모바일 + 데스크탑 광역 동일 paradigm */}
-      <button
-        type="button"
-        onClick={() => setLightboxIdx(0)}
-        className="mt-4 block w-full overflow-hidden rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] transition-colors duration-150 hover:border-[var(--color-ink-700)]"
-        aria-label="사진 1 크게 보기"
-      >
-        <div className="aspect-[4/3]">
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img
-            src={hero.url}
-            alt="물건 대표 사진"
-            className="h-full w-full object-cover"
-          />
-        </div>
-      </button>
-
-      {/* thumbnail strip 4 row (3장 + "+N" 타일 광역 5+ 사진 분기) */}
-      {hasStrip && (
-        <div className="mt-2 grid grid-cols-4 gap-1.5">
-          {stripPhotos.map((photo, idx) => (
+      <div className="mt-4 grid grid-cols-4 gap-2">
+        {visible.map((photo, idx) => {
+          const isLastWithRemaining = idx === lastIdx && remaining > 0;
+          return (
             <button
               key={photo.seq}
               type="button"
-              onClick={() => setLightboxIdx(idx + 1)}
-              className="group aspect-square overflow-hidden rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] transition-colors duration-150 hover:border-[var(--color-ink-700)]"
+              onClick={() => setLightboxIdx(idx)}
+              className="group relative aspect-square overflow-hidden rounded-lg border border-gray-200 bg-[var(--color-surface-muted)] transition-colors duration-150 hover:border-[var(--color-ink-700)]"
+              aria-label={`물건 사진 ${idx + 1}${isLastWithRemaining ? ` (+${remaining}장 더)` : ""}`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}
               <img
                 src={photo.url}
-                alt={`물건 사진 ${idx + 2}`}
+                alt={`물건 사진 ${idx + 1}`}
                 loading="lazy"
                 className="h-full w-full object-cover transition-transform duration-150 group-hover:scale-105"
               />
+              {isLastWithRemaining && (
+                <div className="absolute inset-0 flex items-center justify-center bg-black/55 text-base font-bold text-white">
+                  +{remaining}
+                </div>
+              )}
             </button>
-          ))}
-          {remaining > 0 && (
-            <button
-              type="button"
-              onClick={() => setLightboxIdx(4)}
-              className="aspect-square overflow-hidden rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-[var(--color-ink-100)] text-sm font-bold text-[var(--color-ink-700)] transition-colors duration-150 hover:border-[var(--color-ink-700)]"
-              aria-label={`나머지 ${remaining}장 보기`}
-            >
-              +{remaining}
-            </button>
-          )}
-        </div>
-      )}
+          );
+        })}
+      </div>
 
-      {/* Lightbox 광역 */}
+      {/* Lightbox */}
       {lightboxIdx !== null && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/80"
