@@ -893,7 +893,46 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 
 **학습**:
 - onChange 시점 truncate paradigm = 첫 자리 입력 시점 시각 영역 0 NG (cycle 1-D-A-4-3 보강 1 정정)
-- onBlur 시점 truncate paradigm = 사용자 입력 자유 + 자동 정리 paradigm 단독 정수
+- onBlur 시점 truncate paradigm = 사용자 입력 자유 paradigm 미흡 NG (cycle 1-D-A-4-3 보강 1 정정 사후 회수)
+- 다음 CTA click 시점 단독 truncate paradigm = 사용자 입력 자유 + 자동 정리 paradigm 정수 정합
+
+---
+
+## 25. Step 광역 검증 시점 paradigm (cycle 1-D-A-4-3 보강 1 정정 신규, 2026-05-10)
+
+**원칙 정수**:
+- 다음 CTA click 시점 단독 검증 paradigm
+- mount 시점 + onChange 시점 + onBlur 시점 검증 영구 폐기
+
+**state paradigm**:
+- 각 step 광역 = `attemptedNext: boolean` state 광역 internal paradigm (Step2BidInfo 정수 정합)
+- 다음 CTA click 시점 = `setAttemptedNext(true)` paradigm
+- step 변경 시점 = state 광역 unmount 사후 자동 reset paradigm
+
+**error 광역 표시 paradigm**:
+- attemptedNext === true 시점 단독 = error 광역 표시
+- error 광역 메시지 + input border + CTA disabled 광역 동시 분기 paradigm
+- mount 시점 = error 광역 영역 0 (사용자 광역 첫 진입 시각 paradigm 정수)
+
+**input paradigm 정수**:
+- onChange = raw 보관 단독 (transform 영역 0)
+- onBlur = 영역 0 (transform 영역 0)
+- 다음 CTA click 시점 단독 = transform paradigm (예: truncateBidAmount)
+
+**validate signature paradigm**:
+- validate(amountNum?: number) 광역 = optional param paradigm
+- 다음 CTA click 시점 = truncated 값 광역 직접 props paradigm (state 갱신 전 closure 광역 정합)
+
+**CTA disabled paradigm**:
+- `disabled={attemptedNext && hasErrors}` 광역 paradigm
+- mount 시점 = enabled (사용자 광역 첫 click 광역 시각 paradigm)
+- 첫 click 사후 errors 시점 = disabled (clearError 광역 사용자 fix 사후 enabled 광역 회복)
+
+**학습**:
+- mount 시점 자동 error 표시 NG = 사용자 광역 첫 진입 시각 paradigm 회수 (cycle 1-D-A-4-3 보강 1 정정)
+- onChange 시점 truncate paradigm = 첫 자리 입력 시점 시각 영역 0 NG (cycle 1-D-A-4-3 보강 1 정정)
+- onBlur 시점 truncate paradigm = 사용자 입력 자유 paradigm 미흡 NG (cycle 1-D-A-4-3 보강 1 정정)
+- 다음 CTA click 시점 단독 transform = 사용자 자유 + 자동 정리 paradigm 정수
 
 ---
 

@@ -20,8 +20,12 @@ export function Step2BidInfo({
   onBack: () => void;
 }) {
   const [errors, setErrors] = useState<Record<string, string>>({});
+  // cycle 1-D-A-4-3 보강 1 정정: attemptedNext state 광역 = 다음 CTA click 시점 단독 검증 paradigm.
+  // mount 시점 + onChange 시점 + onBlur 시점 = error 광역 표시 영역 0 paradigm.
+  const [attemptedNext, setAttemptedNext] = useState(false);
   const bid = data.bidInfo;
   const hasErrors = Object.keys(errors).length > 0;
+  const showErrors = attemptedNext;
 
   // cycle 1-D-A-4-2 보강 2: 재경매 ? icon → tooltip on-demand paradigm.
   const [tooltipOpen, setTooltipOpen] = useState(false);
@@ -68,12 +72,13 @@ export function Step2BidInfo({
   const bidDate = data.matchedListing?.bid_date ?? null;
   const fee = bidDate ? computeFee(bidDate) : null;
 
-  function validate(): { ok: boolean; errors: Record<string, string> } {
+  function validate(amountNum: number = bidAmountNum): { ok: boolean; errors: Record<string, string> } {
     const next: Record<string, string> = {};
-    if (!bid.bidAmount.trim() || bidAmountNum <= 0)
+    // cycle 1-D-A-4-3 보강 1 정정: amountNum 광역 props = 다음 CTA click 시점 truncate 사후 값 광역 검증 paradigm.
+    const isBelowMin = hasMinPrice && amountNum > 0 && amountNum < minPrice;
+    if (amountNum <= 0)
       next.bidAmount = "입찰 희망 금액을 입력해주세요.";
-    // cycle 1-D-A-2: 최저가 미만 입찰 enforcement (단순 안내 → 차단).
-    else if (belowMin)
+    else if (isBelowMin)
       next.bidAmount = `최저가(${minPrice.toLocaleString("ko-KR")}원) 이상으로 입력해주세요.`;
     if (!bid.applicantName.trim()) next.applicantName = "성함을 입력해주세요.";
     if (!/^\d{3}-\d{3,4}-\d{4}$/.test(bid.phone))
@@ -93,7 +98,16 @@ export function Step2BidInfo({
   }
 
   function handleNext() {
-    const result = validate();
+    // cycle 1-D-A-4-3 보강 1 정정: 다음 CTA click 시점 단독 검증 paradigm.
+    setAttemptedNext(true);
+    // 입찰가 truncate paradigm (천원 이하 단위 0 자동 절삭).
+    const truncated = truncateBidAmount(bidAmountNum);
+    const truncatedStr = truncated > 0 ? truncated.toLocaleString("ko-KR") : "";
+    if (truncatedStr !== bid.bidAmount) {
+      onBidInfoChange({ bidAmount: truncatedStr });
+    }
+    // truncated 값 광역 검증 paradigm (state 갱신 전 closure 광역 직접 사용 정합).
+    const result = validate(truncated);
     if (result.ok) {
       onNext();
       return;
@@ -111,9 +125,10 @@ export function Step2BidInfo({
 
   function inputClass(key: string) {
     // cycle 1-D-A-2: input height = var(--input-h-app) (56px / 모바일 앱 표준).
+    // cycle 1-D-A-4-3 보강 1 정정: showErrors 분기 = attemptedNext 시점 단독 error border paradigm.
     const base =
       "h-[var(--input-h-app)] w-full rounded-[var(--radius-md)] border bg-white px-4 text-[length:var(--text-body)] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] transition-colors duration-150 focus:outline-none";
-    return errors[key]
+    return showErrors && errors[key]
       ? `${base} border-[var(--color-accent-red)] ring-2 ring-[var(--color-accent-red)]/20`
       : `${base} border-[var(--color-border)] focus:border-[var(--brand-green)] focus:ring-2 focus:ring-[var(--brand-green)]/20`;
   }
@@ -152,20 +167,14 @@ export function Step2BidInfo({
                 }
                 value={bid.bidAmount}
                 onChange={(e) => {
-                  // cycle 1-D-A-4-3 보강 1: onChange = raw 보관 단독 (사용자 입력 시점 시각 영역 보존).
+                  // cycle 1-D-A-4-3 보강 1 정정: onChange = raw 보관 단독 (사용자 입력 시각 보존).
+                  // truncate paradigm = 다음 CTA click 시점 단독 (handleNext 광역).
                   const cleaned = e.target.value.replace(/[^\d]/g, "");
                   const num = parseInt(cleaned, 10) || 0;
                   onBidInfoChange({
                     bidAmount: num > 0 ? num.toLocaleString("ko-KR") : "",
                   });
                   clearError("bidAmount");
-                }}
-                onBlur={() => {
-                  // cycle 1-D-A-4-3 보강 1: onBlur = truncateBidAmount 적용 (천원 이하 0 자동 절삭).
-                  const truncated = truncateBidAmount(bidAmountNum);
-                  onBidInfoChange({
-                    bidAmount: truncated > 0 ? truncated.toLocaleString("ko-KR") : "",
-                  });
                 }}
                 className={`${inputClass("bidAmount")} pr-12 tabular-nums`}
               />
@@ -181,13 +190,13 @@ export function Step2BidInfo({
                 한글 표기: {formatKoreanWon(bidAmountNum)}
               </p>
             )}
-            {belowMin && (
+            {showErrors && belowMin && !errors.bidAmount && (
               <p className="mt-1 flex items-center gap-1 text-xs text-[var(--color-accent-red)]">
                 <AlertCircle size={12} aria-hidden="true" />
                 최저가 미만의 입찰은 무효 처리됩니다.
               </p>
             )}
-            {errors.bidAmount && (
+            {showErrors && errors.bidAmount && (
               <p className="mt-1 text-xs text-[var(--color-accent-red)]">
                 {errors.bidAmount}
               </p>
@@ -214,7 +223,7 @@ export function Step2BidInfo({
                 }}
                 className={inputClass("applicantName")}
               />
-              {errors.applicantName && (
+              {showErrors && errors.applicantName && (
                 <p className="mt-1 text-xs text-[var(--color-accent-red)]">
                   {errors.applicantName}
                 </p>
@@ -239,7 +248,7 @@ export function Step2BidInfo({
                 }}
                 className={inputClass("phone")}
               />
-              {errors.phone && (
+              {showErrors && errors.phone && (
                 <p className="mt-1 text-xs text-[var(--color-accent-red)]">
                   {errors.phone}
                 </p>
@@ -293,7 +302,7 @@ export function Step2BidInfo({
             <p className="mt-1 text-xs leading-5 text-[var(--color-ink-500)]">
               위임장 발급 직후 뒷 7자리는 폐기돼요
             </p>
-            {(errors.ssnFront || errors.ssnBack) && (
+            {showErrors && (errors.ssnFront || errors.ssnBack) && (
               <p className="mt-1 text-xs text-[var(--color-accent-red)]">
                 {errors.ssnFront ?? errors.ssnBack}
               </p>
@@ -377,7 +386,7 @@ export function Step2BidInfo({
                     }}
                     className={`${inputClass("jointApplicantName")} h-11 text-sm`}
                   />
-                  {errors.jointApplicantName && (
+                  {showErrors && errors.jointApplicantName && (
                     <p className="mt-1 text-xs text-[var(--color-accent-red)]">
                       {errors.jointApplicantName}
                     </p>
@@ -402,7 +411,7 @@ export function Step2BidInfo({
                     }}
                     className={`${inputClass("jointApplicantPhone")} h-11 text-sm`}
                   />
-                  {errors.jointApplicantPhone && (
+                  {showErrors && errors.jointApplicantPhone && (
                     <p className="mt-1 text-xs text-[var(--color-accent-red)]">
                       {errors.jointApplicantPhone}
                     </p>
@@ -447,10 +456,10 @@ export function Step2BidInfo({
         <button
           type="button"
           onClick={handleNext}
-          disabled={hasErrors}
+          disabled={attemptedNext && hasErrors}
           className={cn(
             "inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-xl px-8 text-base font-black transition-colors duration-150 sm:w-auto sm:px-10",
-            !hasErrors
+            !(attemptedNext && hasErrors)
               ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)] active:scale-[0.98] active:bg-[var(--brand-green-deep)]"
               : "cursor-not-allowed bg-gray-200 text-gray-400",
           )}
