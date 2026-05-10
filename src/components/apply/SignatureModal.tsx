@@ -75,8 +75,7 @@ export function SignatureModal({ onCancel, onConfirm }: Props) {
           서명을 진행해주세요
         </h3>
         <p className="mt-3 text-sm leading-6 text-[var(--color-ink-700)]">
-          마우스 또는 손가락으로 아래 영역에 서명해주세요. 서명은 위임장
-          입찰의뢰인 자리에 그대로 인쇄됩니다.
+          마우스 또는 손가락으로 서명해주세요.
         </p>
         {/* cycle 1-D-A-4-5 정정: canvas wrapper touchAction:none 명시 (Tailwind touch-none 외 안전망). */}
         <div className="mt-4" style={{ touchAction: "none" }}>

@@ -91,31 +91,31 @@ export function Step4Confirm({
 
       {/* 입찰 정보 요약 (압축 paradigm) */}
       <div className="rounded-2xl border border-gray-200 bg-white p-5">
-        <h3 className="text-base font-black text-[var(--color-ink-900)]">
+        <h3 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
           신청 정보 요약
         </h3>
         <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3.5 text-sm">
           <div>
-            <dt className="text-xs text-[var(--color-ink-500)]">법원 · 사건번호</dt>
-            <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
+            <dt className="text-sm font-medium text-[var(--color-ink-500)]">법원 · 사건번호</dt>
+            <dd className="mt-1 text-base font-bold tabular-nums text-[var(--color-ink-900)]">
               {data.court} · {data.caseNumber}
             </dd>
           </div>
           <div>
-            <dt className="text-xs text-[var(--color-ink-500)]">매각기일</dt>
-            <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
+            <dt className="text-sm font-medium text-[var(--color-ink-500)]">매각기일</dt>
+            <dd className="mt-1 text-base font-bold tabular-nums text-[var(--color-ink-900)]">
               {data.bidDate || "-"}
             </dd>
           </div>
           <div>
-            <dt className="text-xs text-[var(--color-ink-500)]">입찰 희망 금액</dt>
-            <dd className="mt-1 font-black tabular-nums text-[var(--color-accent-red)]">
+            <dt className="text-sm font-medium text-[var(--color-ink-500)]">입찰 희망 금액</dt>
+            <dd className="mt-1 text-base font-black tabular-nums text-[var(--color-accent-red)]">
               {bidAmount > 0 ? formatKoreanWon(bidAmount) : "-"}
             </dd>
           </div>
           <div>
-            <dt className="text-xs text-[var(--color-ink-500)]">신청인</dt>
-            <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
+            <dt className="text-sm font-medium text-[var(--color-ink-500)]">신청인</dt>
+            <dd className="mt-1 text-base font-bold text-[var(--color-ink-900)]">
               {bid.applicantName} · {maskSsnFront(bid.ssnFront)}
             </dd>
           </div>
@@ -134,7 +134,7 @@ export function Step4Confirm({
 
       {/* 동의 + 서명 카드 */}
       <div className="rounded-2xl border border-gray-200 bg-white p-5">
-        <h3 className="text-base font-black text-[var(--color-ink-900)]">
+        <h3 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
           위임 동의
         </h3>
         <ul className="mt-4 flex flex-col gap-3.5">

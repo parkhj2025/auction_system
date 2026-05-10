@@ -80,37 +80,37 @@ export function Step5Payment({
 
       {/* 신청 정보 요약 */}
       <div className="rounded-2xl border border-gray-200 bg-white p-5">
-        <h3 className="text-base font-black text-[var(--color-ink-900)]">
+        <h3 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
           신청 정보
         </h3>
         <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3.5 text-sm">
           <div>
-            <dt className="text-xs text-[var(--color-ink-500)]">사건번호</dt>
-            <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
+            <dt className="text-sm font-medium text-[var(--color-ink-500)]">사건번호</dt>
+            <dd className="mt-1 text-base font-bold tabular-nums text-[var(--color-ink-900)]">
               {data.caseNumber || "-"}
             </dd>
           </div>
           <div>
-            <dt className="text-xs text-[var(--color-ink-500)]">매각기일</dt>
-            <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
+            <dt className="text-sm font-medium text-[var(--color-ink-500)]">매각기일</dt>
+            <dd className="mt-1 text-base font-bold tabular-nums text-[var(--color-ink-900)]">
               {data.bidDate || "-"}
             </dd>
           </div>
           <div>
-            <dt className="text-xs text-[var(--color-ink-500)]">입찰 희망 금액</dt>
-            <dd className="mt-1 font-bold tabular-nums text-[var(--color-accent-red)]">
+            <dt className="text-sm font-medium text-[var(--color-ink-500)]">입찰 희망 금액</dt>
+            <dd className="mt-1 text-base font-bold tabular-nums text-[var(--color-accent-red)]">
               {bidAmount > 0 ? formatKoreanWon(bidAmount) : "-"}
             </dd>
           </div>
           <div>
-            <dt className="text-xs text-[var(--color-ink-500)]">신청인</dt>
-            <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
+            <dt className="text-sm font-medium text-[var(--color-ink-500)]">신청인</dt>
+            <dd className="mt-1 text-base font-bold text-[var(--color-ink-900)]">
               {bid.applicantName || "-"}
             </dd>
           </div>
           {fee && (
             <div className="col-span-2 mt-1 border-t border-[var(--color-ink-200)] pt-3">
-              <dt className="text-xs text-[var(--color-ink-500)]">
+              <dt className="text-sm font-medium text-[var(--color-ink-500)]">
                 입찰대리 수수료
               </dt>
               <dd className="mt-1 flex flex-wrap items-baseline gap-x-3 gap-y-1">
@@ -152,18 +152,18 @@ export function Step5Payment({
 
       {/* 입금 안내 카드 (mockup default + env 정합 시점 단독 분기) */}
       <div className="rounded-2xl border border-gray-200 bg-white p-5">
-        <h3 className="text-base font-black text-[var(--color-ink-900)]">
+        <h3 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
           입금 안내
         </h3>
         <dl className="mt-4 space-y-3 text-sm">
           <div className="flex flex-col gap-1">
-            <dt className="text-xs text-[var(--color-ink-500)]">은행</dt>
-            <dd className="font-bold text-[var(--color-ink-900)]">
+            <dt className="text-sm font-medium text-[var(--color-ink-500)]">은행</dt>
+            <dd className="text-base font-bold text-[var(--color-ink-900)]">
               {DISPLAY_BANK.bankName}
             </dd>
           </div>
           <div className="flex flex-col gap-1">
-            <dt className="text-xs text-[var(--color-ink-500)]">계좌번호</dt>
+            <dt className="text-sm font-medium text-[var(--color-ink-500)]">계좌번호</dt>
             <dd className="flex items-center justify-between gap-2">
               <span className="font-bold tabular-nums text-[var(--color-ink-900)]">
                 {DISPLAY_BANK.accountNumber}
@@ -188,29 +188,28 @@ export function Step5Payment({
             </dd>
           </div>
           <div className="flex flex-col gap-1">
-            <dt className="text-xs text-[var(--color-ink-500)]">예금주</dt>
-            <dd className="font-bold text-[var(--color-ink-900)]">
+            <dt className="text-sm font-medium text-[var(--color-ink-500)]">예금주</dt>
+            <dd className="text-base font-bold text-[var(--color-ink-900)]">
               {DISPLAY_BANK.accountHolder}
             </dd>
           </div>
           {fee && (
             <div className="flex flex-col gap-1">
-              <dt className="text-xs text-[var(--color-ink-500)]">입금 금액</dt>
+              <dt className="text-sm font-medium text-[var(--color-ink-500)]">입금 금액</dt>
               <dd className="text-2xl font-black tabular-nums text-[var(--color-ink-900)]">
                 {formatKoreanWon(fee.baseFee)}
               </dd>
             </div>
           )}
           <div className="flex flex-col gap-1">
-            <dt className="text-xs text-[var(--color-ink-500)]">입금 마감</dt>
-            <dd className="font-bold text-[var(--color-ink-900)]">
+            <dt className="text-sm font-medium text-[var(--color-ink-500)]">입금 마감</dt>
+            <dd className="text-base font-bold text-[var(--color-ink-900)]">
               {paymentDeadline}
             </dd>
           </div>
         </dl>
-        <div className="mt-4 space-y-2 rounded-md bg-gray-50 p-3.5 text-sm leading-6 text-[var(--color-ink-700)]">
-          <p>입금이 확인되면 접수가 완료됩니다.</p>
-          <p>접수가 완료되면 알림을 보내드립니다.</p>
+        <div className="mt-4 rounded-md bg-gray-50 p-3.5 text-sm leading-6 text-[var(--color-ink-700)]">
+          <p>입금이 확인되면 알림과 함께 접수가 완료됩니다.</p>
         </div>
       </div>
 

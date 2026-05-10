@@ -1051,7 +1051,22 @@ const setBidConfirmed = onBidConfirmedChange;    // write
 
 ---
 
-## 28. Step4 paradigm (cycle 1-D-A-4-5 정정 / cycle 1-D-A-4-4 산출 광역 회수 + 신규 정수)
+## 28. Step4 paradigm (cycle 1-D-A-4-8 시각 토큰 정정 / Step1·2 sentinel 정합)
+
+**cycle 1-D-A-4-8 시각 토큰 정정 (Step3·4·5·6 광역 / Step1·2 sentinel 보존)**:
+- 카드 헤더 h3 = `text-base` → **`text-lg + tracking-tight + font-black + ink-900`** (Step1:454 정합 정수)
+- dt label = `text-xs` → **`text-sm + font-medium + ink-500`** (Step1·2 정합 정수)
+- dd value = size 명시 0 → **`text-base 명시`** (Step1·2 정합 정수)
+- 입찰 희망 금액 dd = `text-base + font-black + accent-red` (가격 한정 paradigm 정합)
+- 입금 금액 dd = `text-2xl + font-black + ink-900` (단독 강조 paradigm)
+
+**Step1·2 sentinel 보존 paradigm**:
+- sub paragraph (h2 직후) = `text-sm leading-6 ink-500` 광역 단일 정합 (정정 영역 0 보존)
+- helper text (input sub) = `text-xs ink-500` 광역 단일 정합 (정정 영역 0 보존)
+- info 박스 paragraph (gray-50 내) = `text-sm leading-6 ink-700` 보존 (Step1·2 baseline 영역 0 / paradigm 분기 NG 회피)
+- 가독성 NG 잔존 시점 = 별개 cycle 광역 정정 paradigm 영역 (단계적 정정 paradigm 정수)
+
+
 
 **cycle 1-D-A-4-5 광역 회수 사항** (forward fix paradigm):
 - ContractAgreement.tsx inline 회수 → DelegationPreviewModal body component repurpose (modal 안 view 단독)
@@ -1127,7 +1142,20 @@ const setBidConfirmed = onBidConfirmedChange;    // write
 
 ---
 
-## 29. Step5Payment + Step5Complete paradigm (cycle 1-D-A-4-7 정정 / 카피 + red 색감, 2026-05-10)
+## 29. Step5Payment + Step5Complete paradigm (cycle 1-D-A-4-8 정정 / 카피 통합 + 시각 토큰)
+
+**cycle 1-D-A-4-8 정정 사항**:
+- SignatureModal 안내 = "마우스 또는 손가락으로 서명해주세요" 단독 (담백 paradigm 정수 / 22자)
+- "입금이 확인되면 접수가 완료됩니다 + 접수가 완료되면 알림을 보내드립니다" 중복 paragraph → **"입금이 확인되면 알림과 함께 접수가 완료됩니다"** 단일 paragraph 통합 paradigm
+- 시각 토큰 정정 = h3 + dt + dd 광역 (Step3·4·5·6 단독 / Step1·2 sentinel 보존)
+- 가독성 정합 검수 paradigm 광역 (Step1·2 sentinel 정합 의무 / 별개 cycle 광역 정정 영역 보존)
+
+**카피 통합 paradigm 정수**:
+- 직역 paradigm "사후" 광역 폐기 → 자연 paradigm "확인되면" 단일 paradigm
+- channel 명시 어휘 ("카카오톡으로") 영역 0 paradigm
+- 의미 통합 paradigm = "알림과 함께 접수 완료" 단일 paragraph (분리 paragraph 회수)
+
+
 
 **cycle 1-D-A-4-7 정정 사항**:
 - "입금 사후" → "입금이 확인되면" 광역 정정 (직역 paradigm → 자연 paradigm 정수)
