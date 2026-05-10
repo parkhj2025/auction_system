@@ -761,46 +761,84 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 
 ---
 
-## 21. Step3 첨부 서류 paradigm + 모달 분리 paradigm (cycle 1-D-A-4-3 재진입, 2026-05-10)
+## 21. Step3 첨부 서류 paradigm + 모달 분리 paradigm (cycle 1-D-A-4-3 보강 1 사후, 2026-05-10)
 
-**의뢰인 첨부 paradigm**:
-- 인감증명서 (주민센터 또는 무인발급기 / 1통 600원)
-- 본인서명사실확인서 (주민센터 / 무료 / 2028년까지 수수료 면제)
-- 사용자 자유 선택 paradigm = FileUpload 1개 + label "인감증명서 또는 본인서명사실확인서" + sub "둘 중 하나 발급해서 올려주세요"
-- 전자본인서명확인서 영구 폐기 (공공기관 제출 paradigm 단독 / 민간 사업자 직접 제출 paradigm NG)
+**의뢰인 첨부 paradigm 정수**:
+- **전자본인서명확인서 단독** (정부24 PDF 발급증)
+- 인감증명서 + 본인서명사실확인서 양 서류 paradigm 영구 폐기 (인감증명서 사본 paradigm NG / 비대면 paradigm 정합)
+- FileUpload 1개 + label "전자본인서명확인서" + description "정부24에서 발급한 PDF"
 
-**layered paradigm 정수**:
-- info 박스 = 사용자 첫 진입 사전 인지 paradigm (1줄 단독 = "매수신청 대리에 필요한 서류예요")
-- IssueGuideModal = on-demand 상세 paradigm (양 서류 sequential 광역 발급 단계 paradigm)
+**전자본인서명확인서 paradigm 정수**:
+- 첫 발급 = 주민센터 방문 + 발급시스템 이용 승인 신청 (최초 1회 / 4년 유효)
+- 사전 등록 사후 = 정부24 PC 웹 (www.gov.kr) 접속 + 공동인증서/금융인증서 로그인 + 발급
+- 모바일 앱 NG (PC 웹 단독 paradigm)
+- 수요기관 = 공공기관 (법원 = 사법부 = 중앙행정기관 paradigm 정합)
+
+**layered paradigm**:
+- info 박스 = 사용자 첫 진입 사전 인지 (1줄 단독 = "매수신청 대리에 필요한 서류입니다")
+- IssueGuideModal = on-demand 상세 paradigm (4단계 ol + PC 웹 안내 paragraph)
 - 정보 광역 layered = 첫 진입 인지 + 능동 click 상세
 
 **모달 분리 paradigm**:
-- ConfirmCaseModal = 강제 모달 paradigm (Step1 / backdrop·ESC 닫기 영구 폐기 / paragraph 단독 paradigm 정수 = 줄바꿈 0 paradigm)
-- IssueGuideModal = 정보 모달 paradigm (Step3 / backdrop·ESC 닫기 보존 / 양 서류 sequential section paradigm)
-- 분리 정수 = 사용자 자유 영역 분리 paradigm
+- ConfirmCaseModal = 강제 모달 paradigm (Step1 / backdrop·ESC 닫기 영구 폐기 / 3 paragraph 분리 paradigm = 자연 줄바꿈)
+- IssueGuideModal = 정보 모달 paradigm (Step3 / backdrop·ESC 닫기 보존 / 4단계 ol + PC 웹 안내)
 
 **form field name 변동 0 paradigm**:
-- ApplyDocuments.eSignFile field name 광역 = 백엔드 단독 paradigm 정수 / UI 노출 0 paradigm 정합 (§32 정합)
-- legacy + backend compat 보존
-- label paradigm 광역 = "인감증명서 또는 본인서명사실확인서" 사용자 친화 (field name 영문 노출 0)
+- ApplyDocuments.eSignFile field name 광역 = 백엔드 단독 paradigm 정수 / UI 노출 0 paradigm (§32 정합)
+- label paradigm 광역 = "전자본인서명확인서" 사용자 친화 (field name 영문 노출 0)
 
 **곡률 위계 SCALE**:
 - 카드 rounded-2xl (16px) ⊃ info 박스 rounded-xl (12px) ⊃ input/dropzone rounded-md (10px)
 
-**FileUpload component 토큰 정합** (cycle 1-D-A-4-3 재진입 정정):
-- dropzone primary text = text-base (16px) font-bold ink-700 (모바일 앱 form 광역 정합 / 14 → 16)
-- dropzone sub text = text-xs (12px) ink-500 (광역 paradigm 정합 / 11 → 12)
-- 곡률 = rounded-md (10px) 보존 (시각 SCALE 정수 / input level paradigm 정합)
+**FileUpload component 토큰 정합** (cycle 1-D-A-4-3 보강 1 사후):
+- dropzone primary text = text-base (16px) font-bold ink-700 (모바일 앱 form 정합)
+- dropzone sub text = text-xs (12px) ink-500 (광역 paradigm 정합)
+- label ↔ description gap = mb-2.5 (10px) (Step1·Step2 form 광역 일관성 정합)
+- 곡률 = rounded-md (10px) 보존 (시각 SCALE 정수)
 
-**h2 paradigm 광역 통일** (cycle 1-D-A-4-2 final 누락 회복):
+**h2 paradigm 광역 통일**:
 - Step1·Step2·Step3 광역 = `text-2xl font-black tracking-[-0.015em] leading-[1.2] ink-900` 단독 paradigm
 
-**ConfirmCaseModal paragraph paradigm** (cycle 1-D-A-4-3 재진입 정정):
-- ul + 3 li dom 영구 폐기 → paragraph 단독 paradigm 정수
-- 친근감 어미 "처리됩니다" → "처리돼요" (Step2·Step3 paradigm 정합)
-- 줄바꿈 0 paradigm 정수 (한국어 어절 광역 줄바꿈 회피)
+**ConfirmCaseModal 3 paragraph 분리 paradigm** (cycle 1-D-A-4-3 보강 1):
+- paragraph 단독 paradigm (한 문장 강제) 영구 폐기
+- 3 paragraph 분리 + space-y-2.5 (10px) paradigm = 자연 줄바꿈
+- 어미 = 합니다체 단독 ("처리돼요" → "입력 가능합니다")
+- 카피 차별화 = "올림 처리됩니다" → "만원 단위로만 입력 가능합니다"
 
-**다음 cycle (1-D-A-4-4)**: Step4 §A-9 정합 4건 (체크박스 accent ink-900 → brand-green / dl grid-cols-2 → single column / dt 12 → 14 medium ink-500 / dd 14 → 16 bold ink-900).
+**Step2 입찰가 paradigm** (cycle 1-D-A-4-3 보강 1):
+- truncateBidAmount utility 신규 (Math.floor(num / 10000) * 10000)
+- onChange 시점 = 천원 이하 단위 0 자동 절삭 paradigm
+- display = comma toLocaleString paradigm 보존
+
+**다음 cycle (1-D-A-4-4)**: Step4 §A-9 정합 4건 + ApplyGuideModal/Step4Confirm "전자본인서명확인서" 어휘 일관성 + 다른 sub-page 광역 요체 어미 → 합니다체 회수 paradigm.
+
+---
+
+## 22. Step1·Step2·Step3 광역 톤앤매너 일관성 paradigm (cycle 1-D-A-4-3 보강 1 신규, 2026-05-10)
+
+**source paradigm 정수**:
+- Step1·Step2 form 광역 = source paradigm
+- Step3 FileUpload component = source 정합 의무
+
+**광역 일관성 토큰**:
+- 라벨 fs = `--label-fs-app` (16px) font-bold ink-900
+- description fs = text-xs (12px) leading-5 ink-500
+- field-gap = `--field-gap-app` (28px) (form 영역 단독)
+- 라벨 ↔ input/dropzone gap = mb-2.5 (10px)
+- description ↔ input/dropzone gap = mb-3 (12px)
+
+**시각 위계 SCALE**:
+- 카드 rounded-2xl (16px)
+- CTA + alert/info rounded-xl (12px)
+- input + dropzone rounded-md (10px)
+
+**자가 검증 paradigm**:
+- FileUpload component 광역 = Step1·Step2 form 광역 일관성 grep 검수 의무
+- 모바일 + 데스크탑 동일 paradigm 검수
+- 톤앤매너 일관성 = source 정합 의무 (cycle 광역 paradigm 회귀 차단)
+
+**학습**:
+- (cycle 1-D-A-4-3 보강 1) FileUpload 라벨 ↔ description gap = mb-2 → mb-2.5 정정 (Step1·Step2 일관성 회복)
 
 ---
 
@@ -809,7 +847,7 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 **원칙 정수**:
 - 내부 백엔드 표현 (timestamp / column name / status code / API code / 분류 코드 / field name) UI 노출 NG
 - 백엔드 추적 = UI 분리 paradigm 정수
-- 사용자 노출 어휘 = 마케터 paradigm 단독 (친근감 어미 + 평이한 한국어)
+- 사용자 노출 어휘 = 마케터 paradigm 단독 (**합니다체 단독** + 평이한 한국어)
 
 **금지 영역 광역**:
 - timestamp ISO string 직접 노출 (formatKoreanDate utility 광역 의무)
@@ -818,13 +856,19 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 - API error code 직접 노출 (사용자 친화 메시지 paradigm 의무)
 - 분류 어휘 영문 노출 (tier / matchStatus → 한국어 paradigm 의무)
 
+**어미 paradigm 정수** (cycle 1-D-A-4-3 보강 1 갱신):
+- 합니다체 단독 paradigm (~합니다 / ~해주세요 / ~가능합니다)
+- 요체 (~예요 / ~돼요) 영구 폐기 (비전문 paradigm NG)
+- 사용자 노출 paradigm = 마케터 + 전문 paradigm 광역
+
 **자가 검증 paradigm**:
-- 영문 + ISO string + 영문 status 광역 = grep 광역 자가 검증 의무
-- UI dom 광역 = 한국어 + 친근감 어미 (~예요/~돼요) + 평이한 paradigm 단독
+- 영문 + ISO string + 영문 status 광역 = grep 자가 검증 의무
+- 요체 어미 (~예요 / ~돼요) grep 자가 검증 의무
 
 **학습**:
 - (cycle 1-D-A-4-2 보강 1) "확인 시각 기록됨" UI 노출 = 백엔드 표현 paradigm NG → 영구 폐기 사례
 - (cycle 1-D-A-4-3 재진입) 정부24 "수요기관 입력" 어휘 = 백엔드/행정 paradigm → 영구 폐기 사례
+- (cycle 1-D-A-4-3 보강 1) 요체 어미 비전문 paradigm NG → 합니다체 단독 회수 사례
 
 ---
 

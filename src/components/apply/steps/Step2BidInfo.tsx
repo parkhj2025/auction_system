@@ -6,7 +6,7 @@ import { useEffect, useRef, useState } from "react";
 import { ArrowLeft, ArrowRight, AlertCircle, HelpCircle } from "lucide-react";
 import type { ApplyFormData, ApplyBidInfo } from "@/types/apply";
 import { computeFee, formatPhone } from "@/lib/apply";
-import { cn, formatKoreanWon } from "@/lib/utils";
+import { cn, formatKoreanWon, truncateBidAmount } from "@/lib/utils";
 
 export function Step2BidInfo({
   data,
@@ -152,9 +152,12 @@ export function Step2BidInfo({
                 }
                 value={bid.bidAmount}
                 onChange={(e) => {
+                  // cycle 1-D-A-4-3 보강 1: 천원 이하 단위 = 0 자동 절삭 paradigm.
                   const cleaned = e.target.value.replace(/[^\d]/g, "");
+                  const num = parseInt(cleaned, 10) || 0;
+                  const truncated = truncateBidAmount(num);
                   onBidInfoChange({
-                    bidAmount: cleaned ? Number(cleaned).toLocaleString("ko-KR") : "",
+                    bidAmount: truncated > 0 ? truncated.toLocaleString("ko-KR") : "",
                   });
                   clearError("bidAmount");
                 }}

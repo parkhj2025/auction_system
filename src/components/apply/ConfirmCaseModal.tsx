@@ -54,9 +54,11 @@ export function ConfirmCaseModal({ isOpen, onConfirm, onCancel }: Props) {
         >
           사건 정보를 확인해주세요
         </h3>
-        <p className="mt-4 text-base leading-7 text-[var(--color-ink-700)]">
-          입찰 전 사건 정보를 한 번 더 확인해주세요. 정보 오류로 인한 책임은 부담하지 않으며, 입찰가는 만원 단위로 올림 처리돼요.
-        </p>
+        <div className="mt-4 space-y-2.5 text-base leading-7 text-[var(--color-ink-700)]">
+          <p>입찰 전 사건 정보를 한 번 더 확인해주세요.</p>
+          <p>정보 오류로 인한 책임은 부담하지 않습니다.</p>
+          <p>입찰가는 만원 단위로만 입력 가능합니다.</p>
+        </div>
         <button
           type="button"
           onClick={onConfirm}

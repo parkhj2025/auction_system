@@ -23,6 +23,17 @@ export function formatWonExact(won: number): string {
   return `${won.toLocaleString("ko-KR")}원`;
 }
 
+/**
+ * 입찰가 만원 단위 절삭 utility (cycle 1-D-A-4-3 보강 1).
+ * 천원 이하 단위 = 0 자동 강제 paradigm.
+ * @param value 입력 숫자
+ * @returns 만원 단위 단독 숫자 (천원 이하 = 0)
+ */
+export function truncateBidAmount(value: number): number {
+  if (!Number.isFinite(value) || value < 0) return 0;
+  return Math.floor(value / 10000) * 10000;
+}
+
 /** "2026-04-13" → "2026.04.13" */
 export function formatKoreanDate(iso: string): string {
   if (!iso) return "";

@@ -35,8 +35,9 @@ export function Step3Documents({
         </p>
       </header>
 
-      {/* info 박스 layered paradigm: 첫 진입 사전 인지 (1줄) + button trigger → IssueGuideModal (양 서류 sequential 상세).
-          곡률 = rounded-xl (12px) / 카드 rounded-2xl (16px) ⊃ info 박스 rounded-xl (12px) 시각 위계 SCALE. */}
+      {/* info 박스 layered paradigm: 첫 진입 사전 인지 (1줄) + button trigger → IssueGuideModal (4단계 상세).
+          곡률 = rounded-xl (12px) / 카드 rounded-2xl (16px) ⊃ info 박스 rounded-xl (12px) 시각 위계 SCALE.
+          어미 = 합니다체 단독 paradigm (cycle 1-D-A-4-3 보강 1 / §32 정합). */}
       <div className="flex items-start gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-4 py-3">
         <Info
           size={16}
@@ -44,7 +45,7 @@ export function Step3Documents({
           aria-hidden="true"
         />
         <p className="text-sm leading-6 text-[var(--color-ink-700)]">
-          매수신청 대리에 필요한 서류예요.{" "}
+          매수신청 대리에 필요한 서류입니다.{" "}
           <button
             type="button"
             onClick={() => setIssueGuideOpen(true)}
@@ -57,8 +58,8 @@ export function Step3Documents({
 
       <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-5">
         <FileUpload
-          label="인감증명서 또는 본인서명사실확인서"
-          description="둘 중 하나 발급해서 올려주세요"
+          label="전자본인서명확인서"
+          description="정부24에서 발급한 PDF"
           file={eSignFile}
           onFileChange={(f) => onDocumentsChange({ eSignFile: f })}
         />
@@ -71,7 +72,7 @@ export function Step3Documents({
       </div>
 
       <p className="text-xs leading-5 text-[var(--color-ink-500)]">
-        입찰 대리 업무에만 쓰이고, 3년 후 즉시 폐기돼요
+        입찰 대리 업무에만 쓰이고, 3년 후 즉시 폐기됩니다.
       </p>
 
       <div className="flex flex-col items-stretch gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
