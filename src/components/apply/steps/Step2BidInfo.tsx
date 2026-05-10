@@ -5,9 +5,8 @@
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, AlertCircle } from "lucide-react";
 import type { ApplyFormData, ApplyBidInfo } from "@/types/apply";
-import { formatPhone } from "@/lib/apply";
+import { computeFee, formatPhone } from "@/lib/apply";
 import { cn, formatKoreanWon } from "@/lib/utils";
-import { FeeCalculatorInline } from "../FeeCalculator";
 
 export function Step2BidInfo({
   data,
@@ -49,6 +48,10 @@ export function Step2BidInfo({
   const minPrice = data.matchedListing?.min_bid_amount ?? 0;
   const hasMinPrice = data.matchedListing != null;
   const belowMin = hasMinPrice && bidAmountNum > 0 && bidAmountNum < minPrice;
+
+  // 수수료 inline 압축 paradigm (FeeCalculatorInline dom 영구 폐기 / 토스 송금 결과 footer paradigm 정합).
+  const bidDate = data.matchedListing?.bid_date ?? null;
+  const fee = bidDate ? computeFee(bidDate) : null;
 
   function validate(): { ok: boolean; errors: Record<string, string> } {
     const next: Record<string, string> = {};
@@ -107,8 +110,7 @@ export function Step2BidInfo({
           입찰 정보를 입력해주세요
         </h2>
         <p className="text-sm leading-6 text-[var(--color-ink-500)]">
-          입찰 희망 금액과 신청인 정보는 위임 서류 작성에 사용됩니다.
-          입력하신 정보는 암호화되어 전달되며 접수 외 용도로 사용되지 않습니다.
+          위임 서류 작성에 필요한 정보예요
         </p>
       </header>
 
@@ -202,7 +204,7 @@ export function Step2BidInfo({
                 id="applicant-phone"
                 type="tel"
                 inputMode="tel"
-                placeholder="휴대폰번호를 입력해주세요"
+                placeholder="010-1234-5678"
                 value={bid.phone}
                 onChange={(e) => {
                   onBidInfoChange({ phone: formatPhone(e.target.value) });
@@ -261,9 +263,8 @@ export function Step2BidInfo({
                 autoComplete="off"
               />
             </div>
-            <p className="mt-1 text-xs text-[var(--color-ink-500)]">
-              위임장 작성에만 사용됩니다. 뒷 7자리는 저장되지 않으며, 서류 발급
-              직후 즉시 폐기됩니다.
+            <p className="mt-1 text-xs leading-5 text-[var(--color-ink-500)]">
+              위임장 발급 직후 뒷 7자리는 폐기돼요
             </p>
             {(errors.ssnFront || errors.ssnBack) && (
               <p className="mt-1 text-xs text-[var(--color-accent-red)]">
@@ -272,8 +273,8 @@ export function Step2BidInfo({
             )}
           </div>
 
-          {/* 재경매 물건 여부 */}
-          <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4">
+          {/* 재경매 물건 = alert paradigm 정수 (보증금 20% / amber 박스 단독 보존) */}
+          <div className="rounded-[var(--radius-md)] border border-[var(--color-warning)]/30 bg-[var(--color-warning-soft)] p-4">
             <label className="flex cursor-pointer items-start gap-2">
               <input
                 type="checkbox"
@@ -288,16 +289,14 @@ export function Step2BidInfo({
                   재경매 물건 (보증금 20%)
                 </span>
                 <p className="mt-0.5 text-xs leading-5 text-[var(--color-ink-500)]">
-                  재경매(대금 미납 이력) 사건이면 체크해주세요. 보증금이 감정가의
-                  20%로 적용됩니다. 확실하지 않다면 비워두셔도 접수 후 확인하여
-                  안내드립니다.
+                  이전 낙찰자가 잔금을 미납한 사건이면 보증금이 20%로 올라가요. 확실하지 않으면 비워두세요
                 </p>
               </div>
             </label>
           </div>
 
-          {/* 공동입찰 */}
-          <div className="rounded-[var(--radius-md)] border border-[var(--color-border)] bg-[var(--color-surface-muted)] p-4">
+          {/* 공동입찰 = 일반 체크박스 paradigm (박스 dom 영구 폐기 / 시각 노이즈 ↓) */}
+          <div>
             <label className="flex cursor-pointer items-center gap-2">
               <input
                 type="checkbox"
@@ -307,7 +306,7 @@ export function Step2BidInfo({
                 }
                 className="h-5 w-5 rounded border-[var(--color-border)] accent-[var(--brand-green)]"
               />
-              <span className="text-sm font-bold text-[var(--color-ink-900)]">
+              <span className="text-base font-bold leading-7 text-[var(--color-ink-900)]">
                 공동입찰로 진행합니다
               </span>
             </label>
@@ -365,9 +364,23 @@ export function Step2BidInfo({
             )}
           </div>
 
-          <FeeCalculatorInline
-            bidDate={data.matchedListing?.bid_date ?? null}
-          />
+          {/* 수수료 inline 압축 paradigm (FeeCalculatorInline dom 영구 폐기 / border-t footer paradigm).
+              차용 source: 토스 송금 결과 footer inline paradigm 정수. */}
+          {fee && (
+            <div className="border-t border-[var(--color-ink-200)] pt-4 text-sm leading-6 text-[var(--color-ink-500)]">
+              <p>
+                사전 신청가{" "}
+                <span className="font-bold text-[var(--color-ink-900)]">5만원부터</span>
+                {" · 낙찰 시 +5만원"}
+              </p>
+              <p className="mt-1">
+                D-{Math.max(0, fee.daysUntilBid)} · {fee.tierLabel}{" "}
+                <span className="font-bold text-[var(--color-ink-900)]">
+                  {formatKoreanWon(fee.baseFee)}
+                </span>
+              </p>
+            </div>
+          )}
       </fieldset>
 
       <div className="flex flex-col items-stretch gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
