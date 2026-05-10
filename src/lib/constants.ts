@@ -189,10 +189,9 @@ export function groupCourtsByRegion(): Array<{
 }
 
 /**
- * 수수료·보증금 안내용 전용계좌.
- * Phase 2 현재는 이 상수가 Step5Complete·마이페이지·관리자 뷰에서 노출됨.
- * Phase 3 PG 연동 시 이 상수는 서버 검증용으로만 쓰이고 프런트엔드 노출은 사라짐.
- * TODO: 사업자등록 완료 후 실제 운영 계좌번호로 교체.
+ * 수수료·보증금 안내용 전용계좌 (legacy / Step5Complete 잔존 사용 영역).
+ * cycle 1-D-A-4-5 = BANK_ACCOUNT (env 단일 source) 신규 paradigm 정합 정수 (사업자등록 사후 분기).
+ * TODO: 사업자등록 완료 후 BANK_ACCOUNT env 갱신 + 본 BANK_INFO 폐기.
  */
 export const BANK_INFO = {
   bank: "국민은행",
@@ -202,20 +201,44 @@ export const BANK_INFO = {
 } as const;
 
 /**
- * 온라인 결제(PG) 기능 플래그.
- * Phase 2 기간은 계좌이체만 지원. Phase 3에서 월 수임 20건+ 도달 시 PG 연동.
- * true로 전환되면 Step5Complete의 "온라인 결제 (준비 중)" 카드가 활성 결제
- * 버튼으로 교체되어야 함.
+ * cycle 1-D-A-4-5 신규 — 입금 계좌 env 단일 source paradigm.
+ *
+ * 사업자등록 사전 (현재 Phase 1) = env 미설정 → isConfigured === false
+ *   → Step5Payment + Step5Complete 광역 = "카카오톡 직접 안내" 카피 단독 render
+ * 사업자등록 사후 = env 설정 → isConfigured === true
+ *   → Step5Payment + Step5Complete 광역 = 입금 안내 카드 광역 render (자동 분기)
+ *
+ * NEXT_PUBLIC_ prefix 의무 = client component env 접근 paradigm (Next.js 정합).
+ * env 갱신 = 코드 영역 0 / 형준님 .env.local + Vercel env 단일 갱신 paradigm.
+ */
+export const BANK_ACCOUNT = {
+  bankName: process.env.NEXT_PUBLIC_BANK_NAME ?? "",
+  accountNumber: process.env.NEXT_PUBLIC_BANK_ACCOUNT_NUMBER ?? "",
+  accountHolder: process.env.NEXT_PUBLIC_BANK_ACCOUNT_HOLDER ?? "",
+  isConfigured: !!(
+    process.env.NEXT_PUBLIC_BANK_NAME &&
+    process.env.NEXT_PUBLIC_BANK_ACCOUNT_NUMBER &&
+    process.env.NEXT_PUBLIC_BANK_ACCOUNT_HOLDER
+  ),
+} as const;
+
+/**
+ * 온라인 결제(PG) 기능 플래그 (legacy / Step5Complete 잔존 사용 영역).
+ * cycle 1-D-A-4-5 = 결제 paradigm 광역 = 단순 계좌이체 단독 (PG = Phase 10 사후 영역).
  */
 export const PAYMENT_PG_ENABLED = false;
 
-/** /apply 스텝 폼의 단계 목록. ApplyStepIndicator와 ApplyClient가 공유. */
+/**
+ * /apply 스텝 폼의 단계 목록. ApplyStepIndicator와 ApplyClient가 공유.
+ * cycle 1-D-A-4-5 = "payment" step 신규 추가 (4 → 5단계 광역).
+ */
 export const APPLY_STEPS = [
   { id: "property", label: "물건\n확인", hint: "사건번호로 물건을 확인합니다" },
   { id: "bid-info", label: "입찰\n정보", hint: "입찰가와 신청인 정보" },
   { id: "documents", label: "서류\n업로드", hint: "전자본인서명확인서·신분증" },
-  { id: "confirm", label: "확인·\n제출", hint: "수수료 확인 후 제출" },
-  { id: "complete", label: "접수\n완료", hint: "전용계좌 안내" },
+  { id: "confirm", label: "위임 계약·\n서명", hint: "위임 계약 확인 후 서명" },
+  { id: "payment", label: "결제·\n접수", hint: "입금자명 확인 후 신청 접수" },
+  { id: "complete", label: "접수\n완료", hint: "접수번호 + 입금 안내" },
 ] as const;
 
 export type ApplyStepId = (typeof APPLY_STEPS)[number]["id"];

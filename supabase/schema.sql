@@ -232,6 +232,11 @@ CREATE TABLE IF NOT EXISTS public.orders (
   deposit_received_at TIMESTAMPTZ,
   deposit_returned_at TIMESTAMPTZ,
 
+  -- 결제 (cycle 1-D-A-4-5 신규 / Step5Payment paradigm)
+  payment_status TEXT NOT NULL DEFAULT 'deposit_waiting'
+    CHECK (payment_status IN ('deposit_waiting', 'deposit_confirmed', 'refunded')),
+  depositor_name TEXT,
+
   -- 입찰 결과
   result TEXT CHECK (result IN ('won', 'lost', 'cancelled')),
   result_amount BIGINT,

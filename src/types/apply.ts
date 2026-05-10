@@ -99,6 +99,12 @@ export interface ApplyFormData {
   agreedPrivacy: boolean;
   /** 서비스 이용약관 동의 */
   agreedTerms: boolean;
+  /**
+   * 입금자명 (Step5Payment 단독 / cycle 1-D-A-4-5 신규).
+   * default = bidInfo.applicantName / 사용자 수정 가능 paradigm.
+   * 사업자등록 사후 = 입금자명 매칭 paradigm 백엔드 검증 영역 (admin 영역).
+   */
+  depositorName: string;
 }
 
 export interface ApplySubmissionResult {
@@ -135,4 +141,5 @@ export const INITIAL_APPLY_DATA: ApplyFormData = {
   agreedDelegation: false,
   agreedPrivacy: false,
   agreedTerms: false,
+  depositorName: "",
 };

@@ -1,9 +1,17 @@
 "use client";
 
 import { useState } from "react";
-import { ArrowLeft, AlertCircle, FileText, Send } from "lucide-react";
+import Image from "next/image";
+import {
+  ArrowLeft,
+  ArrowRight,
+  AlertCircle,
+  FileText,
+  PenLine,
+  RotateCcw,
+} from "lucide-react";
 import type { ApplyFormData } from "@/types/apply";
-import { ContractAgreement } from "../ContractAgreement";
+import { DelegationPreviewModal } from "../DelegationPreviewModal";
 import { SignatureModal } from "../SignatureModal";
 import { PrivacyPreviewModal } from "../PrivacyPreviewModal";
 import { TermsPreviewModal } from "../TermsPreviewModal";
@@ -11,105 +19,132 @@ import { computeFee } from "@/lib/apply";
 import { cn, formatKoreanWon } from "@/lib/utils";
 
 /**
- * cycle 1-D-A-4-4 광역 재구성 paradigm:
- * - ContractAgreement (formal 5조) + 동의 카드 + 수수료 inline (Step2 차용) + CTA 단순화.
- * - 위임 정보 요약 / 위임인 서명 별도 카드 영구 폐기 (ContractAgreement 안 흡수 정수).
- * - 마지막 동의 체크박스 click → SignatureModal 자동 pop paradigm (강제 모달).
- * - "취소" 시점 = lastCheckedAgreement 단독 회복 paradigm + 서명 image 회수.
- * - DelegationPreviewModal + PDFPreviewModal + /api/preview-delegation route 광역 폐기 정합.
+ * cycle 1-D-A-4-5 광역 재구성 paradigm:
+ * - 직전 cycle 1-D-A-4-4 inline ContractAgreement paradigm 회수 → modal 안 view paradigm 회복.
+ * - "위임장 내용 보기" button → DelegationPreviewModal trigger (정보 모달 / max-w-720).
+ * - 마지막 동의 자동 pop paradigm 회수 → "✍ 서명하기" button click 단독 trigger paradigm.
+ * - 서명 사후 preview 카드 (image + "다시 서명" button).
+ * - 다음 CTA = "다음: 결제 →" (Step5Payment 진입 paradigm 정합).
  */
 
 type AgreementKey = "agreedDelegation" | "agreedPrivacy" | "agreedTerms";
+
+type Props = {
+  data: ApplyFormData;
+  onSignatureChange: (dataUrl: string | null) => void;
+  onAgreementChange: (key: AgreementKey, value: boolean) => void;
+  onNext: () => void;
+  onBack: () => void;
+};
+
+function maskSsnFront(v: string) {
+  if (!v) return "";
+  return `${v.slice(0, 2)}****`;
+}
 
 export function Step4Confirm({
   data,
   onSignatureChange,
   onAgreementChange,
-  onSubmit,
+  onNext,
   onBack,
-  submitting,
-  submitError,
-}: {
-  data: ApplyFormData;
-  onSignatureChange: (dataUrl: string | null) => void;
-  onAgreementChange: (key: AgreementKey, value: boolean) => void;
-  onSubmit: () => void;
-  onBack: () => void;
-  submitting: boolean;
-  submitError: string | null;
-}) {
+}: Props) {
+  const [delegationOpen, setDelegationOpen] = useState(false);
   const [privacyOpen, setPrivacyOpen] = useState(false);
   const [termsOpen, setTermsOpen] = useState(false);
-  const [signatureModalOpen, setSignatureModalOpen] = useState(false);
-  // cycle 1-D-A-4-4: 마지막 click된 동의 체크박스 추적 paradigm.
-  // SignatureModal "취소" 시점 = 직전 체크박스 단독 정확 회복 paradigm 정수.
-  const [lastCheckedAgreement, setLastCheckedAgreement] =
-    useState<AgreementKey | null>(null);
+  const [signatureOpen, setSignatureOpen] = useState(false);
 
+  const bid = data.bidInfo;
+  const bidAmount = Number(bid.bidAmount.replace(/[^\d]/g, "")) || 0;
   const allAgreed =
     data.agreedDelegation && data.agreedPrivacy && data.agreedTerms;
   const hasSignature = !!data.signature;
-  const canSubmit = hasSignature && allAgreed && !submitting;
+  const canProceed = allAgreed && hasSignature;
+  const canSign = data.agreedDelegation;
 
-  // 수수료 inline (Step2 차용 paradigm).
   const fee = data.bidDate ? computeFee(data.bidDate) : null;
-
-  function handleAgreementClick(key: AgreementKey, nextValue: boolean) {
-    onAgreementChange(key, nextValue);
-    if (!nextValue) return;
-    // 광역 동의 정합 시점 trigger (key === 마지막 click 광역).
-    const willAllAgree =
-      (key === "agreedDelegation" || data.agreedDelegation) &&
-      (key === "agreedPrivacy" || data.agreedPrivacy) &&
-      (key === "agreedTerms" || data.agreedTerms);
-    if (willAllAgree && !hasSignature) {
-      setLastCheckedAgreement(key);
-      setSignatureModalOpen(true);
-    }
-  }
-
-  function handleSignatureCancel() {
-    setSignatureModalOpen(false);
-    if (lastCheckedAgreement) {
-      onAgreementChange(lastCheckedAgreement, false);
-      setLastCheckedAgreement(null);
-    }
-    // 서명 image 회수 paradigm (사용자 prompt 정수).
-    onSignatureChange(null);
-  }
 
   function handleSignatureConfirm(dataUrl: string) {
     onSignatureChange(dataUrl);
-    setSignatureModalOpen(false);
-    setLastCheckedAgreement(null);
+    setSignatureOpen(false);
+  }
+
+  function handleSignatureCancel() {
+    setSignatureOpen(false);
+  }
+
+  function handleResign() {
+    onSignatureChange(null);
+    setSignatureOpen(true);
   }
 
   return (
     <div className="flex flex-col gap-6">
       <header>
         <h2 className="text-2xl font-black leading-[1.2] tracking-[-0.015em] text-[var(--color-ink-900)]">
-          위임 계약 내용을 확인하고 서명해주세요
+          위임 계약을 확인하고 서명해주세요
         </h2>
         <p className="mt-3 text-sm leading-relaxed text-[var(--color-ink-500)]">
-          아래 매수신청 대리 이용 계약서 내용을 확인하시고, 동의 후 서명해주세요. 서명은 위임장 입찰의뢰인 자리에 그대로 담깁니다.
+          위임장 내용을 확인하시고, 동의 후 서명해주세요. 서명은 위임장에 그대로 담깁니다.
         </p>
       </header>
 
-      <ContractAgreement data={data} signatureDataUrl={data.signature} />
+      {/* 입찰 정보 요약 (압축 paradigm) */}
+      <div className="rounded-2xl border border-gray-200 bg-white p-5">
+        <h3 className="text-base font-black text-[var(--color-ink-900)]">
+          신청 정보 요약
+        </h3>
+        <dl className="mt-4 grid grid-cols-2 gap-x-4 gap-y-3.5 text-sm">
+          <div>
+            <dt className="text-xs text-[var(--color-ink-500)]">법원 · 사건번호</dt>
+            <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
+              {data.court} · {data.caseNumber}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs text-[var(--color-ink-500)]">매각기일</dt>
+            <dd className="mt-1 font-bold tabular-nums text-[var(--color-ink-900)]">
+              {data.bidDate || "-"}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs text-[var(--color-ink-500)]">입찰 희망 금액</dt>
+            <dd className="mt-1 font-black tabular-nums text-[var(--color-accent-red)]">
+              {bidAmount > 0 ? formatKoreanWon(bidAmount) : "-"}
+            </dd>
+          </div>
+          <div>
+            <dt className="text-xs text-[var(--color-ink-500)]">신청인</dt>
+            <dd className="mt-1 font-bold text-[var(--color-ink-900)]">
+              {bid.applicantName} · {maskSsnFront(bid.ssnFront)}
+            </dd>
+          </div>
+        </dl>
+      </div>
 
-      {/* 동의 카드 + 수수료 inline */}
+      {/* 위임장 미리보기 button (DelegationPreviewModal trigger) */}
+      <button
+        type="button"
+        onClick={() => setDelegationOpen(true)}
+        className="inline-flex h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-xl border border-[var(--color-ink-900)] bg-white text-base font-bold text-[var(--color-ink-900)] transition-colors duration-150 hover:bg-[var(--color-ink-50)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]"
+      >
+        <FileText size={18} aria-hidden="true" />
+        위임장 내용 보기
+      </button>
+
+      {/* 동의 + 서명 카드 */}
       <div className="rounded-2xl border border-gray-200 bg-white p-5">
         <h3 className="text-base font-black text-[var(--color-ink-900)]">
           위임 동의
         </h3>
-        <ul className="mt-4 flex flex-col gap-3">
+        <ul className="mt-4 flex flex-col gap-3.5">
           <li className="flex items-start gap-2.5">
             <input
               id="agree-delegation"
               type="checkbox"
               checked={data.agreedDelegation}
               onChange={(e) =>
-                handleAgreementClick("agreedDelegation", e.target.checked)
+                onAgreementChange("agreedDelegation", e.target.checked)
               }
               className="mt-1.5 h-4 w-4 shrink-0 cursor-pointer accent-[var(--brand-green)]"
             />
@@ -125,9 +160,7 @@ export function Step4Confirm({
               id="agree-privacy"
               type="checkbox"
               checked={data.agreedPrivacy}
-              onChange={(e) =>
-                handleAgreementClick("agreedPrivacy", e.target.checked)
-              }
+              onChange={(e) => onAgreementChange("agreedPrivacy", e.target.checked)}
               className="mt-1.5 h-4 w-4 shrink-0 cursor-pointer accent-[var(--brand-green)]"
             />
             <label
@@ -150,9 +183,7 @@ export function Step4Confirm({
               id="agree-terms"
               type="checkbox"
               checked={data.agreedTerms}
-              onChange={(e) =>
-                handleAgreementClick("agreedTerms", e.target.checked)
-              }
+              onChange={(e) => onAgreementChange("agreedTerms", e.target.checked)}
               className="mt-1.5 h-4 w-4 shrink-0 cursor-pointer accent-[var(--brand-green)]"
             />
             <label
@@ -171,6 +202,59 @@ export function Step4Confirm({
             </label>
           </li>
         </ul>
+
+        {/* 서명 영역 (체크박스 1번 enable gate) */}
+        <div className="mt-5 border-t border-[var(--color-ink-200)] pt-5">
+          {!hasSignature ? (
+            <button
+              type="button"
+              onClick={() => setSignatureOpen(true)}
+              disabled={!canSign}
+              className={cn(
+                "inline-flex h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-xl text-base font-black transition-colors duration-150 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]",
+                canSign
+                  ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)] active:scale-[0.98] active:bg-[var(--brand-green-deep)]"
+                  : "cursor-not-allowed bg-gray-200 text-gray-400",
+              )}
+              aria-label="서명하기"
+            >
+              <PenLine size={18} aria-hidden="true" />
+              서명하기
+            </button>
+          ) : (
+            <div>
+              <p className="mb-2.5 text-sm font-bold text-[var(--color-ink-900)]">
+                서명 완료
+              </p>
+              <div className="relative flex h-20 items-center justify-center overflow-hidden rounded-md border border-[var(--color-ink-900)] bg-white">
+                <Image
+                  src={data.signature ?? ""}
+                  alt="입찰의뢰인 서명"
+                  width={400}
+                  height={80}
+                  unoptimized
+                  className="h-full w-auto object-contain"
+                />
+              </div>
+              <button
+                type="button"
+                onClick={handleResign}
+                className="mt-2.5 inline-flex items-center gap-1.5 text-sm font-bold text-[var(--color-ink-500)] hover:text-[var(--color-ink-900)] hover:underline"
+              >
+                <RotateCcw size={14} aria-hidden="true" />
+                다시 서명
+              </button>
+            </div>
+          )}
+          {!canSign && !hasSignature && (
+            <p className="mt-2.5 flex items-center gap-1.5 text-xs text-[var(--color-ink-500)]">
+              <AlertCircle size={12} aria-hidden="true" />
+              위임 계약 동의 후 서명할 수 있습니다.
+            </p>
+          )}
+        </div>
+
+        {/* 수수료 inline (Step2 차용 paradigm) */}
         {fee && (
           <div className="mt-5 border-t border-[var(--color-ink-200)] pt-4">
             <div className="text-sm font-medium text-[var(--color-ink-500)]">
@@ -191,47 +275,38 @@ export function Step4Confirm({
         )}
       </div>
 
-      {submitError && (
-        <div
-          role="alert"
-          className="flex items-start gap-2 rounded-[var(--radius-md)] border border-[var(--color-accent-red)] bg-[var(--color-accent-red-soft)] px-5 py-4 text-sm text-[var(--color-accent-red)]"
-        >
-          <AlertCircle
-            size={16}
-            className="mt-0.5 shrink-0"
-            aria-hidden="true"
-          />
-          {submitError}
-        </div>
-      )}
-
       <div className="flex flex-col items-stretch gap-3 pt-2 sm:flex-row sm:items-center sm:justify-between">
         <button
           type="button"
           onClick={onBack}
-          disabled={submitting}
-          className="inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-white px-5 text-base font-bold text-[var(--color-ink-700)] transition-colors duration-150 hover:bg-[var(--color-ink-100)] disabled:opacity-50 sm:w-auto"
+          className="inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-white px-5 text-base font-bold text-[var(--color-ink-700)] transition-colors duration-150 hover:bg-[var(--color-ink-100)] sm:w-auto"
         >
           <ArrowLeft size={16} aria-hidden="true" />
           이전
         </button>
         <button
           type="button"
-          onClick={onSubmit}
-          disabled={!canSubmit}
+          onClick={onNext}
+          disabled={!canProceed}
           className={cn(
             "inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-xl px-8 text-base font-black transition-colors duration-150 sm:w-auto sm:px-10",
-            canSubmit
+            canProceed
               ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)] active:scale-[0.98] active:bg-[var(--brand-green-deep)]"
               : "cursor-not-allowed bg-gray-200 text-gray-400",
           )}
         >
-          {submitting ? "제출 중..." : "신청 제출"}
-          {!submitting && <Send size={16} aria-hidden="true" />}
+          다음: 결제
+          <ArrowRight size={16} aria-hidden="true" />
         </button>
       </div>
 
-      {signatureModalOpen && (
+      <DelegationPreviewModal
+        isOpen={delegationOpen}
+        onClose={() => setDelegationOpen(false)}
+        data={data}
+      />
+
+      {signatureOpen && (
         <SignatureModal
           onCancel={handleSignatureCancel}
           onConfirm={handleSignatureConfirm}

@@ -18,6 +18,7 @@ import { Step1Property } from "./steps/Step1Property";
 import { Step2BidInfo } from "./steps/Step2BidInfo";
 import { Step3Documents } from "./steps/Step3Documents";
 import { Step4Confirm } from "./steps/Step4Confirm";
+import { Step5Payment } from "./steps/Step5Payment";
 import { Step5Complete } from "./steps/Step5Complete";
 
 const STEP_ORDER: ApplyStepId[] = APPLY_STEPS.map((s) => s.id);
@@ -70,6 +71,9 @@ export function ApplyClient() {
     value: boolean,
   ) => setData((d) => ({ ...d, [key]: value }));
 
+  const setDepositorName = (depositorName: string) =>
+    setData((d) => ({ ...d, depositorName }));
+
   function goNext() {
     const i = STEP_ORDER.indexOf(currentStep);
     if (i < 0 || i >= STEP_ORDER.length - 1) return;
@@ -98,6 +102,19 @@ export function ApplyClient() {
       if (typeof window !== "undefined") {
         window.scrollTo({ top: 0, behavior: "smooth" });
       }
+      return;
+    }
+    // cycle 1-D-A-4-5: Step5(payment) 진입 직전 재확인 = 위임 동의 3건 + 서명 정합 의무.
+    if (
+      nextStep === "payment" &&
+      (!data.agreedDelegation ||
+        !data.agreedPrivacy ||
+        !data.agreedTerms ||
+        !data.signature)
+    ) {
+      setSubmitError(
+        "Step4에서 위임 계약 동의와 서명을 완료해주세요.",
+      );
       return;
     }
     setSubmitError(null);
@@ -152,6 +169,11 @@ export function ApplyClient() {
           form.set("jointApplicantPhone", data.bidInfo.jointApplicantPhone);
         }
         form.set("isRebid", String(data.bidInfo.rebid));
+        // cycle 1-D-A-4-5: 입금자명 (Step5Payment / 사용자 입력 또는 applicantName default).
+        form.set(
+          "depositorName",
+          data.depositorName || data.bidInfo.applicantName,
+        );
         if (data.documents.eSignFile)
           form.set("eSignFile", data.documents.eSignFile);
         if (data.documents.idFile) form.set("idFile", data.documents.idFile);
@@ -259,6 +281,15 @@ export function ApplyClient() {
             data={data}
             onSignatureChange={setSignature}
             onAgreementChange={setAgreement}
+            onNext={goNext}
+            onBack={goBack}
+          />
+        );
+      case "payment":
+        return (
+          <Step5Payment
+            data={data}
+            onDepositorNameChange={setDepositorName}
             onSubmit={submit}
             onBack={goBack}
             submitting={submitting}

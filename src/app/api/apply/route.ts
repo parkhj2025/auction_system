@@ -61,6 +61,10 @@ export async function POST(req: Request) {
       (form.get("jointApplicantPhone") as string | null) ?? ""
     ).trim();
     const isRebid = form.get("isRebid") === "true";
+    // cycle 1-D-A-4-5: 입금자명 (Step5Payment / 사용자 입력 또는 applicantName default).
+    const depositorName = (
+      (form.get("depositorName") as string | null) ?? ""
+    ).trim();
     const eSignFile = form.get("eSignFile") as File | null;
     const idFile = form.get("idFile") as File | null;
     // Phase 4-CONFIRM: 사건 정보 4종 (매칭/manualEntry 모두 전송)
@@ -225,6 +229,9 @@ export async function POST(req: Request) {
         base_fee: baseFee,
         deposit_amount: depositAmount,
         status: "pending",
+        // cycle 1-D-A-4-5: 결제 paradigm 신규 — depositor_name + payment_status default.
+        depositor_name: depositorName || applicantName,
+        payment_status: "deposit_waiting",
       })
       .select("id, application_id")
       .single();

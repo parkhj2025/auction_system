@@ -36,8 +36,11 @@ export function SignatureModal({ onCancel, onConfirm }: Props) {
   const [signatureDataUrl, setSignatureDataUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    const prevOverflow = document.body.style.overflow;
+    // cycle 1-D-A-4-5 정정: body + html 동시 scroll lock paradigm (iOS Safari 정합).
+    const prevBodyOverflow = document.body.style.overflow;
+    const prevHtmlOverflow = document.documentElement.style.overflow;
     document.body.style.overflow = "hidden";
+    document.documentElement.style.overflow = "hidden";
     function onKey(e: KeyboardEvent) {
       // 강제 모달 paradigm 정수 = ESC 닫기 영구 폐기.
       if (e.key === "Escape") {
@@ -46,7 +49,8 @@ export function SignatureModal({ onCancel, onConfirm }: Props) {
     }
     window.addEventListener("keydown", onKey);
     return () => {
-      document.body.style.overflow = prevOverflow;
+      document.body.style.overflow = prevBodyOverflow;
+      document.documentElement.style.overflow = prevHtmlOverflow;
       window.removeEventListener("keydown", onKey);
     };
   }, []);
@@ -74,7 +78,8 @@ export function SignatureModal({ onCancel, onConfirm }: Props) {
           마우스 또는 손가락으로 아래 영역에 서명해주세요. 서명은 위임장
           입찰의뢰인 자리에 그대로 인쇄됩니다.
         </p>
-        <div className="mt-4">
+        {/* cycle 1-D-A-4-5 정정: canvas wrapper touchAction:none 명시 (Tailwind touch-none 외 안전망). */}
+        <div className="mt-4" style={{ touchAction: "none" }}>
           <SignatureCanvas
             onChange={setSignatureDataUrl}
             heightClass="h-48"

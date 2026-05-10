@@ -1021,18 +1021,28 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 
 ---
 
-## 28. Step4 광역 재구성 paradigm (cycle 1-D-A-4-4 신규, 2026-05-10)
+## 28. Step4 paradigm (cycle 1-D-A-4-5 정정 / cycle 1-D-A-4-4 산출 광역 회수 + 신규 정수)
 
-**의도**: Step4 = 입찰 정보 요약 + 위임인 서명 (별도) + 동의 + 수수료 + 제출 (양식 분리 + 아마추어) → **매수신청 대리 이용 계약서 (formal) + 서명 자리 inline + 동의 카드 + 수수료 inline + CTA** 정수 전환.
+**cycle 1-D-A-4-5 광역 회수 사항** (forward fix paradigm):
+- ContractAgreement.tsx inline 회수 → DelegationPreviewModal body component repurpose (modal 안 view 단독)
+- DelegationPreviewModal.tsx 폐기 결정 회수 → 회수 + 신규 (정보 모달 / max-w-720 / serif + bordered)
+- SignatureModal trigger = 마지막 동의 자동 pop 회수 → "✍ 서명하기" button click 단독 trigger paradigm
+- /api/preview-delegation route + PDFPreviewModal 폐기 보존 (HTML render 단독 paradigm 정수 / 신규 npm 영역 0)
+- FeeCalculator 폐기 보존 (사용처 0 정합)
+- src/lib/legal/contract.ts 단일 source 보존 (Lessons [A] 정합)
 
-**원칙 정수**:
-- ContractAgreement (formal 5조) = 당사자·사건·보수·위임·계약 광역 inline + 서명 자리 inline image 표기
-- 입찰 정보 요약 / 위임인 서명 별도 카드 영구 폐기 (ContractAgreement 안 흡수)
-- 동의 체크박스 3건 = 광역 정합 시점 SignatureModal 자동 pop paradigm (강제 모달 §31 정합)
-- "취소" click = lastCheckedAgreement 단독 회복 paradigm + 서명 image 회수
-- DelegationPreviewModal + PDFPreviewModal + /api/preview-delegation route + FeeCalculator 광역 폐기
+**의도**: Step4 = 위임 계약 + 서명 단계 (입금 안내 영역 폐기 → Step5Payment 신규 paradigm 정합).
 
-**ContractAgreement 카피 단일 source**: `src/lib/legal/contract.ts` 신규 (Lessons Learned [A] 정합).
+**원칙 정수 (정정 사후)**:
+- 신청 정보 요약 카드 (압축 / 법원·사건·매각기일·입찰가·신청인 단독)
+- "위임장 내용 보기" button → DelegationPreviewModal trigger (정보 모달 / max-w-720 / ContractAgreement body)
+- 동의 체크박스 3건 (위임 계약 + 개인정보 + 약관)
+- "✍ 서명하기" button → SignatureModal trigger (강제 모달 / 위임 계약 동의 enable gate)
+- 서명 사후 preview 카드 (h-20 image + "다시 서명" button paradigm)
+- 수수료 inline (Step2 차용 paradigm 보존)
+- 다음 CTA = "다음: 결제 →" (Step5Payment 진입 / 즉시 submit 영역 0)
+
+**ContractAgreement 카피 단일 source**: `src/lib/legal/contract.ts` (Lessons Learned [A] 정합).
 
 **5조 paradigm**:
 1. 당사자 정보 (입찰의뢰인 + 매수신청대리인 박형준 / 공인중개사 단독)
@@ -1046,16 +1056,18 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
    - 마. 민사집행법 제140조 (공유자 우선매수 신고)
 5. 계약 내용 (가·나·다·라 4영역 / 의무 + 책임 관계 + 회사 사항)
 
-**SignatureModal paradigm**:
+**SignatureModal paradigm (정정 4 강화)**:
 - 강제 모달 (영구 룰 §31 정합 / backdrop·ESC 닫기 영구 폐기)
 - 헤더 "서명을 진행해주세요" 18 black + 안내 paragraph + canvas h-48 + 취소·서명 완료 CTA 56
 - "서명 완료" disabled gate = 서명 영역 비어있음 시점 단독 (bg-gray-200 text-gray-400 cursor-not-allowed)
 - mount paradigm = 부모 조건부 mount (`{signatureModalOpen && <SignatureModal />}`) → 매 open fresh state (lint rule react-hooks/set-state-in-effect 정합)
+- **body + html 동시 scroll lock paradigm** (cycle 1-D-A-4-5 정정 / iOS Safari 정합)
+- **canvas wrapper `style={{ touchAction: 'none' }}` 명시** (Tailwind touch-none 외 안전망)
 
-**lastCheckedAgreement state paradigm**:
-- Step4Confirm 내부 useState<AgreementKey | null>(null)
-- 마지막 동의 click 시점 = setLastCheckedAgreement(key) + setSignatureModalOpen(true)
-- "취소" click 시점 = onAgreementChange(lastCheckedAgreement, false) + setLastCheckedAgreement(null) + onSignatureChange(null)
+**서명 trigger paradigm (정정 4 신규)**:
+- "✍ 서명하기" button click 단독 trigger (마지막 동의 자동 pop paradigm 영구 회수)
+- 위임 계약 동의 (체크박스 1번) = "서명하기" button enable gate paradigm
+- 사용자 의도 명시 paradigm = 자연 진행 + 광역 자유 paradigm 정합
 
 **시각 토큰 광역 정합** (Step1·2·3 일관성):
 - 카드 = rounded-2xl + border-gray-200 + bg-white + p-5 (광역 통일)
@@ -1066,20 +1078,91 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 - 제출 CTA = bg-brand-green text-white font-black + 카피 "신청 제출" + Send icon
 - yellow 강조 영역 0 (영구 룰 §8 정합)
 
-**사용자 광역 흐름 paradigm 6단계**:
-1. Step4 진입 → ContractAgreement (formal) + 동의 3 unchecked + 수수료 inline + 제출 disabled
-2. 사용자 체크박스 1·2 click → 진행 (allAgreed === false / 제출 disabled 보존)
-3. 마지막 체크박스 click → setLastCheckedAgreement(key) + allAgreed === true → SignatureModal 자동 pop (강제 모달)
-4. 서명 + "서명 완료" → onSignatureChange(dataUrl) + modal 닫힘 → 서명 자리 image 표기 + 제출 CTA enable
-5. "취소" click → modal 닫힘 + 직전 체크박스 unchecked + 서명 image 회수 + 제출 disabled 회귀
-6. 제출 CTA click → onSubmit (canSubmit logic 보존) → /api/apply + /api/orders/{id}/generate-delegation → Step5 진입
+**사용자 광역 흐름 paradigm 6단계 (정정 사후)**:
+1. Step4 진입 → 신청 정보 요약 + "위임장 내용 보기" button + 동의 3 unchecked + "서명하기" disabled + 수수료 inline + 다음 CTA disabled
+2. "위임장 내용 보기" click → DelegationPreviewModal pop (정보 모달 / serif + bordered + max-w-720)
+3. 동의 1 (위임 계약) check → "서명하기" button enable
+4. "서명하기" click → SignatureModal pop (강제 모달 / body+html scroll lock + canvas touchAction:none)
+5. 서명 + "서명 완료" → modal 닫힘 + 서명 preview 카드 (h-20 image + "다시 서명" button)
+6. 동의 2·3 check + "다음: 결제 →" click → Step5Payment 진입 (input 영역 0 / 결제 단독)
 
 **학습**:
 - formal 계약서 paradigm = 바토너 차용 + web search 정합 정정 (사용자 prompt §115 → 규칙 §2 / §142 → §115③+§142⑥ 정정)
 - 단일 source paradigm (legal/contract.ts) = HTML inline + 향후 PDF 양 source 일관성 보장 (Lessons [A] 정합)
 - mount paradigm 단순화 = 부모 조건부 mount 정수 (key prop + setState-in-effect 광역 회피)
 - 등록번호 영역 dom 폐기 paradigm = "Phase 10" 어휘 사용자 노출 NG (§32 정합) + 사업자등록 사후 신규 추가 paradigm
-- 광역 폐기 영역 (DelegationPreviewModal + PDFPreviewModal + /api/preview-delegation + FeeCalculator) = 신규 paradigm 사용처 0 사후 즉시 정리 (사용처 0 dead code 광역 회피)
+- inline ContractAgreement paradigm 회수 = Step4 분량 ↑ NG + 시각 위계 NG (cycle 1-D-A-4-4 결함 → 1-D-A-4-5 회수)
+- 자동 pop trigger paradigm 회수 = 사용자 의도 명시 trigger (button click 단독 paradigm 정수)
+- DelegationPreviewModal HTML render paradigm = PDF iframe 부담 ↓ + 단일 source 정수 (Lessons [A] 정합)
+
+---
+
+## 29. Step5Payment + Step5Complete paradigm (cycle 1-D-A-4-5 신규, 2026-05-10)
+
+**의도**: 신청 4-step (property·bid-info·documents·confirm) → **5-step (+ payment)** 광역 전환. "제출 = 끝" paradigm NG (사용자 인지 = "접수만 됐을 뿐 액션 NG") → "결제 = 신청 접수 사후" paradigm 정수.
+
+**Step5Payment 신규 paradigm**:
+- 위치 = currentStep "payment" (confirm → payment → complete)
+- 신청 정보 요약 카드 (사건번호·매각기일·입찰가·신청인·수수료)
+- 입금자명 input (default = bidInfo.applicantName / 사용자 수정 가능)
+- conditional render (`BANK_ACCOUNT.isConfigured` 분기):
+  - 사업자등록 사전 (env 미설정) = "카카오톡 직접 안내" 카피 단독 render
+  - 사업자등록 사후 (env 설정) = 입금 안내 카드 광역 (은행·계좌·예금주·금액·복사 button)
+- 신청 접수 CTA = onSubmit() trigger → /api/apply + /api/orders/{id}/generate-delegation → "complete" 진입
+
+**Step5Complete (Step6 conceptually) 신규 paradigm**:
+- 신청 접수 완료 헤더 (CheckCircle2 icon + 접수번호 GQ-YYYYMMDD-NNNN 친화 형식)
+- conditional render (`BANK_ACCOUNT.isConfigured` 분기):
+  - 사업자등록 사전 = "다음 단계" 카드 (대리인 카카오톡 직접 안내 paragraph)
+  - 사업자등록 사후 = 입금 안내 카드 (재 표기 / 입금자명 표기 추가)
+- 마이페이지 link ("/my/orders" / 카피 "내 신청 보기") + 홈 link
+
+**conditional render paradigm (BANK_ACCOUNT.isConfigured)**:
+```ts
+// src/lib/constants.ts
+export const BANK_ACCOUNT = {
+  bankName: process.env.NEXT_PUBLIC_BANK_NAME ?? "",
+  accountNumber: process.env.NEXT_PUBLIC_BANK_ACCOUNT_NUMBER ?? "",
+  accountHolder: process.env.NEXT_PUBLIC_BANK_ACCOUNT_HOLDER ?? "",
+  isConfigured: !!(env 3건 광역 설정),
+} as const;
+```
+
+env 갱신 paradigm:
+- 사업자등록 사전 (현재 Phase 1) = .env.local + Vercel env 미설정 → isConfigured === false → "카카오톡 직접 안내" 단독 render
+- 사업자등록 사후 = .env.local + Vercel env 설정 → isConfigured === true → 입금 안내 카드 광역 render
+- 코드 영역 0 / 형준님 .env 갱신 단독 paradigm (rebuild 사후 자동 반영)
+
+**ApplyClient state shape 갱신**:
+- depositorName (신규) = string (default "" / Step5Payment mount 시점 = applicantName 자동 fill)
+- paymentStatus = client state 영역 0 (server-side default "deposit_waiting" 단독 / form data 광역 0)
+- receiptNumber = applicationId server response 단독 (별도 client state 영역 0)
+
+**DB schema 갱신 (Lessons [D] 정합)**:
+- supabase/migrations/20260510_orders_payment_columns.sql 신규
+- supabase/schema.sql 동시 갱신
+- 신규 컬럼 광역:
+  - orders.payment_status TEXT NOT NULL DEFAULT 'deposit_waiting' CHECK ('deposit_waiting'·'deposit_confirmed'·'refunded')
+  - orders.depositor_name TEXT
+  - orders_payment_status_idx (admin 영역 filter 정수)
+- 형준님 수동 실행 의무 = Supabase Dashboard SQL Editor 붙여넣기 paradigm
+
+**사용자 광역 흐름 paradigm 8단계**:
+1. Step4 위임 계약 동의 + 서명 정합 시점 → "다음: 결제 →" CTA enable
+2. "다음: 결제 →" click → Step5Payment 진입
+3. Step5Payment 진입 = h2 + 신청 정보 요약 + 입금자명 input (applicantName default) + conditional render 카피 + "신청 접수 →" CTA
+4. 사용자 입금자명 확인 + "신청 접수 →" click → submit (/api/apply)
+5. server = orders insert (payment_status='deposit_waiting' + depositor_name 저장) + applicationId 발급 → /api/orders/{id}/generate-delegation 위임장 PDF 생성
+6. submit 정합 → currentStep 'complete' 진입
+7. Step5Complete 표기 = 접수 완료 + 접수번호 + conditional render (사전: 카카오톡 안내 / 사후: 입금 안내 재 표기)
+8. 사용자 마이페이지 link click → /my/orders 진입 (cycle 1-D-A-5 또는 별개 cycle 영역)
+
+**학습**:
+- "제출 = 끝" paradigm NG = 사용자 인지 부담 (다음 액션 영역 0 NG) → "결제 = 신청 접수 사후" paradigm 정수
+- conditional render paradigm = 코드 영역 0 + env 갱신 단독 paradigm (사업자등록 시점 자연 분기 정수)
+- depositorName paradigm = 입금 매칭 admin 영역 검증 source (사업자등록 사후 운영 정수)
+- payment_status server-side 단독 paradigm = client state tracking 영역 0 (단순 paradigm 정수)
+- 마이페이지 link paradigm = "/my/orders" 사전 예약 (cycle 1-D-A-5 또는 별개 cycle 신규 영역)
 
 ---
 
