@@ -936,6 +936,64 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 
 ---
 
+## 26. §31 모달 paradigm 분류 광역 (영구 룰 / cycle 1-D-A-4-3 보강 1 정정 2 신규, 2026-05-10)
+
+**강제 모달 paradigm 정수**:
+- ConfirmCaseModal (Step1 / 동의 paradigm)
+- BidConfirmModal (Step2 / 검증 paradigm)
+- backdrop click 닫기 영구 폐기
+- ESC 닫기 영구 폐기
+- 사용자 광역 강제 paradigm = "확인" CTA click 시점 단독 = 다음 단계 진입 paradigm
+- "취소" / "수정" 버튼 광역 보존 (사용자 광역 수정 paradigm 단독)
+
+**정보 모달 paradigm 정수**:
+- IssueGuideModal (Step3 / 정보 paradigm)
+- backdrop click 닫기 보존
+- ESC 닫기 보존
+- 사용자 광역 자유 paradigm = 정보 단독 노출 paradigm
+- "확인" CTA 단독 (취소 영역 0)
+
+**구분 paradigm**:
+- 강제 모달 = 사용자 광역 행동 강제 paradigm (다음 진입 + 의무 확인 + 검증 사후)
+- 정보 모달 = 사용자 광역 정보 단독 paradigm (자유 닫기 + 능동 click 노출)
+
+**Modal 토큰 광역 정합 (양 paradigm 공통)**:
+- max-w-[480px] + rounded-2xl + p-6 + bg-white
+- backdrop bg-black/50 + backdrop-blur-sm + px-5
+- 헤더 18 black ink-900
+- CTA 56 rounded-xl + brand-green text-white
+
+---
+
+## 27. Step2 BidConfirmModal paradigm (cycle 1-D-A-4-3 보강 1 정정 2 신규, 2026-05-10)
+
+**원칙 정수**:
+- 다음 CTA click 시점 = truncate 적용 + 검증 + BidConfirmModal pop paradigm
+- 즉시 onNext 영구 폐기 (사용자 인지 paradigm 정수)
+- "확인" click → onNext() (Step3 진입) paradigm
+- "수정" click → modal 닫힘 + bidAmount 광역 보존 paradigm
+
+**카피 paradigm**:
+- 헤더 = "입찰 금액을 확인해주세요"
+- 본문 = "{truncatedAmount.toLocaleString()}원" (24px font-black ink-900) + "한글 표기: {koreanAmount}" (14px ink-500) + "위 금액으로 입찰합니다." + "천원 이하 단위는 자동으로 정리됩니다."
+- CTA = "확인" + "수정"
+
+**시각 위계**:
+- 입찰 금액 = text-2xl (24px) font-black tabular-nums ink-900 (강조 paradigm)
+- 한글 표기 = text-sm (14px) ink-500 (sub paradigm)
+- 본문 paragraph 광역 = text-base leading-7 ink-700 + space-y-2.5
+
+**props paradigm**:
+- truncatedAmount: number (truncateBidAmount 사후 값)
+- koreanAmount: string (formatKoreanWon 사후 값)
+- onClose / onConfirm callback 광역
+
+**학습**:
+- 다음 CTA click 시점 즉시 onNext NG = 사용자 인지 paradigm 0 NG (cycle 1-D-A-4-3 보강 1 정정 2 정정)
+- 강제 모달 paradigm = 사용자 행동 강제 + 의무 확인 paradigm 정수 (ConfirmCaseModal + BidConfirmModal 광역 단일 paradigm)
+
+---
+
 ## Changelog
 
 | 버전 | 날짜 | 변경 |

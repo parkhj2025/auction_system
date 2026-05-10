@@ -7,6 +7,7 @@ import { ArrowLeft, ArrowRight, AlertCircle, HelpCircle } from "lucide-react";
 import type { ApplyFormData, ApplyBidInfo } from "@/types/apply";
 import { computeFee, formatPhone } from "@/lib/apply";
 import { cn, formatKoreanWon, truncateBidAmount } from "@/lib/utils";
+import { BidConfirmModal } from "../BidConfirmModal";
 
 export function Step2BidInfo({
   data,
@@ -23,6 +24,8 @@ export function Step2BidInfo({
   // cycle 1-D-A-4-3 보강 1 정정: attemptedNext state 광역 = 다음 CTA click 시점 단독 검증 paradigm.
   // mount 시점 + onChange 시점 + onBlur 시점 = error 광역 표시 영역 0 paradigm.
   const [attemptedNext, setAttemptedNext] = useState(false);
+  // cycle 1-D-A-4-3 보강 1 정정 2: BidConfirmModal pop paradigm (강제 모달 정수).
+  const [bidConfirmOpen, setBidConfirmOpen] = useState(false);
   const bid = data.bidInfo;
   const hasErrors = Object.keys(errors).length > 0;
   const showErrors = attemptedNext;
@@ -109,7 +112,8 @@ export function Step2BidInfo({
     // truncated 값 광역 검증 paradigm (state 갱신 전 closure 광역 직접 사용 정합).
     const result = validate(truncated);
     if (result.ok) {
-      onNext();
+      // cycle 1-D-A-4-3 보강 1 정정 2: 즉시 onNext 영구 폐기 → BidConfirmModal pop paradigm.
+      setBidConfirmOpen(true);
       return;
     }
     // Phase 6.4 회귀 수정: 첫 에러 필드로 scrollIntoView + focus.
@@ -121,6 +125,17 @@ export function Step2BidInfo({
       el?.scrollIntoView({ behavior: "smooth", block: "center" });
       el?.focus();
     }
+  }
+
+  // cycle 1-D-A-4-3 보강 1 정정 2: BidConfirmModal handler paradigm (강제 모달 정수).
+  function handleBidConfirm() {
+    setBidConfirmOpen(false);
+    onNext();
+  }
+
+  function handleBidCancel() {
+    // bidAmount 광역 보존 (사용자 광역 수정 paradigm).
+    setBidConfirmOpen(false);
   }
 
   function inputClass(key: string) {
@@ -468,6 +483,15 @@ export function Step2BidInfo({
           <ArrowRight size={16} aria-hidden="true" />
         </button>
       </div>
+
+      {/* cycle 1-D-A-4-3 보강 1 정정 2: 입찰 금액 확인 강제 모달 (검증 정합 사후 pop paradigm) */}
+      <BidConfirmModal
+        isOpen={bidConfirmOpen}
+        onClose={handleBidCancel}
+        onConfirm={handleBidConfirm}
+        truncatedAmount={truncateBidAmount(bidAmountNum)}
+        koreanAmount={formatKoreanWon(truncateBidAmount(bidAmountNum))}
+      />
     </div>
   );
 }
