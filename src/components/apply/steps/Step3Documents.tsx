@@ -35,7 +35,7 @@ export function Step3Documents({
         </p>
       </header>
 
-      {/* info 박스 layered paradigm: 첫 진입 사전 인지 (1줄) + button trigger → IssueGuideModal (5단계 상세).
+      {/* info 박스 layered paradigm: 첫 진입 사전 인지 (1줄) + button trigger → IssueGuideModal (양 서류 sequential 상세).
           곡률 = rounded-xl (12px) / 카드 rounded-2xl (16px) ⊃ info 박스 rounded-xl (12px) 시각 위계 SCALE. */}
       <div className="flex items-start gap-2 rounded-xl border border-[var(--color-border)] bg-[var(--color-surface-muted)] px-4 py-3">
         <Info
@@ -44,11 +44,7 @@ export function Step3Documents({
           aria-hidden="true"
         />
         <p className="text-sm leading-6 text-[var(--color-ink-700)]">
-          전자본인서명확인서는{" "}
-          <strong className="text-[var(--color-ink-900)]">
-            대법원 전자민원센터
-          </strong>
-          에서 발급받을 수 있어요.{" "}
+          매수신청 대리에 필요한 서류예요.{" "}
           <button
             type="button"
             onClick={() => setIssueGuideOpen(true)}
@@ -61,8 +57,8 @@ export function Step3Documents({
 
       <div className="flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-5">
         <FileUpload
-          label="전자본인서명확인서"
-          description="대법원 전자민원센터 발급 PDF"
+          label="인감증명서 또는 본인서명사실확인서"
+          description="둘 중 하나 발급해서 올려주세요"
           file={eSignFile}
           onFileChange={(f) => onDocumentsChange({ eSignFile: f })}
         />
@@ -103,11 +99,10 @@ export function Step3Documents({
         </button>
       </div>
 
-      {/* cycle 1-D-A-4-3: IssueGuideModal mount (courtName 동적 props paradigm) */}
+      {/* cycle 1-D-A-4-3 재진입: IssueGuideModal mount (courtName props 영구 폐기 / 양 서류 sequential paradigm) */}
       <IssueGuideModal
         isOpen={issueGuideOpen}
         onClose={() => setIssueGuideOpen(false)}
-        courtName={data.court}
       />
     </div>
   );

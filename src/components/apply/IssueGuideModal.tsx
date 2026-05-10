@@ -3,23 +3,26 @@
 import { useEffect } from "react";
 
 /**
- * cycle 1-D-A-4-3 — 전자본인서명확인서 발급 방법 안내 모달.
+ * cycle 1-D-A-4-3 재진입 — 첨부 서류 발급 방법 안내 모달.
  *
  * 정보 모달 paradigm 정수 (ConfirmCaseModal 강제 모달 paradigm 광역 분리):
  * - backdrop click 닫기 = 보존 (사용자 자유 paradigm)
  * - ESC 키 닫기 = 보존
  * - "확인" CTA 단독 (취소 영역 0)
  *
- * courtName 동적 props paradigm = COURTS_ALL + isServiced 플래그 광역 확장 paradigm 정합.
- * Phase 1 default = "인천지방법원" / 미래 cycle = isServiced 플래그 단독 갱신 / IssueGuideModal 변동 0.
+ * 양 서류 sequential paradigm:
+ * - 인감증명서 (주민센터 또는 무인발급기 / 1통 600원)
+ * - 본인서명사실확인서 (주민센터 / 무료)
+ * - 사용자 자유 선택 paradigm = section 광역 sequential 노출
+ *
+ * courtName props 영구 폐기 (정부24 paradigm 영구 폐기 정합 = 수요기관 영역 0).
  */
 interface Props {
   isOpen: boolean;
   onClose: () => void;
-  courtName: string;
 }
 
-export function IssueGuideModal({ isOpen, onClose, courtName }: Props) {
+export function IssueGuideModal({ isOpen, onClose }: Props) {
   useEffect(() => {
     if (!isOpen) return;
     const prevOverflow = document.body.style.overflow;
@@ -56,24 +59,33 @@ export function IssueGuideModal({ isOpen, onClose, courtName }: Props) {
           id="issue-guide-modal-title"
           className="text-lg font-black text-[var(--color-ink-900)]"
         >
-          전자본인서명확인서 발급 방법
+          발급 방법
         </h3>
-        <ol className="mt-4 list-decimal space-y-2 pl-5 text-base leading-7 text-[var(--color-ink-700)]">
-          <li>
-            대법원 전자민원센터 (
-            <span className="font-medium">ecfs.scourt.go.kr</span>) 접속
-          </li>
-          <li>공동인증서 또는 금융인증서로 로그인</li>
-          <li>&ldquo;전자본인서명확인서 발급&rdquo; 메뉴 선택</li>
-          <li>
-            수요기관 ={" "}
-            <strong className="text-[var(--color-ink-900)]">
-              {courtName} 집행관
-            </strong>{" "}
-            입력
-          </li>
-          <li>발급 PDF 다운로드 → 본 페이지 업로드</li>
-        </ol>
+
+        <section className="mt-4">
+          <h4 className="text-base font-bold text-[var(--color-ink-900)]">
+            인감증명서
+          </h4>
+          <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-sm leading-6 text-[var(--color-ink-700)]">
+            <li>가까운 주민센터 또는 무인발급기 방문</li>
+            <li>신분증 + 인감도장 지참</li>
+            <li>인감증명서 발급 (1통 600원)</li>
+            <li>발급 PDF 또는 스캔본 업로드</li>
+          </ol>
+        </section>
+
+        <section className="mt-5">
+          <h4 className="text-base font-bold text-[var(--color-ink-900)]">
+            본인서명사실확인서
+          </h4>
+          <ol className="mt-2 list-decimal space-y-1.5 pl-5 text-sm leading-6 text-[var(--color-ink-700)]">
+            <li>가까운 주민센터 방문</li>
+            <li>신분증 제출 + 전자패드 서명</li>
+            <li>본인서명사실확인서 발급 (무료)</li>
+            <li>발급 PDF 또는 스캔본 업로드</li>
+          </ol>
+        </section>
+
         <button
           type="button"
           onClick={onClose}

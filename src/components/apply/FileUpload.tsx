@@ -124,10 +124,10 @@ export function FileUpload({
             className="text-[var(--color-ink-500)]"
             aria-hidden="true"
           />
-          <p className="text-sm font-bold text-[var(--color-ink-700)]">
+          <p className="text-base font-bold text-[var(--color-ink-700)]">
             파일을 드래그하거나 클릭하여 선택
           </p>
-          <p className="text-[11px] text-[var(--color-ink-500)]">
+          <p className="text-xs text-[var(--color-ink-500)]">
             PDF · JPG · PNG · WebP · 최대 10MB
           </p>
         </label>
