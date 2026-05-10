@@ -293,6 +293,16 @@ export function ApplyClient() {
   const showSidebar =
     !!data.matchedListing && currentStep !== "complete";
 
+  // cycle 1-D-A-4 진단: parent state 광역 변동 추적 (production 회신 사후 광역 정정 paradigm).
+  console.log("[ApplyClient] render", {
+    has_matchedListing: !!data.matchedListing,
+    matchedListing_docid: data.matchedListing?.docid,
+    bidDate: data.bidDate,
+    propertyType: data.propertyType,
+    showSidebar,
+    currentStep,
+  });
+
   return (
     <>
       {/* cycle 1-D-A-2 = 하단 fixed bar paradigm. completed/caseNumber/court/bidDate/hasMatchedListing

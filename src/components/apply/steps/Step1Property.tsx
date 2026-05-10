@@ -109,14 +109,18 @@ export function Step1Property({
 
     setChecking(true);
     setMatchStatus("checking");
+    // cycle 1-D-A-4 진단: stage 단위 console 광역 (production 광역 회신 사후 광역 정정 paradigm).
+    console.log("[triggerLookup] start", { caseNumber: q, courtCode, courtName: data.court });
     try {
       const res = await fetch("/api/orders/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ caseNumber: q, courtCode, courtName: data.court }),
       });
+      console.log("[triggerLookup] res.status", res.status);
 
       if (res.status === 401) {
+        console.warn("[triggerLookup] 401 unauthenticated — silent return");
         setCaseTaken(false);
         setListings([]);
         setMatchStatus("idle");
@@ -129,6 +133,12 @@ export function Step1Property({
         listings?: CourtListingSummary[];
         case_status?: "active" | "closed" | "not_found";
       };
+      console.log("[triggerLookup] json", {
+        available: json.available,
+        case_status: json.case_status,
+        listings_length: json.listings?.length ?? 0,
+        listings_first: json.listings?.[0],
+      });
 
       setCaseTaken(json.available === false);
 
@@ -137,6 +147,7 @@ export function Step1Property({
 
       // cycle 1-D-A-4: case_status="closed" 분기 (종결 사건 광역 안내 + 차단).
       if (resultListings.length === 0 && json.case_status === "closed") {
+        console.log("[triggerLookup] branch=closed");
         setCaseClosed(true);
         setMatchStatus("idle");
         return;
@@ -144,6 +155,12 @@ export function Step1Property({
 
       if (resultListings.length === 1) {
         const l = resultListings[0];
+        console.log("[triggerLookup] branch=D (single match)", {
+          docid: l.docid,
+          case_number: l.case_number,
+          bid_date: l.bid_date,
+          auction_round: l.auction_round,
+        });
         setMatchStatus("idle");
         latestPatchRef.current({
           matchedListing: l,
@@ -155,9 +172,11 @@ export function Step1Property({
           caseConfirmedAt: null,
           auctionRound: l.auction_round,
         });
+        console.log("[triggerLookup] D branch patch applied");
       } else if (resultListings.length === 0) {
         // cycle 1-D-A-4: 대법원 fetch 단독 paradigm (Cowork 콘텐츠 매칭 광역 폐기).
         // 매칭 0건 → 3초 안내 사후 manualEntry 자동 진입.
+        console.log("[triggerLookup] branch=nomatch (0건 → 3초 → manualEntry)");
         setMatchStatus("nomatch");
         nomatchTimerRef.current = setTimeout(() => {
           latestPatchRef.current({
@@ -175,6 +194,7 @@ export function Step1Property({
         }, 3000);
       } else {
         // 복수 매칭 → 사용자가 selectListing으로 선택 대기
+        console.log("[triggerLookup] branch=multiple", { count: resultListings.length });
         setMatchStatus("idle");
         latestPatchRef.current({
           matchedListing: null,
@@ -187,7 +207,8 @@ export function Step1Property({
           auctionRound: 1,
         });
       }
-    } catch {
+    } catch (err) {
+      console.error("[triggerLookup] catch silent path", err);
       setCaseTaken(false);
       setListings([]);
       setMatchStatus("idle");
