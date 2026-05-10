@@ -223,12 +223,14 @@ export function Step1Property({
 
   return (
     <div className="flex flex-col gap-6">
+      {/* cycle 1-D-A-4-2 보강 1: h2 페이지 헤더 paradigm 신규 도입 (Toss/카뱅 모바일 앱 standard 정합).
+          sub = 단일 매칭 카드 헤더 카피 흡수 paradigm. */}
       <header>
-        <h2 className="text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
-          법원과 사건번호를 입력해주세요
+        <h2 className="text-2xl font-black leading-[1.2] tracking-[-0.015em] text-[var(--color-ink-900)]">
+          사건 정보 확인
         </h2>
-        <p className="mt-2 text-base leading-6 text-[var(--color-ink-700)]">
-          사건번호로 접수를 진행합니다.
+        <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
+          의뢰하실 사건 정보가 맞는지 확인해주세요
         </p>
       </header>
 
@@ -443,19 +445,14 @@ export function Step1Property({
       )}
 
       {/* 단일 카드 paradigm — 모바일 + 데스크탑 광역 동일 dom (§A-9 + §A-12 정합).
-          톤앤매너 일관성 광역 회수 = form 카드 paradigm 정합 (border border-gray-200 / bg-white / p-5).
-          헤더 + 주소 h2 + 사진 4-col + 데이터 grid-cols-2 + amber alert 통합 + 체크박스. */}
+          cycle 1-D-A-4-2 보강 1 = 카드 헤더 dom 영구 폐기 (h2 페이지 헤더 광역 sub로 흡수 정합).
+          톤앤매너 일관성 회수 = form 카드 paradigm 정합 (border border-gray-200 / bg-white / p-5). */}
       {listing && !caseTaken && (
         <div className="rounded-2xl border border-gray-200 bg-white p-5">
-          {/* 헤더 */}
-          <p className="text-base font-bold text-[var(--color-ink-900)]">
-            의뢰하실 사건 정보가 맞는지 확인해주세요
-          </p>
-
-          {/* 주소 h2 */}
-          <h2 className="mt-3 text-lg font-black tracking-tight text-[var(--color-ink-900)]">
+          {/* 주소 h3 (카드 안 헤더 dom 영구 폐기 / 주소 단독 첫 dom) */}
+          <h3 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
             {listing.address_display}
-          </h2>
+          </h3>
 
           {/* 사진 4-col 동등 grid (모바일 + 데스크탑 동일 paradigm) */}
           <PhotoGallery docid={listing.docid} />

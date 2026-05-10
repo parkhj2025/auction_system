@@ -737,6 +737,30 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 
 ---
 
+## 20. Step1 동의 step paradigm (cycle 1-D-A-4-2 보강 1, 2026-05-10)
+
+**의도**: Step1 = 동의 step paradigm 정수 = 체크박스 단독 trigger → ConfirmCaseModal → "확인" → Step2 자동 진입 paradigm. 페이지 헤더 (h2 + sub) + 카드 헤더 dom 폐기 + 백엔드 timestamp UI 노출 폐기. Toss/카뱅 모바일 앱 standard 정합.
+
+**광역 paradigm**:
+
+1. **h2 페이지 헤더** = "사건 정보 확인" + sub = "의뢰하실 사건 정보가 맞는지 확인해주세요"
+2. **단일 매칭 카드 = 카드 헤더 dom 0** (sub로 흡수)
+3. **체크박스 = ConfirmCaseModal trigger 단독**
+4. **modal "확인"** = setStep(2) 직접 진입 + form.confirmedAt 백엔드 timestamp 기록
+5. **modal "취소"** = checked 회복 + Step1 머무름
+6. **backdrop / ESC 닫기 = 영구 폐기** (확인/취소 단독 진입 강제)
+7. **Step1 본문 CTA dom 영구 폐기** (Step2~4 = 보존 / 보강 2 영역)
+8. **form.confirmedAt 백엔드 timestamp 보존** / UI 노출 영구 폐기 (학습 = 내부 백엔드 표현 UI 노출 NG)
+
+**Modal 토큰**:
+- backdrop = bg-black/50 + backdrop-blur-sm + px-5
+- max-w-[480px] + rounded-2xl + p-6 + bg-white
+- 헤더 18 black + ul 16 leading-7 + CTA 56 rounded-xl + 취소 ghost
+
+**다음 보강 (보강 2)**: Step2~4 광역 통합 (h2 페이지 헤더 + 회색 박스 + 카피 정제 + Step4 §A-9 정합 4건 / 통합 진입 적합).
+
+---
+
 ## Changelog
 
 | 버전 | 날짜 | 변경 |
