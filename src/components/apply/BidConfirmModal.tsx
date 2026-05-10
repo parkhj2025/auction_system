@@ -3,18 +3,20 @@
 import { useEffect } from "react";
 
 /**
- * cycle 1-D-A-4-3 보강 1 정정 2 — 입찰 금액 확인 모달.
+ * cycle 1-D-A-4-3 보강 1 정정 4 — 입찰 금액 확정 모달.
  *
  * 강제 모달 paradigm 정수 (ConfirmCaseModal paradigm 광역 정합):
  * - backdrop click 닫기 = 영구 폐기 (사용자 광역 행동 강제 paradigm)
  * - ESC 키 닫기 = 영구 폐기
- * - "확인" CTA = 다음 step 진입 paradigm
+ * - "확인" CTA = bidAmount truncate + bidConfirmed = true + Step2 머무름 paradigm
  * - "수정" CTA = modal 닫힘 + bidAmount 광역 보존 paradigm
  *
- * 흐름 paradigm:
- * - Step2 다음 CTA click → 검증 정합 사후 → modal pop
+ * 흐름 paradigm (정정 4 정수):
+ * - Step2 "입찰가 확정" CTA click → bidAmount 단독 검증 사후 → modal pop
  * - 사용자 광역 = 입찰 금액 정확값 + 한글 표기 광역 인지 paradigm
- * - "확인" → setStep(3) / "수정" → modal 닫힘 + Step2 머무름
+ * - "확인" → bidConfirmed = true + Step2 머무름 + "확정 완료 ✓" 시각 변동
+ * - "수정" → modal 닫힘 + bidAmount 광역 보존 + Step2 머무름
+ * - 다음 CTA = bidConfirmed === true 시점 단독 enable + setStep(3) 즉시 (modal pop 0)
  */
 interface Props {
   isOpen: boolean;

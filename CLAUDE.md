@@ -965,16 +965,30 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 
 ---
 
-## 27. Step2 BidConfirmModal paradigm (cycle 1-D-A-4-3 보강 1 정정 3 갱신, 2026-05-10)
+## 27. Step2 BidConfirmModal paradigm (cycle 1-D-A-4-3 보강 1 정정 4 갱신, 2026-05-10)
 
-**원칙 정수** (정정 사후):
-- 다음 CTA click 시점 = truncate 적용 + 검증 + BidConfirmModal pop paradigm
-- 즉시 setStep(3) 광역 폐기 (사용자 인지 paradigm 정수)
-- "확인" click → modal 닫힘 + Step2 머무름 paradigm (사용자 광역 truncate 갱신 input 인지 paradigm)
-- "수정" click → modal 닫힘 + bidAmount 광역 보존 paradigm (사용자 광역 수정 paradigm)
-- 사용자 광역 다음 CTA 사용자 직접 click 시점 = handleNextStep2 광역 = 다시 BidConfirmModal pop paradigm
+**원칙 정수** (정정 4 정수):
+- 다음 CTA + "입찰가 확정" CTA = 별개 action 분리 paradigm 정수
+- "입찰가 확정" CTA click 시점 = bidAmount 단독 검증 + BidConfirmModal pop paradigm
+- BidConfirmModal "확인" click → bidAmount truncate + setBidConfirmed(true) + modal 닫힘 + Step2 머무름 paradigm
+- BidConfirmModal "수정" click → modal 닫힘 + bidAmount 광역 보존 paradigm
+- 다음 CTA click 시점 = 모든 form validate + bidConfirmed === true → onNext() (Step3) 즉시 paradigm
+- 다음 CTA = modal pop logic 영역 0 (정정 3 click loop 결함 회수)
 
-**카피 paradigm**:
+**bidConfirmed state paradigm**:
+- Step2BidInfo 내부 useState(false) paradigm (props drilling 영역 0)
+- input bidAmount onChange 시점 = setBidConfirmed(false) 자동 회귀 paradigm (사용자 갱신 시점 재확인 의무)
+- modal "확인" click 시점 = setBidConfirmed(true) paradigm
+- 다음 CTA disabled gate = `(attemptedNext && hasErrors) || !bidConfirmed` paradigm
+
+**"입찰가 확정" CTA paradigm**:
+- 위치 = bidAmount input 아래 별도 row (helper text + 한글 표기 + error 사후)
+- 토큰 = `h-[var(--cta-h-app)] rounded-xl text-base font-black w-full mt-3`
+- bidAmountNum > 0 + bidConfirmed === false 시점 = bg-[var(--brand-green)] + 카피 "입찰가 확정"
+- bidConfirmed === true 시점 = bg-[var(--brand-green)] + 카피 "확정 완료" + lucide Check icon (size 18 / strokeWidth 3) + cursor-default + disabled
+- bidAmountNum <= 0 시점 = bg-gray-200 text-gray-400 cursor-not-allowed + disabled
+
+**카피 paradigm** (BidConfirmModal):
 - 헤더 = "입찰 금액을 확인해주세요"
 - 본문 = "{truncatedAmount.toLocaleString()}원" (24px font-black ink-900) + "한글 표기: {koreanAmount}" (14px ink-500) + "위 금액으로 입찰합니다." + "천원 이하 단위는 자동으로 정리됩니다."
 - CTA = "확인" + "수정"
@@ -989,19 +1003,21 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 - koreanAmount: string (formatKoreanWon 사후 값)
 - onClose / onConfirm callback 광역
 
-**사용자 광역 흐름 paradigm**:
-1. 입찰가 입력 (예: "244,449,999")
-2. 다음 CTA click → BidConfirmModal pop ("244,440,000원" 표기 + 한글 표기)
-3. "확인" click → modal 닫힘 + Step2 머무름 + input 광역 갱신 표기 ("244,440,000")
-4. 사용자 광역 truncate 갱신 input 광역 직접 인지
-5. 사용자 광역 다음 CTA 사용자 직접 click → 다시 BidConfirmModal pop (단순 paradigm)
-6. "확인" click → modal 닫힘 + Step2 머무름 (사용자 광역 = bidAmount 광역 변동 0 시점 = 동일 흐름 paradigm)
+**사용자 광역 흐름 paradigm 6단계** (정정 4 정수):
+1. input "100,000" 입력 → bidConfirmed = false 자동 회귀 + "입찰가 확정" CTA enable + 다음 CTA disabled
+2. "입찰가 확정" click → handleConfirmBid → bidAmount 단독 validate → modal pop ("100,000원" + 한글 표기)
+3. modal "확인" click → bidAmount truncate 갱신 + setBidConfirmed(true) + modal 닫힘 → "확정 완료 ✓" 시각 + 다음 CTA enable (모든 form 정합 시점)
+4. input "100,001" 재갱신 → bidConfirmed = false 자동 회귀 + "확정 완료 ✓" → "입찰가 확정" 회귀 + 다음 CTA disabled
+5. "입찰가 확정" 재 click → modal 재 pop → "확인" → 재 truncate + 재 확정
+6. 다음 CTA click → handleNext → 모든 form validate + bidConfirmed === true → onNext() → Step3 즉시 진입 (modal pop 0)
 
 **학습**:
 - 다음 CTA click 시점 즉시 setStep(3) 광역 = 사용자 인지 0 NG (cycle 1-D-A-4-3 보강 1 정정 2 정정)
 - BidConfirmModal "확인" click 시점 즉시 setStep(3) 광역 = 사용자 truncate 갱신 인지 0 NG (cycle 1-D-A-4-3 보강 1 정정 3 정정)
-- isConfirmed state 광역 추가 paradigm 영역 0 = 단순 paradigm 정수 보존 (사용자 광역 다시 확인 paradigm = 안전 paradigm 정합)
-- 강제 모달 paradigm = 사용자 행동 강제 + 의무 확인 + Step 머무름 paradigm 정수 (다음 단계 진입 = 사용자 광역 자유 paradigm 정합)
+- 다음 CTA = modal pop logic 광역 = click loop 영원 + Step3 진입 NG (cycle 1-D-A-4-3 보강 1 정정 3 결함 → 정정 4 회수)
+- 다음 CTA + "입찰가 확정" CTA 별개 action 분리 paradigm = 사용자 의도 분기 명확 + Step3 진입 단순 paradigm 정수
+- bidConfirmed state paradigm = 사용자 의도 명시 trigger paradigm (input onChange 자동 회귀 + 재확인 의무)
+- 강제 모달 paradigm = 사용자 행동 강제 + 의무 확인 + Step 머무름 paradigm 정수 (다음 단계 진입 = 별개 CTA 광역 자유 paradigm 정합)
 
 ---
 

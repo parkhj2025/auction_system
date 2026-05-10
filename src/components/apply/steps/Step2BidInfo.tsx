@@ -3,7 +3,7 @@
 // cycle 1-D-A-2 = 모바일 앱 form 토큰 + minPrice fallback (matchedListing) + belowMin enforcement.
 // cycle 1-D-A-4-2 = PhoneVerifyModal + VerifiedBadge + verifyModalOpen + inputsDisabled + handleVerified 광역 영구 폐기 (form fields 보존 / cycle 1-D-B 영역 정합).
 import { useEffect, useRef, useState } from "react";
-import { ArrowLeft, ArrowRight, AlertCircle, HelpCircle } from "lucide-react";
+import { ArrowLeft, ArrowRight, AlertCircle, Check, HelpCircle } from "lucide-react";
 import type { ApplyFormData, ApplyBidInfo } from "@/types/apply";
 import { computeFee, formatPhone } from "@/lib/apply";
 import { cn, formatKoreanWon, truncateBidAmount } from "@/lib/utils";
@@ -26,6 +26,9 @@ export function Step2BidInfo({
   const [attemptedNext, setAttemptedNext] = useState(false);
   // cycle 1-D-A-4-3 보강 1 정정 2: BidConfirmModal pop paradigm (강제 모달 정수).
   const [bidConfirmOpen, setBidConfirmOpen] = useState(false);
+  // cycle 1-D-A-4-3 보강 1 정정 4: bidConfirmed state 광역 = "입찰가 확정" CTA + modal "확인" 사후 true paradigm.
+  // input onChange 시점 = false 자동 회귀 paradigm = 사용자 광역 갱신 시점 재확인 의무.
+  const [bidConfirmed, setBidConfirmed] = useState(false);
   const bid = data.bidInfo;
   const hasErrors = Object.keys(errors).length > 0;
   const showErrors = attemptedNext;
@@ -100,37 +103,60 @@ export function Step2BidInfo({
     return { ok: Object.keys(next).length === 0, errors: next };
   }
 
-  function handleNext() {
-    // cycle 1-D-A-4-3 보강 1 정정: 다음 CTA click 시점 단독 검증 paradigm.
+  // cycle 1-D-A-4-3 보강 1 정정 4: "입찰가 확정" CTA → bidAmount 단독 검증 + modal pop paradigm.
+  // 다음 CTA logic 분리 정수 = modal pop logic 영역 0 + setStep 즉시 진입 단독 paradigm.
+  function handleConfirmBid() {
     setAttemptedNext(true);
-    // 입찰가 truncate paradigm (천원 이하 단위 0 자동 절삭).
+    const truncated = truncateBidAmount(bidAmountNum);
+    const isBelowMin = hasMinPrice && truncated > 0 && truncated < minPrice;
+    if (truncated <= 0 || isBelowMin) {
+      setErrors((prev) => ({
+        ...prev,
+        bidAmount:
+          truncated <= 0
+            ? "입찰 희망 금액을 입력해주세요."
+            : `최저가(${minPrice.toLocaleString("ko-KR")}원) 이상으로 입력해주세요.`,
+      }));
+      if (typeof document !== "undefined") {
+        const el = document.getElementById("bid-amount");
+        el?.scrollIntoView({ behavior: "smooth", block: "center" });
+        el?.focus();
+      }
+      return;
+    }
+    setBidConfirmOpen(true);
+  }
+
+  function handleNext() {
+    // cycle 1-D-A-4-3 보강 1 정정 4: 다음 CTA = 모든 form validate + bidConfirmed === true → onNext() 즉시 paradigm.
+    // BidConfirmModal pop logic 영역 0 = "입찰가 확정" CTA 단독 trigger paradigm.
+    setAttemptedNext(true);
+    const result = validate(bidAmountNum);
+    if (result.ok && bidConfirmed) {
+      onNext();
+      return;
+    }
+    if (!result.ok) {
+      const firstKey = Object.keys(result.errors)[0];
+      const elementId = ERROR_FIELD_TO_ID[firstKey];
+      if (elementId && typeof document !== "undefined") {
+        const el = document.getElementById(elementId);
+        el?.scrollIntoView({ behavior: "smooth", block: "center" });
+        el?.focus();
+      }
+    }
+  }
+
+  // cycle 1-D-A-4-3 보강 1 정정 4: BidConfirmModal handler paradigm.
+  // "확인" click → bidAmount truncate 갱신 + setBidConfirmed(true) + modal 닫힘 + Step2 머무름 paradigm.
+  // 사용자 광역 다음 CTA 시점 = setStep(3) 즉시 진입 (modal pop 0).
+  function handleBidConfirm() {
     const truncated = truncateBidAmount(bidAmountNum);
     const truncatedStr = truncated > 0 ? truncated.toLocaleString("ko-KR") : "";
     if (truncatedStr !== bid.bidAmount) {
       onBidInfoChange({ bidAmount: truncatedStr });
     }
-    // truncated 값 광역 검증 paradigm (state 갱신 전 closure 광역 직접 사용 정합).
-    const result = validate(truncated);
-    if (result.ok) {
-      // cycle 1-D-A-4-3 보강 1 정정 2: 즉시 onNext 영구 폐기 → BidConfirmModal pop paradigm.
-      setBidConfirmOpen(true);
-      return;
-    }
-    // Phase 6.4 회귀 수정: 첫 에러 필드로 scrollIntoView + focus.
-    // hasErrors disabled 게이트가 1차 방어, 본 scrollTo는 사용자가 어디 막혔는지 즉시 안내.
-    const firstKey = Object.keys(result.errors)[0];
-    const elementId = ERROR_FIELD_TO_ID[firstKey];
-    if (elementId && typeof document !== "undefined") {
-      const el = document.getElementById(elementId);
-      el?.scrollIntoView({ behavior: "smooth", block: "center" });
-      el?.focus();
-    }
-  }
-
-  // cycle 1-D-A-4-3 보강 1 정정 3: BidConfirmModal handler paradigm (강제 모달 + Step2 머무름 정수).
-  // setStep(3) / onNext() 광역 영구 폐기 paradigm = 사용자 광역 truncate 갱신 input 직접 인지 paradigm.
-  // 사용자 광역 다음 CTA 사용자 직접 click 시점 단독 = handleNext 광역 = 다시 BidConfirmModal pop paradigm.
-  function handleBidConfirm() {
+    setBidConfirmed(true);
     setBidConfirmOpen(false);
   }
 
@@ -184,12 +210,14 @@ export function Step2BidInfo({
                 value={bid.bidAmount}
                 onChange={(e) => {
                   // cycle 1-D-A-4-3 보강 1 정정: onChange = raw 보관 단독 (사용자 입력 시각 보존).
-                  // truncate paradigm = 다음 CTA click 시점 단독 (handleNext 광역).
+                  // truncate paradigm = "입찰가 확정" CTA click 시점 단독 (handleConfirmBid → modal "확인" → handleBidConfirm 광역).
+                  // cycle 1-D-A-4-3 보강 1 정정 4: bidConfirmed = false 자동 회귀 paradigm (사용자 광역 갱신 시점 재확인 의무).
                   const cleaned = e.target.value.replace(/[^\d]/g, "");
                   const num = parseInt(cleaned, 10) || 0;
                   onBidInfoChange({
                     bidAmount: num > 0 ? num.toLocaleString("ko-KR") : "",
                   });
+                  setBidConfirmed(false);
                   clearError("bidAmount");
                 }}
                 className={`${inputClass("bidAmount")} pr-12 tabular-nums`}
@@ -217,6 +245,33 @@ export function Step2BidInfo({
                 {errors.bidAmount}
               </p>
             )}
+            {/* cycle 1-D-A-4-3 보강 1 정정 4: "입찰가 확정" CTA 별도 row paradigm.
+                input 아래 = helper text + 한글 표기 + error 사후 위치 정합.
+                bidConfirmed false 시점 = "입찰가 확정" + handleConfirmBid trigger.
+                bidConfirmed true 시점 = "확정 완료 ✓" + disabled + cursor-default 시각 paradigm. */}
+            <button
+              type="button"
+              onClick={handleConfirmBid}
+              disabled={bidConfirmed || bidAmountNum <= 0}
+              className={cn(
+                "mt-3 inline-flex h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-xl px-5 text-base font-black transition-colors duration-200",
+                bidConfirmed
+                  ? "cursor-default bg-[var(--brand-green)] text-white"
+                  : bidAmountNum > 0
+                    ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)] active:scale-[0.98] active:bg-[var(--brand-green-deep)]"
+                    : "cursor-not-allowed bg-gray-200 text-gray-400",
+              )}
+              aria-label={bidConfirmed ? "입찰가 확정 완료" : "입찰가 확정"}
+            >
+              {bidConfirmed ? (
+                <>
+                  <Check size={18} aria-hidden="true" strokeWidth={3} />
+                  확정 완료
+                </>
+              ) : (
+                "입찰가 확정"
+              )}
+            </button>
           </div>
 
           {/* 신청인 (cycle 1-D-A-4-2 paradigm 회수: sm:grid 영구 폐기 → flex flex-col gap-4 단독) */}
@@ -472,10 +527,10 @@ export function Step2BidInfo({
         <button
           type="button"
           onClick={handleNext}
-          disabled={attemptedNext && hasErrors}
+          disabled={(attemptedNext && hasErrors) || !bidConfirmed}
           className={cn(
             "inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-xl px-8 text-base font-black transition-colors duration-150 sm:w-auto sm:px-10",
-            !(attemptedNext && hasErrors)
+            !((attemptedNext && hasErrors) || !bidConfirmed)
               ? "bg-[var(--brand-green)] text-white hover:bg-[var(--brand-green-deep)] active:scale-[0.98] active:bg-[var(--brand-green-deep)]"
               : "cursor-not-allowed bg-gray-200 text-gray-400",
           )}
