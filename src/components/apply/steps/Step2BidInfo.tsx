@@ -127,10 +127,11 @@ export function Step2BidInfo({
     }
   }
 
-  // cycle 1-D-A-4-3 보강 1 정정 2: BidConfirmModal handler paradigm (강제 모달 정수).
+  // cycle 1-D-A-4-3 보강 1 정정 3: BidConfirmModal handler paradigm (강제 모달 + Step2 머무름 정수).
+  // setStep(3) / onNext() 광역 영구 폐기 paradigm = 사용자 광역 truncate 갱신 input 직접 인지 paradigm.
+  // 사용자 광역 다음 CTA 사용자 직접 click 시점 단독 = handleNext 광역 = 다시 BidConfirmModal pop paradigm.
   function handleBidConfirm() {
     setBidConfirmOpen(false);
-    onNext();
   }
 
   function handleBidCancel() {

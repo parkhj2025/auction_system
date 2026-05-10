@@ -965,13 +965,14 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 
 ---
 
-## 27. Step2 BidConfirmModal paradigm (cycle 1-D-A-4-3 보강 1 정정 2 신규, 2026-05-10)
+## 27. Step2 BidConfirmModal paradigm (cycle 1-D-A-4-3 보강 1 정정 3 갱신, 2026-05-10)
 
-**원칙 정수**:
+**원칙 정수** (정정 사후):
 - 다음 CTA click 시점 = truncate 적용 + 검증 + BidConfirmModal pop paradigm
-- 즉시 onNext 영구 폐기 (사용자 인지 paradigm 정수)
-- "확인" click → onNext() (Step3 진입) paradigm
-- "수정" click → modal 닫힘 + bidAmount 광역 보존 paradigm
+- 즉시 setStep(3) 광역 폐기 (사용자 인지 paradigm 정수)
+- "확인" click → modal 닫힘 + Step2 머무름 paradigm (사용자 광역 truncate 갱신 input 인지 paradigm)
+- "수정" click → modal 닫힘 + bidAmount 광역 보존 paradigm (사용자 광역 수정 paradigm)
+- 사용자 광역 다음 CTA 사용자 직접 click 시점 = handleNextStep2 광역 = 다시 BidConfirmModal pop paradigm
 
 **카피 paradigm**:
 - 헤더 = "입찰 금액을 확인해주세요"
@@ -988,9 +989,19 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 - koreanAmount: string (formatKoreanWon 사후 값)
 - onClose / onConfirm callback 광역
 
+**사용자 광역 흐름 paradigm**:
+1. 입찰가 입력 (예: "244,449,999")
+2. 다음 CTA click → BidConfirmModal pop ("244,440,000원" 표기 + 한글 표기)
+3. "확인" click → modal 닫힘 + Step2 머무름 + input 광역 갱신 표기 ("244,440,000")
+4. 사용자 광역 truncate 갱신 input 광역 직접 인지
+5. 사용자 광역 다음 CTA 사용자 직접 click → 다시 BidConfirmModal pop (단순 paradigm)
+6. "확인" click → modal 닫힘 + Step2 머무름 (사용자 광역 = bidAmount 광역 변동 0 시점 = 동일 흐름 paradigm)
+
 **학습**:
-- 다음 CTA click 시점 즉시 onNext NG = 사용자 인지 paradigm 0 NG (cycle 1-D-A-4-3 보강 1 정정 2 정정)
-- 강제 모달 paradigm = 사용자 행동 강제 + 의무 확인 paradigm 정수 (ConfirmCaseModal + BidConfirmModal 광역 단일 paradigm)
+- 다음 CTA click 시점 즉시 setStep(3) 광역 = 사용자 인지 0 NG (cycle 1-D-A-4-3 보강 1 정정 2 정정)
+- BidConfirmModal "확인" click 시점 즉시 setStep(3) 광역 = 사용자 truncate 갱신 인지 0 NG (cycle 1-D-A-4-3 보강 1 정정 3 정정)
+- isConfirmed state 광역 추가 paradigm 영역 0 = 단순 paradigm 정수 보존 (사용자 광역 다시 확인 paradigm = 안전 paradigm 정합)
+- 강제 모달 paradigm = 사용자 행동 강제 + 의무 확인 + Step 머무름 paradigm 정수 (다음 단계 진입 = 사용자 광역 자유 paradigm 정합)
 
 ---
 
