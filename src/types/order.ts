@@ -18,12 +18,20 @@ export type FeeTier = "earlybird" | "standard" | "rush";
 
 export type DepositStatus = "pending" | "received" | "returned" | "forfeited";
 
+/**
+ * cycle 1-D-A-4-5 신규 — 수수료 입금 status enum.
+ * deposit_waiting (default) = 입금 대기 / deposit_confirmed = 입금 확인 (admin 수동) / refunded = 환불 (cycle 1-E 사후).
+ */
+export type PaymentStatus = "deposit_waiting" | "deposit_confirmed" | "refunded";
+
 export interface OrderRow {
   id: string;
   application_id: string;
   user_id: string;
 
   case_number: string;
+  /** 매각회차 (Phase 6.7.6 신규 column / 동일 사건 다른 회차 = 별개 접수 paradigm). */
+  auction_round: number;
   court: string;
   court_division: string | null;
   matched_slug: string | null;
@@ -47,6 +55,11 @@ export interface OrderRow {
   deposit_status: DepositStatus | null;
   deposit_received_at: string | null;
   deposit_returned_at: string | null;
+
+  /** cycle 1-D-A-4-5 신규 — 수수료 입금 status (admin 수동 갱신 paradigm). */
+  payment_status: PaymentStatus;
+  /** cycle 1-D-A-4-5 신규 — 입금자명 (Step5Payment 사용자 입력 / default = applicant_name). */
+  depositor_name: string | null;
 
   result: "won" | "lost" | "cancelled" | null;
   result_amount: number | null;
