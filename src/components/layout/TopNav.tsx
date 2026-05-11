@@ -9,16 +9,17 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/Logo";
 
-/* cycle 1-E-A-3-γ — TopNav 인증 button 단순화:
- * - "신청하기" CTA 영구 폐기 (Hero "조회하기" 단독 진입점 / 중복 회수)
- * - "로그인" + "회원가입" 통합 → "로그인" 단독 (Google OAuth handle_new_user trigger 자동 가입 paradigm)
- * - "로그인" button 시각 = primary CTA (brand-green solid + white text + font-bold)
- * - 모바일 상단 우측 = hamburger 단독
- * - 모바일 드로어 비로그인 = "로그인" 단독 button (primary CTA 시각 일관성)
+/* cycle 1-G-α — TopNav primary CTA "신청하기" 재추가 paradigm:
+ * - 산업 표준 8/8 사이트 광역 = primary CTA 메뉴 안 영구 노출 (Phase 2-A + 2-B 광역 일치)
+ * - 데스크탑 = "신청하기" 좌 + (UserMenu | "로그인") 우 (사전 cycle 1-A 보강 1+ paradigm 차용)
+ * - 모바일 상단 = hamburger 좌측 inline + "신청하기" button (사전 cycle 1-A 보강 1+ paradigm)
+ * - 모바일 드로어 비로그인 = "신청하기" + "로그인" 양 button (드로어 메뉴 사후)
+ * - "신청하기" + "로그인" 양 button 동일 brand-green solid 시각 (사전 cycle 1-E-A-3-γ "로그인" 영구 보존 / 시각 hierarchy 0 paradigm)
  *
- * cycle 1-E-A-3-β 영구 보존 paradigm:
+ * cycle 1-E-A-3-β·γ 영구 보존 paradigm:
  * - 모바일 드로어 로그인 시점 = 사용자 정보 + 마이페이지 + 내 정보 + (조건부) 관리자 + separator + 로그아웃 button
- * - 모바일 드로어 로그아웃 button = red-600 + 즉시 signOut 실행 (산업 표준 paradigm 정합)
+ * - 모바일 드로어 로그아웃 button = red-600 + 즉시 signOut 실행
+ * - "로그인" button 시각 영구 보존 (변경 0)
  */
 
 const TOPNAV_LINKS = [
@@ -89,6 +90,20 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
         </nav>
 
         <div className="flex items-center gap-2">
+          {/* 모바일 "신청하기" CTA (hamburger 좌측 inline / 사전 cycle 1-A 보강 1+ paradigm). */}
+          <Link
+            href="/apply"
+            className="inline-flex h-9 items-center justify-center rounded-full bg-[var(--brand-green)] px-3 text-[13px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 lg:hidden"
+          >
+            신청하기
+          </Link>
+          {/* 데스크탑 "신청하기" CTA (UserMenu / "로그인" button 좌측 inline). */}
+          <Link
+            href="/apply"
+            className="hidden h-10 items-center justify-center rounded-full bg-[var(--brand-green)] px-5 text-[15px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 lg:inline-flex"
+          >
+            신청하기
+          </Link>
           {user ? (
             <div className="hidden lg:flex lg:items-center">
               <UserMenu {...user} />
@@ -138,8 +153,16 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
             ))}
           </ul>
           {user ? (
-            <div className="mt-3 overflow-hidden rounded-2xl border border-[var(--border-1)]">
-              <div className="px-4 py-3">
+            <>
+              <Link
+                href="/apply"
+                onClick={() => setOpen(false)}
+                className="mt-3 flex min-h-12 items-center justify-center rounded-xl bg-[var(--brand-green)] px-4 text-[16px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)]"
+              >
+                신청하기
+              </Link>
+              <div className="mt-2 overflow-hidden rounded-2xl border border-[var(--border-1)]">
+                <div className="px-4 py-3">
                 <p className="truncate text-sm font-bold text-[var(--text-primary)]">
                   {user.displayName}
                 </p>
@@ -179,9 +202,17 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
               >
                 로그아웃
               </button>
-            </div>
+              </div>
+            </>
           ) : (
-            <div className="mt-3">
+            <div className="mt-3 flex flex-col gap-2">
+              <Link
+                href="/apply"
+                onClick={() => setOpen(false)}
+                className="flex min-h-12 items-center justify-center rounded-xl bg-[var(--brand-green)] px-4 text-[16px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)]"
+              >
+                신청하기
+              </Link>
               <Link
                 href="/login"
                 onClick={() => setOpen(false)}
