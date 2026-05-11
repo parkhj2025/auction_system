@@ -61,7 +61,7 @@ export default async function MyOrdersListPage() {
           </Link>
         </div>
       ) : (
-        <div className="mt-8 grid gap-4 sm:grid-cols-2">
+        <div className="mt-8 flex flex-col gap-3">
           {rows.map((order) => (
             <OrderCard key={order.id} order={order} />
           ))}

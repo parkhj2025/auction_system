@@ -85,3 +85,17 @@ export interface DocumentRow {
   created_at: string;
   deleted_at: string | null;
 }
+
+/**
+ * cycle 1-E-A-2 — order_status_log row type (StatusTimeline sub-label paradigm 광역).
+ * 광역 admin StatusLogHistory + 마이페이지 StatusTimeline 양 광역 단일 source paradigm 정합.
+ */
+export interface OrderStatusLogRow {
+  id: string;
+  order_id: string;
+  from_status: OrderStatus | null;
+  to_status: OrderStatus;
+  changed_by: string | null;
+  note: string | null;
+  created_at: string;
+}

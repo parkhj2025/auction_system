@@ -92,7 +92,7 @@ export default async function MyDashboardPage() {
         {active.length === 0 ? (
           <EmptyActive />
         ) : (
-          <div className="mt-4 grid gap-4 sm:grid-cols-2">
+          <div className="mt-4 flex flex-col gap-3">
             {active.map((order) => (
               <OrderCard key={order.id} order={order} />
             ))}
@@ -106,7 +106,7 @@ export default async function MyDashboardPage() {
           <h2 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
             최근 완료
           </h2>
-          <div className="mt-4 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="mt-4 flex flex-col gap-3">
             {completed.map((order) => (
               <OrderCard key={order.id} order={order} />
             ))}

@@ -10,6 +10,12 @@ import { cn } from "@/lib/utils";
 
 /**
  * 마이페이지 대시보드와 목록에서 공용으로 쓰는 주문 카드.
+ *
+ * cycle 1-E-A-2 paradigm 정수:
+ * - 1-col stacked layout 단독 (호출처 광역 grid → flex col 정정)
+ * - 카드 안 = 모바일 vertical stacking + 데스크탑 horizontal layout (sm:flex-row paradigm)
+ * - 4-field grid (모바일 2-col + 데스크탑 4-col) paradigm
+ * - ChevronRight icon 데스크탑 단독 (hidden sm:block paradigm)
  */
 export function OrderCard({ order }: { order: OrderRow }) {
   const snapshot = order.property_snapshot ?? {};
@@ -19,70 +25,87 @@ export function OrderCard({ order }: { order: OrderRow }) {
   return (
     <Link
       href={`/my/orders/${order.id}`}
-      className="group relative flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-5 transition hover:border-[var(--color-ink-900)] hover:shadow-[var(--shadow-card)]"
+      className="group relative flex min-h-11 flex-col gap-3 rounded-2xl border border-gray-200 bg-white p-5 transition-shadow hover:border-[var(--color-ink-900)] hover:shadow-md sm:flex-row sm:items-center sm:justify-between sm:gap-6"
     >
-      <div className="flex items-start justify-between gap-2">
-        <div className="min-w-0 flex-1">
-          <div className="flex items-center gap-2">
-            <span
-              className={cn(
-                "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-black",
-                getStatusBadgeClass(order.status)
-              )}
-            >
-              {getStatusLabel(order.status)}
-            </span>
-            <span className="truncate font-mono text-[11px] text-[var(--color-ink-500)]">
-              {order.application_id}
-            </span>
-          </div>
-          {/* 주문의 정체성은 콘텐츠 제목이 아니라 "법원 + 사건번호" */}
-          <p className="mt-2 text-xs font-bold text-[var(--color-ink-700)]">
-            {order.court}
-          </p>
-          <h3 className="mt-0.5 truncate font-mono text-[length:var(--text-body)] font-black tabular-nums text-[var(--color-ink-900)] sm:text-lg">
-            {order.case_number}
-          </h3>
+      {/* 정보 영역 1: 상태 + 사건번호 + 주소 */}
+      <div className="min-w-0 flex-1">
+        <div className="flex items-center gap-2">
+          <span
+            className={cn(
+              "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-black",
+              getStatusBadgeClass(order.status)
+            )}
+          >
+            {getStatusLabel(order.status)}
+          </span>
+          <span className="truncate font-mono text-[11px] text-[var(--color-ink-500)]">
+            {order.application_id}
+          </span>
         </div>
-        <ChevronRight
-          size={18}
-          className="mt-1 shrink-0 text-[var(--color-ink-500)] transition group-hover:text-[var(--color-ink-900)]"
-          aria-hidden="true"
-        />
+        <p className="mt-2 text-xs font-bold text-[var(--color-ink-700)]">
+          {order.court}
+        </p>
+        <h3 className="mt-0.5 truncate font-mono text-base font-bold tabular-nums text-[var(--color-ink-900)] sm:text-lg">
+          {order.case_number}
+        </h3>
+        {address && (
+          <p className="mt-1 truncate text-sm text-[var(--color-ink-500)]">
+            {address}
+          </p>
+        )}
       </div>
 
-      {address && (
-        <p className="truncate text-xs text-[var(--color-ink-700)]">{address}</p>
-      )}
-
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-3 border-t border-gray-200 pt-4 text-xs">
-        <div>
-          <dt className="text-[var(--color-ink-500)]">입찰가</dt>
-          <dd className="mt-0.5 font-black tabular-nums text-[var(--color-ink-900)]">
-            {formatKoreanWon(order.bid_amount)}
-          </dd>
-        </div>
-        {bidDate && (
-          <div>
-            <dt className="text-[var(--color-ink-500)]">입찰일</dt>
-            <dd className="mt-0.5 font-black tabular-nums text-[var(--color-ink-900)]">
-              {bidDate}
-            </dd>
-          </div>
-        )}
-        <div>
-          <dt className="text-[var(--color-ink-500)]">접수일</dt>
-          <dd className="mt-0.5 font-bold text-[var(--color-ink-700)]">
-            {formatKoreanDate(order.created_at)}
-          </dd>
-        </div>
-        <div>
-          <dt className="text-[var(--color-ink-500)]">수수료</dt>
-          <dd className="mt-0.5 font-bold tabular-nums text-[var(--color-ink-700)]">
-            {formatKoreanWon(order.base_fee)}
-          </dd>
-        </div>
+      {/* 정보 영역 2: 4-field 메타 (모바일 2-col + 데스크탑 4-col) */}
+      <dl className="grid grid-cols-2 gap-3 sm:grid-cols-4 sm:gap-6 sm:flex-shrink-0">
+        <Field
+          label="입찰가"
+          value={formatKoreanWon(order.bid_amount)}
+          mono
+        />
+        {bidDate && <Field label="입찰일" value={bidDate} mono />}
+        <Field
+          label="접수일"
+          value={formatKoreanDate(order.created_at)}
+        />
+        <Field
+          label="수수료"
+          value={formatKoreanWon(order.base_fee)}
+          mono
+        />
       </dl>
+
+      {/* ChevronRight: 데스크탑 단독 (모바일 영역 0) */}
+      <ChevronRight
+        size={20}
+        className="hidden shrink-0 text-[var(--color-ink-400)] transition group-hover:text-[var(--color-ink-900)] sm:block"
+        aria-hidden="true"
+      />
     </Link>
+  );
+}
+
+function Field({
+  label,
+  value,
+  mono,
+}: {
+  label: string;
+  value: string;
+  mono?: boolean;
+}) {
+  return (
+    <div>
+      <dt className="text-xs font-medium text-[var(--color-ink-500)]">
+        {label}
+      </dt>
+      <dd
+        className={cn(
+          "mt-0.5 text-sm font-bold text-[var(--color-ink-900)]",
+          mono && "tabular-nums"
+        )}
+      >
+        {value}
+      </dd>
+    </div>
   );
 }

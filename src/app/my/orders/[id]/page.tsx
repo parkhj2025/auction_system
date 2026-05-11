@@ -3,7 +3,11 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ChevronRight, Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import type { OrderRow, DocumentRow } from "@/types/order";
+import type {
+  OrderRow,
+  DocumentRow,
+  OrderStatusLogRow,
+} from "@/types/order";
 import {
   getStatusLabel,
   getStatusBadgeClass,
@@ -52,6 +56,14 @@ export default async function OrderDetailPage({
     .eq("order_id", id)
     .is("deleted_at", null)
     .order("created_at", { ascending: true });
+
+  // cycle 1-E-A-2 — StatusTimeline sub-label paradigm (각 step 광역 timestamp 표기)
+  const { data: statusLogsData } = await supabase
+    .from("order_status_log")
+    .select("*")
+    .eq("order_id", id)
+    .order("created_at", { ascending: true });
+  const statusLogs = (statusLogsData ?? []) as OrderStatusLogRow[];
 
   // 서류별 60초 signed URL 생성
   const rawDocs = (documents ?? []) as DocumentRow[];
@@ -139,7 +151,7 @@ export default async function OrderDetailPage({
           진행 상태
         </h2>
         <div className="mt-5">
-          <StatusTimeline status={row.status} />
+          <StatusTimeline status={row.status} statusLogs={statusLogs} />
         </div>
       </div>
 
