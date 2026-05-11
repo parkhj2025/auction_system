@@ -49,6 +49,20 @@ export default async function AdminDashboardPage() {
 
   const rows = (recent ?? []) as OrderRow[];
 
+  // cycle 1-E-B-ε-α — super_admin 광역 권한 검수 (AdminOrdersTable trash icon 진입 분기 paradigm)
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  let isSuperAdmin = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+    isSuperAdmin = profile?.role === "super_admin";
+  }
+
   // 통계 계산 — 작은 데이터셋이라 별도 쿼리 대신 클라이언트 집계로 충분.
   // 정확한 통계는 /admin/orders 필터로 확인하도록 유도.
   const { data: allActive } = await supabase
@@ -149,7 +163,7 @@ export default async function AdminDashboardPage() {
           </Link>
         </div>
         <div className="mt-4">
-          <AdminOrdersTable orders={rows} />
+          <AdminOrdersTable orders={rows} isSuperAdmin={isSuperAdmin} />
         </div>
       </div>
     </section>
