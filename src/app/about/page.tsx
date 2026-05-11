@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Image from "next/image";
 import Link from "next/link";
 import {
   ShieldCheck,
@@ -6,12 +7,14 @@ import {
   HandCoins,
   ArrowRight,
   Building2,
+  CheckCircle2,
+  XCircle,
 } from "lucide-react";
 import { COMPANY, COURTS_ACTIVE, COURTS_COMING_SOON } from "@/lib/constants";
 import { PageHero } from "@/components/common/PageHero";
 
 export const metadata: Metadata = {
-  title: "대표 소개",
+  title: "서비스 소개",
   description: `${COMPANY.name} 대표 ${COMPANY.ceo}. 공인중개사 자격 보유, 서울보증보험 가입. 경매 입찰 대리라는 단일 업무에 집중해 합리적인 가격으로 서비스를 제공합니다.`,
 };
 
@@ -47,6 +50,91 @@ export default function AboutPage() {
         }
         subtitle="5만원부터, 보증금 전용계좌 분리, D-1 할증 없이."
       />
+
+      {/* Hero 일러스트 (산업 표준 정합 / Hero 사후 광역 배치). */}
+      <section className="border-b border-[var(--color-border)] bg-white">
+        <div className="mx-auto w-full max-w-5xl px-5 py-10 sm:px-8 sm:py-14">
+          <div className="relative aspect-[16/10] w-full overflow-hidden rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-[var(--color-ink-50)]">
+            <Image
+              src="/illustrations/about-hero-v1.png"
+              alt="법원으로 향하는 공인중개사 일러스트"
+              fill
+              priority
+              sizes="(min-width: 1024px) 960px, 100vw"
+              className="object-cover"
+            />
+          </div>
+        </div>
+      </section>
+
+      {/* What 섹션 — 입찰 대리 단독 paradigm + 다른 분야 분리 명시 (§A-11 정합 / 사이트 본질 사전 노출). */}
+      <section className="border-t border-[var(--color-border)] bg-white">
+        <div className="mx-auto w-full max-w-5xl px-5 py-16 sm:px-8 sm:py-20">
+          <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
+            서비스
+          </p>
+          <h2 className="mt-2 text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
+            입찰 대리, <span className="text-[var(--brand-green)]">그 한 가지</span>만 합니다
+            <span style={{ color: "#FFD43B" }}>.</span>
+          </h2>
+          <p className="mt-3 max-w-3xl text-sm leading-7 text-[var(--color-ink-500)] sm:text-[length:var(--text-body)]">
+            경매퀵은 입찰 당일 법원에 가지 않아도 되도록, 공인중개사가 직접
+            법원에 출석해 입찰을 진행하는 서비스입니다.
+          </p>
+
+          {/* 3 카드 grid (1 강조 + 2 회색). */}
+          <div className="mt-10 grid gap-4 md:grid-cols-3">
+            <article className="rounded-[var(--radius-xl)] border-2 border-[var(--brand-green)] bg-white p-6 shadow-[var(--shadow-card)]">
+              <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-[var(--brand-green-soft)] text-[var(--brand-green)]">
+                <CheckCircle2 size={22} aria-hidden="true" />
+              </span>
+              <h3 className="mt-5 text-lg font-black tracking-tight text-[var(--color-ink-900)]">
+                입찰 대리
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-[var(--color-ink-700)]">
+                법원 출석 + 입찰표 작성 + 보증금 처리 광역 단독 수행
+              </p>
+            </article>
+            <article className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-ink-50)] p-6">
+              <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-white text-[var(--color-ink-300)]">
+                <XCircle size={22} aria-hidden="true" />
+              </span>
+              <h3 className="mt-5 text-lg font-black tracking-tight text-[var(--color-ink-500)]">
+                권리분석
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
+                전문가 영역 / 별도 의뢰 의무
+              </p>
+            </article>
+            <article className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-[var(--color-ink-50)] p-6">
+              <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-white text-[var(--color-ink-300)]">
+                <XCircle size={22} aria-hidden="true" />
+              </span>
+              <h3 className="mt-5 text-lg font-black tracking-tight text-[var(--color-ink-500)]">
+                명도·투자자문
+              </h3>
+              <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
+                전문가 영역 / 별도 의뢰 의무
+              </p>
+            </article>
+          </div>
+
+          {/* What 일러스트 (3 카드 사후 배치 / 시각 paradigm 정합). */}
+          <div className="relative mt-10 aspect-[16/6] w-full overflow-hidden rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white">
+            <Image
+              src="/illustrations/about-what-v1.png"
+              alt="입찰 대리 단독 서비스 paradigm 일러스트"
+              fill
+              sizes="(min-width: 1024px) 960px, 100vw"
+              className="object-cover"
+            />
+          </div>
+
+          <p className="mt-8 text-sm leading-7 text-[var(--color-ink-700)] sm:text-[length:var(--text-body)]">
+            범위를 좁힐수록 가격은 낮아지고, 품질은 올라갑니다.
+          </p>
+        </div>
+      </section>
 
       {/* Founder profile */}
       <section className="mx-auto w-full max-w-4xl px-5 py-16 sm:px-8 sm:py-20">
