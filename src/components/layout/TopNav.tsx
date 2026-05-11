@@ -9,16 +9,16 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/Logo";
 
-/* Stage 2 cycle 1-A 보강 1+ — TopNav "신청하기" CTA 신규 mount (conversion 파이프라인 강화).
- * 모바일 = hamburger 좌측 inline (Logo·CTA·hamburger 3 column 정합)
- * 데스크탑 = user/login 좌측 inline (광역 우측 CTA + user 정합)
- * 광역 별개 2 Link (className 분기 lg:hidden / hidden lg:inline-flex).
+/* cycle 1-E-A-3-γ — TopNav 인증 button 단순화:
+ * - "신청하기" CTA 영구 폐기 (Hero "조회하기" 단독 진입점 / 중복 회수)
+ * - "로그인" + "회원가입" 통합 → "로그인" 단독 (Google OAuth handle_new_user trigger 자동 가입 paradigm)
+ * - "로그인" button 시각 = primary CTA (brand-green solid + white text + font-bold)
+ * - 모바일 상단 우측 = hamburger 단독
+ * - 모바일 드로어 비로그인 = "로그인" 단독 button (primary CTA 시각 일관성)
  *
- * cycle 1-E-A-3-β paradigm:
- * - 비로그인 데스크탑 = "로그인" link + "회원가입" CTA (green brand) 양 paradigm
+ * cycle 1-E-A-3-β 영구 보존 paradigm:
  * - 모바일 드로어 로그인 시점 = 사용자 정보 + 마이페이지 + 내 정보 + (조건부) 관리자 + separator + 로그아웃 button
  * - 모바일 드로어 로그아웃 button = red-600 + 즉시 signOut 실행 (산업 표준 paradigm 정합)
- * - 모바일 드로어 로그인 시점 button (비로그인) = surface-muted bg + font-bold (시각 강화)
  */
 
 const TOPNAV_LINKS = [
@@ -89,39 +89,17 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
         </nav>
 
         <div className="flex items-center gap-2">
-          {/* 모바일 CTA (hamburger 좌측 inline). */}
-          <Link
-            href="/apply"
-            className="inline-flex h-9 items-center justify-center rounded-full bg-[var(--brand-green)] px-3 text-[13px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 lg:hidden"
-          >
-            신청하기
-          </Link>
-          {/* 데스크탑 CTA (user/login 좌측 inline). */}
-          <Link
-            href="/apply"
-            className="hidden h-10 items-center justify-center rounded-full bg-[var(--brand-green)] px-5 text-[15px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 lg:inline-flex"
-          >
-            신청하기
-          </Link>
           {user ? (
             <div className="hidden lg:flex lg:items-center">
               <UserMenu {...user} />
             </div>
           ) : (
-            <div className="hidden lg:flex lg:items-center lg:gap-2">
-              <Link
-                href="/login"
-                className="inline-flex h-10 items-center justify-center rounded-full px-4 text-[15px] font-medium text-[var(--text-secondary)] transition-colors duration-150 hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
-              >
-                로그인
-              </Link>
-              <Link
-                href="/login"
-                className="inline-flex h-10 items-center justify-center rounded-full border border-[var(--brand-green)] px-4 text-[15px] font-bold text-[var(--brand-green)] transition-colors duration-150 hover:bg-[var(--brand-green)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
-              >
-                회원가입
-              </Link>
-            </div>
+            <Link
+              href="/login"
+              className="hidden h-10 items-center justify-center rounded-full bg-[var(--brand-green)] px-5 text-[15px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 lg:inline-flex"
+            >
+              로그인
+            </Link>
           )}
           <button
             type="button"
@@ -203,20 +181,13 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
               </button>
             </div>
           ) : (
-            <div className="mt-3 flex flex-col gap-2">
+            <div className="mt-3">
               <Link
                 href="/login"
                 onClick={() => setOpen(false)}
-                className="flex min-h-12 items-center justify-center rounded-xl bg-[var(--bg-secondary)] px-4 text-[16px] font-bold text-[var(--text-primary)] transition-colors duration-150 hover:bg-[var(--color-ink-100)]"
+                className="flex min-h-12 items-center justify-center rounded-xl bg-[var(--brand-green)] px-4 text-[16px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)]"
               >
                 로그인
-              </Link>
-              <Link
-                href="/login"
-                onClick={() => setOpen(false)}
-                className="flex min-h-12 items-center justify-center rounded-xl border border-[var(--brand-green)] bg-white px-4 text-[16px] font-bold text-[var(--brand-green)] transition-colors duration-150 hover:bg-[var(--brand-green)] hover:text-white"
-              >
-                회원가입
               </Link>
             </div>
           )}

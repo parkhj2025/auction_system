@@ -36,7 +36,7 @@ const PROVIDERS: ProviderConfig[] = [
   },
   {
     id: "kakao",
-    label: "카카오로 시작하기",
+    label: "카카오로 계속하기",
     bgClass: "bg-[#FEE500] hover:bg-[#FEE500]",
     textClass: "text-[#1F1F1F]",
     borderClass: "border border-transparent",
@@ -44,7 +44,7 @@ const PROVIDERS: ProviderConfig[] = [
   },
   {
     id: "naver",
-    label: "네이버로 시작하기",
+    label: "네이버로 계속하기",
     bgClass: "bg-[#03C75A] hover:bg-[#03C75A]",
     textClass: "text-white",
     borderClass: "border border-transparent",

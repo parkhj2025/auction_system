@@ -36,7 +36,7 @@ export default async function LoginPage({
       <div className="w-full max-w-md">
         <div className="rounded-[var(--radius-2xl)] border border-[var(--color-border)] bg-white p-8 shadow-[var(--shadow-card)] sm:p-10">
           <h1 className="text-h3 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h2">
-            로그인
+            {BRAND_NAME}에 오신 것을 환영합니다
           </h1>
           <p className="mt-3 text-sm leading-6 text-[var(--color-ink-500)]">
             처음이신가요? 소셜 로그인 시 자동으로 가입됩니다.
