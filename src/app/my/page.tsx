@@ -2,27 +2,15 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { Inbox } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
-import type { OrderRow } from "@/types/order";
-import { OrderCard } from "@/components/my/OrderCard";
+import { MyStatsCards } from "@/components/my/MyStatsCards";
+import { STATUS_GROUPS } from "@/lib/order-status";
 
 export const dynamic = "force-dynamic";
 
 export const metadata: Metadata = {
-  title: "마이페이지",
-  description:
-    "내 접수 현황과 진행 상태를 한 곳에서 확인하세요. 진행 중 접수, 최근 완료, 내 정보 관리.",
+  title: "내 신청",
+  description: "신청 상태를 한눈에 확인하세요.",
 };
-
-const ACTIVE_STATUSES = [
-  "pending",
-  "confirmed",
-  "deposit_received",
-  "bidding",
-  "won",
-  "lost",
-] as const;
-
-const COMPLETED_STATUSES = ["settled", "deposit_returned", "cancelled"] as const;
 
 export default async function MyDashboardPage() {
   const supabase = await createClient();
@@ -33,28 +21,27 @@ export default async function MyDashboardPage() {
   // 미들웨어가 이미 보호하지만 타입 내로잉용 가드
   if (!user) return null;
 
-  const [{ data: activeOrders }, { data: completedOrders }] = await Promise.all(
-    [
-      supabase
-        .from("orders")
-        .select("*")
-        .eq("user_id", user.id)
-        .is("deleted_at", null)
-        .in("status", ACTIVE_STATUSES)
-        .order("created_at", { ascending: false }),
-      supabase
-        .from("orders")
-        .select("*")
-        .eq("user_id", user.id)
-        .is("deleted_at", null)
-        .in("status", COMPLETED_STATUSES)
-        .order("created_at", { ascending: false })
-        .limit(3),
-    ]
-  );
+  // cycle 1-E-A-2 — dashboard counts fetch (status + count 광역 단일 query / 클라이언트 집계)
+  const { data: ordersData } = await supabase
+    .from("orders")
+    .select("status")
+    .eq("user_id", user.id)
+    .is("deleted_at", null);
 
-  const active = (activeOrders ?? []) as OrderRow[];
-  const completed = (completedOrders ?? []) as OrderRow[];
+  const orders = (ordersData ?? []) as Array<{ status: string }>;
+  const totalCount = orders.length;
+
+  const countOf = (groupKey: keyof typeof STATUS_GROUPS) =>
+    orders.filter((o) =>
+      (STATUS_GROUPS[groupKey] as readonly string[]).includes(o.status)
+    ).length;
+
+  const counts = {
+    in_progress: countOf("in_progress"),
+    pending: countOf("pending"),
+    completed: countOf("completed"),
+    all: totalCount,
+  };
 
   return (
     <section className="mx-auto w-full max-w-5xl px-5 py-10 sm:px-8 sm:py-12">
@@ -64,8 +51,11 @@ export default async function MyDashboardPage() {
             My Page
           </p>
           <h1 className="mt-2 text-2xl font-black tracking-[-0.015em] leading-[1.2] text-[var(--color-ink-900)] sm:text-3xl">
-            접수 현황
+            내 신청
           </h1>
+          <p className="mt-2 text-sm text-[var(--color-ink-500)]">
+            신청 상태를 한눈에 확인하세요.
+          </p>
         </div>
         <Link
           href="/my/profile"
@@ -75,42 +65,11 @@ export default async function MyDashboardPage() {
         </Link>
       </header>
 
-      {/* 진행 중 접수 */}
-      <div className="mt-10">
-        <div className="flex items-baseline justify-between">
-          <h2 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
-            진행 중
-          </h2>
-          <Link
-            href="/my/orders"
-            className="text-xs font-bold text-[var(--color-ink-900)] hover:text-black"
-          >
-            전체 내역 보기
-          </Link>
-        </div>
-
-        {active.length === 0 ? (
-          <EmptyActive />
-        ) : (
-          <div className="mt-4 flex flex-col gap-3">
-            {active.map((order) => (
-              <OrderCard key={order.id} order={order} />
-            ))}
-          </div>
-        )}
-      </div>
-
-      {/* 최근 완료 */}
-      {completed.length > 0 && (
-        <div className="mt-12">
-          <h2 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
-            최근 완료
-          </h2>
-          <div className="mt-4 flex flex-col gap-3">
-            {completed.map((order) => (
-              <OrderCard key={order.id} order={order} />
-            ))}
-          </div>
+      {totalCount === 0 ? (
+        <EmptyActive />
+      ) : (
+        <div className="mt-8">
+          <MyStatsCards counts={counts} />
         </div>
       )}
     </section>
@@ -119,7 +78,7 @@ export default async function MyDashboardPage() {
 
 function EmptyActive() {
   return (
-    <div className="mt-4 flex flex-col items-center justify-center gap-4 rounded-[var(--radius-xl)] border border-dashed border-[var(--color-border)] bg-[var(--color-surface-muted)] px-6 py-12 text-center">
+    <div className="mt-10 flex flex-col items-center justify-center gap-4 rounded-[var(--radius-xl)] border border-dashed border-[var(--color-border)] bg-[var(--color-surface-muted)] px-6 py-12 text-center">
       <Inbox
         size={32}
         className="text-[var(--color-ink-500)]"

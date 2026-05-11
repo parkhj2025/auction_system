@@ -86,6 +86,68 @@ export function isActiveStatus(status: OrderStatus): boolean {
 }
 
 /**
+ * cycle 1-E-A-2 — OrderStatus → StatusGroup mapping paradigm (단일 source / Lessons [A] 정합).
+ * /my dashboard MyStatsCards 광역 + /my/orders FilterChips 광역 양 광역 단일 source paradigm.
+ */
+export type StatusGroup =
+  | "in_progress"
+  | "pending"
+  | "completed"
+  | "cancelled"
+  | "all";
+
+export const STATUS_GROUPS: Record<StatusGroup, OrderStatus[]> = {
+  in_progress: ["confirmed", "deposit_received", "bidding", "won", "lost"],
+  pending: ["pending"],
+  completed: ["deposit_returned", "settled"],
+  cancelled: ["cancelled"],
+  all: [
+    "pending",
+    "confirmed",
+    "deposit_received",
+    "bidding",
+    "won",
+    "lost",
+    "deposit_returned",
+    "settled",
+    "cancelled",
+  ],
+};
+
+export const STATUS_GROUP_LABEL: Record<StatusGroup, string> = {
+  in_progress: "진행 중",
+  pending: "입금 대기",
+  completed: "완료",
+  cancelled: "취소",
+  all: "전체",
+};
+
+export function getStatusGroup(status: OrderStatus): Exclude<StatusGroup, "all"> {
+  if (status === "pending") return "pending";
+  if (status === "cancelled") return "cancelled";
+  if (
+    status === "confirmed" ||
+    status === "deposit_received" ||
+    status === "bidding" ||
+    status === "won" ||
+    status === "lost"
+  ) {
+    return "in_progress";
+  }
+  return "completed";
+}
+
+export function isValidStatusGroup(value: string): value is StatusGroup {
+  return (
+    value === "in_progress" ||
+    value === "pending" ||
+    value === "completed" ||
+    value === "cancelled" ||
+    value === "all"
+  );
+}
+
+/**
  * 타임라인 6단계 정의. StatusTimeline 컴포넌트에서 사용.
  */
 export const TIMELINE_STEPS = [
