@@ -266,6 +266,50 @@ export const APPLY_STEPS = [
 
 export type ApplyStepId = (typeof APPLY_STEPS)[number]["id"];
 
+/**
+ * cycle 1-G-β 재시작 — /about 차별화 5축 paradigm (Values 영구 폐기 사후 신규).
+ * paradigm: 5 카드 = 큰 숫자 + title + body + colored bg (브랜드 색 분기).
+ */
+export const DIFFERENTIATORS = [
+  {
+    id: "price",
+    bigNumber: "5만원",
+    title: "업계 평균 대비 절반 수준",
+    body: "콘텐츠 기반 유입 구조로 마케팅 비용을 줄여 절반 수준의 수수료를 책정했습니다.",
+    tone: "green",
+  },
+  {
+    id: "deposit",
+    bigNumber: "100%",
+    title: "보증금 전용계좌 분리",
+    body: "고객 보증금은 전용계좌로 분리 관리하며 패찰 시 당일 즉시 반환됩니다.",
+    tone: "yellow",
+  },
+  {
+    id: "rush",
+    bigNumber: "D-1",
+    title: "할증 없이 동일 가격",
+    body: "급한 일정에도 정찰제 가격을 그대로 적용합니다. 추가 비용 없음.",
+    tone: "green",
+  },
+  {
+    id: "agent",
+    bigNumber: "1인",
+    title: "공인중개사가 직접 입찰",
+    body: "박형준 대표가 인천지방법원에 직접 출석해 입찰을 수행합니다.",
+    tone: "ink",
+  },
+  {
+    id: "channel",
+    bigNumber: "24h",
+    title: "카카오톡으로 직접 소통",
+    body: "신청부터 결과까지 카카오톡으로 직접 안내드립니다. 콜센터 0.",
+    tone: "yellow",
+  },
+] as const;
+
+export type DifferentiatorTone = (typeof DIFFERENTIATORS)[number]["tone"];
+
 /* Phase 1.2 (A-1-2) v6 — InsightBlock 카테고리 색 시스템.
  * 4 카테고리: 무료 물건분석 (green) / 가이드 (blue) / 시장 인사이트 (orange) / 낙찰사례 (purple). */
 export type InsightCategoryKey = "analysis" | "guide" | "insight" | "cases";
