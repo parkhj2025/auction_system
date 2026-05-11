@@ -5,6 +5,7 @@ import {
   getStatusBadgeClass,
 } from "@/lib/order-status";
 import { formatKoreanWon, formatKoreanDate, cn } from "@/lib/utils";
+import { SoftDeletedBadge } from "./SoftDeletedBadge";
 
 /**
  * 관리자용 접수 테이블. 데스크톱은 테이블, 모바일은 카드 리스트.
@@ -48,14 +49,17 @@ export function AdminOrdersTable({ orders }: { orders: OrderRow[] }) {
                   className="border-t border-[var(--color-border)] hover:bg-[var(--color-ink-100)]/40"
                 >
                   <Td>
-                    <span
-                      className={cn(
-                        "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-black",
-                        getStatusBadgeClass(o.status)
-                      )}
-                    >
-                      {getStatusLabel(o.status)}
-                    </span>
+                    <div className="flex items-center gap-1.5">
+                      <span
+                        className={cn(
+                          "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-black",
+                          getStatusBadgeClass(o.status)
+                        )}
+                      >
+                        {getStatusLabel(o.status)}
+                      </span>
+                      {o.deleted_at && <SoftDeletedBadge />}
+                    </div>
                   </Td>
                   <Td>
                     <span className="font-mono text-xs text-[var(--color-ink-700)]">
@@ -113,14 +117,17 @@ export function AdminOrdersTable({ orders }: { orders: OrderRow[] }) {
               className="flex flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white p-4 transition hover:border-[var(--color-ink-900)]"
             >
               <div className="flex items-center justify-between gap-2">
-                <span
-                  className={cn(
-                    "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-black",
-                    getStatusBadgeClass(o.status)
-                  )}
-                >
-                  {getStatusLabel(o.status)}
-                </span>
+                <div className="flex items-center gap-1.5">
+                  <span
+                    className={cn(
+                      "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-black",
+                      getStatusBadgeClass(o.status)
+                    )}
+                  >
+                    {getStatusLabel(o.status)}
+                  </span>
+                  {o.deleted_at && <SoftDeletedBadge />}
+                </div>
                 <span className="font-mono text-[10px] text-[var(--color-ink-500)]">
                   {o.application_id}
                 </span>

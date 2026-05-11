@@ -35,10 +35,10 @@ export default async function AdminOrdersListPage({
   const activeFilter = (rawStatus ?? "all") as OrderStatus | "all";
 
   const supabase = await createClient();
+  // cycle 1-E-B-β — admin = 광역 view paradigm (deleted_at filter 영역 0 / soft delete case 광역 회수 정수)
   let query = supabase
     .from("orders")
     .select("*")
-    .is("deleted_at", null)
     .order("created_at", { ascending: false });
 
   if (activeFilter !== "all") {

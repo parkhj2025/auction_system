@@ -34,10 +34,14 @@ export function truncateBidAmount(value: number): number {
   return Math.floor(value / 10000) * 10000;
 }
 
-/** "2026-04-13" → "2026.04.13" */
+/**
+ * "2026-04-13" 또는 "2026-04-13T13:50:32.306Z" 광역 → "2026.04.13" 회수 paradigm.
+ * cycle 1-E-B-β — ISO raw 광역 광역 광역 paradigm (created_at 광역 timestamptz raw 광역 호출처 광역 일관 정합).
+ */
 export function formatKoreanDate(iso: string): string {
   if (!iso) return "";
-  const [y, m, d] = iso.split("-");
+  const datePart = iso.slice(0, 10);
+  const [y, m, d] = datePart.split("-");
   if (!y || !m || !d) return iso;
   return `${y}.${m}.${d}`;
 }

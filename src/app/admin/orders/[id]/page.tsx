@@ -16,6 +16,7 @@ import { SsnDeleteButton } from "@/components/admin/SsnDeleteButton";
 import { StatusLogHistory } from "@/components/admin/StatusLogHistory";
 import { KakaoNotifyButton } from "@/components/admin/KakaoNotifyButton";
 import { OrderDeleteButton } from "@/components/admin/OrderDeleteButton";
+import { SoftDeletedBadge } from "@/components/admin/SoftDeletedBadge";
 import { formatKoreanWon, formatKoreanDate, cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -34,11 +35,11 @@ export default async function AdminOrderDetailPage({
   const { id } = await params;
   const supabase = await createClient();
 
+  // cycle 1-E-B-β — admin = 광역 view paradigm (deleted_at filter 영역 0 / soft delete case 광역 detail 진입 정합)
   const { data: order } = await supabase
     .from("orders")
     .select("*")
     .eq("id", id)
-    .is("deleted_at", null)
     .maybeSingle();
 
   if (!order) notFound();
@@ -139,6 +140,7 @@ export default async function AdminOrderDetailPage({
           >
             {getStatusLabel(row.status)}
           </span>
+          {row.deleted_at && <SoftDeletedBadge />}
           <span className="font-mono text-xs text-[var(--color-ink-500)]">
             {row.application_id}
           </span>
