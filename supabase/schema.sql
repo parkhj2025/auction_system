@@ -312,13 +312,12 @@ DROP POLICY IF EXISTS "orders_admin_update" ON public.orders;
 CREATE POLICY "orders_admin_update" ON public.orders
   FOR UPDATE USING ((select public.is_admin()));
 
--- cycle 1-E-B-α — super_admin 단독 hard delete + 3중 안전망 (status='cancelled' + deleted_at NOT NULL)
+-- cycle 1-E-B-ε — super_admin 단독 hard delete (status 조건 광역 제거 / 광역 status 강제 paradigm 정수)
+-- 실수 회피 paradigm = super_admin 단독 권한 + OrderDeleteModal application_id 정확 입력 강제 광역
 DROP POLICY IF EXISTS "orders_super_admin_delete" ON public.orders;
 CREATE POLICY "orders_super_admin_delete" ON public.orders
   FOR DELETE USING (
     (select public.is_super_admin())
-    AND status = 'cancelled'
-    AND deleted_at IS NOT NULL
   );
 
 

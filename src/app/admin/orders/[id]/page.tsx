@@ -330,8 +330,8 @@ export default async function AdminOrderDetailPage({
         </div>
       </div>
 
-      {/* cycle 1-E-B-α — super_admin 단독 hard delete (status='cancelled' 정합 시점 단독) */}
-      {row.status === "cancelled" && isSuperAdmin && (
+      {/* cycle 1-E-B-ε — super_admin 단독 hard delete (status 조건 광역 제거 / 강제 modal application_id 정확 입력 실수 회피 paradigm) */}
+      {isSuperAdmin && (
         <div className="mt-10 flex flex-col items-start gap-3 rounded-2xl border border-red-200 bg-red-50/40 p-5">
           <div>
             <h2 className="text-base font-black tracking-tight text-red-600">

@@ -46,14 +46,19 @@ export async function DELETE(
     const { data: isSuperAdmin } = await supabase.rpc("is_super_admin");
     if (isSuperAdmin !== true) {
       return NextResponse.json(
-        { ok: false, error: "최고 관리자 권한이 필요합니다." },
+        {
+          ok: false,
+          error: "주문을 영구 삭제하시려면 super_admin 권한이 필요합니다.",
+        },
         { status: 403 }
       );
     }
 
+    // cycle 1-E-B-ε — status + deleted_at 검증 광역 제거 (광역 status 강제 hard delete paradigm 정수).
+    // 실수 회피 paradigm = super_admin 단독 권한 + OrderDeleteModal application_id 정확 입력 강제 광역 충분.
     const { data: order, error: loadError } = await supabase
       .from("orders")
-      .select("id, user_id, status, deleted_at")
+      .select("id, user_id")
       .eq("id", id)
       .maybeSingle();
 
@@ -61,26 +66,6 @@ export async function DELETE(
       return NextResponse.json(
         { ok: false, error: "주문을 찾을 수 없습니다." },
         { status: 404 }
-      );
-    }
-
-    if (order.status !== "cancelled") {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: "취소된 주문만 영구 삭제할 수 있습니다.",
-        },
-        { status: 400 }
-      );
-    }
-
-    if (order.deleted_at === null) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: "취소 처리가 완료된 주문만 영구 삭제할 수 있습니다.",
-        },
-        { status: 400 }
       );
     }
 

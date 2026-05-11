@@ -106,7 +106,7 @@ export function AdminOrdersTable({
                       >
                         상세 →
                       </Link>
-                      {o.status === "cancelled" && isSuperAdmin && (
+                      {isSuperAdmin && (
                         <OrderDeleteButton
                           orderId={o.id}
                           applicationId={o.application_id}
