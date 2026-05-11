@@ -16,13 +16,12 @@ export function DepositStatus({ order }: { order: OrderRow }) {
   const amount = order.deposit_amount;
   if (amount === null) {
     return (
-      <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-sm">
-        <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
+      <div className="rounded-2xl border border-gray-200 bg-white p-5">
+        <h3 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
           보증금
         </h3>
         <p className="mt-3 text-sm leading-6 text-[var(--color-ink-500)]">
-          수동 접수로 감정가가 확정되지 않아 보증금 금액이 아직 산출되지
-          않았습니다. 접수 확인 시 알림을 보내드립니다.
+          감정가 확정 대기 중입니다. 확정 시 알림을 보내드립니다.
         </p>
       </div>
     );
@@ -32,8 +31,8 @@ export function DepositStatus({ order }: { order: OrderRow }) {
   const rebidLabel = order.is_rebid ? "감정가의 20% (재경매)" : "감정가의 10%";
 
   return (
-    <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-sm">
-      <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5">
+      <h3 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
         보증금
       </h3>
 

@@ -35,7 +35,7 @@ export default async function MyOrdersListPage() {
         <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
           Orders
         </p>
-        <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
+        <h1 className="mt-2 text-2xl font-black tracking-[-0.015em] leading-[1.2] text-[var(--color-ink-900)] sm:text-3xl">
           전체 접수 내역
         </h1>
         <p className="mt-2 text-sm text-[var(--color-ink-500)]">

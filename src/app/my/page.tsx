@@ -63,7 +63,7 @@ export default async function MyDashboardPage() {
           <p className="text-xs font-black uppercase tracking-wider text-[var(--color-ink-900)]">
             My Page
           </p>
-          <h1 className="mt-2 text-h2 font-black tracking-tight text-[var(--color-ink-900)] sm:text-h1">
+          <h1 className="mt-2 text-2xl font-black tracking-[-0.015em] leading-[1.2] text-[var(--color-ink-900)] sm:text-3xl">
             접수 현황
           </h1>
         </div>
@@ -130,15 +130,15 @@ function EmptyActive() {
           아직 접수 내역이 없습니다
         </p>
         <p className="mt-1 text-xs text-[var(--color-ink-500)]">
-          물건분석을 둘러보고 입찰 대리를 신청해보세요.
+          경매 인사이트를 둘러보고 입찰 대리를 신청해보세요.
         </p>
       </div>
       <div className="flex flex-col gap-2 sm:flex-row">
         <Link
-          href="/analysis"
+          href="/insight"
           className="inline-flex min-h-11 items-center rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-900)] hover:border-[var(--color-ink-900)] hover:text-black"
         >
-          물건분석 보기
+          경매 인사이트 보기
         </Link>
         <Link
           href="/apply"

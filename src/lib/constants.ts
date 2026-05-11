@@ -50,6 +50,14 @@ export const PRIVACY_CONTACT =
   process.env.NEXT_PUBLIC_PRIVACY_CONTACT ??
   "연락처 준비 중 (사업자등록 후 갱신)";
 
+/**
+ * 고객지원 이메일. cycle 1-E-A 신규 = 마이페이지 "고객지원" mailto link paradigm.
+ * 사업자등록 후 NEXT_PUBLIC_SUPPORT_EMAIL 환경변수로 실제 값 교체 (코드 영역 0).
+ */
+export const MOCKUP_SUPPORT_EMAIL = "support@auctionquick.kr";
+export const SUPPORT_EMAIL =
+  process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? MOCKUP_SUPPORT_EMAIL;
+
 export const COMPANY = {
   name: BRAND_NAME,
   ceo: "박형준",

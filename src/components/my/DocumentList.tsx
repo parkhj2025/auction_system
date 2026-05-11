@@ -18,8 +18,8 @@ function formatFileSize(bytes: number): string {
 export function DocumentList({ documents }: { documents: DocumentWithUrl[] }) {
   if (documents.length === 0) {
     return (
-      <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-sm">
-        <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
+      <div className="rounded-2xl border border-gray-200 bg-white p-5">
+        <h3 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
           제출 서류
         </h3>
         <p className="mt-3 text-sm text-[var(--color-ink-500)]">
@@ -30,8 +30,8 @@ export function DocumentList({ documents }: { documents: DocumentWithUrl[] }) {
   }
 
   return (
-    <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-sm">
-      <h3 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
+    <div className="rounded-2xl border border-gray-200 bg-white p-5">
+      <h3 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
         제출 서류
       </h3>
       <ul className="mt-4 flex flex-col gap-2">
@@ -58,7 +58,7 @@ export function DocumentList({ documents }: { documents: DocumentWithUrl[] }) {
                 href={doc.signedUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex min-h-10 items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-white px-3 text-xs font-bold text-[var(--color-ink-900)] hover:border-[var(--color-ink-900)] hover:text-black"
+                className="inline-flex min-h-11 items-center gap-1.5 rounded-[var(--radius-sm)] border border-[var(--color-border)] bg-white px-3 text-sm font-bold text-[var(--color-ink-900)] hover:border-[var(--color-ink-900)] hover:text-black"
               >
                 <Download size={14} aria-hidden="true" />
                 열기

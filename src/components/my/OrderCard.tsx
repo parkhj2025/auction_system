@@ -19,7 +19,7 @@ export function OrderCard({ order }: { order: OrderRow }) {
   return (
     <Link
       href={`/my/orders/${order.id}`}
-      className="group relative flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-5 shadow-sm transition hover:border-[var(--color-ink-900)] hover:shadow-[var(--shadow-card)]"
+      className="group relative flex flex-col gap-4 rounded-2xl border border-gray-200 bg-white p-5 transition hover:border-[var(--color-ink-900)] hover:shadow-[var(--shadow-card)]"
     >
       <div className="flex items-start justify-between gap-2">
         <div className="min-w-0 flex-1">
@@ -55,7 +55,7 @@ export function OrderCard({ order }: { order: OrderRow }) {
         <p className="truncate text-xs text-[var(--color-ink-700)]">{address}</p>
       )}
 
-      <dl className="grid grid-cols-2 gap-x-4 gap-y-3 border-t border-[var(--color-border)] pt-4 text-xs">
+      <dl className="grid grid-cols-2 gap-x-4 gap-y-3 border-t border-gray-200 pt-4 text-xs">
         <div>
           <dt className="text-[var(--color-ink-500)]">입찰가</dt>
           <dd className="mt-0.5 font-black tabular-nums text-[var(--color-ink-900)]">

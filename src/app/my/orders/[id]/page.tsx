@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ChevronRight, MessageCircle } from "lucide-react";
+import { ChevronRight, Mail } from "lucide-react";
 import { createClient } from "@/lib/supabase/server";
 import type { OrderRow, DocumentRow } from "@/types/order";
 import {
@@ -12,6 +12,7 @@ import {
 import { StatusTimeline } from "@/components/my/StatusTimeline";
 import { DepositStatus } from "@/components/my/DepositStatus";
 import { DocumentList } from "@/components/my/DocumentList";
+import { SUPPORT_EMAIL } from "@/lib/constants";
 import { formatKoreanWon, formatKoreanDate, cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -108,7 +109,7 @@ export default async function OrderDetailPage({
           <p className="mt-3 text-sm font-bold text-[var(--color-ink-700)]">
             {row.court}
           </p>
-          <h1 className="mt-1 font-mono text-h3 font-black tabular-nums tracking-tight text-[var(--color-ink-900)] sm:text-h2">
+          <h1 className="mt-1 font-mono text-2xl font-black tabular-nums tracking-[-0.015em] leading-[1.2] text-[var(--color-ink-900)] sm:text-3xl">
             {row.case_number}
           </h1>
           <p className="mt-2 text-sm text-[var(--color-ink-500)]">
@@ -124,19 +125,17 @@ export default async function OrderDetailPage({
           )}
         </div>
         <a
-          href="https://pf.kakao.com/"
-          target="_blank"
-          rel="noopener noreferrer"
+          href={`mailto:${SUPPORT_EMAIL}`}
           className="inline-flex min-h-11 items-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-4 text-sm font-bold text-[var(--color-ink-900)] hover:border-[var(--color-ink-900)] hover:text-black"
         >
-          <MessageCircle size={16} aria-hidden="true" />
-          카카오톡 문의
+          <Mail size={16} aria-hidden="true" />
+          고객지원
         </a>
       </header>
 
       {/* 상태 타임라인 */}
-      <div className="mt-8 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-sm">
-        <h2 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
+      <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-5">
+        <h2 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
           진행 상태
         </h2>
         <div className="mt-5">
@@ -148,8 +147,8 @@ export default async function OrderDetailPage({
         {/* 왼쪽: 물건 + 입찰 정보 */}
         <div className="flex flex-col gap-6">
           {/* 물건 정보 */}
-          <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-sm">
-            <h2 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <h2 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
               물건 정보
             </h2>
             <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-4 text-sm sm:grid-cols-3">
@@ -200,15 +199,15 @@ export default async function OrderDetailPage({
             </dl>
             {row.manual_entry && (
               <p className="mt-4 rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] px-3 py-2 text-xs text-[var(--color-ink-500)]">
-                수동 입력으로 접수된 건입니다. 물건 상세는 접수 확인 시
-                알림을 보내드립니다.
+                확인 대기 중입니다. 물건 상세는 접수 확인 시 알림을
+                보내드립니다.
               </p>
             )}
           </div>
 
           {/* 입찰 정보 */}
-          <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-sm">
-            <h2 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <h2 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
               입찰 정보
             </h2>
             <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-4 text-sm">
@@ -254,8 +253,8 @@ export default async function OrderDetailPage({
           </div>
 
           {/* 수수료 */}
-          <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-sm">
-            <h2 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <h2 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
               수수료
             </h2>
             <div className="mt-4 flex flex-col gap-2 sm:flex-row sm:items-end sm:justify-between">
