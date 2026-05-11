@@ -2,18 +2,24 @@
 
 import Link from "next/link";
 import { useState, useEffect } from "react";
-import { Menu, X, User } from "lucide-react";
+import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserMenu, type UserMenuProps } from "@/components/auth/UserMenu";
+import { LogoutConfirmModal } from "@/components/auth/LogoutConfirmModal";
 import { Logo } from "@/components/Logo";
 
 /* Stage 2 cycle 1-A 보강 1+ — TopNav "신청하기" CTA 신규 mount (conversion 파이프라인 강화).
  * 모바일 = hamburger 좌측 inline (Logo·CTA·hamburger 3 column 정합)
  * 데스크탑 = user/login 좌측 inline (광역 우측 CTA + user 정합)
- * 광역 별개 2 Link (className 분기 lg:hidden / hidden lg:inline-flex). */
+ * 광역 별개 2 Link (className 분기 lg:hidden / hidden lg:inline-flex).
+ *
+ * cycle 1-E-A-3 paradigm:
+ * - 비로그인 데스크탑 = "로그인" link + "회원가입" CTA (green brand) 양 paradigm
+ * - 모바일 드로어 로그인 시점 = 사용자 정보 + 마이페이지 + 내 정보 + (조건부) 관리자 + separator + 로그아웃 button
+ * - 모바일 드로어 로그아웃 button = red-600 + LogoutConfirmModal trigger
+ * - 모바일 드로어 로그인 시점 button (비로그인) = surface-muted bg + font-bold (시각 강화)
+ */
 
-/* TopNav 본질 nav links (v5 Q5 형준님 결정 — 낙찰사례 폐기 + 경매 인사이트 메인).
- * lib/navigation.ts PRIMARY_NAV (모바일 drawer 본질) 본질 보존. */
 const TOPNAV_LINKS = [
   { href: "/about", label: "서비스 소개" },
   { href: "/service", label: "이용 절차" },
@@ -24,6 +30,7 @@ const TOPNAV_LINKS = [
 export function TopNav({ user }: { user: UserMenuProps | null }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const [logoutOpen, setLogoutOpen] = useState(false);
 
   /* scroll 8px+ 시 border 본질 추가 (Linear paradigm). */
   useEffect(() => {
@@ -46,6 +53,11 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
       window.removeEventListener("keydown", onKey);
     };
   }, [open]);
+
+  function handleMobileLogoutClick() {
+    setOpen(false);
+    setLogoutOpen(true);
+  }
 
   return (
     <header
@@ -73,14 +85,14 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
         </nav>
 
         <div className="flex items-center gap-2">
-          {/* Stage 2 cycle 1-A 보강 1+ — 모바일 CTA (hamburger 좌측 inline). */}
+          {/* 모바일 CTA (hamburger 좌측 inline). */}
           <Link
             href="/apply"
             className="inline-flex h-9 items-center justify-center rounded-full bg-[var(--brand-green)] px-3 text-[13px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 lg:hidden"
           >
             신청하기
           </Link>
-          {/* Stage 2 cycle 1-A 보강 1+ — 데스크탑 CTA (user/login 좌측 inline). */}
+          {/* 데스크탑 CTA (user/login 좌측 inline). */}
           <Link
             href="/apply"
             className="hidden h-10 items-center justify-center rounded-full bg-[var(--brand-green)] px-5 text-[15px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 lg:inline-flex"
@@ -92,13 +104,18 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
               <UserMenu {...user} />
             </div>
           ) : (
-            <div className="hidden lg:flex lg:items-center">
+            <div className="hidden lg:flex lg:items-center lg:gap-2">
               <Link
                 href="/login"
-                className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-[var(--border-1)] text-[var(--text-secondary)] transition-colors duration-150 hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
-                aria-label="로그인"
+                className="inline-flex h-10 items-center justify-center rounded-full px-4 text-[15px] font-medium text-[var(--text-secondary)] transition-colors duration-150 hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
               >
-                <User size={18} strokeWidth={1.75} />
+                로그인
+              </Link>
+              <Link
+                href="/login"
+                className="inline-flex h-10 items-center justify-center rounded-full border border-[var(--brand-green)] px-4 text-[15px] font-bold text-[var(--brand-green)] transition-colors duration-150 hover:bg-[var(--brand-green)] hover:text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
+              >
+                회원가입
               </Link>
             </div>
           )}
@@ -139,34 +156,73 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
             ))}
           </ul>
           {user ? (
-            <div className="mt-3 rounded-2xl border border-[var(--border-1)] px-4 py-3">
-              <p className="truncate text-sm font-bold text-[var(--text-primary)]">
-                {user.displayName}
-              </p>
-              {user.email && (
-                <p className="mt-0.5 truncate text-xs text-[var(--text-secondary)]">
-                  {user.email}
+            <div className="mt-3 overflow-hidden rounded-2xl border border-[var(--border-1)]">
+              <div className="px-4 py-3">
+                <p className="truncate text-sm font-bold text-[var(--text-primary)]">
+                  {user.displayName}
                 </p>
-              )}
+                {user.email && (
+                  <p className="mt-0.5 truncate text-xs text-[var(--text-secondary)]">
+                    {user.email}
+                  </p>
+                )}
+              </div>
               <Link
                 href="/my"
                 onClick={() => setOpen(false)}
-                className="mt-3 flex min-h-11 items-center justify-center rounded-xl border border-[var(--border-1)] px-4 text-sm font-semibold text-[var(--text-secondary)] transition-colors duration-150 hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]"
+                className="flex min-h-12 items-center border-t border-[var(--border-1)] px-4 text-[15px] font-semibold text-[var(--text-primary)] transition-colors duration-150 hover:bg-[var(--bg-secondary)]"
               >
                 마이페이지
               </Link>
+              <Link
+                href="/my/profile"
+                onClick={() => setOpen(false)}
+                className="flex min-h-12 items-center border-t border-[var(--border-1)] px-4 text-[15px] font-semibold text-[var(--text-primary)] transition-colors duration-150 hover:bg-[var(--bg-secondary)]"
+              >
+                내 정보
+              </Link>
+              {user.isAdmin && (
+                <Link
+                  href="/admin"
+                  onClick={() => setOpen(false)}
+                  className="flex min-h-12 items-center border-t border-[var(--border-1)] px-4 text-[15px] font-bold text-[var(--text-primary)] transition-colors duration-150 hover:bg-[var(--bg-secondary)]"
+                >
+                  관리자
+                </Link>
+              )}
+              <button
+                type="button"
+                onClick={handleMobileLogoutClick}
+                className="flex min-h-12 w-full items-center border-t border-[var(--border-1)] px-4 text-left text-[15px] font-semibold text-red-600 transition-colors duration-150 hover:bg-red-50 hover:text-red-700"
+              >
+                로그아웃
+              </button>
             </div>
           ) : (
-            <Link
-              href="/login"
-              onClick={() => setOpen(false)}
-              className="mt-3 flex min-h-12 items-center justify-center rounded-xl border border-[var(--border-1)] px-4 text-[16px] font-semibold text-[var(--text-secondary)] transition-colors duration-150 hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]"
-            >
-              로그인
-            </Link>
+            <div className="mt-3 flex flex-col gap-2">
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className="flex min-h-12 items-center justify-center rounded-xl bg-[var(--bg-secondary)] px-4 text-[16px] font-bold text-[var(--text-primary)] transition-colors duration-150 hover:bg-[var(--color-ink-100)]"
+              >
+                로그인
+              </Link>
+              <Link
+                href="/login"
+                onClick={() => setOpen(false)}
+                className="flex min-h-12 items-center justify-center rounded-xl border border-[var(--brand-green)] bg-white px-4 text-[16px] font-bold text-[var(--brand-green)] transition-colors duration-150 hover:bg-[var(--brand-green)] hover:text-white"
+              >
+                회원가입
+              </Link>
+            </div>
           )}
         </div>
       </div>
+
+      <LogoutConfirmModal
+        open={logoutOpen}
+        onClose={() => setLogoutOpen(false)}
+      />
     </header>
   );
 }
