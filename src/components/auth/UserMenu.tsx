@@ -90,7 +90,7 @@ export function UserMenu({ displayName, email, initial, isAdmin }: UserMenuProps
                 className="block px-4 py-2.5 text-sm font-medium text-[var(--color-ink-700)] transition-colors duration-150 hover:bg-[var(--color-ink-100)] focus-visible:bg-[var(--color-ink-100)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--brand-green)]/40"
                 role="menuitem"
               >
-                접수 내역
+                신청 내역
               </Link>
               <Link
                 href="/my/profile"
@@ -99,14 +99,6 @@ export function UserMenu({ displayName, email, initial, isAdmin }: UserMenuProps
                 role="menuitem"
               >
                 내 정보
-              </Link>
-              <Link
-                href="/apply"
-                onClick={() => setOpen(false)}
-                className="block px-4 py-2.5 text-sm font-medium text-[var(--color-ink-700)] transition-colors duration-150 hover:bg-[var(--color-ink-100)] focus-visible:bg-[var(--color-ink-100)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-[var(--brand-green)]/40"
-                role="menuitem"
-              >
-                입찰 대리 신청
               </Link>
               {isAdmin && (
                 <Link
