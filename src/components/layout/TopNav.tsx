@@ -5,7 +5,8 @@ import { useState, useEffect } from "react";
 import { Menu, X } from "lucide-react";
 import { cn } from "@/lib/utils";
 import { UserMenu, type UserMenuProps } from "@/components/auth/UserMenu";
-import { LogoutConfirmModal } from "@/components/auth/LogoutConfirmModal";
+import { createClient } from "@/lib/supabase/client";
+import { useRouter } from "next/navigation";
 import { Logo } from "@/components/Logo";
 
 /* Stage 2 cycle 1-A 보강 1+ — TopNav "신청하기" CTA 신규 mount (conversion 파이프라인 강화).
@@ -13,10 +14,10 @@ import { Logo } from "@/components/Logo";
  * 데스크탑 = user/login 좌측 inline (광역 우측 CTA + user 정합)
  * 광역 별개 2 Link (className 분기 lg:hidden / hidden lg:inline-flex).
  *
- * cycle 1-E-A-3 paradigm:
+ * cycle 1-E-A-3-β paradigm:
  * - 비로그인 데스크탑 = "로그인" link + "회원가입" CTA (green brand) 양 paradigm
  * - 모바일 드로어 로그인 시점 = 사용자 정보 + 마이페이지 + 내 정보 + (조건부) 관리자 + separator + 로그아웃 button
- * - 모바일 드로어 로그아웃 button = red-600 + LogoutConfirmModal trigger
+ * - 모바일 드로어 로그아웃 button = red-600 + 즉시 signOut 실행 (산업 표준 paradigm 정합)
  * - 모바일 드로어 로그인 시점 button (비로그인) = surface-muted bg + font-bold (시각 강화)
  */
 
@@ -30,7 +31,7 @@ const TOPNAV_LINKS = [
 export function TopNav({ user }: { user: UserMenuProps | null }) {
   const [open, setOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
-  const [logoutOpen, setLogoutOpen] = useState(false);
+  const router = useRouter();
 
   /* scroll 8px+ 시 border 본질 추가 (Linear paradigm). */
   useEffect(() => {
@@ -54,9 +55,12 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
     };
   }, [open]);
 
-  function handleMobileLogoutClick() {
+  async function handleMobileLogout() {
     setOpen(false);
-    setLogoutOpen(true);
+    const supabase = createClient();
+    await supabase.auth.signOut();
+    router.push("/");
+    router.refresh();
   }
 
   return (
@@ -192,7 +196,7 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
               )}
               <button
                 type="button"
-                onClick={handleMobileLogoutClick}
+                onClick={handleMobileLogout}
                 className="flex min-h-12 w-full items-center border-t border-[var(--border-1)] px-4 text-left text-[15px] font-semibold text-red-600 transition-colors duration-150 hover:bg-red-50 hover:text-red-700"
               >
                 로그아웃
@@ -218,11 +222,6 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
           )}
         </div>
       </div>
-
-      <LogoutConfirmModal
-        open={logoutOpen}
-        onClose={() => setLogoutOpen(false)}
-      />
     </header>
   );
 }
