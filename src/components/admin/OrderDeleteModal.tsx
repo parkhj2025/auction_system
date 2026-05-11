@@ -28,6 +28,12 @@ interface Props {
   caseNumber: string;
   bidAmount: number;
   createdAt: string;
+  /**
+   * cycle 1-E-B-γ — variant 광역 router 분기 paradigm.
+   * "default" (detail page footer) = DELETE 사후 router.push('/admin/orders') + refresh.
+   * "row" (list 행) = DELETE 사후 router.refresh() 단독 (list 광역 머무름 paradigm).
+   */
+  variant?: "default" | "row";
   onClose: () => void;
 }
 
@@ -39,6 +45,7 @@ export function OrderDeleteModal({
   caseNumber,
   bidAmount,
   createdAt,
+  variant = "default",
   onClose,
 }: Props) {
   const router = useRouter();
@@ -72,8 +79,12 @@ export function OrderDeleteModal({
       if (!json.ok) {
         throw new Error(json.error ?? "주문 삭제에 실패했습니다.");
       }
-      router.push("/admin/orders");
-      router.refresh();
+      if (variant === "row") {
+        router.refresh();
+      } else {
+        router.push("/admin/orders");
+        router.refresh();
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "주문 삭제에 실패했습니다.");
       setDeleting(false);

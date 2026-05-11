@@ -16,7 +16,6 @@ import { SsnDeleteButton } from "@/components/admin/SsnDeleteButton";
 import { StatusLogHistory } from "@/components/admin/StatusLogHistory";
 import { KakaoNotifyButton } from "@/components/admin/KakaoNotifyButton";
 import { OrderDeleteButton } from "@/components/admin/OrderDeleteButton";
-import { SoftDeletedBadge } from "@/components/admin/SoftDeletedBadge";
 import { formatKoreanWon, formatKoreanDate, cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -140,7 +139,6 @@ export default async function AdminOrderDetailPage({
           >
             {getStatusLabel(row.status)}
           </span>
-          {row.deleted_at && <SoftDeletedBadge />}
           <span className="font-mono text-xs text-[var(--color-ink-500)]">
             {row.application_id}
           </span>

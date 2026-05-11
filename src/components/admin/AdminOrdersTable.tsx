@@ -5,12 +5,22 @@ import {
   getStatusBadgeClass,
 } from "@/lib/order-status";
 import { formatKoreanWon, formatKoreanDate, cn } from "@/lib/utils";
-import { SoftDeletedBadge } from "./SoftDeletedBadge";
+import { OrderDeleteButton } from "./OrderDeleteButton";
 
 /**
  * 관리자용 접수 테이블. 데스크톱은 테이블, 모바일은 카드 리스트.
+ *
+ * cycle 1-E-B-γ — 데스크탑 행 광역 trash icon button 신규 (variant="row" paradigm).
+ * 진입 조건 = status='cancelled' + isSuperAdmin 양 조건. 모바일 카드 광역 trash icon 영역 0
+ * (admin 영역 = 데스크탑 단독 paradigm 정합 보존).
  */
-export function AdminOrdersTable({ orders }: { orders: OrderRow[] }) {
+export function AdminOrdersTable({
+  orders,
+  isSuperAdmin = false,
+}: {
+  orders: OrderRow[];
+  isSuperAdmin?: boolean;
+}) {
   if (orders.length === 0) {
     return (
       <div className="rounded-[var(--radius-xl)] border border-dashed border-[var(--color-border)] bg-[var(--color-surface-muted)] px-6 py-12 text-center">
@@ -49,17 +59,14 @@ export function AdminOrdersTable({ orders }: { orders: OrderRow[] }) {
                   className="border-t border-[var(--color-border)] hover:bg-[var(--color-ink-100)]/40"
                 >
                   <Td>
-                    <div className="flex items-center gap-1.5">
-                      <span
-                        className={cn(
-                          "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-black",
-                          getStatusBadgeClass(o.status)
-                        )}
-                      >
-                        {getStatusLabel(o.status)}
-                      </span>
-                      {o.deleted_at && <SoftDeletedBadge />}
-                    </div>
+                    <span
+                      className={cn(
+                        "inline-flex items-center rounded-full px-2.5 py-0.5 text-[11px] font-black",
+                        getStatusBadgeClass(o.status)
+                      )}
+                    >
+                      {getStatusLabel(o.status)}
+                    </span>
                   </Td>
                   <Td>
                     <span className="font-mono text-xs text-[var(--color-ink-700)]">
@@ -92,12 +99,26 @@ export function AdminOrdersTable({ orders }: { orders: OrderRow[] }) {
                     </span>
                   </Td>
                   <Td>
-                    <Link
-                      href={`/admin/orders/${o.id}`}
-                      className="text-xs font-bold text-[var(--color-ink-900)] hover:text-black"
-                    >
-                      상세 →
-                    </Link>
+                    <div className="flex items-center gap-3">
+                      <Link
+                        href={`/admin/orders/${o.id}`}
+                        className="text-xs font-bold text-[var(--color-ink-900)] hover:text-black"
+                      >
+                        상세 →
+                      </Link>
+                      {o.status === "cancelled" && isSuperAdmin && (
+                        <OrderDeleteButton
+                          orderId={o.id}
+                          applicationId={o.application_id}
+                          applicantName={o.applicant_name}
+                          court={o.court}
+                          caseNumber={o.case_number}
+                          bidAmount={o.bid_amount}
+                          createdAt={o.created_at}
+                          variant="row"
+                        />
+                      )}
+                    </div>
                   </Td>
                 </tr>
               );
@@ -117,17 +138,14 @@ export function AdminOrdersTable({ orders }: { orders: OrderRow[] }) {
               className="flex flex-col gap-2 rounded-[var(--radius-lg)] border border-[var(--color-border)] bg-white p-4 transition hover:border-[var(--color-ink-900)]"
             >
               <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-1.5">
-                  <span
-                    className={cn(
-                      "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-black",
-                      getStatusBadgeClass(o.status)
-                    )}
-                  >
-                    {getStatusLabel(o.status)}
-                  </span>
-                  {o.deleted_at && <SoftDeletedBadge />}
-                </div>
+                <span
+                  className={cn(
+                    "inline-flex items-center rounded-full px-2 py-0.5 text-[10px] font-black",
+                    getStatusBadgeClass(o.status)
+                  )}
+                >
+                  {getStatusLabel(o.status)}
+                </span>
                 <span className="font-mono text-[10px] text-[var(--color-ink-500)]">
                   {o.application_id}
                 </span>

@@ -78,7 +78,7 @@ export async function DELETE(
       return NextResponse.json(
         {
           ok: false,
-          error: "삭제 표시된 주문만 영구 삭제할 수 있습니다.",
+          error: "취소 처리가 완료된 주문만 영구 삭제할 수 있습니다.",
         },
         { status: 400 }
       );

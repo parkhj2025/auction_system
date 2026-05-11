@@ -48,6 +48,20 @@ export default async function AdminOrdersListPage({
   const { data: orders } = await query;
   const rows = (orders ?? []) as OrderRow[];
 
+  // cycle 1-E-B-γ — super_admin 광역 권한 검수 (행 광역 trash icon button 진입 분기 paradigm)
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  let isSuperAdmin = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+    isSuperAdmin = profile?.role === "super_admin";
+  }
+
   return (
     <section className="mx-auto w-full max-w-[var(--c-base)] px-5 py-10 sm:px-8 sm:py-12">
       <header>
@@ -85,7 +99,7 @@ export default async function AdminOrdersListPage({
       </div>
 
       <div className="mt-8">
-        <AdminOrdersTable orders={rows} />
+        <AdminOrdersTable orders={rows} isSuperAdmin={isSuperAdmin} />
       </div>
     </section>
   );
