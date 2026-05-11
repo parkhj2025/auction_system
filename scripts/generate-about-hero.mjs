@@ -15,7 +15,7 @@ if (!apiKey) {
 
 const ai = new GoogleGenAI({ apiKey });
 
-const PROMPT = `A minimalist illustration showing a professional Korean real estate agent (공인중개사) confidently walking towards a courthouse building, carrying a leather folder. Flat design style with clean geometric shapes. Use a color palette of charcoal (#111418) for the figure outline, vibrant green (#00C853) for accents on the folder and tie, soft yellow (#FFD43B) for a subtle highlight. White background. Korean modern minimalist aesthetic. The agent appears trustworthy and competent. No text in the illustration. 16:10 aspect ratio.`;
+const PROMPT = `A friendly, approachable illustration in the style of modern flat design used by popular Korean services like Toss, KakaoBank, or Banksalad. A cheerful Korean real estate professional in a smart casual outfit, walking confidently with a light step, holding a green folder. Soft, rounded shapes with friendly proportions. Bright cheerful background with subtle green (#00C853) and yellow (#FFD43B) accent shapes (circles, soft curves). The courthouse in the background should look approachable and clean — like a modern building, not imposing. Use warm pastel tones, lots of white space, soft shadows. The overall mood is optimistic, friendly, and trustworthy. NO black-dominant figures. NO heavy outlines. Use thin charcoal (#374151) lines for outlines only. The character should have a warm smile and look welcoming. 16:10 aspect ratio.`;
 
 console.log("[about-hero] 산출 진입...");
 

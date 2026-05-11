@@ -15,7 +15,11 @@ if (!apiKey) {
 
 const ai = new GoogleGenAI({ apiKey });
 
-const PROMPT = `A minimalist illustration showing three icon-style symbols arranged horizontally on a clean white background. Center icon: a green checkmark (#00C853) above a gavel and document, representing "bidding service" — bold and prominent. Left icon: a faded grey magnifying glass with subtle X mark, representing "legal analysis (not our service)". Right icon: a faded grey house key with subtle X mark, representing "eviction/investment advice (not our service)". Flat design, geometric shapes, charcoal (#111418) outlines, generous spacing. Korean modern minimalist aesthetic. No text labels. 16:6 aspect ratio.`;
+const PROMPT = `A friendly, modern illustration in the style of popular Korean fintech apps (Toss, KakaoBank). Three friendly icon illustrations arranged horizontally on a clean white background with subtle pastel backgrounds.
+Center: A bright, cheerful illustration showing a green (#00C853) circular badge with a white checkmark, with friendly floating elements (a small gavel, a document with soft rounded corners). Surrounded by a soft green pastel circle background. This is the HERO element — bigger and more prominent.
+Left: A smaller, softer illustration of a magnifying glass icon in soft pastel grey (#E5E7EB) with rounded friendly shape. NO X marks. Just a gentle, faded appearance.
+Right: A smaller, softer illustration of a house key in soft pastel grey, with rounded friendly shape. NO X marks.
+Style: Modern flat design, friendly proportions, soft rounded corners, lots of white space, subtle pastel backgrounds, thin charcoal (#374151) outlines only. Warm, approachable, optimistic mood. 16:6 aspect ratio.`;
 
 console.log("[about-what] 산출 진입...");
 
