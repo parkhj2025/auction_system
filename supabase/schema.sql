@@ -71,6 +71,18 @@ RETURNS BOOLEAN AS $$
 $$ LANGUAGE sql SECURITY DEFINER STABLE;
 
 
+-- super_admin 단독 권한 확인 (cycle 1-E-B-α — hard delete paradigm 정수)
+-- admin = soft delete + status 전이 / super_admin = hard delete + Storage cascade 광역 분리.
+-- 형준님 단독 super_admin 권한 paradigm 정수 (production).
+CREATE OR REPLACE FUNCTION public.is_super_admin()
+RETURNS BOOLEAN AS $$
+  SELECT EXISTS (
+    SELECT 1 FROM public.profiles
+    WHERE id = auth.uid() AND role = 'super_admin'
+  );
+$$ LANGUAGE sql SECURITY DEFINER STABLE;
+
+
 -- 사건번호 + 매각회차가 현재 활성 접수 상태인지 확인 (1물건 1고객 사전 검증용)
 -- SECURITY DEFINER로 orders RLS 우회하여 본인 접수뿐 아니라 타인 접수도 체크 가능.
 -- 반환은 boolean만이므로 타인 접수의 상세 내용은 노출되지 않음.
@@ -299,6 +311,15 @@ CREATE POLICY "orders_admin_select" ON public.orders
 DROP POLICY IF EXISTS "orders_admin_update" ON public.orders;
 CREATE POLICY "orders_admin_update" ON public.orders
   FOR UPDATE USING ((select public.is_admin()));
+
+-- cycle 1-E-B-α — super_admin 단독 hard delete + 3중 안전망 (status='cancelled' + deleted_at NOT NULL)
+DROP POLICY IF EXISTS "orders_super_admin_delete" ON public.orders;
+CREATE POLICY "orders_super_admin_delete" ON public.orders
+  FOR DELETE USING (
+    (select public.is_super_admin())
+    AND status = 'cancelled'
+    AND deleted_at IS NOT NULL
+  );
 
 
 -- ============================================================================

@@ -1342,6 +1342,79 @@ env 갱신 paradigm:
 
 ---
 
+## 30-α. 관리자 hard delete paradigm 신규 (cycle 1-E-B-α, 2026-05-11)
+
+**의도**: 사용자 paradigm (soft delete = status='cancelled' + deleted_at) vs 관리자 paradigm (hard delete = DB row + Storage 광역 회수) 광역 분리 정수. mockup 광역 hard delete paradigm 신규 = 강한 경고 + 재 확인 modal + cascade Storage 양 bucket 회수.
+
+**광역 paradigm 정수**:
+- 형준님 단독 super_admin 권한 paradigm 정수 (production)
+- admin = soft delete + status 전이 광역 단독 (is_admin 보존)
+- super_admin = hard delete + Storage cascade 광역 단독 (is_super_admin 신규)
+- /admin/orders 광역 list bulk delete 영역 0 (실수 회피 정수)
+- /admin/orders/[id] footer 영역 단독 진입 paradigm
+
+**광역 산출 영역 8건**:
+
+1. **is_super_admin() 함수 신규** (supabase/migrations/20260511_is_super_admin_function.sql):
+   - SECURITY DEFINER + STABLE paradigm (is_admin 정합 차용)
+   - profiles.role = 'super_admin' 정합 시점 단독 true
+
+2. **orders_super_admin_delete RLS policy 신규** (supabase/migrations/20260511_orders_super_admin_delete_policy.sql):
+   - FOR DELETE + is_super_admin() + status='cancelled' + deleted_at IS NOT NULL **3중 안전망**
+   - DB row 광역 보호 paradigm 정수
+
+3. **DELETE endpoint 신규** (src/app/api/admin/orders/[id]/delete/route.ts):
+   - method DELETE 단독 (POST/GET/PUT 영역 0)
+   - 권한 = is_super_admin RPC 정합 시점 단독 진입
+   - 광역 순서: documents fetch → order-documents remove → delegations list+remove → orders DELETE (cascade 자동)
+   - transaction-like error handling = Storage 실패 시점 orders delete 회수 NG
+
+4. **OrderDeleteButton component** (src/components/admin/OrderDeleteButton.tsx):
+   - 위치 = /admin/orders/[id] page footer 영역 단독
+   - 진입 조건 = `status='cancelled' && isSuperAdmin` 양 조건 정합 단독 (server component 광역 검수)
+   - 시각 = h-12 + rounded-lg + bg-red-600 + text-white + Trash2 icon (destructive paradigm)
+   - 카피 = "주문 영구 삭제"
+
+5. **OrderDeleteModal component** (src/components/admin/OrderDeleteModal.tsx):
+   - 강제 paradigm (영구 룰 §31 정합 / backdrop·ESC 닫기 영역 0)
+   - max-w-480 + rounded-2xl + p-6 (KakaoNotifyButton 정합)
+   - 헤더 "정말 영구 삭제하시겠습니까?" (text-lg + font-black + text-red-600 + AlertTriangle icon)
+   - 광역 정보 카드 (rounded-2xl + bg-ink-50 + p-5) = 신청번호 + 신청자 + 사건번호 + 입찰가 + 신청일 광역 표기
+   - 신청번호 = font-mono + bg-white + 복사 button paradigm
+   - 확인 input = application_id 직접 입력 정수 (placeholder "GQ-YYYYMMDD-NNNN" / 정확 일치 시점 단독 CTA enable)
+   - CTA 광역 = "취소" (border + bg-white) + "영구 삭제" (정합 시점 단독 bg-red-600 + text-white)
+
+6. **/admin/orders/[id] page 갱신** (src/app/admin/orders/[id]/page.tsx):
+   - isSuperAdmin server component 광역 검증 (auth.getUser + profiles.role 광역)
+   - footer "위험 영역" 카드 신규 (border-red-200 + bg-red-50/40 + p-5) → status='cancelled' + isSuperAdmin 양 조건 분기
+
+7. **schema.sql 광역 동기화** = is_super_admin 함수 + orders_super_admin_delete RLS policy 광역 (Lessons [D] 정합)
+
+8. **middleware.ts 영역 0** = admin + super_admin 양쪽 광역 기존 정합 보존 (변경 영역 0)
+
+**광역 흐름 paradigm 6단계**:
+1. 형준님 super_admin TopNav 진입 → /admin/orders/[id] 진입 (status='cancelled' 정합)
+2. footer "위험 영역" 카드 표기 → OrderDeleteButton 표기 (red 광역)
+3. button click → OrderDeleteModal pop (강제 paradigm / backdrop·ESC 닫기 NG)
+4. 광역 정보 + 신청번호 직접 입력 paradigm
+5. 정확 일치 시점 → "영구 삭제" CTA enable → click → DELETE 호출
+6. Storage 광역 회수 (order-documents + delegations) + DB CASCADE 광역 회수 → redirect /admin/orders
+
+**보존 paradigm**:
+- 사용자 paradigm soft delete 광역 (status='cancelled' + deleted_at IS NULL 쌍) 영구 보존
+- /api/orders/[id] 사용자 영역 route DELETE method 영역 0 (보호 paradigm)
+- StatusChanger + StatusLogHistory + 시각 토큰 정합 광역 보존
+- documents + order_status_log ON DELETE CASCADE 광역 정합 보존
+
+**학습**:
+- 권한 paradigm 광역 분리 = admin (soft) + super_admin (hard) 광역 paradigm 정수 (단일 is_admin 광역 paradigm 영역 0)
+- 3중 안전망 = RLS 광역 (super_admin + cancelled + deleted_at NOT NULL) + button 광역 (cancelled + isSuperAdmin) 양쪽 광역 정수
+- application_id 직접 입력 paradigm = "삭제" 광역 단독 input 광역 NG → GitHub repo delete paradigm 정합 (정확 식별 + 사용자 의도 강제)
+- Storage cascade paradigm = DB cascade 영역 0 paradigm 정수 (Supabase Storage 별개 system) → DELETE route 안 광역 회수 의무
+- transaction-like error handling = Storage 실패 시점 orders delete 회수 NG (Lessons [A] 정합 / drift 회피)
+
+---
+
 ## Changelog
 
 | 버전 | 날짜 | 변경 |

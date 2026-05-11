@@ -15,6 +15,7 @@ import { StatusChanger } from "@/components/admin/StatusChanger";
 import { SsnDeleteButton } from "@/components/admin/SsnDeleteButton";
 import { StatusLogHistory } from "@/components/admin/StatusLogHistory";
 import { KakaoNotifyButton } from "@/components/admin/KakaoNotifyButton";
+import { OrderDeleteButton } from "@/components/admin/OrderDeleteButton";
 import { formatKoreanWon, formatKoreanDate, cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -43,6 +44,20 @@ export default async function AdminOrderDetailPage({
   if (!order) notFound();
 
   const row = order as OrderRow;
+
+  // cycle 1-E-B-α — super_admin 광역 권한 검수 (OrderDeleteButton 진입 분기 paradigm)
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  let isSuperAdmin = false;
+  if (user) {
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+    isSuperAdmin = profile?.role === "super_admin";
+  }
 
   // 고객 프로필 (admin RLS로 전체 조회 가능)
   const { data: customer } = await supabase
@@ -314,6 +329,30 @@ export default async function AdminOrderDetailPage({
           </div>
         </div>
       </div>
+
+      {/* cycle 1-E-B-α — super_admin 단독 hard delete (status='cancelled' 정합 시점 단독) */}
+      {row.status === "cancelled" && isSuperAdmin && (
+        <div className="mt-10 flex flex-col items-start gap-3 rounded-2xl border border-red-200 bg-red-50/40 p-5">
+          <div>
+            <h2 className="text-base font-black tracking-tight text-red-600">
+              위험 영역
+            </h2>
+            <p className="mt-1 text-sm text-[var(--color-ink-700)]">
+              이 주문을 영구 삭제하면 첨부 파일과 상태 이력까지 모두 사라집니다.
+              복구할 수 없습니다.
+            </p>
+          </div>
+          <OrderDeleteButton
+            orderId={row.id}
+            applicationId={row.application_id}
+            applicantName={row.applicant_name}
+            court={row.court}
+            caseNumber={row.case_number}
+            bidAmount={row.bid_amount}
+            createdAt={row.created_at}
+          />
+        </div>
+      )}
     </section>
   );
 }
