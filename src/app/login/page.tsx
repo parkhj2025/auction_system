@@ -51,7 +51,12 @@ export default async function LoginPage({
             </div>
           )}
 
-          <div className="mt-8">
+          <p className="mt-6 text-center text-xs leading-5 text-[var(--color-ink-500)]">
+            안전한 인증을 위해 Google 로그인 페이지로 이동합니다. 인증 처리는
+            보안 서버에서 진행됩니다.
+          </p>
+
+          <div className="mt-4">
             <LoginButton redirect={redirectParam} />
           </div>
 
