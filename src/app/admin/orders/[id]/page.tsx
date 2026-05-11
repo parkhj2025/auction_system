@@ -14,6 +14,7 @@ import { DocumentList } from "@/components/my/DocumentList";
 import { StatusChanger } from "@/components/admin/StatusChanger";
 import { SsnDeleteButton } from "@/components/admin/SsnDeleteButton";
 import { StatusLogHistory } from "@/components/admin/StatusLogHistory";
+import { KakaoNotifyButton } from "@/components/admin/KakaoNotifyButton";
 import { formatKoreanWon, formatKoreanDate, cn } from "@/lib/utils";
 
 export const dynamic = "force-dynamic";
@@ -147,8 +148,8 @@ export default async function AdminOrderDetailPage({
       </header>
 
       {/* 타임라인 */}
-      <div className="mt-8 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-sm">
-        <h2 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
+      <div className="mt-8 rounded-2xl border border-gray-200 bg-white p-5">
+        <h2 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
           진행 상태
         </h2>
         <div className="mt-5">
@@ -159,11 +160,18 @@ export default async function AdminOrderDetailPage({
       <div className="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         {/* 왼쪽: 상세 정보 */}
         <div className="flex flex-col gap-6">
-          {/* 고객 정보 */}
-          <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-sm">
-            <h2 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
-              고객 정보
-            </h2>
+          {/* 고객 정보 (cycle 1-E-B 정정: 시각 토큰 정합 + KakaoNotifyButton 신규) */}
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <div className="flex items-center justify-between gap-3">
+              <h2 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
+                고객 정보
+              </h2>
+              <KakaoNotifyButton
+                applicantName={row.applicant_name}
+                applicationId={row.application_id}
+                phone={row.phone}
+              />
+            </div>
             <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
               <Field label="이름" value={customer?.display_name ?? "-"} />
               <Field label="이메일" value={customer?.email ?? "-"} />
@@ -189,8 +197,8 @@ export default async function AdminOrderDetailPage({
           </div>
 
           {/* 물건 정보 */}
-          <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-sm">
-            <h2 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <h2 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
               물건 정보
             </h2>
             <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3">
@@ -228,8 +236,8 @@ export default async function AdminOrderDetailPage({
           </div>
 
           {/* 입찰 + 수수료 + 보증금 */}
-          <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-sm">
-            <h2 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <h2 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
               입찰 / 수수료 / 보증금
             </h2>
             <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 text-sm sm:grid-cols-3">
@@ -285,7 +293,7 @@ export default async function AdminOrderDetailPage({
         {/* 오른쪽: 상태 변경 + 이력 */}
         <div className="flex flex-col gap-6">
           <div className="rounded-[var(--radius-xl)] border-2 border-[var(--color-ink-900)] bg-[var(--color-ink-50)]/50 p-6">
-            <h2 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-900)]">
+            <h2 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
               상태 변경
             </h2>
             <div className="mt-4">
@@ -296,8 +304,8 @@ export default async function AdminOrderDetailPage({
             </div>
           </div>
 
-          <div className="rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-sm">
-            <h2 className="text-sm font-black uppercase tracking-wider text-[var(--color-ink-500)]">
+          <div className="rounded-2xl border border-gray-200 bg-white p-5">
+            <h2 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
               상태 이력
             </h2>
             <div className="mt-4">
@@ -323,11 +331,11 @@ function Field({
 }) {
   return (
     <div>
-      <dt className="text-xs text-[var(--color-ink-500)]">{label}</dt>
+      <dt className="text-sm font-medium text-[var(--color-ink-500)]">{label}</dt>
       <dd
         className={cn(
-          "mt-0.5 text-[var(--color-ink-900)]",
-          emphasized ? "text-lg font-black" : "text-sm font-bold",
+          "mt-1 text-[var(--color-ink-900)]",
+          emphasized ? "text-lg font-black" : "text-base font-bold",
           mono && "tabular-nums"
         )}
       >

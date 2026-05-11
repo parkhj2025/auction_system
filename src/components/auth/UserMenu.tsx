@@ -9,9 +9,11 @@ export type UserMenuProps = {
   displayName: string;
   email: string | null;
   initial: string;
+  /** cycle 1-E-B 신규 — profiles.role 정합 시점 단독 "관리자" link 표기 paradigm. */
+  isAdmin: boolean;
 };
 
-export function UserMenu({ displayName, email, initial }: UserMenuProps) {
+export function UserMenu({ displayName, email, initial, isAdmin }: UserMenuProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
   const router = useRouter();
@@ -102,6 +104,16 @@ export function UserMenu({ displayName, email, initial }: UserMenuProps) {
             >
               입찰 대리 신청
             </Link>
+            {isAdmin && (
+              <Link
+                href="/admin"
+                onClick={() => setOpen(false)}
+                className="block border-t border-[var(--color-border)] px-4 py-2.5 text-sm font-bold text-[var(--color-ink-900)] hover:bg-[var(--color-ink-100)]"
+                role="menuitem"
+              >
+                관리자
+              </Link>
+            )}
             <button
               type="button"
               onClick={handleSignOut}

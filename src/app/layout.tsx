@@ -48,7 +48,16 @@ async function getUserForNav(): Promise<UserMenuProps | null> {
     const email = user.email ?? null;
     const initial = displayName.trim().charAt(0).toUpperCase() || "U";
 
-    return { displayName, email, initial };
+    // cycle 1-E-B 신규: profiles.role 정합 시점 isAdmin 광역 (UserMenu 안 "관리자" link 조건부 표기 paradigm).
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .maybeSingle();
+    const isAdmin =
+      profile?.role === "admin" || profile?.role === "super_admin";
+
+    return { displayName, email, initial, isAdmin };
   } catch {
     // 환경변수 누락 등으로 클라이언트 생성 실패 시 미로그인 상태로 폴백
     return null;

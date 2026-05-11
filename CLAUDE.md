@@ -1285,6 +1285,63 @@ env 갱신 paradigm:
 
 ---
 
+## 30. 관리자 paradigm (cycle 1-E-B 갱신, 2026-05-11)
+
+**의도**: 직전 cycle 산출 광역 관리자 영역 (admin page + components 5건 + middleware + order-transitions + /api/orders/[id]/status 광역 정합) → 시각 토큰 정합 갱신 + UserMenu 관리자 link 신규 + KakaoNotifyButton 신규 paradigm.
+
+**광역 산출 영역 (보존)**:
+- /admin/page.tsx (dashboard / StatsCards + 최근 접수 list)
+- /admin/orders/page.tsx (광역 list + filter)
+- /admin/orders/[id]/page.tsx (단독 detail)
+- components/admin: AdminOrdersTable + StatusChanger + StatusLogHistory + SsnDeleteButton + StatsCards
+- middleware.ts admin 권한 검수 (profiles.role + is_admin() + ADMIN_PREFIXES)
+- order-transitions.ts ALLOWED_TRANSITIONS map (단일 source paradigm)
+- /api/orders/[id]/status route (isAdmin RPC + status 갱신 + log INSERT 광역)
+
+**cycle 1-E-B 신규 영역 4건**:
+
+1. **UserMenu 관리자 link 신규** = profiles.role 정합 시점 단독 표기 paradigm:
+   - layout.tsx getUserForNav() = profiles.role fetch + isAdmin 결정
+   - UserMenuProps.isAdmin: boolean 신규 field
+   - UserMenu = `isAdmin && (<Link href="/admin">관리자</Link>)` 조건부 표기
+   - 위치 = "입찰 대리 신청" Link 사후 + 구분 border-t paradigm
+
+2. **KakaoNotifyButton 신규 component** (Phase 1 = 수동 단독):
+   - 위치 = /admin/orders/[id] 고객 정보 카드 헤더 우측 inline
+   - 동작 = button click → modal pop (카피 + 전화번호 + 복사 button 광역)
+   - 카피 paradigm = `[경매퀵] {applicant_name}님, 입찰 대리 신청이 접수되었습니다. 접수번호: {application_id}`
+   - 형준님 = 카피 copy + 전화번호 copy → 카카오톡 직접 paradigm
+   - 자동 alimtalk = Phase 2 v2 패키지 영역 (CLAUDE.md §17 정합)
+
+3. **admin 광역 시각 토큰 정합 갱신** (Step1·2 sentinel paradigm 정합 / cycle 1-D-A-4-8 정수):
+   - 카드 = `rounded-2xl + border-gray-200 + bg-white + p-5` (직전 `rounded-[var(--radius-xl)] + p-6 + shadow-sm` 광역 정정)
+   - 카드 헤더 h2 = `text-lg + font-black + tracking-tight + ink-900` (직전 `text-sm + uppercase + tracking-wider + ink-500` 광역 정정)
+   - Field component label dt = `text-sm + font-medium + ink-500` (직전 `text-xs + ink-500` 정정)
+   - Field component value dd = `text-base + font-bold + ink-900` (직전 `text-sm + font-bold` 정정)
+
+4. **/api/admin/* route 영역 0 보존** = 직전 /api/orders/[id]/status route 재사용 paradigm 정수 (단일 source paradigm + transition map 'cancelled' 광역 정합).
+
+**보존 paradigm**:
+- StatusChanger = 단일 source paradigm (dropdown + note + transition map / 액션 panel 8건 button 신규 NG)
+- StatusLogHistory = timeline view 광역 정합 (별개 view 신규 NG)
+- 모바일 반응형 영역 0 (관리자 = 데스크탑 단독 paradigm 정수)
+- Step1·2 시각 토큰 sentinel 보존 (회귀 NG 영역 0)
+
+**광역 흐름 paradigm**:
+1. admin user TopNav 진입 → UserMenu open → "관리자" link 표기 (profiles.role admin 정합 시점 단독)
+2. /admin/orders/[id] 진입 → 고객 정보 카드 헤더 = KakaoNotifyButton 표기
+3. KakaoNotifyButton click → modal pop (카피 + 전화번호 광역)
+4. 형준님 = 복사 + 카카오톡 직접 단독 paradigm
+5. StatusChanger = transition map 광역 정수 ('cancelled' 광역 정합)
+
+**학습**:
+- 광역 paradigm 직전 산출 정합 식별 → 신규 영역 단독 추가 paradigm 정수 (재 분리 영역 0 / 단일 source paradigm 보존)
+- 시각 토큰 정합 갱신 = Field component 광역 단일 정정 (광역 dom 변경 영역 0 / 단일 component paradigm 정수)
+- KakaoNotifyButton paradigm = 수동 카카오톡 channel paradigm 정수 (자동 alimtalk = Phase 2 v2 영역)
+- UserMenu 안 admin link 조건부 표기 paradigm = 사용자 영역 노출 영역 0 정합
+
+---
+
 ## Changelog
 
 | 버전 | 날짜 | 변경 |
