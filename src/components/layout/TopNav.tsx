@@ -9,17 +9,19 @@ import { createClient } from "@/lib/supabase/client";
 import { useRouter } from "next/navigation";
 import { Logo } from "@/components/Logo";
 
-/* cycle 1-G-α — TopNav primary CTA "신청하기" 재추가 paradigm:
- * - 산업 표준 8/8 사이트 광역 = primary CTA 메뉴 안 영구 노출 (Phase 2-A + 2-B 광역 일치)
- * - 데스크탑 = "신청하기" 좌 + (UserMenu | "로그인") 우 (사전 cycle 1-A 보강 1+ paradigm 차용)
- * - 모바일 상단 = hamburger 좌측 inline + "신청하기" button (사전 cycle 1-A 보강 1+ paradigm)
- * - 모바일 드로어 비로그인 = "신청하기" + "로그인" 양 button (드로어 메뉴 사후)
- * - "신청하기" + "로그인" 양 button 동일 brand-green solid 시각 (사전 cycle 1-E-A-3-γ "로그인" 영구 보존 / 시각 hierarchy 0 paradigm)
+/* cycle 1-G-α-α — TopNav 시각 위계 정리 paradigm:
+ * - "신청하기" = primary CTA 단독 강조 (brand-green solid / 데스크탑 + 모바일 드로어 광역)
+ * - "로그인" = 약한 보조 시각 (회색 텍스트 링크 / 배경 0 + 테두리 0 / 메뉴 항목 paradigm 일치)
+ * - 모바일 상단 = Logo + hamburger 2 column (cycle 1-G-α "신청하기" 광역 회수 / cycle 1-E-A-3-γ paradigm 회수)
+ *
+ * cycle 1-G-α 영구 보존 paradigm:
+ * - 데스크탑 "신청하기" = brand-green solid + h-10 + rounded-full
+ * - 모바일 드로어 비로그인 = 메뉴 4건 + "신청하기" (primary) + "로그인" (보조)
+ * - 모바일 드로어 로그인 = 메뉴 4건 + "신청하기" + 사용자 정보 카드
  *
  * cycle 1-E-A-3-β·γ 영구 보존 paradigm:
  * - 모바일 드로어 로그인 시점 = 사용자 정보 + 마이페이지 + 내 정보 + (조건부) 관리자 + separator + 로그아웃 button
  * - 모바일 드로어 로그아웃 button = red-600 + 즉시 signOut 실행
- * - "로그인" button 시각 영구 보존 (변경 0)
  */
 
 const TOPNAV_LINKS = [
@@ -90,14 +92,7 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
         </nav>
 
         <div className="flex items-center gap-2">
-          {/* 모바일 "신청하기" CTA (hamburger 좌측 inline / 사전 cycle 1-A 보강 1+ paradigm). */}
-          <Link
-            href="/apply"
-            className="inline-flex h-9 items-center justify-center rounded-full bg-[var(--brand-green)] px-3 text-[13px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 lg:hidden"
-          >
-            신청하기
-          </Link>
-          {/* 데스크탑 "신청하기" CTA (UserMenu / "로그인" button 좌측 inline). */}
+          {/* 데스크탑 "신청하기" CTA (primary 단독 강조 / UserMenu | "로그인" 좌측 inline). */}
           <Link
             href="/apply"
             className="hidden h-10 items-center justify-center rounded-full bg-[var(--brand-green)] px-5 text-[15px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 lg:inline-flex"
@@ -111,7 +106,7 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
           ) : (
             <Link
               href="/login"
-              className="hidden h-10 items-center justify-center rounded-full bg-[var(--brand-green)] px-5 text-[15px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2 lg:inline-flex"
+              className="hidden h-10 items-center justify-center rounded-full px-4 text-[15px] font-medium text-[var(--text-secondary)] transition-colors duration-150 hover:text-[var(--text-primary)] focus-visible:outline-none focus-visible:text-[var(--text-primary)] lg:inline-flex"
             >
               로그인
             </Link>
@@ -205,7 +200,7 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
               </div>
             </>
           ) : (
-            <div className="mt-3 flex flex-col gap-2">
+            <div className="mt-3 flex flex-col gap-1">
               <Link
                 href="/apply"
                 onClick={() => setOpen(false)}
@@ -216,7 +211,7 @@ export function TopNav({ user }: { user: UserMenuProps | null }) {
               <Link
                 href="/login"
                 onClick={() => setOpen(false)}
-                className="flex min-h-12 items-center justify-center rounded-xl bg-[var(--brand-green)] px-4 text-[16px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)]"
+                className="flex min-h-12 items-center justify-center rounded-xl px-4 text-[16px] font-semibold text-[var(--text-secondary)] transition-colors duration-150 hover:bg-[var(--bg-secondary)] hover:text-[var(--text-primary)]"
               >
                 로그인
               </Link>
