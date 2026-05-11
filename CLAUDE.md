@@ -856,19 +856,25 @@ v2 진입 조건: Phase 1 수익 입증 (인당 월 1,000만원 — 사업계획
 - API error code 직접 노출 (사용자 친화 메시지 paradigm 의무)
 - 분류 어휘 영문 노출 (tier / matchStatus → 한국어 paradigm 의무)
 
-**어미 paradigm 정수** (cycle 1-D-A-4-3 보강 1 갱신):
+**어미 paradigm 정수** (cycle 1-D-A-4-3 보강 1 갱신 / cycle 1-E-B-δ 예외 명문화 갱신):
 - 합니다체 단독 paradigm (~합니다 / ~해주세요 / ~가능합니다)
 - 요체 (~예요 / ~돼요) 영구 폐기 (비전문 paradigm NG)
 - 사용자 노출 paradigm = 마케터 + 전문 paradigm 광역
 
+**적용 영역 광역** (cycle 1-E-B-δ 명문화):
+- narrator + meta + UI label + helper text + error message + body copy + heading + sub paragraph 광역 = 합니다체 단독 영구 정합
+- **예외 paradigm 정수**: 직접 인용 quote paradigm 안 광역 (큰따옴표 안 광역 = 실 고객 발화 paradigm) = **요체 자연 paradigm 예외 정합** (예: ReviewsMarquee quote1/quote2 광역)
+- quote 밖 narrator 광역 = 합니다체 단독 정합 (quote = 실 고객 발화 paradigm 진정성 정수 / narrator = 마케터 paradigm 정수)
+
 **자가 검증 paradigm**:
 - 영문 + ISO string + 영문 status 광역 = grep 자가 검증 의무
-- 요체 어미 (~예요 / ~돼요) grep 자가 검증 의무
+- 요체 어미 (~예요 / ~돼요) grep 자가 검증 의무 (단 quote paradigm 안 영역 광역 예외 정합)
 
 **학습**:
 - (cycle 1-D-A-4-2 보강 1) "확인 시각 기록됨" UI 노출 = 백엔드 표현 paradigm NG → 영구 폐기 사례
 - (cycle 1-D-A-4-3 재진입) 정부24 "수요기관 입력" 어휘 = 백엔드/행정 paradigm → 영구 폐기 사례
 - (cycle 1-D-A-4-3 보강 1) 요체 어미 비전문 paradigm NG → 합니다체 단독 회수 사례
+- (cycle 1-E-B-δ) quote paradigm 안 요체 자연 paradigm 예외 명문화 = 실 고객 발화 진정성 paradigm 정수 (narrator 합니다체 단독 vs quote 요체 자연 paradigm 분리 정합)
 
 ---
 

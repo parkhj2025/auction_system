@@ -201,7 +201,7 @@ export default async function OrderDetailPage({
             {row.manual_entry && (
               <p className="mt-4 rounded-[var(--radius-sm)] bg-[var(--color-surface-muted)] px-3 py-2 text-xs text-[var(--color-ink-500)]">
                 수동 입력으로 접수된 건입니다. 물건 상세는 접수 확인 시
-                카카오톡으로 안내드립니다.
+                알림을 보내드립니다.
               </p>
             )}
           </div>

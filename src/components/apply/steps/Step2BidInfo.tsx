@@ -185,7 +185,7 @@ export function Step2BidInfo({
           입찰 정보를 입력해주세요
         </h2>
         <p className="text-sm leading-6 text-[var(--color-ink-500)]">
-          위임 서류 작성에 필요한 정보예요
+          위임 서류 작성에 필요한 정보입니다
         </p>
       </header>
 
@@ -374,7 +374,7 @@ export function Step2BidInfo({
               />
             </div>
             <p className="mt-1 text-xs leading-5 text-[var(--color-ink-500)]">
-              위임장 발급 직후 뒷 7자리는 폐기돼요
+              위임장 발급 직후 뒷 7자리는 폐기됩니다
             </p>
             {showErrors && (errors.ssnFront || errors.ssnBack) && (
               <p className="mt-1 text-xs text-[var(--color-accent-red)]">

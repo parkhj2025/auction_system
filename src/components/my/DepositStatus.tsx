@@ -22,7 +22,7 @@ export function DepositStatus({ order }: { order: OrderRow }) {
         </h3>
         <p className="mt-3 text-sm leading-6 text-[var(--color-ink-500)]">
           수동 접수로 감정가가 확정되지 않아 보증금 금액이 아직 산출되지
-          않았습니다. 접수 확인 시 카카오톡으로 안내드립니다.
+          않았습니다. 접수 확인 시 알림을 보내드립니다.
         </p>
       </div>
     );

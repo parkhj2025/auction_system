@@ -21,7 +21,7 @@ export function StatusTimeline({ status }: { status: OrderStatus }) {
           접수가 취소되었습니다
         </p>
         <p className="mt-1 text-xs text-[var(--color-ink-500)]">
-          문의가 있으시면 카카오톡 채널로 연락해주세요.
+          문의가 있으시면 고객지원팀으로 연락해주세요.
         </p>
       </div>
     );
