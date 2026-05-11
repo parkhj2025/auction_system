@@ -267,48 +267,60 @@ export const APPLY_STEPS = [
 export type ApplyStepId = (typeof APPLY_STEPS)[number]["id"];
 
 /**
- * cycle 1-G-β 재시작 — /about 차별화 5축 paradigm (Values 영구 폐기 사후 신규).
- * paradigm: 5 카드 = 큰 숫자 + title + body + colored bg (브랜드 색 분기).
+ * cycle 1-G-β-β — /about 차별화 3축 paradigm (5축 → 3축 단순화 / pastel bg 영구 폐기).
+ * paradigm: 3 카드 = 큰 숫자 + title + body / bg-white + brand-green 단독 강조.
  */
 export const DIFFERENTIATORS = [
   {
     id: "price",
     bigNumber: "5만원",
     title: "업계 평균 대비 절반 수준",
-    body: "콘텐츠 기반 유입 구조로 마케팅 비용을 줄여 절반 수준의 수수료를 책정했습니다.",
-    tone: "green",
+    body: "콘텐츠 기반 유입 구조로 마케팅 비용을 줄였습니다.",
   },
   {
-    id: "deposit",
-    bigNumber: "100%",
-    title: "보증금 전용계좌 분리",
-    body: "고객 보증금은 전용계좌로 분리 관리하며 패찰 시 당일 즉시 반환됩니다.",
-    tone: "yellow",
+    id: "safety",
+    bigNumber: "당일",
+    title: "패찰 시 보증금 당일 즉시 반환",
+    body: "공인중개사 자격과 서울보증보험으로 자산을 보호합니다.",
   },
   {
-    id: "rush",
-    bigNumber: "D-1",
-    title: "할증 없이 동일 가격",
-    body: "급한 일정에도 정찰제 가격을 그대로 적용합니다. 추가 비용 없음.",
-    tone: "green",
-  },
-  {
-    id: "agent",
-    bigNumber: "1인",
-    title: "공인중개사가 직접 입찰",
-    body: "박형준 대표가 인천지방법원에 직접 출석해 입찰을 수행합니다.",
-    tone: "ink",
-  },
-  {
-    id: "channel",
-    bigNumber: "24h",
-    title: "카카오톡으로 직접 소통",
-    body: "신청부터 결과까지 카카오톡으로 직접 안내드립니다. 콜센터 0.",
-    tone: "yellow",
+    id: "direct",
+    bigNumber: "카톡",
+    title: "공인중개사가 직접 출석합니다",
+    body: "신청부터 결과까지 카카오톡으로 직접 안내드립니다.",
   },
 ] as const;
 
-export type DifferentiatorTone = (typeof DIFFERENTIATORS)[number]["tone"];
+/**
+ * cycle 1-G-β-β — /about 비교 섹션 3 카드 paradigm.
+ * paradigm: 좌 (일반) ink-500 + 우 (우리) brand-green 강조 / 비용 row 영구 폐기 (영구 룰 §13 정합).
+ */
+export const COMPARISON_CARDS = [
+  {
+    id: "steps",
+    meta: "본인 출석 vs 대리 처리",
+    leftValue: "5단계",
+    leftSubtitle: "휴가 → 서류 → 수표 → 이동 → 대기",
+    rightValue: "6단계",
+    rightSubtitle: "웹 신청 → 입찰 정보 → 서류 → 결제 → 입찰 → 결과",
+  },
+  {
+    id: "time",
+    meta: "98% 절약",
+    leftValue: "255분",
+    leftSubtitle: "법원 출석 + 대기",
+    rightValue: "3분",
+    rightSubtitle: "웹 접수만",
+  },
+  {
+    id: "result",
+    meta: "패찰 시 보증금 당일 즉시 반환",
+    leftValue: "직접 입찰",
+    leftSubtitle: "결과 본인 회수",
+    rightValue: "대리 입찰",
+    rightSubtitle: "카카오톡 통보 + 보증금 즉시 반환",
+  },
+] as const;
 
 /* Phase 1.2 (A-1-2) v6 — InsightBlock 카테고리 색 시스템.
  * 4 카테고리: 무료 물건분석 (green) / 가이드 (blue) / 시장 인사이트 (orange) / 낙찰사례 (purple). */

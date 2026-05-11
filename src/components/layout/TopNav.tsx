@@ -25,7 +25,7 @@ import { Logo } from "@/components/Logo";
  */
 
 const TOPNAV_LINKS = [
-  { href: "/about", label: "서비스" },
+  { href: "/about", label: "서비스 소개" },
   { href: "/service", label: "이용 절차" },
   { href: "/faq", label: "자주 묻는 질문" },
   { href: "/insight", label: "경매 인사이트" },
