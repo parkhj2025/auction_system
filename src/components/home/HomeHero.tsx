@@ -1,46 +1,192 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState, useMemo } from "react";
+import { useState } from "react";
 import { motion } from "motion/react";
-import { Building2, FileText, Lock } from "lucide-react";
+import {
+  Building2,
+  FileText,
+  Lock,
+  AlertCircle,
+  Loader2,
+  ImageOff,
+} from "lucide-react";
+import type { CourtListingSummary } from "@/types/apply";
 
-/* cycle 1-G-γ-α-β — HomeHero 사전 HeroSearch paradigm 전체 회복 (commit 2d2601e 기준).
- * - 모바일 + 데스크탑 풀스크린 (min-h dvh paradigm 회복)
- * - vstack 가운데 정렬 + Liquid Glass 박스 + form 통합 회복
- * - chip 2건 + Lock caption + 데스크탑 강점 3건 광역 회복
- * - 백그라운드 단독 변경 = video hero-bg.mp4 영구 폐기 → 자체 SVG 일러스트 (continuous loop)
- * - h1 + subtitle textShadow paradigm 회복 (가독성 + glow). */
+/* cycle 1-G-γ-α-δ — Hero 사건 조회 + 물건 선택 + 자동 진입 paradigm:
+ * - input 형식 검증 (CASE_NUMBER_PATTERN) + CTA "조회하기" → /api/auction/lookup GET fetch
+ * - inline 결과 카드 (listings 1건 단독) + inline 물건 선택 (listings 다건)
+ * - NG 안내 (status closed + not_found)
+ * - sessionStorage 보존 (key + TTL 1시간) + /apply?case=XXX&prefill=1 진입. */
 
-export function HomeHero({ caseNumbers }: { caseNumbers: string[] }) {
+const CASE_NUMBER_PATTERN = /^\d{4}타경\d+$/;
+const COURT_CODE = "B000240"; // Phase 1 = 인천지방법원 단독
+const SESSION_KEY = "auctionquick:hero-lookup";
+// SESSION_TTL_MS = ApplyClient.tsx 단독 사용 (1시간 / Hero 안 영역 0).
+
+type LookupStatus =
+  | "idle"
+  | "loading"
+  | "active-single"
+  | "active-multi"
+  | "closed"
+  | "not-found"
+  | "invalid"
+  | "error";
+
+type SessionPayload = {
+  caseNumber: string;
+  selectedDocid: string | null;
+  listings: CourtListingSummary[];
+  lookupAt: number;
+};
+
+function saveSession(payload: SessionPayload) {
+  if (typeof window === "undefined") return;
+  try {
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(payload));
+  } catch {
+    // sessionStorage 영역 0 시점 = silent fallback.
+  }
+}
+
+function formatWon(n: number | null): string {
+  if (n === null || n === undefined) return "—";
+  return `${n.toLocaleString()}원`;
+}
+
+function formatBidDate(iso: string | null): string {
+  if (!iso) return "—";
+  const [y, m, d] = iso.split("-");
+  if (!y || !m || !d) return iso;
+  return `${y}.${m}.${d}`;
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+
+export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] }) {
+  void _caseNumbers; // 사전 paradigm 호환 (사후 cycle 광역 제거 영역).
   const router = useRouter();
   const [value, setValue] = useState("");
+  const [lookupStatus, setLookupStatus] = useState<LookupStatus>("idle");
+  const [listings, setListings] = useState<CourtListingSummary[]>([]);
+  const [selectedDocid, setSelectedDocid] = useState<string | null>(null);
+  const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
-  const normalizedCases = useMemo(
-    () => new Set(caseNumbers.map((c) => c.normalize("NFC"))),
-    [caseNumbers]
-  );
-
-  function onSubmit(e: React.FormEvent) {
+  async function handleLookup(e: React.FormEvent) {
     e.preventDefault();
-    const trimmed = value.trim();
+    const trimmed = value.trim().normalize("NFC");
     if (!trimmed) return;
-    const normalized = trimmed.normalize("NFC");
-    if (normalizedCases.has(normalized)) {
-      router.push(`/analysis/${encodeURIComponent(normalized)}`);
-    } else {
-      router.push(`/apply?case=${encodeURIComponent(normalized)}`);
+
+    if (!CASE_NUMBER_PATTERN.test(trimmed)) {
+      setLookupStatus("invalid");
+      setListings([]);
+      setSelectedDocid(null);
+      setErrorMessage("사건번호 형식: 2024타경XXX (한글 '타경' 포함)");
+      return;
     }
+
+    setLookupStatus("loading");
+    setListings([]);
+    setSelectedDocid(null);
+    setErrorMessage(null);
+
+    try {
+      const url = `/api/auction/lookup?caseNumber=${encodeURIComponent(trimmed)}&courtCode=${COURT_CODE}`;
+      const res = await fetch(url);
+      const json = (await res.json()) as {
+        status: string;
+        listings?: CourtListingSummary[];
+      };
+
+      if (json.status === "active" && json.listings && json.listings.length > 0) {
+        setListings(json.listings);
+        if (json.listings.length === 1) {
+          setSelectedDocid(json.listings[0].docid);
+          setLookupStatus("active-single");
+        } else {
+          setLookupStatus("active-multi");
+        }
+        return;
+      }
+
+      if (json.status === "closed") {
+        setLookupStatus("closed");
+        setErrorMessage("이 사건은 매각이 종결됐습니다.");
+        return;
+      }
+
+      if (json.status === "not_found") {
+        setLookupStatus("not-found");
+        setErrorMessage(
+          "사건 정보를 확인할 수 없습니다. 사건번호를 다시 확인해주세요.",
+        );
+        return;
+      }
+
+      setLookupStatus("error");
+      setErrorMessage("조회 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    } catch {
+      setLookupStatus("error");
+      setErrorMessage("조회 중 오류가 발생했습니다. 잠시 후 다시 시도해주세요.");
+    }
+  }
+
+  function handleApply() {
+    if (!selectedDocid) return;
+    const trimmed = value.trim().normalize("NFC");
+    const payload: SessionPayload = {
+      caseNumber: trimmed,
+      selectedDocid,
+      listings,
+      lookupAt: Date.now(),
+    };
+    saveSession(payload);
+    router.push(
+      `/apply?case=${encodeURIComponent(trimmed)}&prefill=1`,
+    );
+  }
+
+  function handleRetry() {
+    setLookupStatus("idle");
+    setListings([]);
+    setSelectedDocid(null);
+    setErrorMessage(null);
+  }
+
+  const isLoading = lookupStatus === "loading";
+  const hasResult =
+    lookupStatus === "active-single" || lookupStatus === "active-multi";
+  const hasError =
+    lookupStatus === "closed" ||
+    lookupStatus === "not-found" ||
+    lookupStatus === "invalid" ||
+    lookupStatus === "error";
+  const ctaDisabled =
+    isLoading || (lookupStatus === "active-multi" && !selectedDocid);
+  const ctaLabel = isLoading
+    ? "조회 중..."
+    : hasResult
+    ? "신청하기"
+    : hasError
+    ? "다시 조회하기"
+    : "조회하기";
+
+  function handleCtaClick() {
+    if (hasResult) {
+      handleApply();
+    } else if (hasError) {
+      handleRetry();
+    }
+    // idle / loading 시점 = form onSubmit 광역 진입 paradigm.
   }
 
   return (
     <section className="relative isolate flex min-h-[calc(100dvh-64px)] flex-col items-center justify-center overflow-hidden bg-[#111418] px-6 lg:min-h-[calc(100dvh-80px)]">
-      {/* 백그라운드 SVG 일러스트 (continuous loop / video 영구 폐기 사후 신규). */}
       <HeroFlowBackground />
 
-      {/* vstack — h1 + 모바일 subtext + 모바일 chip + 박스. */}
-      <div className="relative z-10 flex flex-col items-center text-center gap-6 lg:gap-14 w-full max-w-[800px]">
-        {/* h1 (모바일 44px / 데스크탑 88px). */}
+      <div className="relative z-10 flex w-full max-w-[800px] flex-col items-center gap-6 text-center lg:gap-14">
+        {/* h1. */}
         <h1
           className="w-full text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-white [text-wrap:balance] lg:text-[88px]"
           style={{
@@ -61,7 +207,7 @@ export function HomeHero({ caseNumbers }: { caseNumbers: string[] }) {
           </span>
         </h1>
 
-        {/* subtext 모바일 박스 밖 (17px). */}
+        {/* 모바일 subtext. */}
         <p
           className="lg:hidden text-[17px] text-white/90 font-medium leading-[1.6] text-center"
           style={{
@@ -72,7 +218,7 @@ export function HomeHero({ caseNumbers }: { caseNumbers: string[] }) {
           사건번호만 주시면, 법원은 저희가 갑니다.
         </p>
 
-        {/* 모바일 chip 2건 (외부 gap-7 / 아이콘 18 / 라벨 14px). */}
+        {/* 모바일 chip 2건. */}
         <div className="lg:hidden flex items-center justify-center gap-7">
           <div className="flex items-center gap-2">
             <Building2
@@ -100,9 +246,9 @@ export function HomeHero({ caseNumbers }: { caseNumbers: string[] }) {
           </div>
         </div>
 
-        {/* Apple Liquid Glass 박스 (회복). */}
+        {/* Apple Liquid Glass 박스. */}
         <div
-          className="flex flex-col gap-5 lg:gap-8 w-full items-center rounded-[28px] px-6 py-7 lg:px-10 lg:py-8"
+          className="flex w-full flex-col items-center gap-5 rounded-[28px] px-6 py-7 lg:gap-8 lg:px-10 lg:py-8"
           style={{
             background:
               "linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.20) 100%)",
@@ -113,7 +259,7 @@ export function HomeHero({ caseNumbers }: { caseNumbers: string[] }) {
               "inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 32px 80px -16px rgba(0, 0, 0, 0.35)",
           }}
         >
-          {/* subtext 데스크탑 박스 안 (24px). */}
+          {/* 데스크탑 박스 안 subtext. */}
           <p
             className="hidden lg:block text-center text-[24px] font-medium leading-[1.6] text-white/90"
             style={{ textShadow: "0 1px 4px rgba(0, 0, 0, 0.3)" }}
@@ -121,118 +267,256 @@ export function HomeHero({ caseNumbers }: { caseNumbers: string[] }) {
             사건번호만 주시면, 법원은 저희가 갑니다.
           </p>
 
-          {/* 모바일 form (vertical / input h-16 + CTA h-16). */}
+          {/* form (모바일 vertical + 데스크탑 horizontal). */}
           <form
-            onSubmit={onSubmit}
+            onSubmit={handleLookup}
             role="search"
-            aria-label="사건번호 검색"
-            className="lg:hidden flex flex-col gap-3 w-full"
+            aria-label="사건번호 조회"
+            className="flex w-full flex-col gap-3 lg:flex-row lg:max-w-[600px] lg:items-center lg:rounded-2xl lg:bg-white lg:p-1.5 lg:shadow-md"
           >
-            <label htmlFor="hero-case-mobile" className="sr-only">
+            <label htmlFor="hero-case" className="sr-only">
               사건번호
             </label>
-            <p className="text-[15px] text-white/85 font-medium text-center">
-              사건번호로 시작해보세요
+            <input
+              id="hero-case"
+              type="text"
+              inputMode="text"
+              autoComplete="off"
+              value={value}
+              onChange={(e) => {
+                setValue(e.target.value);
+                if (lookupStatus !== "idle") {
+                  setLookupStatus("idle");
+                  setListings([]);
+                  setSelectedDocid(null);
+                  setErrorMessage(null);
+                }
+              }}
+              placeholder="사건번호 입력 (예: 2024타경569067)"
+              className="w-full h-16 rounded-2xl bg-white px-5 text-[16px] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] outline-none shadow-md lg:h-16 lg:flex-1 lg:bg-transparent lg:px-6 lg:text-[18px] lg:shadow-none"
+            />
+            <button
+              type={hasResult || hasError ? "button" : "submit"}
+              onClick={hasResult || hasError ? handleCtaClick : undefined}
+              disabled={ctaDisabled}
+              className="inline-flex h-16 w-full items-center justify-center gap-2 rounded-2xl bg-[var(--brand-green)] px-8 text-[16px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 lg:w-auto lg:rounded-xl lg:px-12 lg:text-[18px]"
+            >
+              {isLoading && <Loader2 size={18} className="animate-spin" aria-hidden="true" />}
+              {ctaLabel}
+            </button>
+          </form>
+
+          {/* helper text. */}
+          {lookupStatus === "idle" && (
+            <p className="text-center text-xs text-white/60 lg:text-sm">
+              한글 &apos;타경&apos; 포함 형식으로 입력해주세요
             </p>
-            <input
-              id="hero-case-mobile"
-              type="text"
-              inputMode="text"
-              autoComplete="off"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder="사건번호 입력 (예: 2026타경500459)"
-              className="w-full h-16 rounded-2xl bg-white px-5 text-[16px] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] outline-none shadow-md"
-            />
-            <button
-              type="submit"
-              className="w-full h-16 rounded-2xl bg-[var(--brand-green)] inline-flex items-center justify-center text-[16px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2"
-            >
-              조회하기
-            </button>
-          </form>
+          )}
 
-          {/* 데스크탑 form (horizontal 통합 / max-w 600). */}
-          <form
-            onSubmit={onSubmit}
-            role="search"
-            aria-label="사건번호 검색"
-            className="hidden lg:flex w-full max-w-[600px] items-center rounded-2xl bg-white p-1.5 shadow-md transition-shadow duration-200 focus-within:shadow-lg"
-          >
-            <label htmlFor="hero-case-desktop" className="sr-only">
-              사건번호
-            </label>
-            <input
-              id="hero-case-desktop"
-              type="text"
-              inputMode="text"
-              autoComplete="off"
-              value={value}
-              onChange={(e) => setValue(e.target.value)}
-              placeholder="사건번호 입력 (예: 2026타경500459)"
-              className="h-16 flex-1 bg-transparent px-6 text-[18px] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] outline-none"
-            />
-            <button
-              type="submit"
-              className="inline-flex h-16 items-center justify-center rounded-xl bg-[var(--brand-green)] px-12 text-[18px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2"
-            >
-              조회하기
-            </button>
-          </form>
-
-          {/* 모바일 보증금 caption (form 사후 / 박스 안). */}
-          <div className="lg:hidden flex items-center justify-center gap-2 mt-1">
-            <Lock
-              strokeWidth={2.2}
-              className="w-4 h-4 flex-shrink-0 text-green-400"
-            />
-            <span className="text-[14px] text-white/80 font-medium whitespace-nowrap">
-              보증금 전용계좌로 분리 보관
-            </span>
-          </div>
-
-          {/* 데스크탑 강점 3건 가로 1행. */}
-          <div className="hidden lg:flex items-center justify-center gap-6">
-            <div className="flex items-center gap-2">
-              <Building2
-                strokeWidth={2}
-                className="h-5 w-5 flex-shrink-0 text-green-400"
-              />
-              <span className="whitespace-nowrap text-[15px] font-semibold text-white/95">
-                법원 방문 없음
-              </span>
+          {/* inline 결과: status active. */}
+          {hasResult && listings.length > 0 && (
+            <div className="w-full">
+              {lookupStatus === "active-multi" && (
+                <p className="mb-3 text-sm text-white/80">
+                  이 사건은 {listings.length}개 물건으로 구성됩니다. 신청하실 물건을 선택해주세요.
+                </p>
+              )}
+              {lookupStatus === "active-single" && listings[0] && (
+                <SingleListingCard listing={listings[0]} />
+              )}
+              {lookupStatus === "active-multi" && (
+                <div className="flex flex-col gap-2">
+                  {listings.map((l) => (
+                    <ListingPickerCard
+                      key={l.docid}
+                      listing={l}
+                      selected={selectedDocid === l.docid}
+                      onClick={() => setSelectedDocid(l.docid)}
+                    />
+                  ))}
+                </div>
+              )}
             </div>
-            <div className="h-5 w-px flex-shrink-0 bg-white/30" />
-            <div className="flex items-center gap-2">
-              <FileText
-                strokeWidth={2}
-                className="h-5 w-5 flex-shrink-0 text-green-400"
+          )}
+
+          {/* NG 안내: status closed + not_found + invalid + error. */}
+          {hasError && errorMessage && (
+            <div className="flex w-full items-start gap-3 rounded-2xl border border-red-500/30 bg-red-500/10 p-4">
+              <AlertCircle
+                size={20}
+                strokeWidth={2.2}
+                className="mt-0.5 shrink-0 text-red-400"
+                aria-hidden="true"
               />
-              <span className="whitespace-nowrap text-[15px] font-semibold text-white/95">
-                서류 비대면
-              </span>
+              <p className="text-sm font-medium leading-6 text-white">
+                {errorMessage}
+              </p>
             </div>
-            <div className="h-5 w-px flex-shrink-0 bg-white/30" />
-            <div className="flex items-center gap-2">
+          )}
+
+          {/* 모바일 보증금 caption. */}
+          {lookupStatus === "idle" && (
+            <div className="lg:hidden flex items-center justify-center gap-2">
               <Lock
-                strokeWidth={2}
-                className="h-5 w-5 flex-shrink-0 text-green-400"
+                strokeWidth={2.2}
+                className="w-4 h-4 flex-shrink-0 text-green-400"
               />
-              <span className="whitespace-nowrap text-[15px] font-semibold text-white/95">
-                보증금 전용계좌
+              <span className="text-[14px] text-white/80 font-medium whitespace-nowrap">
+                보증금 전용계좌로 분리 보관
               </span>
             </div>
-          </div>
+          )}
+
+          {/* 데스크탑 강점 3건. */}
+          {lookupStatus === "idle" && (
+            <div className="hidden lg:flex items-center justify-center gap-6">
+              <div className="flex items-center gap-2">
+                <Building2
+                  strokeWidth={2}
+                  className="h-5 w-5 flex-shrink-0 text-green-400"
+                />
+                <span className="whitespace-nowrap text-[15px] font-semibold text-white/95">
+                  법원 방문 없음
+                </span>
+              </div>
+              <div className="h-5 w-px flex-shrink-0 bg-white/30" />
+              <div className="flex items-center gap-2">
+                <FileText
+                  strokeWidth={2}
+                  className="h-5 w-5 flex-shrink-0 text-green-400"
+                />
+                <span className="whitespace-nowrap text-[15px] font-semibold text-white/95">
+                  서류 비대면
+                </span>
+              </div>
+              <div className="h-5 w-px flex-shrink-0 bg-white/30" />
+              <div className="flex items-center gap-2">
+                <Lock
+                  strokeWidth={2}
+                  className="h-5 w-5 flex-shrink-0 text-green-400"
+                />
+                <span className="whitespace-nowrap text-[15px] font-semibold text-white/95">
+                  보증금 전용계좌
+                </span>
+              </div>
+            </div>
+          )}
         </div>
       </div>
     </section>
   );
 }
 
-/* 자체 SVG 백그라운드 일러스트 (continuous loop / video 영구 폐기 사후 신규).
- * paradigm: 법원 building skyline 추상 + 망치 + 사건 흐름 line + floating dot 광역.
- * 색 = charcoal bg + brand-green stroke + yellow accent + white opacity 변주.
- * opacity = 0.3 (textShadow 동시 가독성 회수). */
+// ─────────────────────────────────────────────────────────────────────────────
+// inline 결과 카드.
+
+function SingleListingCard({ listing }: { listing: CourtListingSummary }) {
+  return (
+    <article className="rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-sm">
+      <span className="inline-flex items-center rounded-full bg-[var(--brand-green)] px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
+        조회 완료
+      </span>
+      <div className="mt-4 grid grid-cols-[88px_1fr] gap-4 lg:grid-cols-[120px_1fr]">
+        <div
+          aria-hidden="true"
+          className="flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-white/5"
+        >
+          <ImageOff
+            size={32}
+            className="text-white/40"
+            strokeWidth={1.5}
+            aria-hidden="true"
+          />
+        </div>
+        <div className="flex flex-col gap-2 text-left">
+          {listing.usage_name && (
+            <p className="text-xs font-bold uppercase tracking-wider text-[var(--brand-green)]">
+              {listing.usage_name}
+            </p>
+          )}
+          <p className="text-base font-medium leading-snug text-white">
+            {listing.address_display ?? listing.case_title ?? "주소 정보 미수신"}
+          </p>
+          <div className="mt-1 grid grid-cols-2 gap-2 text-xs text-white/80 sm:text-sm">
+            <div>
+              <p className="text-white/60">감정가</p>
+              <p className="tabular-nums text-white">
+                {formatWon(listing.appraisal_amount)}
+              </p>
+            </div>
+            <div>
+              <p className="text-white/60">최저가</p>
+              <p className="tabular-nums text-white">
+                {formatWon(listing.min_bid_amount)}
+              </p>
+            </div>
+            <div>
+              <p className="text-white/60">입찰일</p>
+              <p className="tabular-nums text-white">
+                {formatBidDate(listing.bid_date)}
+              </p>
+            </div>
+            <div>
+              <p className="text-white/60">유찰 횟수</p>
+              <p className="tabular-nums text-white">{listing.failed_count}회</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+function ListingPickerCard({
+  listing,
+  selected,
+  onClick,
+}: {
+  listing: CourtListingSummary;
+  selected: boolean;
+  onClick: () => void;
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-pressed={selected}
+      className={
+        "flex w-full items-center gap-3 rounded-xl border p-3 text-left transition-colors duration-150 " +
+        (selected
+          ? "border-[var(--brand-green)] bg-[var(--brand-green)]/15"
+          : "border-white/15 bg-white/5 hover:bg-white/10")
+      }
+    >
+      <span
+        aria-hidden="true"
+        className={
+          selected
+            ? "h-2 w-2 shrink-0 rounded-full bg-[var(--brand-green)]"
+            : "h-2 w-2 shrink-0 rounded-full bg-white/30"
+        }
+      />
+      <span className="flex-1 text-sm text-white/90 tabular-nums">
+        <span className="font-bold text-white">#{listing.item_sequence}</span>
+        {listing.usage_name && (
+          <span className="ml-2 text-white/70">{listing.usage_name}</span>
+        )}
+        {listing.address_display && (
+          <span className="ml-2 text-white/60">
+            · {listing.address_display}
+          </span>
+        )}
+        <span className="ml-2 text-white/80">
+          · {formatWon(listing.appraisal_amount)}
+        </span>
+      </span>
+    </button>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// 자체 SVG 백그라운드 (continuous loop / cycle 1-G-γ-α-β + γ paradigm).
+
 function HeroFlowBackground() {
   return (
     <div
@@ -256,7 +540,6 @@ function HeroFlowBackground() {
           </radialGradient>
         </defs>
 
-        {/* 광역 광채 (가운데 brand-green glow). */}
         <motion.circle
           cx="800"
           cy="450"
@@ -267,15 +550,12 @@ function HeroFlowBackground() {
           style={{ transformOrigin: "800px 450px" }}
         />
 
-        {/* 법원 building skyline 추상 (하단). */}
         <g opacity="0.5">
           <rect x="120" y="640" width="80" height="160" fill="none" stroke="#00C853" strokeWidth="1.5" />
           <rect x="220" y="580" width="100" height="220" fill="none" stroke="#00C853" strokeWidth="1.5" />
           <rect x="340" y="620" width="70" height="180" fill="none" stroke="#00C853" strokeWidth="1.5" />
-          {/* 가운데 = 법원 (큰 paradigm). */}
           <g>
             <rect x="700" y="500" width="200" height="300" fill="none" stroke="#00C853" strokeWidth="2" />
-            {/* 기둥 6개. */}
             {[0, 1, 2, 3, 4, 5].map((i) => (
               <line
                 key={i}
@@ -287,14 +567,12 @@ function HeroFlowBackground() {
                 strokeWidth="1.5"
               />
             ))}
-            {/* 지붕 삼각. */}
             <path
               d="M 690 500 L 800 440 L 910 500 Z"
               fill="none"
               stroke="#00C853"
               strokeWidth="2"
             />
-            {/* yellow dot accent. */}
             <circle cx="800" cy="470" r="6" fill="#FFD43B" />
           </g>
           <rect x="1000" y="600" width="90" height="200" fill="none" stroke="#00C853" strokeWidth="1.5" />
@@ -303,7 +581,6 @@ function HeroFlowBackground() {
           <rect x="1330" y="620" width="70" height="180" fill="none" stroke="#00C853" strokeWidth="1.5" />
         </g>
 
-        {/* 흐름 line (좌→우 dashed / opacity 약화). */}
         <motion.line
           x1="100"
           y1="180"
@@ -329,7 +606,6 @@ function HeroFlowBackground() {
           transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
         />
 
-        {/* 망치 (gavel) 우상단 추상. */}
         <motion.g
           opacity="0.55"
           animate={{ rotate: [0, -8, 0] }}
@@ -341,7 +617,6 @@ function HeroFlowBackground() {
           <circle cx="1380" cy="180" r="5" fill="#FFD43B" />
         </motion.g>
 
-        {/* 사건번호 input 추상 좌상단. */}
         <g opacity="0.55">
           <rect x="160" y="160" width="260" height="56" rx="14" fill="none" stroke="#00C853" strokeWidth="2" />
           <motion.rect
@@ -357,7 +632,6 @@ function HeroFlowBackground() {
           <rect x="180" y="196" width="80" height="3" rx="1.5" fill="#00C853" opacity="0.6" />
         </g>
 
-        {/* floating dot 광역 (5건 / 각 다른 cycle). */}
         {[
           { cx: 280, cy: 380, r: 3, delay: 0 },
           { cx: 520, cy: 280, r: 4, delay: 0.4 },
@@ -383,7 +657,6 @@ function HeroFlowBackground() {
           />
         ))}
 
-        {/* 광역 fade overlay (가독성 회복 paradigm). */}
         <rect width="1600" height="900" fill="url(#hero-fade)" />
       </svg>
     </div>

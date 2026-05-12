@@ -12,6 +12,7 @@ import type {
   ApplyDocuments,
 } from "@/types/apply";
 import { INITIAL_APPLY_DATA } from "@/types/apply";
+import type { CourtListingSummary } from "@/types/apply";
 import { APPLY_STEPS, COURTS_ALL, type ApplyStepId } from "@/lib/constants";
 import { ApplyStepIndicator } from "./ApplyStepIndicator";
 import { Step1Property } from "./steps/Step1Property";
@@ -23,9 +24,39 @@ import { Step5Complete } from "./steps/Step5Complete";
 
 const STEP_ORDER: ApplyStepId[] = APPLY_STEPS.map((s) => s.id);
 
+/* cycle 1-G-γ-α-δ — Hero sessionStorage 회수 paradigm.
+ * Hero 사건 조회 사후 sessionStorage 보존 → /apply 자동 prefill (matchedListing + bidDate + propertyType + propertyAddress + auctionRound).
+ * TTL 1시간 만료 시점 = prefill 영역 0 (사용자 직접 lookup 단계 진입). */
+const SESSION_KEY = "auctionquick:hero-lookup";
+const SESSION_TTL_MS = 60 * 60 * 1000;
+
+type SessionPayload = {
+  caseNumber: string;
+  selectedDocid: string | null;
+  listings: CourtListingSummary[];
+  lookupAt: number;
+};
+
+function readHeroSession(): SessionPayload | null {
+  if (typeof window === "undefined") return null;
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw) as SessionPayload;
+    if (!parsed.lookupAt || Date.now() - parsed.lookupAt > SESSION_TTL_MS) {
+      sessionStorage.removeItem(SESSION_KEY);
+      return null;
+    }
+    return parsed;
+  } catch {
+    return null;
+  }
+}
+
 export function ApplyClient() {
   const searchParams = useSearchParams();
   const initialCase = searchParams.get("case") ?? "";
+  const prefillFromHero = searchParams.get("prefill") === "1";
   // Phase 6.5-POST 작업 1: court 영문/courtCode/한글 무엇이 와도 한글 label로 정규화.
   // 매칭 실패 시 빈 문자열 → INITIAL_APPLY_DATA.court 기본값(="인천지방법원") 유지.
   const initialCourtRaw = searchParams.get("court") ?? "";
@@ -35,10 +66,27 @@ export function ApplyClient() {
       )?.label ?? ""
     : "";
 
+  // Hero sessionStorage 회수 (prefill=1 단독 / TTL 만료 시점 = null).
+  const heroSession =
+    prefillFromHero && typeof window !== "undefined" ? readHeroSession() : null;
+  const matchedFromHero =
+    heroSession?.selectedDocid
+      ? heroSession.listings.find((l) => l.docid === heroSession.selectedDocid) ?? null
+      : null;
+
   const [data, setData] = useState<ApplyFormData>({
     ...INITIAL_APPLY_DATA,
     caseNumber: initialCase,
     ...(initialCourt ? { court: initialCourt } : {}),
+    ...(matchedFromHero
+      ? {
+          matchedListing: matchedFromHero,
+          bidDate: matchedFromHero.bid_date ?? "",
+          propertyType: matchedFromHero.usage_name ?? "",
+          propertyAddress: matchedFromHero.address_display ?? "",
+          auctionRound: matchedFromHero.auction_round,
+        }
+      : {}),
   });
   const [currentStep, setCurrentStep] = useState<ApplyStepId>("property");
   // cycle 1-D-A-2: completed state는 setter만 사용 (5 step 원 paradigm 폐기 / 추후 진행 추적 영역).
