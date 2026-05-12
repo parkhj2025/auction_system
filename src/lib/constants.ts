@@ -351,6 +351,108 @@ export const ABOUT_TRUST: ReadonlyArray<{
   },
 ];
 
+/**
+ * cycle 1-G-γ — /service Scope 섹션 (업무 범위 DO + DON'T).
+ * paradigm: 6 + 6 item / DO chip brand-green + DON'T chip ink-100 / lucide Check + X.
+ */
+export const SERVICE_SCOPE_DO = [
+  "사건번호·물건 정보 확인 및 접수 관리",
+  "위임장·입찰표 등 법적 서류 작성",
+  "입찰일 법원 방문 및 현장 입찰 대리",
+  "입찰 보증금 수납·반환 관리 (전용계좌)",
+  "낙찰·패찰 결과 당일 통보",
+  "낙찰 시 잔금 납부 일정 안내",
+] as const;
+
+export const SERVICE_SCOPE_DONT = [
+  "권리분석 결론 제공 (등기부·인수 여부 최종 판단)",
+  "투자 권유 또는 매수 추천",
+  "매매 알선·시세 감정",
+  "명도 · 점유자 퇴거 · 이사비 협상",
+  "소유권 이전 등기 대행",
+  "세무 상담 및 절세 전략 수립",
+] as const;
+
+/**
+ * cycle 1-G-γ — /service Process 5단계 (카톡 명시 영구 폐기 / 신규 카피).
+ * paradigm: number 01~05 + title + D-day chip + 본문 / brand-green 풀스크린.
+ */
+export const SERVICE_PROCESS_STEPS = [
+  {
+    id: "submit",
+    number: "01",
+    title: "웹 접수",
+    dDay: "D-7 이상 권장",
+    body: "사건번호와 입찰 정보를 입력하고, 본인서명확인서를 업로드합니다. 평균 10분.",
+  },
+  {
+    id: "confirm",
+    number: "02",
+    title: "접수 확인",
+    dDay: "접수 당일",
+    body: "접수번호 발급 사후, 수수료·보증금 입금과 서류 이상 유무를 확인합니다.",
+  },
+  {
+    id: "finalize",
+    number: "03",
+    title: "서류·보증금 확정",
+    dDay: "D-1",
+    body: "입찰 전일까지 서류 최종 확인과 보증금 입금 확인을 완료합니다.",
+  },
+  {
+    id: "bid",
+    number: "04",
+    title: "법원 대리 입찰",
+    dDay: "D-Day 오전",
+    body: "지정 시각에 공인중개사가 법원에서 입찰표를 제출합니다. 진행 과정은 내부 기록으로 남깁니다.",
+  },
+  {
+    id: "result",
+    number: "05",
+    title: "결과 통보·정산",
+    dDay: "D-Day 오후",
+    body: "낙찰·패찰 결과를 즉시 알려드립니다. 패찰 시 보증금은 당일 반환됩니다.",
+  },
+] as const;
+
+/**
+ * cycle 1-G-γ — /service Pricing 3 tier (가격 작은 paradigm / v62 일치).
+ * paradigm: 32/40px 작은 가격 + 시점 강조 단독 (큰 숫자 강조 NG).
+ */
+export const SERVICE_PRICING_TIERS = [
+  {
+    id: "early",
+    title: "얼리버드",
+    dDay: "D-7 이상",
+    priceLabel: "5만원",
+    body: "여유 있게 준비할 때.",
+  },
+  {
+    id: "standard",
+    title: "일반",
+    dDay: "D-2 ~ D-7",
+    priceLabel: "7만원",
+    body: "일반 진행.",
+  },
+  {
+    id: "rush",
+    title: "급건",
+    dDay: "D-2 이내",
+    priceLabel: "10만원",
+    body: "촉박한 일정.",
+  },
+] as const;
+
+/**
+ * cycle 1-G-γ — /service CTA 마무리 짧은 chip (Trust System 짧은 요약).
+ * paradigm: charcoal bg + bg-white/5 chip + 3 짧은 단어.
+ */
+export const SERVICE_TRUST_CHIPS = [
+  "1인 1물건",
+  "공인중개사 직접",
+  "보증보험 가입",
+] as const;
+
 /* Phase 1.2 (A-1-2) v6 — InsightBlock 카테고리 색 시스템.
  * 4 카테고리: 무료 물건분석 (green) / 가이드 (blue) / 시장 인사이트 (orange) / 낙찰사례 (purple). */
 export type InsightCategoryKey = "analysis" | "guide" | "insight" | "cases";
