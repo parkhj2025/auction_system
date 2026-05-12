@@ -4,11 +4,9 @@ import { useRef } from "react";
 import { motion, useInView } from "motion/react";
 import { SERVICE_PROCESS_STEPS } from "@/lib/constants";
 
-/* cycle 1-G-γ — /service 섹션 3: Process (5단계).
- * paradigm: brand-green 풀스크린 + horizontal step flow SVG + 5 step 카드 (모바일 1-col + 데스크탑 5-col).
- * 카톡 명시 영구 폐기 (Step 2 + Step 5). */
+/* cycle 1-G-γ-α — 메인 섹션 4: Process (5단계 / /service Process 차용 paradigm 영구 보존). */
 
-export function ServiceProcess() {
+export function HomeProcess() {
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { once: true, amount: 0.15 });
 
@@ -36,7 +34,7 @@ export function ServiceProcess() {
           <span style={{ color: "#FFD43B" }}>.</span>
         </motion.h2>
 
-        {/* horizontal step flow SVG. */}
+        {/* horizontal step flow SVG (데스크탑 단독). */}
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={inView ? { opacity: 1, scale: 1 } : {}}
@@ -46,7 +44,7 @@ export function ServiceProcess() {
           <ProcessStepFlow inView={inView} />
         </motion.div>
 
-        {/* 5 step 카드 (모바일 1-col + 데스크탑 5-col). */}
+        {/* 5 step 카드. */}
         <div className="mt-12 grid grid-cols-1 gap-5 lg:mt-10 lg:grid-cols-5">
           {SERVICE_PROCESS_STEPS.map((step, i) => (
             <motion.article
@@ -80,17 +78,14 @@ export function ServiceProcess() {
   );
 }
 
-/* 자체 SVG — horizontal step flow (5 step + 연결 line + scroll-triggered draw). */
 function ProcessStepFlow({ inView }: { inView: boolean }) {
   const stepX = [80, 230, 380, 530, 680];
-
   return (
     <svg
       viewBox="0 0 760 120"
       className="h-full w-full"
       aria-hidden="true"
     >
-      {/* 연결 line (draw). */}
       <motion.line
         x1="80"
         y1="60"
@@ -103,8 +98,6 @@ function ProcessStepFlow({ inView }: { inView: boolean }) {
         animate={inView ? { pathLength: 1, opacity: 0.6 } : {}}
         transition={{ duration: 1.6, ease: "easeOut", delay: 0.4 }}
       />
-
-      {/* 5 step circle. */}
       {stepX.map((x, i) => (
         <g key={i}>
           <motion.circle

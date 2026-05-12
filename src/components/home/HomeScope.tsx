@@ -5,10 +5,11 @@ import { motion, useInView } from "motion/react";
 import { Check, X } from "lucide-react";
 import { SERVICE_SCOPE_DO, SERVICE_SCOPE_DONT } from "@/lib/constants";
 
-/* cycle 1-G-γ — /service 섹션 2: Scope (업무 범위 DO + DON'T).
- * paradigm: white bg + 2-col (모바일 1-col stack) + DO brand-green chip + DON'T ink-100 chip. */
+/* cycle 1-G-γ-α — 메인 섹션 2: Scope.
+ * paradigm: white bg + 2-col (모바일 1-col stack) + DO brand-green chip + DON'T ink-100 chip.
+ * DON'T h3 정정 = "별도 위임 흐름" (사전 "전문가 영역" 영구 폐기 / 우리 비전문가 느낌 NG). */
 
-export function ServiceScope() {
+export function HomeScope() {
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { once: true, amount: 0.15 });
 
@@ -38,7 +39,7 @@ export function ServiceScope() {
         </motion.h2>
 
         <div className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-2">
-          {/* 좌 카드 = DO (우리가 하는 일). */}
+          {/* DO 카드. */}
           <motion.article
             initial={{ opacity: 0, y: 30 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -68,7 +69,7 @@ export function ServiceScope() {
             </ul>
           </motion.article>
 
-          {/* 우 카드 = DON'T (전문가 영역). */}
+          {/* DON'T 카드 (h3 정정 = "별도 위임 흐름"). */}
           <motion.article
             initial={{ opacity: 0, y: 30 }}
             animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -79,7 +80,7 @@ export function ServiceScope() {
               DON&apos;T
             </span>
             <h3 className="mt-5 text-2xl font-black tracking-tight text-[var(--color-ink-900)] sm:text-[28px]">
-              전문가 영역
+              별도 위임 흐름
             </h3>
             <ul className="mt-6 flex flex-col gap-3">
               {SERVICE_SCOPE_DONT.map((item) => (
@@ -99,7 +100,6 @@ export function ServiceScope() {
           </motion.article>
         </div>
 
-        {/* Scope 마무리 paragraph (가운데 정렬 / 보존). */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}

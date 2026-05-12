@@ -453,6 +453,89 @@ export const SERVICE_TRUST_CHIPS = [
   "보증보험 가입",
 ] as const;
 
+/**
+ * cycle 1-G-γ-α — 메인 Compare 5 row 비교 paradigm (직접 입찰 vs 우리 대리).
+ * paradigm: 좌 ink-100 pill + 우 brand-green pill / 5 row 안 5번 row 강조 단독.
+ */
+export const COMPARE_ROWS = [
+  {
+    id: "form",
+    category: "입찰표 작성",
+    left: "처음 보는 양식, 실수 위험",
+    right: "전문가가 직접 작성합니다",
+    emphasis: false,
+  },
+  {
+    id: "deposit",
+    category: "보증금 납부",
+    left: "수표 발급 + 직접 납부",
+    right: "전용계좌 입금 한 번으로",
+    emphasis: false,
+  },
+  {
+    id: "courthouse",
+    category: "법원 방문",
+    left: "왕복 이동 + 대기",
+    right: "공인중개사가 직접 출석",
+    emphasis: false,
+  },
+  {
+    id: "result",
+    category: "결과 확인",
+    left: "당일 현장 대기",
+    right: "당일 즉시 통보합니다",
+    emphasis: false,
+  },
+  {
+    id: "time",
+    category: "소요 시간",
+    left: "5시간 이상",
+    right: "5분 신청",
+    emphasis: true,
+  },
+] as const;
+
+/**
+ * cycle 1-G-γ-α — 메인 Pricing 공통 포함 사항 chip 4건.
+ */
+export const PRICING_INCLUDES = [
+  "낙찰 성공보수 +5만원",
+  "전용계좌 분리 보관",
+  "당일 보증금 반환",
+  "서울보증보험 가입",
+] as const;
+
+/**
+ * cycle 1-G-γ-α — 메인 Insight 4 카테고리 (사전 메인 InsightBlock 카피 영구 보존).
+ * paradigm: 카드 = title + preview + slug / 카드 안 시각 = magazine style.
+ */
+export const INSIGHT_TILES = [
+  {
+    slug: "analysis",
+    label: "무료 물건분석",
+    title: "이 물건, 왜 유찰됐을까",
+    preview: "권리·시세·수익률 한 눈에",
+  },
+  {
+    slug: "guide",
+    label: "경매 가이드",
+    title: "경매, 어디서부터 시작할까",
+    preview: "낙찰까지 한 흐름",
+  },
+  {
+    slug: "glossary",
+    label: "경매 용어",
+    title: "이 단어, 무슨 뜻이지",
+    preview: "사례로 풀어쓴 경매 사전",
+  },
+  {
+    slug: "data",
+    label: "경매 빅데이터",
+    title: "지금 시장, 어디로 가나",
+    preview: "데이터가 보여주는 흐름",
+  },
+] as const;
+
 /* Phase 1.2 (A-1-2) v6 — InsightBlock 카테고리 색 시스템.
  * 4 카테고리: 무료 물건분석 (green) / 가이드 (blue) / 시장 인사이트 (orange) / 낙찰사례 (purple). */
 export type InsightCategoryKey = "analysis" | "guide" | "insight" | "cases";

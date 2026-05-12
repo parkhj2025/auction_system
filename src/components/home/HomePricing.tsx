@@ -2,20 +2,21 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "motion/react";
-import { SERVICE_PRICING_TIERS } from "@/lib/constants";
+import { SERVICE_PRICING_TIERS, PRICING_INCLUDES } from "@/lib/constants";
 
-/* cycle 1-G-γ — /service 섹션 4: Pricing (정찰제 / 가격 작은 paradigm).
- * paradigm: surface-muted bg + 3 카드 (작은 가격 32/40px + 시점 강조 단독 / v62 일치).
- * 광역 chip = "낙찰 성공보수 +5만원". */
+/* cycle 1-G-γ-α — 메인 섹션 5: Pricing.
+ * paradigm: white bg + 3 카드 (가격 32/40px 작은 paradigm) + 공통 포함 사항 chip 4건.
+ * id="pricing" 영구 보존 (Footer /#pricing link 정합). */
 
-export function ServicePricing() {
+export function HomePricing() {
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { once: true, amount: 0.15 });
 
   return (
     <section
       ref={sectionRef}
-      className="bg-[var(--color-surface-muted)] py-20 sm:py-32"
+      id="pricing"
+      className="border-t border-[var(--color-border)] bg-white py-20 sm:py-32"
     >
       <div className="container-app mx-auto w-full max-w-[1200px]">
         <motion.p
@@ -65,16 +66,26 @@ export function ServicePricing() {
           ))}
         </div>
 
-        {/* 광역 chip = 낙찰 성공보수. */}
+        {/* 공통 포함 사항 chip 4건. */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.85 }}
-          className="mt-10 flex justify-center"
+          className="mt-12 text-center"
         >
-          <span className="inline-flex items-center rounded-full bg-[var(--color-ink-100)] px-4 py-2 text-sm font-semibold text-[var(--color-ink-700)]">
-            낙찰 성공보수 +5만원 (낙찰 시 단독 청구)
-          </span>
+          <p className="text-sm font-bold uppercase tracking-wider text-[var(--color-ink-500)]">
+            공통 포함 사항
+          </p>
+          <div className="mt-4 flex flex-wrap items-center justify-center gap-2 sm:gap-3">
+            {PRICING_INCLUDES.map((chip) => (
+              <span
+                key={chip}
+                className="inline-flex items-center rounded-full bg-[var(--color-ink-100)] px-4 py-2 text-sm font-semibold text-[var(--color-ink-700)]"
+              >
+                {chip}
+              </span>
+            ))}
+          </div>
         </motion.div>
       </div>
     </section>

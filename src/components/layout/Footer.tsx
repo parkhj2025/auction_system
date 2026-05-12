@@ -29,7 +29,6 @@ const FOOTER_COLUMNS: { title: string; links: { href: string; label: string }[] 
     title: "서비스",
     links: [
       { href: "/apply", label: "입찰 대리 신청" },
-      { href: "/service", label: "이용 절차" },
       { href: "/#pricing", label: "수수료" },
       { href: "/faq", label: "자주 묻는 질문" },
     ],

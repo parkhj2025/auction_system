@@ -6,10 +6,9 @@ import { motion, useInView } from "motion/react";
 import { ArrowRight } from "lucide-react";
 import { SERVICE_TRUST_CHIPS } from "@/lib/constants";
 
-/* cycle 1-G-γ — /service 섹션 5: CTA 마무리 (charcoal bg).
- * paradigm: 가운데 정렬 + 양 button + 3 짧은 chip (Trust 짧은 요약 / 5가지 안전장치 별개 섹션 영구 폐기). */
+/* cycle 1-G-γ-α — 메인 섹션 8: CTA 마무리 (/service CTA 차용 paradigm 영구 보존). */
 
-export function ServiceCTA() {
+export function HomeCTA() {
   const sectionRef = useRef<HTMLElement>(null);
   const inView = useInView(sectionRef, { once: true, amount: 0.2 });
 
@@ -45,7 +44,6 @@ export function ServiceCTA() {
           사건번호 한 번이면 충분합니다.
         </motion.p>
 
-        {/* 양 button. */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
@@ -67,7 +65,6 @@ export function ServiceCTA() {
           </Link>
         </motion.div>
 
-        {/* 3 짧은 chip = Trust 요약. */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
