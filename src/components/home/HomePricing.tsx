@@ -138,6 +138,14 @@ export function HomePricing() {
       className="flex min-h-[calc(100vh-64px)] flex-col justify-center bg-[var(--color-surface-muted)] py-12 lg:min-h-[calc(100vh-80px)] lg:py-16"
     >
       <div className="container-app w-full">
+        <motion.p
+          variants={fadeVariants}
+          initial="hidden"
+          animate={sectionInView ? "visible" : "hidden"}
+          className="mb-4 text-xs font-bold uppercase tracking-wider text-[var(--brand-green)]"
+        >
+          Pricing
+        </motion.p>
         <motion.h2
           id="pricing-heading"
           variants={fadeVariants}
@@ -156,7 +164,7 @@ export function HomePricing() {
           variants={fadeVariants}
           initial="hidden"
           animate={sectionInView ? "visible" : "hidden"}
-          className="mb-10 text-[14px] text-[var(--color-ink-500)] lg:mb-14 lg:text-[16px]"
+          className="mb-10 text-base leading-7 text-[var(--color-ink-500)] lg:mb-14 lg:text-lg lg:leading-8"
         >
           낙찰 시에는 성공보수 5만원 추가, 패찰 시 보증금 당일 즉시 반환됩니다.
         </motion.p>

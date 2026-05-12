@@ -28,7 +28,8 @@ export function HomeProcess() {
           initial={{ opacity: 0, y: 20 }}
           animate={inView ? { opacity: 1, y: 0 } : {}}
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
-          className="mt-4 text-[56px] font-black leading-[1.05] tracking-[-0.015em] text-white sm:text-[96px]"
+          className="mt-4 text-[44px] font-extrabold leading-[1.1] tracking-[-0.015em] text-white [text-wrap:balance] lg:text-[88px]"
+          style={{ fontWeight: 800 }}
         >
           접수부터 정산까지, 다섯 단계
           <span style={{ color: "#FFD43B" }}>.</span>

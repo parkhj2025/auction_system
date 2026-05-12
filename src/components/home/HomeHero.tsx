@@ -54,7 +54,7 @@ export function HomeHero({ caseNumbers }: { caseNumbers: string[] }) {
             style={{
               color: "#FFD43B",
               textShadow:
-                "0 0 32px rgba(255, 212, 59, 0.7), 0 0 64px rgba(255, 212, 59, 0.5), 0 4px 16px rgba(0, 0, 0, 0.5)",
+                "0 0 16px rgba(255, 212, 59, 0.4), 0 0 32px rgba(255, 212, 59, 0.25), 0 4px 16px rgba(0, 0, 0, 0.5)",
             }}
           >
             경매를 시작하세요.
@@ -246,12 +246,12 @@ function HeroFlowBackground() {
       >
         <defs>
           <linearGradient id="hero-fade" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#111418" stopOpacity="0.2" />
-            <stop offset="50%" stopColor="#111418" stopOpacity="0.5" />
-            <stop offset="100%" stopColor="#111418" stopOpacity="0.85" />
+            <stop offset="0%" stopColor="#111418" stopOpacity="0.15" />
+            <stop offset="50%" stopColor="#111418" stopOpacity="0.35" />
+            <stop offset="100%" stopColor="#111418" stopOpacity="0.5" />
           </linearGradient>
           <radialGradient id="hero-glow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#00C853" stopOpacity="0.18" />
+            <stop offset="0%" stopColor="#00C853" stopOpacity="0.28" />
             <stop offset="100%" stopColor="#00C853" stopOpacity="0" />
           </radialGradient>
         </defs>
@@ -268,7 +268,7 @@ function HeroFlowBackground() {
         />
 
         {/* 법원 building skyline 추상 (하단). */}
-        <g opacity="0.35">
+        <g opacity="0.5">
           <rect x="120" y="640" width="80" height="160" fill="none" stroke="#00C853" strokeWidth="1.5" />
           <rect x="220" y="580" width="100" height="220" fill="none" stroke="#00C853" strokeWidth="1.5" />
           <rect x="340" y="620" width="70" height="180" fill="none" stroke="#00C853" strokeWidth="1.5" />
@@ -312,7 +312,7 @@ function HeroFlowBackground() {
           stroke="#00C853"
           strokeWidth="1"
           strokeDasharray="8 12"
-          opacity="0.35"
+          opacity="0.5"
           animate={{ strokeDashoffset: [-20, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
         />
@@ -324,14 +324,14 @@ function HeroFlowBackground() {
           stroke="#00C853"
           strokeWidth="1"
           strokeDasharray="8 12"
-          opacity="0.35"
+          opacity="0.5"
           animate={{ strokeDashoffset: [0, -20] }}
           transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
         />
 
         {/* 망치 (gavel) 우상단 추상. */}
         <motion.g
-          opacity="0.4"
+          opacity="0.55"
           animate={{ rotate: [0, -8, 0] }}
           transition={{ duration: 2.4, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }}
           style={{ transformOrigin: "1380px 220px" }}
@@ -342,7 +342,7 @@ function HeroFlowBackground() {
         </motion.g>
 
         {/* 사건번호 input 추상 좌상단. */}
-        <g opacity="0.4">
+        <g opacity="0.55">
           <rect x="160" y="160" width="260" height="56" rx="14" fill="none" stroke="#00C853" strokeWidth="2" />
           <motion.rect
             x="180"
@@ -371,8 +371,8 @@ function HeroFlowBackground() {
             cy={dot.cy}
             r={dot.r}
             fill="#FFD43B"
-            opacity="0.5"
-            animate={{ opacity: [0.2, 0.6, 0.2], scale: [1, 1.4, 1] }}
+            opacity="0.7"
+            animate={{ opacity: [0.4, 0.8, 0.4], scale: [1, 1.4, 1] }}
             transition={{
               duration: 3,
               repeat: Infinity,
