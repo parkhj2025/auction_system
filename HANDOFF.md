@@ -1,10 +1,11 @@
 # 경매퀵 웹사이트 핸드오프 문서
 
 > **용도**: 다음 세션 진입 시 본 문서 단일 영역 광역 컨텍스트 영역.
-> **최종 업데이트**: 2026-05-11 (cycle 1-E-B 종료 / 관리자 영역 4건 단독 갱신 push 정합)
-> **현재 빌드 상태**: HEAD = `1df21f9` (cycle 1-E-B: 관리자 영역 4건 단독 갱신 / TopNav link + KakaoNotifyButton + 시각 토큰)
-> **production URL**: https://auctionsystem-green.vercel.app
-> **다음 세션 진입 트리거**: **형준님 = cycle 1-E-B production 시각 검증 광역 NG 회신 → cycle 1-E-A 사용자 마이페이지 갱신 진입**
+> **최종 업데이트**: 2026-05-12 (cycle 1-G-γ-α-ε 종료 / fetch_failed 신규 status + closed 판정 단계 정정 push 정합)
+> **현재 빌드 상태**: HEAD = `9802285` (cycle 1-G-γ-α-ε / fetch_failed 신규 status + closed 판정 단계 정정)
+> **production URL**: https://auctionsystem-auctionq.vercel.app (alias: auctionsystem-green.vercel.app)
+> **production 광역 deployment**: `dpl_BjX2D7DxKouVAhxEPyG7dwqoC3de` (READY 정합 / 1778563815772)
+> **다음 세션 진입 트리거**: **2024타경569067 closed 잘못 판정 잔존 NG → seed-photos 12 row 광역 정리 paradigm 결정 의뢰**
 > **함께 읽을 문서**: `CLAUDE.md` section 27~30 (Step2~6 + 관리자 paradigm 광역 명문화)
 
 ---
@@ -13,386 +14,278 @@
 
 ### 지금 어디인가
 
-**Stage 2 cycle 1-E-B 종료** = 관리자 영역 4건 단독 갱신 paradigm 정합. **cycle 1-E-A 사용자 마이페이지 갱신 진입 paradigm 대기**.
+**cycle 1-G-γ-α-ε 종료** = fetch_failed 신규 status 광역 정정 paradigm 정합. **2024타경582718 fetch_failed 회복** ✓ / **2024타경569067 closed 잔존 NG** (seed-photos row 광역 단독).
 
-광역 진행 history (현재 세션):
-- cycle 1-D-A-4-3 보강 1 정정 3 (BidConfirmModal 확인 click 사후 Step2 머무름) ✅ `5bb41ae`
-- cycle 1-D-A-4-3 보강 1 정정 4 (입찰가 확정 CTA 분리 + Step3 진입 paradigm 회복) ✅ `71e0c9a`
-- cycle 1-D-A-4-4 (Step4 광역 재구성 + ContractAgreement formal 5조 + SignatureModal 강제 모달) ✅ `df9e009`
-- cycle 1-D-A-4-5 (Step4 paradigm 회수 + Step5Payment 신규 + conditional render) ✅ `70f0915`
-- cycle 1-D-A-4-6 (Step4·5·6 광역 검수 + mockup default + 카피 + 카카오톡 단독) ✅ `5da323e`
-- cycle 1-D-A-4-7 (NG 4건 정정 / 카피 + red 색감 + bidConfirmed drilling) ✅ `2bbe667`
-- cycle 1-D-A-4-8 (NG 3건 정정 + Step3·4·5·6 시각 토큰 + Step1·2 sentinel 보존) ✅ `5430617`
-- cycle 1-E-D (mockup 4건 cancelled / 형준님 수동 SQL) ✅ Supabase Dashboard
-- cycle 1-E-C (OrderRow interface 정정 + PaymentStatus type) ✅ `48c27e7`
-- **cycle 1-E-B (관리자 영역 4건 단독 갱신)** ✅ `1df21f9` 🔥
-- 다음 = **cycle 1-E-B production 시각 검증 사후 NG 영역 → cycle 1-E-A 사용자 마이페이지 진입**
+광역 진행 history (현재 세션 / cycle 1-G 광역):
+- cycle 1-G-α (TopNav 신청하기 메뉴 안 재추가) ✅ `dd47ec8`
+- cycle 1-G-α-α (TopNav 시각 위계 정리) ✅ `5619cc7`
+- cycle 1-G-β (/about What 섹션 + 일러스트 2건 / 사후 광역 회수) ✅ `af247c8`
+- cycle 1-G-β-α (/about 일러스트 2건 재산출) ✅ `4546f09`
+- cycle 1-G-β 재시작 (/about 광역 재산출) ✅ `9905bd9`
+- cycle 1-G-β-β (/about 광역 재산출 / Bottom CTA 폐기 + pastel 폐기) ✅ `88473a5`
+- cycle 1-G-β-γ (/about 제로베이스 / Apple-style Bento Grid) ✅ `4e2e6bc`
+- cycle 1-G-β-γ-β (/about 광역 재설계 / 자체 SVG 5건 + asymmetric) ✅ `936b163`
+- cycle 1-G-β-γ-γ (/about 5 섹션 정정 / Problems + Trust System + Office·Regions·Credentials 폐기) ✅ `911147e`
+- cycle 1-G-γ (/service 광역 재설계) ✅ `2d2601e`
+- cycle 1-G-γ-α (메인 광역 재구성 + /service 페이지 영구 폐기) ✅ `f553608`
+- cycle 1-G-γ-α-α (메인 광역 정정 / 섹션 순서 + Hero SoT + Compare 신규 + Process 압축 + Pricing 회복 + Scope 위치 + Insight aspect) ✅ `c0f8a10`
+- cycle 1-G-γ-α-β (Hero + Pricing 사전 paradigm 회복 + Hero bg SVG) ✅ `784c8ee`
+- cycle 1-G-γ-α-γ (HomeCTA → TrustCTA 회복 + Pricing eyebrow + Process h2 + Hero glow/bg) ✅ `111adfb`
+- cycle 1-G-γ-α-δ (Hero 사건 조회 + 물건 선택 + sessionStorage + Step1 prefill) ✅ `fd3dad6`
+- **cycle 1-G-γ-α-ε (fetch_failed 신규 status + closed 판정 단계 정정)** ✅ `9802285` 🔥
+- 다음 = **seed-photos 12 row 정리 paradigm 결정 → cycle 1-G-δ (/faq) 또는 별개 sub-cycle 진입**
 
-### 본 세션 광역 push history (10 commit / 2026-05-10 ~ 2026-05-11)
+---
 
-| commit | cycle | 영역 |
+## ⚠ 잔존 NG 사실 (다음 세션 진입 우선)
+
+### NG #1: 2024타경569067 closed 잘못 판정 잔존 (cycle 1-G-γ-α-ε 사후 검수)
+
+**production 직접 호출 결과** (commit `9802285` 사후):
+| 사건번호 | 회신 status | 결과 |
 |---|---|---|
-| `5bb41ae` | 1-D-A-4-3 보강 1 정정 3 | BidConfirmModal 확인 click 사후 Step2 머무름 paradigm |
-| `71e0c9a` | 1-D-A-4-3 보강 1 정정 4 | 입찰가 확정 CTA 분리 + Step3 진입 paradigm 회복 |
-| `df9e009` | 1-D-A-4-4 | Step4 광역 재구성 + ContractAgreement formal 5조 + SignatureModal 강제 모달 |
-| `70f0915` | 1-D-A-4-5 | Step4 paradigm 회수 + Step5Payment 신규 + conditional render |
-| `5da323e` | 1-D-A-4-6 | mockup default + 카피 + 카카오톡 단독 + 입금 마감 자동 표기 + 마이페이지 link 폐기 |
-| `2bbe667` | 1-D-A-4-7 | 카피 정정 (입금 사후 + 카카오톡으로) + red 색감 정정 (입금 금액) + bidConfirmed ApplyClient drilling |
-| `5430617` | 1-D-A-4-8 | NG 3건 (담백 카피 + 단일 paragraph 통합 + Step3·4·5·6 시각 토큰) + Step1·2 sentinel 보존 |
-| `48c27e7` | 1-E-C | OrderRow interface 정정 (auction_round + payment_status + depositor_name + PaymentStatus type) |
-| `1df21f9` | 1-E-B | 관리자 영역 4건 단독 갱신 (TopNav link + KakaoNotifyButton + 시각 토큰 + /api/admin 영역 0) |
+| 2024타경582718 | `fetch_failed` ✓ | 정정 정상 회복 (사전 closed 잘못 판정 회피) |
+| 2024타경569067 | **`closed`** ⚠ | 잔존 NG (실제 = 진행 중 사건) |
 
-### 핵심 paradigm 정수 광역 (cycle 1-D-A-4 + 1-E 광역)
+**NG 원인 식별**:
+- DB 안 2024타경569067 = 2 row 광역
+  - `"인천지방법원"` court_name / `is_active=false` / `last_seen_at 2026-04-15` (stale)
+  - **`"B000240 (seed-photos)"` court_name / `is_active=false` / `last_seen_at 2026-05-11` (within 24h)** ← NG 식별 source
+- 정정 후 closed 판정 흐름 = `closedFresh` query → seed-photos row within 24h is_active=false 검수 → closed 회신 paradigm
+- seed-photos row 광역 = cycle 안 photo seed 작업 paradigm (사전 cycle 광역 산출)
 
-1. **Step1·2 sentinel paradigm**: cycle 1-D-A-4-8 = Step1·2 시각 토큰 sentinel 보존 (회귀 NG 영역 0). 광역 정정 시점 = Step1·2 영역 0 보존 의무.
-2. **bidConfirmed ApplyClient drilling**: cycle 1-D-A-4-7 = Step2BidInfo internal useState 회수 → `data.bidConfirmed` field 광역 (Step navigation 회귀 시점 보존 paradigm 정수).
-3. **단일 source paradigm (Lessons [A]·[D])**: order_status_log = 단일 source / orders 테이블 column 광역 추가 영역 0. legal/contract.ts = 카피 단일 source (HTML preview 단독 / PDF generation 분리).
-4. **mockup default paradigm**: cycle 1-D-A-4-6 = `DISPLAY_BANK = isConfigured ? env source : MOCKUP_BANK` 단일 paradigm. 사업자등록 사후 env 갱신 단독 (코드 영역 0).
-5. **광역 산출 정합 + 신규 영역 단독 paradigm**: cycle 1-E-B = 직전 산출 광역 정합 식별 → 신규 영역 4건 단독 추가 (재 분리 영역 0).
-6. **카피 단일 paragraph 통합 paradigm**: cycle 1-D-A-4-8 = "입금이 확인되면 알림과 함께 접수가 완료됩니다" 단일 paragraph (직역 "사후" + channel "카카오톡으로" 광역 폐기).
-7. **시각 토큰 광역 paradigm (Step1·2 정합)**: 카드 = rounded-2xl + border-gray-200 + bg-white + p-5 / 카드 헤더 h3 = text-lg + tracking-tight + font-black + ink-900 / dt = text-sm + font-medium + ink-500 / dd = text-base + font-bold + ink-900.
+**seed-photos 광역 사실**:
+- 12 row 광역 (`court_name = "B000240 (seed-photos)"`)
+- last_seen_at 2026-04-24 ~ 2026-05-11 (within 24h = 일부 / stale = 일부)
+- 광역 잠재 NG = 12 사건 광역 closed 잘못 판정 잠재 paradigm
 
-### 다음 세션 진입 paradigm (즉시 진입 영역)
+### NG #2: 대법원 fetch 자체 광역 NG 잠재
 
-**옵션 A**: 형준님 production 시각 검증 (cycle 1-E-B 광역) NG 영역 회신 사후 정정 paradigm
-- TopNav 진입 (admin user) = "관리자" link 표기 정합 검수
-- TopNav 진입 (customer user) = "관리자" link 영역 0 검수
-- /admin/orders/[id] = KakaoNotifyButton + 시각 토큰 정합 검수
-- /admin/page.tsx + /admin/orders/page.tsx 추가 갱신 영역 단독 식별 의뢰
+- 2024타경582718 = fetch_failed 회신 = records.length 0 (대법원 fetch 실패 또는 응답 0건)
+- production runtime logs 직접 회수 NG (`get_runtime_logs` "No logs found" 회신 / Vercel dashboard 직접 조회 의무)
+- console.error 광역 보존 paradigm (정정 사후 영구)
 
-**옵션 B**: cycle 1-E-A 사용자 마이페이지 갱신 진입 paradigm (단계 분리 정수)
-- /my/page.tsx + /my/orders/page.tsx + /my/orders/[id]/page.tsx 시각 토큰 정합 갱신 (Step1·2 sentinel 정합)
-- OrderCard.tsx + StatusTimeline.tsx + DepositStatus.tsx 광역 검수
-- 카피 정합 검수 (cycle 1-D-A-4-8 paradigm 정합 / "입금이 확인되면 알림과 함께 접수가 완료됩니다" 통합)
+### NG #3: mapper.ts `is_active` hardcoded (별개 cycle 영역)
 
-**옵션 C**: 형준님 수동 SQL 실행 (보존 의무)
-- cycle 1-E-C SQL = pending 2건 status 정정 + cancelled log INSERT 보강 (Supabase Dashboard 직접 실행)
+- 현재 = `is_active: true` hardcoded (mapper.ts line 145)
+- 검수 = `is_active: r.mulJinYn === "Y"` 동적 매핑 paradigm 검수 의무
+- 사전 검수 = 광역 records 광역 mulJinYn 광역 값 회수 (dev 환경 fetch 단독)
+- cycle 1-G-γ-α-ε 의도 안 별개 cycle 진입 영역 명시
 
 ---
 
-## 📊 cycle 1-D-A-4 광역 산출 정수 (Step1~6 + 모달)
+## 📋 결정 의뢰 영역 (다음 세션 진입 사전)
 
-### Step1·2·3 광역 (sentinel paradigm)
+### 결정 #1: seed-photos 12 row 광역 정리 paradigm
 
-- Step1 = 사건 정보 확인 + ConfirmCaseModal (강제 모달 §31)
-- Step2 = 입찰 정보 + BidConfirmModal (강제 모달 §31) + bidConfirmed ApplyClient drilling
-- Step3 = 서류 업로드 + IssueGuideModal (정보 모달)
-- **시각 토큰 = sentinel paradigm 정수** (cycle 1-D-A-4-8 = 광역 정정 영역 0 보존 의무)
-
-### Step4 (위임 계약 + 서명)
-
-- ContractAgreement.tsx = DelegationPreviewModal body component (serif + bordered + max-w-720)
-- DelegationPreviewModal = 정보 모달 paradigm (backdrop·ESC 닫기 OK)
-- "위임장 내용 보기" button = 미리보기 trigger
-- 동의 체크박스 3건 (위임 계약 + 개인정보 + 약관)
-- "✍ 서명하기" button = 위임 계약 동의 enable gate + SignatureModal trigger
-- SignatureModal = 강제 모달 paradigm + body+html scroll lock + canvas touchAction:none + h-48
-- 서명 사후 preview 카드 (h-20 image + "다시 서명" button)
-- 수수료 inline (Step2 차용)
-- "다음: 결제 →" CTA
-
-### Step5 (결제·접수 / 신규)
-
-- h2 = "신청 정보를 확인해주세요"
-- 신청 정보 요약 + 입금자명 input (default = applicantName / 사용자 수정 가능)
-- **mockup default 입금 안내 카드** = `DISPLAY_BANK = isConfigured ? env source : MOCKUP_BANK`
-- 입금 마감 자동 표기 = `formatPaymentDeadline()` (매각기일 -1 영업일 + 오후 8시 + 요일)
-- 안내 paragraph = "입금이 확인되면 알림과 함께 접수가 완료됩니다" 단일 통합
-- "신청 접수 →" CTA → /api/apply submit
-
-### Step6 (접수 완료)
-
-- h2 leading-[1.2] = "신청이 접수되었습니다"
-- 접수번호 (applicationId = GQ-YYYYMMDD-NNNN 친화 형식)
-- mockup 입금 안내 재 표기 + 입금자명
-- 안내 paragraph 분리 ("입금 마감까지 위 계좌로 입금해주세요" + "입금이 확인되면 알림과 함께 접수가 완료됩니다")
-- "홈으로" link 단독 (마이페이지 link 폐기 / cycle 1-D-A-4-6 paradigm)
-
-### 모달 광역 (영구 룰 §31 분류)
-
-| 모달 | 분류 | 진입 |
+| 옵션 | 내용 | 정수 |
 |---|---|---|
-| ConfirmCaseModal (Step1) | 강제 / 동의 paradigm | 체크박스 click |
-| BidConfirmModal (Step2) | 강제 / 검증 paradigm | "입찰가 확정" CTA |
-| IssueGuideModal (Step3) | 정보 (backdrop OK) | "전자본인서명확인서 발급 방법" link |
-| DelegationPreviewModal (Step4) | 정보 (backdrop OK / max-w-720) | "위임장 내용 보기" button |
-| SignatureModal (Step4) | 강제 / 서명 paradigm + scroll lock | "서명하기" button |
-| PrivacyPreviewModal + TermsPreviewModal (Step4) | 정보 | "내용 보기" link |
-| KakaoNotifyButton modal (admin) | 정보 (backdrop OK / max-w-[480px]) | "알림 보내기" button |
+| (a) cache lookup query 정정 = `court_name ILIKE '%seed%'` 광역 제외 | 임시 paradigm + 코드 단독 | △ 임시 |
+| (b) seed-photos row 광역 DB 수동 정정 | Code 자율 진입 NG / 형준님 수동 SQL 의무 | 형준님 결정 의뢰 |
+| (c) court_name 광역 cleanup = "B000240 (seed-photos)" → "인천지방법원" 광역 정정 | 정합 + 일회성 SQL | ✓ |
+| (d) closedFresh + not_found 검수 단계 = court_name 광역 분기 추가 | 광역 코드 정정 + 정합 | ✓ |
+
+### 결정 #2: 대법원 fetch 검수 paradigm
+
+- production 단계 fetchSingleCase 직접 호출 검수 의뢰
+- mulJinYn + status_code 광역 records 광역 값 회수 의뢰
+- mapper is_active 동적 매핑 결정 의뢰
+
+### 결정 #3: cycle 1-G-δ /faq 광역 정정 진입 timing
+
+- (a) NG #1 정정 사후 진입 (안정 paradigm)
+- (b) NG #1 + 1-G-δ 광역 분기 진입
 
 ---
 
-## 🛠 cycle 1-E 광역 산출 정수 (관리자 + DB schema)
+## 📂 영역 광역 paradigm
 
-### cycle 1-E-D (mockup 4건 cancelled) — 형준님 수동 SQL ✅
+### 메인 페이지 (cycle 1-G-γ-α-ε 정합)
 
-- Supabase Dashboard SQL Editor 직접 실행 paradigm
-- mockup 케이스 광역 = UPDATE status='cancelled' + deleted_at=NOW() (soft delete + RLS 정합)
+**8 섹션 광역 순서**:
+1. Hero (charcoal 풀스크린 / 사건번호 폼 + Liquid Glass 박스 + 자체 SVG 일러스트 / 카피 SoT 영구 회복)
+2. Process (brand-green 풀스크린 / 5-col horizontal + horizontal step flow SVG)
+3. Compare (surface-muted / 2-col 비교 카드 / 5시간·5단계 vs 10분·2단계)
+4. Pricing (surface-muted 풀스크린 / 3-tier green·orange·red + timeline + NumberFlow + button selected)
+5. Scope (surface-muted / DO + DON'T 2-col)
+6. Reviews (charcoal / ReviewsMarquee)
+7. Insight (white / 4 magazine card aspect-[4/1])
+8. CTA (TrustCTA 회복 / trust-bg.jpg + Liquid Glass + 3 trust 카드 + CTA + 캡션)
 
-### cycle 1-E-C (OrderRow interface 정정) — Code 산출 ✅
+**Hero 사건 조회 paradigm (cycle 1-G-γ-α-δ)**:
+- input 형식 검증 `/^\d{4}타경\d+$/`
+- CTA → `/api/auction/lookup` GET fetch
+- listings 1건 = SingleListingCard inline / 다건 = ListingPickerCard radio
+- 신청하기 click = sessionStorage 보존 + `/apply?case=XXX&prefill=1` 진입
+- ApplyClient sessionStorage 회수 + matchedListing 자동 prefill
 
-- src/types/order.ts OrderRow interface 잔존 field 3건 추가
-  - `auction_round: number` (Phase 6.7.6 column)
-  - `payment_status: PaymentStatus` (cycle 1-D-A-4-5)
-  - `depositor_name: string | null` (cycle 1-D-A-4-5)
-- **PaymentStatus type 신규 export** (`"deposit_waiting" | "deposit_confirmed" | "refunded"`)
-- orders 테이블 column 광역 추가 영역 0 (Lessons [A] 정합 / order_status_log 단일 source paradigm)
+### /about (cycle 1-G-β-γ-γ 정합 / `911147e`)
 
-### cycle 1-E-B (관리자 영역 4건 단독 갱신) — Code 산출 ✅
+**5 섹션 광역** (영구 보존):
+1. Hero (charcoal / 시계·번개·궤도 SVG continuous loop)
+2. Problems (white / 4 카드 / 고객 problem 직접 표현)
+3. Values (brand-green 풀스크린 / 시간·이동·집중 SVG + "법원은 저희가" + "시간은 그대로" + "처음이어도")
+4. Trust System (surface-muted / lucide 96px Users·Award·ShieldCheck 3 카드)
+5. Company (charcoal / phone mockup floating SVG)
 
-| 영역 | 정수 |
-|---|---|
-| 영역 1 | UserMenu 관리자 link 신규 (profiles.role 정합 시점 단독 / border-t + font-bold 강조) |
-| 영역 2 | KakaoNotifyButton 신규 component (modal pop + 전화번호·카피 copy button 광역) |
-| 영역 3 | admin 광역 시각 토큰 정합 갱신 (Step1·2 paradigm + Field component dt/dd 광역) |
-| 영역 4 | /api/admin/* route 영역 0 보존 (직전 /api/orders/[id]/status route 재사용) |
+**폐기 영구**: Office (인천 사무실) + Regions (한국 지도) + Credentials 별개 섹션 + "당일·직접·거품 0" 카피
 
-### 광역 산출 보존 (재 분리 영역 0)
+### 사건 조회 API paradigm (cycle 1-G-γ-α-ε 정합)
 
-- StatusChanger = 단일 source paradigm (dropdown + note + transition map)
-- StatusLogHistory = timeline view 광역 정합
-- middleware.ts admin 권한 검수 (profiles.role + is_admin() + ADMIN_PREFIXES)
-- order-transitions.ts ALLOWED_TRANSITIONS map (단일 source paradigm)
-- /api/orders/[id]/status route (isAdmin RPC + status 갱신 + log INSERT)
+**/api/auction/lookup** (GET / 비로그인 / Hero 단독):
+- rate limit IP 단위 1분당 10건
+- caseNumber `/^\d{4}타경\d+$/` 검증
+- courtCode 검증 (Phase 1 = B000240 단독)
+- cache lookup (`is_active=true + TTL 24h`)
+- cache MISS = fetchSingleCase + upsert + 재조회
+- status 분기 = active / closed / not_found / **fetch_failed** (신규) / invalid_input / invalid_court / rate_limited / server_error
 
-### cycle 1-E-A (사용자 마이페이지 갱신) — 미진입 대기 ⏳
+**/api/orders/check** (POST / login 의무 / Step1 단독):
+- 동일 paradigm + 중복 체크 (1물건 1고객) + form prefill
+- 동일 fetch_failed 신규 status 광역
 
-**예상 영역**:
-- /my/page.tsx + /my/orders/page.tsx + /my/orders/[id]/page.tsx 시각 토큰 정합 갱신 (Step1·2 sentinel paradigm)
-- OrderCard.tsx + StatusTimeline.tsx + DepositStatus.tsx 광역 검수
-- 카피 정합 검수 (cycle 1-D-A-4-8 paradigm 정합)
-- 사용자 영역 취소 신청 paradigm 검수 (Phase 2 영역 추정 / Phase 1 영역 0 추천)
+**closed 판정 단계 정정 (cycle 1-G-γ-α-ε)**:
+- TTL within 24h + is_active=false → closed 회신
+- TTL 만료 + fetch records 0 + is_active=false → **fetch_failed** 회신 (stale closed NG 회피)
+- 종결 record 부재 → not_found
 
----
+### TopNav 메뉴 (cycle 1-G-α + α-α 정합)
 
-## 📁 영향 파일 광역 (cycle 1-D-A-4 + 1-E 광역)
-
-### Apply flow 광역
-
-- `src/components/apply/ApplyClient.tsx` (state shape + step 갱신 + bidConfirmed drilling)
-- `src/components/apply/steps/Step1Property.tsx` (sentinel 보존)
-- `src/components/apply/steps/Step2BidInfo.tsx` (sentinel 보존 + bidConfirmed drilling)
-- `src/components/apply/steps/Step3Documents.tsx` (sentinel 보존)
-- `src/components/apply/steps/Step4Confirm.tsx` (광역 재구성 / cycle 1-D-A-4-4/5/6/7/8)
-- `src/components/apply/steps/Step5Payment.tsx` (신규 / cycle 1-D-A-4-5)
-- `src/components/apply/steps/Step5Complete.tsx` (광역 재구성 / 마이페이지 link 폐기)
-- `src/components/apply/ContractAgreement.tsx` (serif + bordered modal body)
-- `src/components/apply/DelegationPreviewModal.tsx` (정보 모달 + max-w-720)
-- `src/components/apply/SignatureModal.tsx` (강제 모달 + body+html scroll lock)
-- `src/components/apply/BidConfirmModal.tsx` (강제 모달 / cycle 1-D-A-4-3 보강 1 정정 2~4)
-
-### 단일 source + utility 광역
-
-- `src/lib/legal/contract.ts` (계약서 카피 단일 source)
-- `src/lib/calendar.ts` (영업일 계산 utility / Phase 1 = 주말 skip 단독)
-- `src/lib/constants.ts` (MOCKUP_BANK + BANK_ACCOUNT + DISPLAY_BANK + APPLY_STEPS)
-- `src/lib/order-status.ts` (status label 광역)
-- `src/lib/order-transitions.ts` (ALLOWED_TRANSITIONS map / 단일 source)
-- `src/lib/apply.ts` (computeFee + formatPhone + generateApplicationId)
-- `src/types/apply.ts` (ApplyFormData.bidConfirmed + depositorName 신규)
-- `src/types/order.ts` (OrderRow + PaymentStatus 신규 / cycle 1-E-C)
-
-### Admin 영역 광역
-
-- `src/app/admin/layout.tsx` + `/admin/page.tsx` + `/admin/orders/page.tsx` + `/admin/orders/[id]/page.tsx`
-- `src/components/admin/AdminOrdersTable.tsx` + StatusChanger.tsx + StatusLogHistory.tsx + SsnDeleteButton.tsx + StatsCards.tsx
-- **`src/components/admin/KakaoNotifyButton.tsx` (cycle 1-E-B 신규)**
-- `src/lib/supabase/middleware.ts` (admin 권한 검수)
-- `src/components/auth/UserMenu.tsx` (cycle 1-E-B isAdmin link)
-- `src/app/layout.tsx` (getUserForNav profiles.role fetch)
-
-### My 영역 (cycle 1-E-A 진입 대기)
-
-- `src/app/my/layout.tsx` + `/my/page.tsx` + `/my/profile/page.tsx` + `/my/orders/page.tsx` + `/my/orders/[id]/page.tsx`
-- `src/components/my/OrderCard.tsx` + StatusTimeline.tsx + DepositStatus.tsx + DocumentList.tsx + ProfileForm.tsx
-
-### API 광역
-
-- `src/app/api/apply/route.ts` (depositor_name + payment_status default)
-- `src/app/api/orders/[id]/status/route.ts` (admin status 갱신 + log INSERT)
-- `src/app/api/orders/[id]/generate-delegation/route.ts` (위임장 PDF 생성)
-- `src/app/api/admin/*` 영역 0 (재사용 paradigm)
-
-### DB 광역
-
-- `supabase/schema.sql` (orders + order_status_log + profiles + documents 광역)
-- `supabase/migrations/20260510_orders_payment_columns.sql` (cycle 1-D-A-4-5 신규)
-- order_status_log 단일 source paradigm (cycle 1-E-C 정수)
-
-### CLAUDE.md 광역 명문화
-
-- section 20~27 = Step1~3 paradigm 광역
-- section 28 = Step4 paradigm (cycle 1-D-A-4-8 시각 토큰 정정 + sentinel paradigm)
-- section 29 = Step5Payment + Step5Complete paradigm (cycle 1-D-A-4-8 카피 통합 + 시각 토큰)
-- section 30 = 관리자 paradigm (cycle 1-E-B / TopNav link + KakaoNotifyButton + 시각 토큰)
+- 사전 4 메뉴 = 서비스 소개 / 이용 절차 / 자주 묻는 질문 / 경매 인사이트
+- 정정 3 메뉴 = **서비스 소개 / 자주 묻는 질문 / 경매 인사이트** (이용 절차 영구 폐기 / 메인 통합)
+- 데스크탑 = "신청하기" primary brand-green solid + "로그인" 회색 텍스트 링크
+- 모바일 = Logo + hamburger 2 column (신청하기 모바일 상단 영역 0)
 
 ---
 
-## 🔒 보존 의무 (영구 룰 + sentinel paradigm)
+## 🔧 영구 룰 + 보존 paradigm
 
-### Step1·2 시각 토큰 sentinel (cycle 1-D-A-4-8)
+### 사업 핵심 가치 v62
 
-| 영역 | 토큰 | 회귀 NG 영역 |
-|---|---|---|
-| 카드 헤더 h3 | text-lg + font-black + tracking-tight + ink-900 | Step1:454 단일 baseline |
-| dt label | text-sm + font-medium + ink-500 | Step1·2 광역 정합 |
-| dd value | text-base + font-bold + ink-900 | Step1·2 광역 정합 |
-| sub paragraph (h2 직후) | text-sm leading-6 ink-500 | Step1·2·3·4·5 광역 단일 |
-| helper text (input sub) | text-xs ink-500 | Step1·2 광역 paradigm |
+- **투자자의 시간적·물리적 병목 해소** 단독
+- 차별화 축 = 신속 + 신뢰 + 경제적 (가격 메인 강조 NG)
+- 폐기 어휘 영구 = "카톡" 메인 노출 + "5만원" 큰 숫자 강조 + "박형준" 개인 색 + 사진·자격증·등록증 메인 노출
 
 ### 영구 룰 §1~§33 광역 정합
 
-- §8: yellow 색감 영역 0 (cycle 1-D-A-4-4 정합)
-- §9: red 색감 paradigm (가격 한정 + required marker + error / 정보 영역 NG)
+- §1: 신규 npm 광역 0 (motion v12.38.0 + lucide-react + NumberFlow 사전 사용 광역)
+- §8: yellow 색감 영역 0 (마침표 + 강조 단어 단독 paradigm)
+- §9: red 색감 paradigm (가격 한정 + required + error / 정보 영역 NG)
 - §10: PG 도입 영역 0 (Phase 10 사후 paradigm)
-- §22: sidebar 영역 0 (모바일·데스크탑 동일 paradigm)
-- §31: 모달 분류 (강제 vs 정보 / backdrop·ESC 닫기 분기)
-- §32: 합니다체 단독 (요체 ~예요/~돼요/~해요 영역 0 의무)
-- §A-2: production hex 추정 NG (var 단독 paradigm)
-- §A-11: /apply = 매수신청 대리 단독 paradigm (분석·자문·투자 어휘 영역 0)
+- §13 (CLAUDE.md): 오렌지 사용 금지 + 컬러 3색 이상 NG (단 Pricing 3-tier green·orange·red = 영구 회복 paradigm 임시 예외)
+- §22: sidebar 영역 0 (/apply 단독 paradigm)
+- §29: 토큰 단독 사용 (literal hex = Hero source-of-truth #FFD43B + #00C853 + #111418 단독 / 그 외 var 광역)
+- §31: 모달 분류 (강제 vs 정보)
+- §32: 합니다체 단독 (요체 ~예요/~돼요/~해요 영역 0 / quote paradigm 예외)
+- §36: 광역 시각 토큰 보존 (메인 = cycle 1-G-γ-α 광역 재구성 영역 / /apply + 마이페이지 영구 보존)
+- §A-2: production hex 추정 NG (var 단독)
+- §A-11: /apply = 매수신청 대리 단독 (분석·자문·투자 어휘 영역 0)
 - §A-12: 데스크탑 = 모바일 동일 paradigm
 
-### Lessons Learned [A]·[D] 정합
+### 영구 보존 paradigm 광역
 
-- [A] 이중 source paradigm 회피 (legal/contract.ts + order_status_log 단일 source)
-- [D] DB 변경 워크플로우 (supabase/migrations/...sql + schema.sql 동시 commit)
+- cycle 1-D-A-3-2 paradigm = on-demand fetch + 광역 cron 폐기 영구
+- court_listings DB + TTL 24h + cache paradigm 영구
+- /apply Step1 caseConfirmedByUser 사용자 직접 확인 단계 영구
+- /api/orders/check + login 의무 + 중복 체크 + form prefill 영구
+- mapper.ts is_active hardcoded true (별개 cycle 검수 영역 / 본 cycle 영역 0)
+- console.error 광역 보존 (Vercel logs 회수 단독)
 
----
+### 자가 검증 paradigm
 
-## 📋 결정 사안 광역 history (push GO 분기)
-
-### cycle 1-D-A-4-7 결정 사안 (NG 정정)
-
-- bidConfirmed = ApplyClient drilling paradigm (Step2BidInfo internal 회수)
-- red 색감 = 입금 금액 단독 정정 (입찰 희망 금액 보존)
-- 시각 토큰 광역 정정 = 영역 단독 검수 paradigm (광역 정정 영역 0 보존)
-
-### cycle 1-D-A-4-8 결정 사안 (sentinel)
-
-- sub paragraph + helper + info 박스 = Step1·2 sentinel 보존 (영역 0 보존 GO)
-- h3 + dt + dd = Step3·4·5·6 단독 정정 (Step1·2 paradigm 정합)
-- Step3Documents = h3/dt/dd 영역 0 (정정 영역 0)
-
-### cycle 1-E-C 결정 사안 (column 광역)
-
-- orders 테이블 column 광역 추가 = 영역 0 (Lessons [A] 정합 / order_status_log 단독)
-- OrderRow interface 정정 단독 + PaymentStatus type 신규
-- 형준님 수동 SQL = pending 2건 + cancelled 4건 광역 log INSERT 보강 (Supabase Dashboard)
-
-### cycle 1-E-B 결정 사안 (4건 단독)
-
-- 영역 광역 = TopNav link + KakaoNotifyButton + 시각 토큰 갱신 + /api/admin 영역 0
-- StatusChanger 정합 보존 (재 분리 영역 0)
-- 모바일 반응형 = 관리자 = 데스크탑 단독 (광역 view 정수)
-- 카카오톡 카피 = Code 자율 + 형준님 사후 검수
-
----
-
-## 🚧 형준님 수동 실행 의뢰 (보존)
-
-### 즉시 실행 의뢰
-
-| # | 영역 | 시점 |
-|---|---|---|
-| 1 | cycle 1-E-C SQL (pending 2건 + cancelled 4건 광역 log INSERT 보강) | 미실행 시점 Supabase Dashboard 직접 실행 |
-
-**SQL paradigm**:
-```sql
-DO $$
-DECLARE rec RECORD;
-BEGIN
-  FOR rec IN SELECT id, status FROM orders WHERE status = 'pending' AND deleted_at IS NOT NULL LOOP
-    UPDATE orders SET status = 'cancelled' WHERE id = rec.id;
-    INSERT INTO order_status_log (order_id, from_status, to_status, changed_by, note)
-    VALUES (rec.id, rec.status, 'cancelled', NULL, 'mockup test 회수 (cycle 1-E-C 정합 정정)');
-  END LOOP;
-  FOR rec IN SELECT id FROM orders WHERE status = 'cancelled' AND deleted_at IS NOT NULL
-    AND id NOT IN (SELECT order_id FROM order_status_log WHERE to_status = 'cancelled') LOOP
-    INSERT INTO order_status_log (order_id, from_status, to_status, changed_by, note)
-    VALUES (rec.id, NULL, 'cancelled', NULL, 'mockup test 회수 (cycle 1-E-D 광역 회수)');
-  END LOOP;
-END $$;
-```
-
-### 사업자등록 사후 실행 의뢰 (보존)
-
-| # | 영역 | 시점 |
-|---|---|---|
-| 1 | .env.local 갱신 (NEXT_PUBLIC_BANK_NAME / NEXT_PUBLIC_BANK_ACCOUNT_NUMBER / NEXT_PUBLIC_BANK_ACCOUNT_HOLDER) | 사업자등록 사후 단독 |
-| 2 | Vercel env 갱신 (동일 3건) | 사업자등록 사후 + rebuild 트리거 |
-| 3 | Supabase Dashboard SQL 실행 = mockup → 실제 운영 케이스 paradigm 분기 | 실 운영 시점 단독 |
-
----
-
-## 🎯 다음 세션 진입 권고 흐름
-
-### 사용자 직관 우선 paradigm (즉시 진입)
-
-1. **형준님 production 시각 검증 회신 수신** (cycle 1-E-B 광역)
-   - TopNav 관리자 link 정합 검수
-   - /admin/orders/[id] KakaoNotifyButton + 시각 토큰 검수
-   - NG 영역 단독 식별 사후 정정 paradigm 진입
-
-2. **/admin/page.tsx + /admin/orders/page.tsx 시각 토큰 추가 갱신 영역 식별 의뢰**
-   - 본 cycle 1-E-B = /admin/orders/[id] 단독 갱신
-   - 추가 갱신 영역 = 형준님 식별 사후 진입 paradigm
-
-3. **cycle 1-E-A 사용자 마이페이지 갱신 진입** (단계 분리 paradigm 정수)
-   - 사전 검수 의뢰 → push GO → Code 산출 paradigm 흐름
-
-### Code 사전 회신 영역 (다음 세션 즉시)
-
-- 사용자 production 시각 검증 결과 회신 의뢰 (cycle 1-E-B 6단계)
-- NG 영역 식별 → 정정 paradigm 추천 → push GO 사전 검수
-- 광역 paradigm = "사용자 직관 우선 + Code 광역 grep 검수 + 단계 분리" 정수
-
----
-
-## 🔧 자가 검증 의무 (push 사후 광역 paradigm)
-
-### 표준 자가 검증 광역
-
-- `pnpm tsc --noEmit` = 0 error
-- `pnpm lint` = 0 신규 error (ReviewsMarquee:66 pre-existing 단독 보존)
+- tsc = 0 error
+- lint = 신규 0 (ReviewsMarquee 사전 1 error 영구 보존)
 - §32 합니다체 grep = 0건 (요체 어미 ~예요/~돼요/~해요)
-- §A-2 production hex 추정 grep = 0건 (var 단독)
-- "카카오톡 또는 SMS" + "카카오톡으로" 사용자 노출 grep = 0건 (jsdoc 잔존 영역 0)
-- "입금 사후" 사용자 노출 grep = 0건
-- "Phase 10" 사용자 노출 grep = 0건
-- "/my/orders" + "/my" link 영역 = cycle 1-E-A 사후 단독 진입 영역
-- **Step1·2 시각 토큰 sentinel 변동 0 grep** (회귀 NG 의무 검수)
-
-### Lessons [D] DB 변동 광역
-
-- supabase/migrations/...sql + schema.sql 동시 commit
-- 형준님 Supabase Dashboard 직접 실행 paradigm
-- order_status_log 단일 source 보존
+- §A-2 production hex 추정 grep = 0건 (var 단독 / Hero source-of-truth + Pricing 3-tier 예외)
 
 ---
 
-## 📞 형준님 production URL + 검증 영역
+## 📁 핵심 파일 + 컴포넌트 영역
 
-- 메인: https://auctionsystem-green.vercel.app
-- /apply: https://auctionsystem-green.vercel.app/apply
-- /admin: https://auctionsystem-green.vercel.app/admin
-- /admin/orders: https://auctionsystem-green.vercel.app/admin/orders
-- /my: https://auctionsystem-green.vercel.app/my
-- /my/orders: https://auctionsystem-green.vercel.app/my/orders
+### 메인 8 섹션 (src/components/home/)
+- HomePageClient.tsx (광역 client wrapper)
+- HomeHero.tsx (Hero + 사건 조회 + sessionStorage / cycle 1-G-γ-α-δ + ε)
+- HomeProcess.tsx (5 step + horizontal step flow SVG)
+- HomeCompare.tsx (2-col 비교 카드 / 5시간 vs 10분)
+- HomePricing.tsx (3-tier + NumberFlow + timeline / cycle 1-G-γ-α-β 회복)
+- HomeScope.tsx (DO + DON'T 2-col / surface-muted)
+- HomeReviews.tsx + ReviewsMarquee.tsx (charcoal)
+- HomeInsight.tsx (4 magazine card / aspect-[4/1])
+- HomeCTA.tsx (TrustCTA 회복 / cycle 1-G-γ-α-γ)
 
-### 시각 검증 광역 paradigm (cycle 1-E-B)
+### /about 5 섹션 (src/components/about/)
+- AboutPageClient.tsx
+- AboutHero.tsx (시계·번개·궤도 SVG)
+- AboutProblems.tsx (4 카드 / problem 직접 표현)
+- AboutValues.tsx (brand-green 풀스크린 / 시간·이동·집중 SVG)
+- AboutTrust.tsx (lucide 96px / Users·Award·ShieldCheck)
+- AboutCompany.tsx (phone mockup floating)
 
-| # | 단계 | 정합 기준 |
-|---|---|---|
-| 1 | TopNav admin user 진입 | UserMenu 안 "관리자" link 표기 (border-t + font-bold) |
-| 2 | TopNav customer user 진입 | UserMenu 안 "관리자" link 영역 0 (사용자 영역 노출 영역 0) |
-| 3 | /admin 진입 | dashboard 시각 토큰 (추가 갱신 영역 식별 의뢰) |
-| 4 | /admin/orders 진입 | filter + table (추가 갱신 영역 식별 의뢰) |
-| 5 | /admin/orders/[id] 진입 | 카드 광역 rounded-2xl + h2 text-lg + KakaoNotifyButton + Field component dt/dd 정합 |
-| 6 | StatusChanger "cancelled" 전이 click | order_status 갱신 + log INSERT 정합 |
-| 7 | KakaoNotifyButton click | modal pop (max-w-[480px] + 전화번호·카피 copy button 광역) |
+### 사건 조회 API
+- src/app/api/auction/lookup/route.ts (GET / 비로그인 / Hero 단독)
+- src/app/api/orders/check/route.ts (POST / login / Step1 + 중복 체크)
+- src/lib/courtAuction/search.ts (`fetchSingleCase` 대법원 fetch)
+- src/lib/courtAuction/mapper.ts (`mapRecordToRow` / is_active hardcoded true)
+
+### 영역 외 보존
+- src/components/apply/ (Step1 + Step2 + ... / 영구 보존)
+- src/app/apply/ (영구 보존)
+- src/app/my/ + src/components/my/ (영구 보존)
 
 ---
 
-## 🏁 종료 paradigm
+## 🚀 다음 세션 진입 순서 추천
 
-cycle 1-E-B 광역 종료. 다음 세션 = 형준님 production 시각 검증 회신 + cycle 1-E-A 사용자 마이페이지 갱신 진입 단계 분리 paradigm 정수.
+1. **잔존 NG #1 결정 의뢰 회수** = seed-photos 12 row 광역 정리 paradigm
+   - 옵션 (a/b/c/d) 결정 사후 진입
+   - 채택 = (c) court_name cleanup 또는 (d) lookup 분기 추가 단단함
+2. **production 검수 자동화 paradigm**
+   - Vercel dashboard logs 직접 회수 paradigm (Code 자율 진입 NG)
+   - 또는 endpoint 직접 호출 paradigm 정합 (cycle 1-G-γ-α-ε 검수 paradigm 일치)
+3. **mapper.ts is_active 동적 매핑 검수** (별개 cycle 영역)
+4. **cycle 1-G-δ (/faq) 광역 정정 진입**
+   - persona-aware + two-column + search bar + 아코디언 paradigm
+5. **cycle 1-G-ε (/insight) 광역 정정 진입**
+   - v53 보존 + shadow token 정정 + subtitle 정정
+6. **cycle 1-G 종료 사후** = 도메인 결정 (auctionquick.kr / 가비아 1.5만원/년)
+
+---
+
+## 🗂 cycle history 요약 (현재 세션 광역)
+
+### 시각 + UX paradigm 정정 (cycle 1-G-α ~ 1-G-γ-α-γ)
+- TopNav 메뉴 정리 + 시각 위계 분리 (cycle 1-G-α + α-α)
+- /about 광역 재설계 광역 (cycle 1-G-β 광역 → γ-γ 최종 / 5 섹션 영구 보존)
+- /service 영구 폐기 + 메인 통합 (cycle 1-G-γ-α 광역)
+- 메인 8 섹션 광역 정리 (Hero SoT + Process + Compare + Pricing + Scope + Reviews + Insight + CTA)
+- Pricing + Hero 사전 paradigm 회복 + bg SVG (cycle 1-G-γ-α-β)
+- HomeCTA → TrustCTA 회복 + Pricing eyebrow + Process h2 + Hero glow 약화 (cycle 1-G-γ-α-γ)
+
+### 사건 조회 paradigm 정정 (cycle 1-G-γ-α-δ + ε)
+- Hero 사건 조회 + 물건 선택 + sessionStorage + /apply prefill (cycle 1-G-γ-α-δ)
+- fetch_failed 신규 status + closed 판정 단계 정정 (cycle 1-G-γ-α-ε)
+
+---
+
+## 📝 명문화 source 영역
+
+- `CLAUDE.md` = 사업 본질 + 영구 룰 + Phase 설계 + cycle 광역 명문화
+- `HANDOFF.md` = 본 문서 (다음 세션 진입 컨텍스트 단독)
+- `docs/roadmap.md` = Phase 7~10 + v2 패키지
+- `docs/content-source-v2.md` = Cowork 원천 자료 규격
+
+---
+
+## 자가 검증 paradigm (다음 세션 진입 사전 의무)
+
+| # | 검증 |
+|---|---|
+| 1 | tsc 0 error (`pnpm tsc --noEmit`) |
+| 2 | lint 0 신규 (`pnpm lint` / ReviewsMarquee 사전 1 error 보존) |
+| 3 | production endpoint 직접 호출 (`/api/auction/lookup?caseNumber=2024타경569067&courtCode=B000240`) |
+| 4 | DB seed-photos row 광역 count (`SELECT court_name, COUNT(*) FROM court_listings WHERE court_name LIKE '%seed%'`) |
+| 5 | 영구 룰 §32 합니다체 + §A-2 hex + §29 토큰 광역 grep |
+
+---
+
+**End of HANDOFF.md (cycle 1-G-γ-α-ε 종료 paradigm 정합)**
