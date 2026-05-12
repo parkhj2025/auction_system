@@ -8,6 +8,7 @@ import {
   FileText,
   Lock,
   AlertCircle,
+  AlertTriangle,
   Loader2,
   ImageOff,
 } from "lucide-react";
@@ -32,7 +33,8 @@ type LookupStatus =
   | "closed"
   | "not-found"
   | "invalid"
-  | "error";
+  | "error"
+  | "fetch-failed";
 
 type SessionPayload = {
   caseNumber: string;
@@ -116,6 +118,14 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
         return;
       }
 
+      if (json.status === "fetch_failed") {
+        setLookupStatus("fetch-failed");
+        setErrorMessage(
+          "사건 정보 확인이 일시적으로 어렵습니다. 잠시 후 다시 시도해주세요.",
+        );
+        return;
+      }
+
       if (json.status === "not_found") {
         setLookupStatus("not-found");
         setErrorMessage(
@@ -161,7 +171,8 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
     lookupStatus === "closed" ||
     lookupStatus === "not-found" ||
     lookupStatus === "invalid" ||
-    lookupStatus === "error";
+    lookupStatus === "error" ||
+    lookupStatus === "fetch-failed";
   const ctaDisabled =
     isLoading || (lookupStatus === "active-multi" && !selectedDocid);
   const ctaLabel = isLoading
@@ -339,15 +350,30 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
             </div>
           )}
 
-          {/* NG 안내: status closed + not_found + invalid + error. */}
+          {/* NG 안내: closed + not-found + invalid + error = red / fetch-failed = amber (일시 NG paradigm). */}
           {hasError && errorMessage && (
-            <div className="flex w-full items-start gap-3 rounded-2xl border border-red-500/30 bg-red-500/10 p-4">
-              <AlertCircle
-                size={20}
-                strokeWidth={2.2}
-                className="mt-0.5 shrink-0 text-red-400"
-                aria-hidden="true"
-              />
+            <div
+              className={
+                lookupStatus === "fetch-failed"
+                  ? "flex w-full items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4"
+                  : "flex w-full items-start gap-3 rounded-2xl border border-red-500/30 bg-red-500/10 p-4"
+              }
+            >
+              {lookupStatus === "fetch-failed" ? (
+                <AlertTriangle
+                  size={20}
+                  strokeWidth={2.2}
+                  className="mt-0.5 shrink-0 text-amber-400"
+                  aria-hidden="true"
+                />
+              ) : (
+                <AlertCircle
+                  size={20}
+                  strokeWidth={2.2}
+                  className="mt-0.5 shrink-0 text-red-400"
+                  aria-hidden="true"
+                />
+              )}
               <p className="text-sm font-medium leading-6 text-white">
                 {errorMessage}
               </p>

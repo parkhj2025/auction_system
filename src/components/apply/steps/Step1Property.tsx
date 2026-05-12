@@ -36,6 +36,7 @@ export function Step1Property({
   const [caseTaken, setCaseTaken] = useState(false);
   const [caseClosed, setCaseClosed] = useState(false);
   const [caseNotFound, setCaseNotFound] = useState(false);
+  const [caseFetchFailed, setCaseFetchFailed] = useState(false);
   const [checking, setChecking] = useState(false);
   const [listings, setListings] = useState<CourtListingSummary[]>([]);
   const [matchStatus, setMatchStatus] = useState<"idle" | "checking">("idle");
@@ -62,6 +63,7 @@ export function Step1Property({
     setCaseTaken(false);
     setCaseClosed(false);
     setCaseNotFound(false);
+    setCaseFetchFailed(false);
     setListings([]);
     if (
       data.matchedListing ||
@@ -93,6 +95,7 @@ export function Step1Property({
     setCaseTaken(false);
     setCaseClosed(false);
     setCaseNotFound(false);
+    setCaseFetchFailed(false);
 
     try {
       const res = await fetch("/api/orders/check", {
@@ -110,7 +113,7 @@ export function Step1Property({
         available?: boolean | null;
         reason?: string;
         listings?: CourtListingSummary[];
-        case_status?: "active" | "closed" | "not_found";
+        case_status?: "active" | "closed" | "not_found" | "fetch_failed";
       };
 
       setCaseTaken(json.available === false);
@@ -118,13 +121,23 @@ export function Step1Property({
       const resultListings = json.listings ?? [];
       setListings(resultListings);
 
+      if (resultListings.length === 0 && json.case_status === "fetch_failed") {
+        setCaseFetchFailed(true);
+        setMatchStatus("idle");
+        return;
+      }
+
       if (resultListings.length === 0 && json.case_status === "closed") {
         setCaseClosed(true);
         setMatchStatus("idle");
         return;
       }
 
-      if (resultListings.length === 0 && json.case_status !== "closed") {
+      if (
+        resultListings.length === 0 &&
+        json.case_status !== "closed" &&
+        json.case_status !== "fetch_failed"
+      ) {
         setCaseNotFound(true);
         setMatchStatus("idle");
         caseNumberInputRef.current?.focus();
@@ -385,6 +398,22 @@ export function Step1Property({
             <p className="font-bold">사건번호를 다시 확인해주세요</p>
             <p className="mt-1 text-xs leading-5">
               입력하신 사건번호로 매물을 찾지 못했습니다. 사건번호와 법원이 정확한지 확인 후 다시 시도해주세요.
+            </p>
+          </div>
+        </div>
+      )}
+
+      {/* 사건번호 NG — fetch_failed 분기 (amber / 일시 NG paradigm / cycle 1-G-γ-α-ε) */}
+      {caseFetchFailed && (
+        <div
+          role="alert"
+          className="flex items-start gap-2 rounded-xl border border-[var(--color-warning)]/30 bg-[var(--color-warning-soft)] px-4 py-3 text-sm leading-6 text-[var(--color-warning)]"
+        >
+          <AlertTriangle size={16} aria-hidden="true" className="mt-0.5 shrink-0" />
+          <div>
+            <p className="font-bold">사건 정보 확인이 일시적으로 어렵습니다</p>
+            <p className="mt-1 text-xs leading-5">
+              잠시 후 다시 시도해주세요. 계속 진행이 어려우신 경우 직접 상담을 신청해주세요.
             </p>
           </div>
         </div>

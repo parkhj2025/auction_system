@@ -203,12 +203,14 @@ export async function POST(req: Request) {
     let cacheHit = cached.length > 0;
     let fetchAttempted = false;
     let fetchError: string | null = null;
+    let fetchRecordsCount: number | null = null;
 
     // 3. cache MISS = 대법원 광역 on-demand fetch
     if (!cacheHit && courtCode) {
       fetchAttempted = true;
       try {
         const records = await fetchSingleCase({ courtCode, caseNumber });
+        fetchRecordsCount = records.length;
         if (records.length > 0) {
           const rows = records.map((r) => mapRecordToRow(r, courtName));
           const { error: upsertError } = await admin
@@ -234,19 +236,63 @@ export async function POST(req: Request) {
       }
     }
 
-    // 4. cycle 1-D-A-4: is_active 분기 — listings 0건 + 종결 record 광역 분기.
-    let caseStatus: "active" | "closed" | "not_found" = "active";
+    // 3-A. fetch error 시점 = fetch_failed 즉시 회신 (cycle 1-G-γ-α-ε / DB stale closed 회피).
+    if (fetchError !== null) {
+      return NextResponse.json({
+        available: null,
+        case_status: "fetch_failed",
+        message:
+          "사건 정보 확인이 일시적으로 어렵습니다. 잠시 후 다시 시도해주세요.",
+        listings: [],
+        cache_hit: cacheHit,
+        fetch_attempted: fetchAttempted,
+        fetch_error: fetchError,
+      });
+    }
+
+    // 4. cycle 1-G-γ-α-ε: is_active 분기 정정.
+    //   - 종결 record TTL within 24h 단독 → closed (실제 종결 사건)
+    //   - 종결 record stale + fetch records.length === 0 → fetch_failed (stale closed NG 회피)
+    //   - 종결 record 부재 → not_found
+    let caseStatus: "active" | "closed" | "not_found" | "fetch_failed" =
+      "active";
     if (cached.length === 0) {
-      // 종결 record 광역 검수 (is_active=false / TTL 광역 무관 / court_code 단독)
-      const { data: inactive } = await admin
+      const cutoffIso = new Date(
+        Date.now() - CACHE_TTL_HOURS * 60 * 60 * 1000,
+      ).toISOString();
+
+      const { data: closedFresh } = await admin
         .from("court_listings")
         .select("docid")
         .eq("case_number", caseNumber)
         .eq("is_active", false)
+        .gte("last_seen_at", cutoffIso)
         .limit(1);
-      if (inactive && inactive.length > 0) {
+      if (closedFresh && closedFresh.length > 0) {
         caseStatus = "closed";
       } else {
+        const { data: closedStale } = await admin
+          .from("court_listings")
+          .select("docid")
+          .eq("case_number", caseNumber)
+          .eq("is_active", false)
+          .limit(1);
+        if (
+          closedStale &&
+          closedStale.length > 0 &&
+          fetchRecordsCount === 0
+        ) {
+          return NextResponse.json({
+            available: null,
+            case_status: "fetch_failed",
+            message:
+              "사건 정보 확인이 일시적으로 어렵습니다. 잠시 후 다시 시도해주세요.",
+            listings: [],
+            cache_hit: cacheHit,
+            fetch_attempted: fetchAttempted,
+            fetch_error: null,
+          });
+        }
         caseStatus = "not_found";
       }
     }
