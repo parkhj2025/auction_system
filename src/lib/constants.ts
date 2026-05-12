@@ -471,16 +471,6 @@ export const COMPARE_QUICK_STEPS = [
 ] as const;
 
 /**
- * cycle 1-G-γ-α — 메인 Pricing 공통 포함 사항 chip 4건.
- */
-export const PRICING_INCLUDES = [
-  "낙찰 성공보수 +5만원",
-  "전용계좌 분리 보관",
-  "당일 보증금 반환",
-  "서울보증보험 가입",
-] as const;
-
-/**
  * cycle 1-G-γ-α — 메인 Insight 4 카테고리 (사전 메인 InsightBlock 카피 영구 보존).
  * paradigm: 카드 = title + preview + slug / 카드 안 시각 = magazine style.
  */
