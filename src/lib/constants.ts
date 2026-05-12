@@ -267,58 +267,52 @@ export const APPLY_STEPS = [
 export type ApplyStepId = (typeof APPLY_STEPS)[number]["id"];
 
 /**
- * cycle 1-G-β-β — /about 차별화 3축 paradigm (5축 → 3축 단순화 / pastel bg 영구 폐기).
- * paradigm: 3 카드 = 큰 숫자 + title + body / bg-white + brand-green 단독 강조.
+ * cycle 1-G-β-γ — /about 가치 제안 3축 (v62 사업 핵심 가치 = 신속·신뢰·경제).
+ * paradigm: Bento Grid Apple-style (신속 hero col-span-2 row-span-2 + 신뢰·경제 col-span-1).
+ * 큰 카피 = 한 단어 + 마침표 paradigm / sub 카피 = 위계 약화.
  */
-export const DIFFERENTIATORS = [
+export const ABOUT_VALUES = [
   {
-    id: "price",
-    bigNumber: "5만원",
-    title: "업계 평균 대비 절반 수준",
-    body: "콘텐츠 기반 유입 구조로 마케팅 비용을 줄였습니다.",
+    id: "speed",
+    bigCopy: "당일.",
+    subCopy: "패찰 시 보증금 즉시 반환, 결과는 그날 통보합니다.",
+    span: "hero",
   },
   {
-    id: "safety",
-    bigNumber: "당일",
-    title: "패찰 시 보증금 당일 즉시 반환",
-    body: "공인중개사 자격과 서울보증보험으로 자산을 보호합니다.",
+    id: "trust",
+    bigCopy: "직접.",
+    subCopy: "공인중개사가 직접 출석합니다.",
+    span: "single",
   },
   {
-    id: "direct",
-    bigNumber: "카톡",
-    title: "공인중개사가 직접 출석합니다",
-    body: "신청부터 결과까지 카카오톡으로 직접 안내드립니다.",
+    id: "value",
+    bigCopy: "거품 0.",
+    subCopy: "입찰 자체에 집중할 수 있도록 돕습니다.",
+    span: "single",
   },
 ] as const;
 
+export type AboutValueSpan = (typeof ABOUT_VALUES)[number]["span"];
+
 /**
- * cycle 1-G-β-β — /about 비교 섹션 3 카드 paradigm.
- * paradigm: 좌 (일반) ink-500 + 우 (우리) brand-green 강조 / 비용 row 영구 폐기 (영구 룰 §13 정합).
+ * cycle 1-G-β-γ — /about 신뢰 근거 3 카드 (proof paradigm).
+ * paradigm: 텍스트 단독 / 박형준 개인 사진·자격증·등록증·보증보험증서 영역 영구 0 (영구 룰 §39).
  */
-export const COMPARISON_CARDS = [
+export const ABOUT_PROOFS = [
   {
-    id: "steps",
-    meta: "본인 출석 vs 대리 처리",
-    leftValue: "5단계",
-    leftSubtitle: "휴가 → 서류 → 수표 → 이동 → 대기",
-    rightValue: "6단계",
-    rightSubtitle: "웹 신청 → 입찰 정보 → 서류 → 결제 → 입찰 → 결과",
+    id: "agent",
+    line1: "공인중개사",
+    line2: "국가 자격 / 법무부 등록",
   },
   {
-    id: "time",
-    meta: "98% 절약",
-    leftValue: "255분",
-    leftSubtitle: "법원 출석 + 대기",
-    rightValue: "3분",
-    rightSubtitle: "웹 접수만",
+    id: "bidder",
+    line1: "매수신청 대리인",
+    line2: "법원 등록 / 정기 교육 이수",
   },
   {
-    id: "result",
-    meta: "패찰 시 보증금 당일 즉시 반환",
-    leftValue: "직접 입찰",
-    leftSubtitle: "결과 본인 회수",
-    rightValue: "대리 입찰",
-    rightSubtitle: "카카오톡 통보 + 보증금 즉시 반환",
+    id: "insurance",
+    line1: "서울보증보험",
+    line2: "보증금 분리 보관 / 사고 시 배상",
   },
 ] as const;
 
