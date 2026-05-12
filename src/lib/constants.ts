@@ -267,54 +267,59 @@ export const APPLY_STEPS = [
 export type ApplyStepId = (typeof APPLY_STEPS)[number]["id"];
 
 /**
- * cycle 1-G-β-γ — /about 가치 제안 3축 (v62 사업 핵심 가치 = 신속·신뢰·경제).
- * paradigm: Bento Grid Apple-style (신속 hero col-span-2 row-span-2 + 신뢰·경제 col-span-1).
- * 큰 카피 = 한 단어 + 마침표 paradigm / sub 카피 = 위계 약화.
+ * cycle 1-G-β-γ-β — /about 가치 제안 3축 (v62 / 신속·신뢰·경제).
+ * paradigm: 풀스크린 brand-green bg + 가운데 자체 SVG + 3 카드 (모바일 1-col + 데스크탑 3-col).
+ * 큰 카피 = 한 단어 + 마침표 0 paradigm / sub 카피 = 위계 약화.
  */
 export const ABOUT_VALUES = [
   {
     id: "speed",
-    bigCopy: "당일.",
+    bigCopy: "당일",
     subCopy: "패찰 시 보증금 즉시 반환, 결과는 그날 통보합니다.",
-    span: "hero",
   },
   {
     id: "trust",
-    bigCopy: "직접.",
+    bigCopy: "직접",
     subCopy: "공인중개사가 직접 출석합니다.",
-    span: "single",
   },
   {
     id: "value",
-    bigCopy: "거품 0.",
+    bigCopy: "거품 0",
     subCopy: "입찰 자체에 집중할 수 있도록 돕습니다.",
-    span: "single",
   },
 ] as const;
 
-export type AboutValueSpan = (typeof ABOUT_VALUES)[number]["span"];
-
 /**
- * cycle 1-G-β-γ — /about 신뢰 근거 3 카드 (proof paradigm).
- * paradigm: 텍스트 단독 / 박형준 개인 사진·자격증·등록증·보증보험증서 영역 영구 0 (영구 룰 §39).
+ * cycle 1-G-β-γ-β — /about 신뢰 근거 3 카드 (Credentials).
+ * paradigm: lucide 아이콘 + line1 + line2 / 박형준 개인 사진 영역 영구 0 (영구 룰 §39).
  */
-export const ABOUT_PROOFS = [
+export type AboutProofIconKey = "shield" | "award" | "building2";
+
+export const ABOUT_PROOFS: ReadonlyArray<{
+  id: string;
+  iconKey: AboutProofIconKey;
+  line1: string;
+  line2: string;
+}> = [
   {
     id: "agent",
+    iconKey: "shield",
     line1: "공인중개사",
     line2: "국가 자격 / 법무부 등록",
   },
   {
     id: "bidder",
+    iconKey: "award",
     line1: "매수신청 대리인",
     line2: "법원 등록 / 정기 교육 이수",
   },
   {
     id: "insurance",
+    iconKey: "building2",
     line1: "서울보증보험",
     line2: "보증금 분리 보관 / 사고 시 배상",
   },
-] as const;
+];
 
 /* Phase 1.2 (A-1-2) v6 — InsightBlock 카테고리 색 시스템.
  * 4 카테고리: 무료 물건분석 (green) / 가이드 (blue) / 시장 인사이트 (orange) / 낙찰사례 (purple). */
