@@ -2,12 +2,12 @@
 
 import { useRef } from "react";
 import { motion, useInView } from "motion/react";
-import { COMPARE_ROWS } from "@/lib/constants";
-import { cn } from "@/lib/utils";
+import { Check } from "lucide-react";
+import { COMPARE_DIRECT_STEPS, COMPARE_QUICK_STEPS } from "@/lib/constants";
 
-/* cycle 1-G-γ-α — 메인 섹션 3: Compare (시간 세이브 비교).
- * paradigm: surface-muted bg + 5 row pill (좌 일반 ink + 우 우리 brand-green).
- * 5번 row "소요 시간" = 큰 대비 paradigm 단독 (text-xl sm:text-2xl). */
+/* cycle 1-G-γ-α-α — 메인 섹션 3: Compare (2-col 비교 카드 / 신규 paradigm).
+ * paradigm: surface-muted bg + 좌 ink-100 (5시간 / 5단계) + 우 brand-green (10분 / 2단계).
+ * 사전 cycle 1-G-γ-α 5 row pill paradigm 영구 폐기 (바토너 추종 NG). */
 
 export function HomeCompare() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -43,60 +43,69 @@ export function HomeCompare() {
           transition={{ duration: 0.5, ease: "easeOut", delay: 0.2 }}
           className="mt-5 text-base leading-7 text-[var(--color-ink-500)] sm:text-lg sm:leading-8"
         >
-          5시간이 5분으로 줄어듭니다.
+          5단계가 2단계로, 5시간이 10분으로 줄어듭니다.
         </motion.p>
 
-        {/* 5 row 비교. */}
-        <div className="mt-14 flex flex-col gap-4">
-          {COMPARE_ROWS.map((row, i) => (
-            <motion.div
-              key={row.id}
-              initial={{ opacity: 0, y: 20 }}
-              animate={inView ? { opacity: 1, y: 0 } : {}}
-              transition={{
-                duration: 0.5,
-                ease: "easeOut",
-                delay: 0.3 + i * 0.12,
-              }}
-              className="grid grid-cols-1 items-center gap-3 lg:grid-cols-[1fr_200px_1fr]"
-            >
-              {/* 좌 pill (일반). */}
-              <div
-                className={cn(
-                  "flex items-center justify-center rounded-full bg-[var(--color-ink-100)] px-6 py-4 text-center font-semibold text-[var(--color-ink-700)]",
-                  row.emphasis
-                    ? "text-xl font-black sm:text-2xl"
-                    : "text-base sm:text-lg"
-                )}
-              >
-                {row.left}
-              </div>
+        <div className="mt-14 grid grid-cols-1 gap-5 md:grid-cols-2">
+          {/* 좌 카드 (직접 입찰 / ink-100). */}
+          <motion.article
+            initial={{ opacity: 0, y: 30 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.3 }}
+            className="flex flex-col rounded-2xl bg-[var(--color-ink-100)] p-8 sm:p-10"
+          >
+            <p className="text-xs font-bold uppercase tracking-wider text-[var(--color-ink-500)]">
+              직접 입찰
+            </p>
+            <p className="mt-6 text-5xl font-black leading-none tabular-nums text-[var(--color-ink-700)] sm:text-7xl">
+              5시간
+            </p>
+            <p className="mt-4 text-sm font-semibold text-[var(--color-ink-500)] sm:text-base">
+              5단계
+            </p>
+            <ul className="mt-8 flex flex-col gap-3">
+              {COMPARE_DIRECT_STEPS.map((step, i) => (
+                <li key={step} className="flex gap-3">
+                  <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-[var(--color-ink-300)] text-[10px] font-bold text-white">
+                    {i + 1}
+                  </span>
+                  <span className="text-sm leading-6 text-[var(--color-ink-700)]">
+                    {step}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </motion.article>
 
-              {/* 가운데 카테고리 label. */}
-              <div
-                className={cn(
-                  "flex items-center justify-center text-center",
-                  row.emphasis
-                    ? "text-base font-black tracking-tight text-[var(--color-ink-900)] sm:text-lg"
-                    : "text-sm font-medium text-[var(--color-ink-500)] sm:text-base"
-                )}
-              >
-                {row.category}
-              </div>
-
-              {/* 우 pill (경매퀵). */}
-              <div
-                className={cn(
-                  "flex items-center justify-center rounded-full bg-[var(--brand-green)] px-6 py-4 text-center font-semibold text-white",
-                  row.emphasis
-                    ? "text-xl font-black sm:text-2xl"
-                    : "text-base sm:text-lg"
-                )}
-              >
-                {row.right}
-              </div>
-            </motion.div>
-          ))}
+          {/* 우 카드 (경매퀵 대리 / brand-green). */}
+          <motion.article
+            initial={{ opacity: 0, y: 30 }}
+            animate={inView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, ease: "easeOut", delay: 0.45 }}
+            className="flex flex-col rounded-2xl bg-[var(--brand-green)] p-8 sm:p-10"
+          >
+            <p className="text-xs font-bold uppercase tracking-wider text-white/80">
+              경매퀵 대리
+            </p>
+            <p className="mt-6 text-5xl font-black leading-none tabular-nums text-white sm:text-7xl">
+              10분
+            </p>
+            <p className="mt-4 text-sm font-semibold text-white/80 sm:text-base">
+              2단계
+            </p>
+            <ul className="mt-8 flex flex-col gap-3">
+              {COMPARE_QUICK_STEPS.map((step, i) => (
+                <li key={step} className="flex gap-3">
+                  <span className="mt-1 flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-white/20 text-white">
+                    <Check size={12} strokeWidth={3} aria-hidden="true" />
+                  </span>
+                  <span className="text-sm leading-6 text-white">
+                    {i + 1}. {step}
+                  </span>
+                </li>
+              ))}
+            </ul>
+          </motion.article>
         </div>
       </div>
     </section>

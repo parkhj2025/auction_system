@@ -54,7 +54,7 @@ export function HomeInsight() {
             >
               <Link
                 href={`/insight?cat=${tile.slug}`}
-                className="group flex aspect-[2/1] flex-row overflow-hidden rounded-2xl border border-gray-200 bg-white transition-transform duration-300 ease-out hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
+                className="group flex aspect-[4/1] flex-row overflow-hidden rounded-2xl border border-gray-200 bg-white transition-transform duration-300 ease-out hover:-translate-y-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/40 focus-visible:ring-offset-2"
               >
                 {/* 좌 이미지. */}
                 <div className="relative w-1/2 overflow-hidden bg-[var(--color-ink-100)]">

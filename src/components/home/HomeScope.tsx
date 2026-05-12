@@ -16,7 +16,7 @@ export function HomeScope() {
   return (
     <section
       ref={sectionRef}
-      className="border-t border-[var(--color-border)] bg-white py-20 sm:py-32"
+      className="bg-[var(--color-surface-muted)] py-20 sm:py-32"
     >
       <div className="container-app mx-auto w-full max-w-[1200px]">
         <motion.p

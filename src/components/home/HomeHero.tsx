@@ -31,8 +31,16 @@ export function HomeHero({ caseNumbers }: { caseNumbers: string[] }) {
   }
 
   return (
-    <section className="relative min-h-[90vh] w-full bg-[#111418] py-20 sm:py-28">
-      <div className="container-app mx-auto grid h-full w-full grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12">
+    <section className="relative w-full overflow-hidden bg-[#111418] py-16 sm:py-20 lg:min-h-[90vh] lg:py-28">
+      {/* 모바일 SVG = absolute bg + opacity 약화 paradigm (lg:hidden / 카피·폼 위 z-index 앞). */}
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 flex items-center justify-center opacity-[0.18] lg:hidden"
+      >
+        <ServiceFlow />
+      </div>
+
+      <div className="container-app relative z-10 mx-auto grid h-full w-full grid-cols-1 items-center gap-10 lg:grid-cols-12 lg:gap-12">
         {/* 좌 영역 (카피 + 사건번호 폼). */}
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -41,11 +49,12 @@ export function HomeHero({ caseNumbers }: { caseNumbers: string[] }) {
           className="lg:col-span-7"
         >
           <h1 className="text-[44px] font-black leading-[1.1] tracking-[-0.015em] text-white sm:text-[88px]">
-            <span className="text-[var(--brand-green)]">사건번호</span> 입력부터, 낙찰까지
-            <span style={{ color: "#FFD43B" }}>.</span>
+            법원에 가지 않고,
+            <br />
+            <span style={{ color: "#FFD43B" }}>경매를 시작하세요.</span>
           </h1>
           <p className="mt-6 max-w-xl text-base leading-7 text-[var(--color-ink-300)] sm:text-lg sm:leading-8">
-            신청 · 서류 · 입찰 · 결과 — 한 번에 처리합니다.
+            사건번호만 주시면, 법원은 저희가 갑니다.
           </p>
 
           {/* 사건번호 폼 카드 (charcoal bg 안 white/5 paradigm). */}
@@ -79,12 +88,12 @@ export function HomeHero({ caseNumbers }: { caseNumbers: string[] }) {
           </form>
         </motion.div>
 
-        {/* 우 자체 SVG (사건번호 input → 5 dot → 망치 추상). */}
+        {/* 우 자체 SVG (데스크탑 단독 / 모바일 = absolute bg paradigm 광역 분기). */}
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ duration: 0.8, ease: "easeOut", delay: 0.2 }}
-          className="flex items-center justify-center lg:col-span-5"
+          className="hidden items-center justify-center lg:col-span-5 lg:flex"
         >
           <ServiceFlow />
         </motion.div>

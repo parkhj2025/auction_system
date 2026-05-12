@@ -454,45 +454,20 @@ export const SERVICE_TRUST_CHIPS = [
 ] as const;
 
 /**
- * cycle 1-G-γ-α — 메인 Compare 5 row 비교 paradigm (직접 입찰 vs 우리 대리).
- * paradigm: 좌 ink-100 pill + 우 brand-green pill / 5 row 안 5번 row 강조 단독.
+ * cycle 1-G-γ-α-α — 메인 Compare 2-col 비교 카드 (직접 입찰 vs 경매퀵 대리).
+ * paradigm: 좌 ink-100 5단계 5시간 + 우 brand-green 2단계 10분 / 신규 paradigm (사전 5 row pill 영구 폐기).
  */
-export const COMPARE_ROWS = [
-  {
-    id: "form",
-    category: "입찰표 작성",
-    left: "처음 보는 양식, 실수 위험",
-    right: "전문가가 직접 작성합니다",
-    emphasis: false,
-  },
-  {
-    id: "deposit",
-    category: "보증금 납부",
-    left: "수표 발급 + 직접 납부",
-    right: "전용계좌 입금 한 번으로",
-    emphasis: false,
-  },
-  {
-    id: "courthouse",
-    category: "법원 방문",
-    left: "왕복 이동 + 대기",
-    right: "공인중개사가 직접 출석",
-    emphasis: false,
-  },
-  {
-    id: "result",
-    category: "결과 확인",
-    left: "당일 현장 대기",
-    right: "당일 즉시 통보합니다",
-    emphasis: false,
-  },
-  {
-    id: "time",
-    category: "소요 시간",
-    left: "5시간 이상",
-    right: "5분 신청",
-    emphasis: true,
-  },
+export const COMPARE_DIRECT_STEPS = [
+  "물건 사전 검색 + 분석",
+  "위임장 + 입찰표 작성",
+  "수표 발급 + 보증금 납부",
+  "법원 출석 + 현장 입찰",
+  "현장 결과 대기",
+] as const;
+
+export const COMPARE_QUICK_STEPS = [
+  "사건번호 + 입찰 정보 입력",
+  "당일 결과 회수",
 ] as const;
 
 /**

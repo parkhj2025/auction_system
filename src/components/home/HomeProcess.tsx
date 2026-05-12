@@ -44,8 +44,8 @@ export function HomeProcess() {
           <ProcessStepFlow inView={inView} />
         </motion.div>
 
-        {/* 5 step 카드. */}
-        <div className="mt-12 grid grid-cols-1 gap-5 lg:mt-10 lg:grid-cols-5">
+        {/* 5 step 카드 (5-col horizontal 압축 paradigm). */}
+        <div className="mt-12 grid grid-cols-1 gap-4 lg:mt-10 lg:grid-cols-5">
           {SERVICE_PROCESS_STEPS.map((step, i) => (
             <motion.article
               key={step.id}
@@ -56,18 +56,18 @@ export function HomeProcess() {
                 ease: "easeOut",
                 delay: 0.5 + i * 0.15,
               }}
-              className="flex flex-col rounded-2xl border border-white/20 bg-transparent p-6 sm:p-8"
+              className="flex flex-col rounded-2xl border border-white/20 bg-transparent p-4 sm:p-6"
             >
-              <p className="text-[48px] font-black leading-none tabular-nums text-white sm:text-[72px]">
+              <p className="text-[40px] font-black leading-none tabular-nums text-white sm:text-[56px]">
                 {step.number}
               </p>
-              <h3 className="mt-6 text-2xl font-black tracking-tight text-white sm:text-[32px]">
+              <h3 className="mt-4 text-xl font-black tracking-tight text-white sm:text-2xl">
                 {step.title}
               </h3>
-              <span className="mt-3 inline-flex w-fit items-center rounded-full border border-white/20 bg-white/10 px-3 py-1 text-sm font-semibold text-white">
+              <span className="mt-2 inline-flex w-fit items-center rounded-full border border-white/20 bg-white/10 px-3 py-1 text-xs font-semibold text-white sm:text-sm">
                 {step.dDay}
               </span>
-              <p className="mt-5 text-base leading-7 text-white/80 sm:text-lg sm:leading-8">
+              <p className="mt-4 text-sm leading-6 text-white/80 sm:text-base sm:leading-7">
                 {step.body}
               </p>
             </motion.article>
