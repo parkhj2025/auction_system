@@ -32,7 +32,7 @@ export function AboutValues() {
           transition={{ duration: 0.6, ease: "easeOut", delay: 0.1 }}
           className="mt-4 text-[56px] font-black leading-[1.05] tracking-[-0.015em] text-white sm:text-[96px]"
         >
-          세 가지로, 새롭게 갑니다
+          입찰의 처음을, 대신 갑니다
           <span style={{ color: "#FFD43B" }}>.</span>
         </motion.h2>
 
@@ -60,10 +60,10 @@ export function AboutValues() {
               }}
               className="flex flex-col rounded-2xl border border-white/20 bg-transparent p-6 text-left sm:p-8"
             >
-              <p className="text-[80px] font-black leading-none tabular-nums text-white sm:text-[120px]">
+              <p className="text-[64px] font-black leading-[1.05] tracking-[-0.015em] text-white sm:text-[88px]">
                 {item.bigCopy}
               </p>
-              <p className="mt-6 text-sm leading-7 text-white/80 sm:text-base sm:leading-8">
+              <p className="mt-6 text-base leading-7 text-white/80 sm:text-lg sm:leading-8">
                 {item.subCopy}
               </p>
             </motion.article>

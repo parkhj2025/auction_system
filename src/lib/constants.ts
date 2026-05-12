@@ -267,57 +267,87 @@ export const APPLY_STEPS = [
 export type ApplyStepId = (typeof APPLY_STEPS)[number]["id"];
 
 /**
- * cycle 1-G-β-γ-β — /about 가치 제안 3축 (v62 / 신속·신뢰·경제).
- * paradigm: 풀스크린 brand-green bg + 가운데 자체 SVG + 3 카드 (모바일 1-col + 데스크탑 3-col).
- * 큰 카피 = 한 단어 + 마침표 0 paradigm / sub 카피 = 위계 약화.
+ * cycle 1-G-β-γ-γ — /about Problems 4 카드 (고객 problem 직접 표현 paradigm).
+ * paradigm: white bg + 모바일 1-col + 데스크탑 2-col 또는 4-col / 큰 카피 단독 + sub 약화.
  */
-export const ABOUT_VALUES = [
+export const ABOUT_PROBLEMS = [
   {
-    id: "speed",
-    bigCopy: "당일",
-    subCopy: "패찰 시 보증금 즉시 반환, 결과는 그날 통보합니다.",
+    id: "courthouse",
+    bigCopy: "법원까지 가야 한다.",
+    subCopy: "입찰일의 휴가, 왕복 이동, 대기 시간.",
   },
   {
-    id: "trust",
-    bigCopy: "직접",
-    subCopy: "공인중개사가 직접 출석합니다.",
+    id: "form",
+    bigCopy: "입찰표가 낯설다.",
+    subCopy: "처음 가는 법원, 처음 보는 양식.",
   },
   {
-    id: "value",
-    bigCopy: "거품 0",
-    subCopy: "입찰 자체에 집중할 수 있도록 돕습니다.",
+    id: "oneshot",
+    bigCopy: "한 번에 끝낸다.",
+    subCopy: "10분 늦으면 다음 달, 1원 차이로 패찰.",
+  },
+  {
+    id: "wait",
+    bigCopy: "결과를 기다린다.",
+    subCopy: "낙찰·패찰 통보까지 흐르는 시간.",
   },
 ] as const;
 
 /**
- * cycle 1-G-β-γ-β — /about 신뢰 근거 3 카드 (Credentials).
- * paradigm: lucide 아이콘 + line1 + line2 / 박형준 개인 사진 영역 영구 0 (영구 룰 §39).
+ * cycle 1-G-β-γ-γ — /about Why us 3 카드 (정정 카피 / 큰 카피 64/88px).
+ * paradigm: brand-green 풀스크린 + 사전 "당일·직접·거품 0" 영구 폐기.
  */
-export type AboutProofIconKey = "shield" | "award" | "building2";
+export const ABOUT_VALUES = [
+  {
+    id: "court",
+    bigCopy: "법원은 저희가.",
+    subCopy:
+      "사건번호만 주시면, 입찰부터 결과까지 한 번에 처리합니다.",
+  },
+  {
+    id: "time",
+    bigCopy: "시간은 그대로.",
+    subCopy:
+      "신청 한 번 + 당일 결과. 휴가도 출장도 필요 없습니다.",
+  },
+  {
+    id: "first",
+    bigCopy: "처음이어도.",
+    subCopy:
+      "전문 자격을 갖춘 공인중개사가 직접 진행합니다.",
+  },
+] as const;
 
-export const ABOUT_PROOFS: ReadonlyArray<{
+/**
+ * cycle 1-G-β-γ-γ — /about Trust System 3축 (Credentials 통합 paradigm).
+ * paradigm: lucide 96px + line1 28/36px + 본문 text-base sm:text-lg (풍성).
+ * 박형준 개인 사진·자격증·등록증·보증보험증서 영역 영구 0 (영구 룰 §39).
+ */
+export type AboutTrustIconKey = "users" | "award" | "shieldCheck";
+
+export const ABOUT_TRUST: ReadonlyArray<{
   id: string;
-  iconKey: AboutProofIconKey;
+  iconKey: AboutTrustIconKey;
   line1: string;
-  line2: string;
+  body: string;
 }> = [
   {
+    id: "one-to-one",
+    iconKey: "users",
+    line1: "1인 1물건",
+    body: "한 물건당 한 명의 고객만 대리합니다. 같은 사건에서 우리와 경합할 위험은 0입니다.",
+  },
+  {
     id: "agent",
-    iconKey: "shield",
-    line1: "공인중개사",
-    line2: "국가 자격 / 법무부 등록",
-  },
-  {
-    id: "bidder",
     iconKey: "award",
-    line1: "매수신청 대리인",
-    line2: "법원 등록 / 정기 교육 이수",
+    line1: "공인중개사 직접 수행",
+    body: "법원이 인정한 매수신청 대리인 자격을 갖춘 공인중개사가 직접 출석해 입찰합니다.",
   },
   {
-    id: "insurance",
-    iconKey: "building2",
-    line1: "서울보증보험",
-    line2: "보증금 분리 보관 / 사고 시 배상",
+    id: "safety",
+    iconKey: "shieldCheck",
+    line1: "전용계좌·보증보험",
+    body: "운영 계좌와 분리된 전용 계좌로 보증금을 보관하고, 서울보증보험으로 사고에 대비합니다.",
   },
 ];
 
