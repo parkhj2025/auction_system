@@ -208,14 +208,12 @@ export async function POST(req: Request) {
     let cacheHit = cached.length > 0;
     let fetchAttempted = false;
     let fetchError: string | null = null;
-    let fetchRecordsCount: number | null = null;
 
-    // 3. cache MISS = 대법원 광역 on-demand fetch
+    // 3. cache MISS = 대법원 광역 on-demand fetch (work-005 정정 1 = closedStale 분기 폐기).
     if (!cacheHit && courtCode) {
       fetchAttempted = true;
       try {
         const records = await fetchSingleCase({ courtCode, caseNumber });
-        fetchRecordsCount = records.length;
         if (records.length > 0) {
           const rows = records.map((r) => mapRecordToRow(r, courtName));
           const { error: upsertError } = await admin
@@ -255,9 +253,9 @@ export async function POST(req: Request) {
       });
     }
 
-    // 4. cycle 1-G-γ-α-ε: is_active 분기 정정.
-    //   - 종결 record TTL within 24h 단독 → closed (실제 종결 사건)
-    //   - 종결 record stale + fetch records.length === 0 → fetch_failed (stale closed NG 회피)
+    // 4. work-005 정정 1: closedStale 분기 영구 폐기 paradigm.
+    //   - 종결 record TTL within 24h 단독 → closed (영구 보존)
+    //   - 종결 record stale + records 0 → not_found 단독 회신 (closedStale 분기 영구 폐기)
     //   - 종결 record 부재 → not_found
     let caseStatus: "active" | "closed" | "not_found" | "fetch_failed" =
       "active";
@@ -266,8 +264,7 @@ export async function POST(req: Request) {
         Date.now() - CACHE_TTL_HOURS * 60 * 60 * 1000,
       ).toISOString();
 
-      // cycle 1-G-γ-α-ζ-1 safety check = seed-photos row (court_name '(seed-photos)' 패턴) 광역 차단.
-      // 미래 잠재 NG 회피 (script INSERT 단계 영구 폐기 사후 신규 row 진입 부재 + 인적 실수 광역 차단).
+      // work-001 정정 7 safety check = seed-photos row (court_name '(seed-photos)' 패턴) 광역 차단.
       const { data: closedFresh } = await admin
         .from("court_listings")
         .select("docid")
@@ -279,29 +276,6 @@ export async function POST(req: Request) {
       if (closedFresh && closedFresh.length > 0) {
         caseStatus = "closed";
       } else {
-        const { data: closedStale } = await admin
-          .from("court_listings")
-          .select("docid")
-          .eq("case_number", caseNumber)
-          .eq("is_active", false)
-          .not("court_name", "ilike", "%(seed-photos)%")
-          .limit(1);
-        if (
-          closedStale &&
-          closedStale.length > 0 &&
-          fetchRecordsCount === 0
-        ) {
-          return NextResponse.json({
-            available: null,
-            case_status: "fetch_failed",
-            message:
-              "사건 정보 확인이 일시적으로 어렵습니다. 잠시 후 다시 시도해주세요.",
-            listings: [],
-            cache_hit: cacheHit,
-            fetch_attempted: fetchAttempted,
-            fetch_error: null,
-          });
-        }
         caseStatus = "not_found";
       }
     }

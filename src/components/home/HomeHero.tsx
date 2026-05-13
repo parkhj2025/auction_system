@@ -10,8 +10,10 @@ import {
   AlertTriangle,
   Loader2,
   ImageOff,
+  MessageCircle,
 } from "lucide-react";
 import type { CourtListingSummary } from "@/types/apply";
+import { COMPANY } from "@/lib/constants";
 
 /* cycle 1-G-γ-α-δ — Hero 사건 조회 + 물건 선택 + 자동 진입 paradigm:
  * - input 형식 검증 (CASE_NUMBER_PATTERN) + CTA "조회하기" → /api/auction/lookup GET fetch
@@ -33,7 +35,8 @@ type LookupStatus =
   | "not-found"
   | "invalid"
   | "error"
-  | "fetch-failed";
+  | "fetch-failed"
+  | "already-taken"; // work-005 정정 3 = 1물건 1고객 race 회피 1차 단계 신규.
 
 type SessionPayload = {
   caseNumber: string;
@@ -111,6 +114,15 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
         return;
       }
 
+      // work-005 정정 3 = 1물건 1고객 race 회피 1차 단계 (Hero 비로그인 시점).
+      if (json.status === "already_taken") {
+        setLookupStatus("already-taken");
+        setErrorMessage(
+          "이 사건은 이미 다른 고객의 신청이 진행 중입니다. 같은 회차는 중복 접수가 불가합니다. 다음 회차 진행 시점 재 진입 가능합니다.",
+        );
+        return;
+      }
+
       if (json.status === "closed") {
         setLookupStatus("closed");
         setErrorMessage("이 사건은 매각이 종결됐습니다.");
@@ -171,7 +183,8 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
     lookupStatus === "not-found" ||
     lookupStatus === "invalid" ||
     lookupStatus === "error" ||
-    lookupStatus === "fetch-failed";
+    lookupStatus === "fetch-failed" ||
+    lookupStatus === "already-taken";
   const ctaDisabled =
     isLoading || (lookupStatus === "active-multi" && !selectedDocid);
   const ctaLabel = isLoading
@@ -369,33 +382,60 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
             </div>
           )}
 
-          {/* NG 안내: closed + not-found + invalid + error = red / fetch-failed = amber (일시 NG paradigm). */}
+          {/* NG 안내: closed + not-found + invalid + error = red / fetch-failed + already-taken = amber.
+              work-005 정정 3 = already-taken 분기 = amber alert + 대안 carrier (카카오톡 + 다른 사건 button). */}
           {hasError && errorMessage && (
             <div
               className={
-                lookupStatus === "fetch-failed"
-                  ? "flex w-full items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4"
+                lookupStatus === "fetch-failed" ||
+                lookupStatus === "already-taken"
+                  ? "flex w-full flex-col gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4"
                   : "flex w-full items-start gap-3 rounded-2xl border border-red-500/30 bg-red-500/10 p-4"
               }
             >
-              {lookupStatus === "fetch-failed" ? (
-                <AlertTriangle
-                  size={20}
-                  strokeWidth={2.2}
-                  className="mt-0.5 shrink-0 text-amber-400"
-                  aria-hidden="true"
-                />
-              ) : (
-                <AlertCircle
-                  size={20}
-                  strokeWidth={2.2}
-                  className="mt-0.5 shrink-0 text-red-400"
-                  aria-hidden="true"
-                />
+              <div className="flex items-start gap-3">
+                {lookupStatus === "fetch-failed" ||
+                lookupStatus === "already-taken" ? (
+                  <AlertTriangle
+                    size={20}
+                    strokeWidth={2.2}
+                    className="mt-0.5 shrink-0 text-amber-400"
+                    aria-hidden="true"
+                  />
+                ) : (
+                  <AlertCircle
+                    size={20}
+                    strokeWidth={2.2}
+                    className="mt-0.5 shrink-0 text-red-400"
+                    aria-hidden="true"
+                  />
+                )}
+                <p className="text-sm font-medium leading-6 text-white">
+                  {errorMessage}
+                </p>
+              </div>
+
+              {/* work-005 정정 3 = already-taken 분기 대안 carrier (카카오톡 + 다른 사건 button). */}
+              {lookupStatus === "already-taken" && (
+                <div className="flex flex-wrap gap-2 pl-8">
+                  <a
+                    href={COMPANY.kakaoChannelUrl}
+                    target="_blank"
+                    rel="noreferrer noopener"
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-amber-400/40 bg-amber-500/10 px-4 py-2 text-sm font-bold text-amber-100 transition-colors duration-150 hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50"
+                  >
+                    <MessageCircle size={16} strokeWidth={2.2} aria-hidden="true" />
+                    카카오톡 상담
+                  </a>
+                  <button
+                    type="button"
+                    onClick={handleRetry}
+                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-bold text-white transition-colors duration-150 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
+                  >
+                    다른 사건 검색
+                  </button>
+                </div>
               )}
-              <p className="text-sm font-medium leading-6 text-white">
-                {errorMessage}
-              </p>
             </div>
           )}
 

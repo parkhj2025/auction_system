@@ -6,7 +6,7 @@ import type { ApplyFormData } from "@/types/apply";
 import { computeFee } from "@/lib/apply";
 import { formatPaymentDeadline } from "@/lib/calendar";
 import { cn, formatKoreanWon } from "@/lib/utils";
-import { DISPLAY_BANK } from "@/lib/constants";
+import { DISPLAY_BANK, COURTS_ALL } from "@/lib/constants";
 
 /**
  * cycle 1-D-A-4-7 정정 — 결제·접수 단계 (카피 정수 + red 색감 정수 + channel 영역 0 paradigm).
@@ -42,6 +42,11 @@ export function Step5Payment({
 }: Props) {
   const [copied, setCopied] = useState(false);
 
+  // work-005 정정 5 = 1물건 1고객 race 회피 3차 단계 (Step5 결제 submit 직전 재 호출).
+  // Hero (1차) + Step1 (2차) + Step5 (3차 / 본 정정) + DB unique constraint (4차 / 최종 안전망).
+  const [raceChecking, setRaceChecking] = useState(false);
+  const [raceBlocked, setRaceBlocked] = useState(false);
+
   const bid = data.bidInfo;
   const bidAmount = Number(bid.bidAmount.replace(/[^\d]/g, "")) || 0;
   const fee = data.bidDate ? computeFee(data.bidDate) : null;
@@ -55,6 +60,39 @@ export function Step5Payment({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
+  // work-005 정정 5 = submit 직전 is_case_active 재 호출 paradigm.
+  // Step1 caseTaken alert 사후 사용자 광역 단계 진입 사후 시점 광역 race condition 회피 의무.
+  async function handlePreSubmitCheck() {
+    if (raceChecking) return;
+    setRaceChecking(true);
+    setRaceBlocked(false);
+    try {
+      const selectedCourt = COURTS_ALL.find((c) => c.label === data.court);
+      const courtCode = selectedCourt?.courtCode ?? "";
+      const res = await fetch("/api/orders/check", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          caseNumber: data.caseNumber,
+          courtCode,
+          courtName: data.court,
+          round: data.auctionRound ?? 1,
+        }),
+      });
+      const json = (await res.json()) as { available?: boolean | null };
+      if (json.available === false) {
+        setRaceBlocked(true);
+        return;
+      }
+      onSubmit();
+    } catch {
+      // network NG 시점 = DB unique constraint 4차 안전망 paradigm 정합 → onSubmit 자연 진입.
+      onSubmit();
+    } finally {
+      setRaceChecking(false);
+    }
+  }
+
   async function copyAccount() {
     try {
       await navigator.clipboard.writeText(DISPLAY_BANK.accountNumber);
@@ -65,7 +103,8 @@ export function Step5Payment({
     }
   }
 
-  const canSubmit = !!data.depositorName.trim() && !submitting;
+  const canSubmit =
+    !!data.depositorName.trim() && !submitting && !raceChecking && !raceBlocked;
 
   return (
     <div className="flex flex-col gap-6">
@@ -213,6 +252,22 @@ export function Step5Payment({
         </div>
       </div>
 
+      {/* work-005 정정 5 = race condition 차단 alert (Step5 직전 재 호출 사후 isActive=true 시점). */}
+      {raceBlocked && (
+        <div
+          role="alert"
+          className="flex items-start gap-2 rounded-[var(--radius-md)] border border-[var(--color-accent-red)] bg-[var(--color-accent-red-soft)] px-5 py-4 text-sm leading-6 text-[var(--color-accent-red)]"
+        >
+          <AlertCircle size={16} className="mt-0.5 shrink-0" aria-hidden="true" />
+          <div>
+            <p className="font-bold">접수가 막 차단됐습니다</p>
+            <p className="mt-1 text-xs leading-5 text-[var(--color-ink-700)]">
+              조금 전 다른 고객의 신청이 먼저 접수됐습니다. 같은 회차는 중복 접수가 불가합니다. 사건 조회부터 다시 진행해주세요.
+            </p>
+          </div>
+        </div>
+      )}
+
       {submitError && (
         <div
           role="alert"
@@ -231,7 +286,7 @@ export function Step5Payment({
         <button
           type="button"
           onClick={onBack}
-          disabled={submitting}
+          disabled={submitting || raceChecking}
           className="inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-xl border border-[var(--color-border)] bg-white px-5 text-base font-bold text-[var(--color-ink-700)] transition-colors duration-150 hover:bg-[var(--color-ink-100)] disabled:opacity-50 sm:w-auto"
         >
           <ArrowLeft size={16} aria-hidden="true" />
@@ -239,7 +294,7 @@ export function Step5Payment({
         </button>
         <button
           type="button"
-          onClick={onSubmit}
+          onClick={handlePreSubmitCheck}
           disabled={!canSubmit}
           className={cn(
             "inline-flex min-h-[var(--cta-h-app)] w-full items-center justify-center gap-2 rounded-xl px-8 text-base font-black transition-colors duration-150 sm:w-auto sm:px-10",
@@ -248,8 +303,12 @@ export function Step5Payment({
               : "cursor-not-allowed bg-gray-200 text-gray-400",
           )}
         >
-          {submitting ? "접수 중..." : "신청 접수"}
-          {!submitting && <Send size={16} aria-hidden="true" />}
+          {raceChecking
+            ? "확인 중..."
+            : submitting
+              ? "접수 중..."
+              : "신청 접수"}
+          {!submitting && !raceChecking && <Send size={16} aria-hidden="true" />}
         </button>
       </div>
     </div>

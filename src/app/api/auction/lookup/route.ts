@@ -183,15 +183,12 @@ export async function GET(req: Request) {
     let cacheHit = cached.length > 0;
 
     // cache MISS = 대법원 광역 on-demand fetch.
-    // 사후 단계 정정 (cycle 1-G-γ-α-ε):
+    // 사후 단계 정정 (cycle 1-G-γ-α-ε / work-005 정정 1 closedStale 분기 폐기):
     //   - fetch error catch → fetch_failed 즉시 회신 (stale closed 회피)
-    //   - records.length === 0 + DB stale은 단계 4에서 fetch_failed 분기.
     let fetchError: unknown = null;
-    let fetchRecordsCount: number | null = null;
     if (!cacheHit) {
       try {
         const records = await fetchSingleCase({ courtCode, caseNumber });
-        fetchRecordsCount = records.length;
         if (records.length > 0) {
           const rows = records.map((r) => mapRecordToRow(r, "인천지방법원"));
           const { error: upsertError } = await admin
@@ -223,16 +220,17 @@ export async function GET(req: Request) {
     }
 
     // is_active 분기 — listings 0건 + 종결 record 광역 분기.
-    // 사후 단계 정정 (cycle 1-G-γ-α-ε):
-    //   - 종결 record TTL within 24h 단독 → closed (실제 종결 사건)
-    //   - 종결 record stale + fetch records.length === 0 → fetch_failed (stale closed NG 회피)
+    // work-005 정정 1 = closedStale 분기 영구 폐기 paradigm.
+    // 사유: stale closed row + 신규 records 0 = "사건 자체 사라짐" 의미 = not_found 단단 paradigm.
+    // 사전 work-002 cycle ε commit 9802285 closedStale → fetch_failed paradigm NG source 확정.
+    //   - 종결 record TTL within 24h 단독 → closed (실제 종결 사건 / 영구 보존)
+    //   - 종결 record stale + records 0 → not_found 단독 회신 (closedStale 분기 영구 폐기)
     //   - 종결 record 부재 → not_found
     if (cached.length === 0) {
       const cutoffIso = new Date(
         Date.now() - CACHE_TTL_HOURS * 60 * 60 * 1000,
       ).toISOString();
-      // cycle 1-G-γ-α-ζ-1 safety check = seed-photos row (court_name '(seed-photos)' 패턴) 광역 차단.
-      // 미래 잠재 NG 회피 (script INSERT 단계 영구 폐기 사후 신규 row 진입 부재 + 인적 실수 광역 차단).
+      // work-001 정정 6 safety check = seed-photos row (court_name '(seed-photos)' 패턴) 광역 차단.
       const { data: closedFresh } = await admin
         .from("court_listings")
         .select("docid")
@@ -246,31 +244,31 @@ export async function GET(req: Request) {
         return NextResponse.json({ status: "closed", listings: [] });
       }
 
-      const { data: closedStale } = await admin
-        .from("court_listings")
-        .select("docid")
-        .eq("case_number", caseNumber)
-        .eq("court_code", courtCode)
-        .eq("is_active", false)
-        .not("court_name", "ilike", "%(seed-photos)%")
-        .limit(1);
-      if (
-        closedStale &&
-        closedStale.length > 0 &&
-        fetchRecordsCount === 0
-      ) {
-        return NextResponse.json({
-          status: "fetch_failed",
-          message:
-            "사건 정보 확인이 일시적으로 어렵습니다. 잠시 후 다시 시도해주세요.",
-          listings: [],
-        });
-      }
-
       return NextResponse.json({ status: "not_found", listings: [] });
     }
 
     const listings = groupByItem(cached);
+
+    // work-005 정정 2 = 1물건 1고객 race 회피 1차 단계 (Hero 비로그인 시점).
+    // listings 광역 첫 항목 auction_round 광역 회수 → is_case_active(case_no, round_no) 호출.
+    // anon role EXECUTE GRANT 광역 사실 정합 (Supabase MCP 직접 검수 / PUBLIC + anon 광역).
+    // isActive=true 시점 = already_taken 분기 회신 + listings + auction_round 보존 (사용자 안내 + 대안 carrier).
+    const auctionRound = listings[0]?.auction_round ?? 1;
+    const { data: isActive, error: rpcError } = await admin.rpc(
+      "is_case_active",
+      { case_no: caseNumber, round_no: auctionRound },
+    );
+    if (rpcError) {
+      console.error("[auction/lookup] is_case_active rpc failed", rpcError);
+    }
+    if (isActive === true) {
+      return NextResponse.json({
+        status: "already_taken",
+        listings,
+        auction_round: auctionRound,
+      });
+    }
+
     return NextResponse.json({ status: "active", listings });
   } catch (err) {
     console.error("[auction/lookup] unexpected error", err);

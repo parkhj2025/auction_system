@@ -98,10 +98,18 @@ export function Step1Property({
     setCaseFetchFailed(false);
 
     try {
+      // work-005 정정 4 = round 명시 호출 paradigm.
+      // orders/check 안 is_case_active RPC 호출은 round null 시점 분기 부재 사실 → round 명시 의무.
+      // 사전 단계 = matchedListing 광역 영역 0 (조회 사전) = data.auctionRound 광역 단단 (Step navigation 회귀 시점 보존).
       const res = await fetch("/api/orders/check", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ caseNumber: q, courtCode, courtName: data.court }),
+        body: JSON.stringify({
+          caseNumber: q,
+          courtCode,
+          courtName: data.court,
+          round: data.auctionRound ?? 1,
+        }),
       });
 
       if (res.status === 401) {
