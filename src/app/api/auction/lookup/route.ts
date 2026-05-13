@@ -226,6 +226,8 @@ export async function GET(req: Request) {
       const cutoffIso = new Date(
         Date.now() - CACHE_TTL_HOURS * 60 * 60 * 1000,
       ).toISOString();
+      // cycle 1-G-γ-α-ζ-1 safety check = seed-photos row (court_name '(seed-photos)' 패턴) 광역 차단.
+      // 미래 잠재 NG 회피 (script INSERT 단계 영구 폐기 사후 신규 row 진입 부재 + 인적 실수 광역 차단).
       const { data: closedFresh } = await admin
         .from("court_listings")
         .select("docid")
@@ -233,6 +235,7 @@ export async function GET(req: Request) {
         .eq("court_code", courtCode)
         .eq("is_active", false)
         .gte("last_seen_at", cutoffIso)
+        .not("court_name", "ilike", "%(seed-photos)%")
         .limit(1);
       if (closedFresh && closedFresh.length > 0) {
         return NextResponse.json({ status: "closed", listings: [] });
@@ -244,6 +247,7 @@ export async function GET(req: Request) {
         .eq("case_number", caseNumber)
         .eq("court_code", courtCode)
         .eq("is_active", false)
+        .not("court_name", "ilike", "%(seed-photos)%")
         .limit(1);
       if (
         closedStale &&
