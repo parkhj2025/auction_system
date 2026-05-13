@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { motion } from "motion/react";
 import {
   Building2,
@@ -11,7 +11,7 @@ import {
   Loader2,
   ImageOff,
 } from "lucide-react";
-import type { CourtListingSummary } from "@/types/apply";
+import type { CourtListingSummary, Photo } from "@/types/apply";
 
 /* cycle 1-G-γ-α-δ — Hero 사건 조회 + 물건 선택 + 자동 진입 paradigm:
  * - input 형식 검증 (CASE_NUMBER_PATTERN) + CTA "조회하기" → /api/auction/lookup GET fetch
@@ -113,11 +113,10 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
       }
 
       // work-005 정정 3 = 1물건 1고객 race 회피 1차 단계 (Hero 비로그인 시점).
+      // work-008 정정 5 = 카피 단순화 (1문장 단단 paradigm).
       if (json.status === "already_taken") {
         setLookupStatus("already-taken");
-        setErrorMessage(
-          "이 사건은 이미 다른 고객의 신청이 진행 중입니다. 같은 회차는 중복 접수가 불가합니다. 다음 회차 진행 시점 재 진입 가능합니다.",
-        );
+        setErrorMessage("이미 다른 고객이 신청 중인 사건입니다.");
         return;
       }
 
@@ -334,7 +333,15 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
                 }
               }}
               placeholder="사건번호 입력 (예: 2024타경569067)"
-              className="w-full h-16 rounded-2xl bg-white px-5 text-[16px] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] outline-none shadow-md transition-shadow duration-150 focus:ring-2 focus:ring-[var(--brand-green)]/30 focus:shadow-[0_0_0_3px_rgba(0,200,83,0.2)] disabled:cursor-not-allowed disabled:opacity-60 lg:h-16 lg:flex-1 lg:bg-transparent lg:px-6 lg:text-[18px] lg:shadow-none lg:focus:shadow-none"
+              /**
+               * work-008 정정 4 = 검은 outline 제거 paradigm.
+               *   - focus-visible:outline-none + focus:outline-none 양쪽 명시 (mouse + keyboard 광역 동일 paradigm 보장).
+               *   - WebkitTapHighlightColor: transparent (iOS Safari tap 시점 회색 highlight 제거).
+               *   - browser default focus outline 광역 = appearance-none + 명시적 outline-none paradigm.
+               *   - green ring + green shadow 단독 = focus-visible 광역 단독 표시 (keyboard 광역 a11y 보장 + mouse 광역 ring 동시 paradigm 정합).
+               */
+              style={{ WebkitTapHighlightColor: "transparent" }}
+              className="w-full h-16 appearance-none rounded-2xl bg-white px-5 text-[16px] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] outline-none shadow-md transition-shadow duration-150 focus:outline-none focus:ring-2 focus:ring-[var(--brand-green)]/30 focus:shadow-[0_0_0_3px_rgba(0,200,83,0.2)] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 lg:h-16 lg:flex-1 lg:bg-transparent lg:px-6 lg:text-[18px] lg:shadow-none lg:focus:shadow-none"
             />
             <button
               type={hasResult || hasError ? "button" : "submit"}
@@ -381,50 +388,35 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
           )}
 
           {/* NG 안내: closed + not-found + invalid + error = red / fetch-failed + already-taken = amber.
-              work-006 정정 1 = 카카오톡 상담 link 영구 폐기. "다른 사건 검색" button 단독 carrier 보존. */}
+              work-008 정정 5 = "다른 사건 검색" 버튼 영구 폐기 (사용자 input 광역 재 진입 paradigm 단단). */}
           {hasError && errorMessage && (
             <div
               className={
                 lookupStatus === "fetch-failed" ||
                 lookupStatus === "already-taken"
-                  ? "flex w-full flex-col gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4"
+                  ? "flex w-full items-start gap-3 rounded-2xl border border-amber-500/30 bg-amber-500/10 p-4"
                   : "flex w-full items-start gap-3 rounded-2xl border border-red-500/30 bg-red-500/10 p-4"
               }
             >
-              <div className="flex items-start gap-3">
-                {lookupStatus === "fetch-failed" ||
-                lookupStatus === "already-taken" ? (
-                  <AlertTriangle
-                    size={20}
-                    strokeWidth={2.2}
-                    className="mt-0.5 shrink-0 text-amber-400"
-                    aria-hidden="true"
-                  />
-                ) : (
-                  <AlertCircle
-                    size={20}
-                    strokeWidth={2.2}
-                    className="mt-0.5 shrink-0 text-red-400"
-                    aria-hidden="true"
-                  />
-                )}
-                <p className="text-sm font-medium leading-6 text-white">
-                  {errorMessage}
-                </p>
-              </div>
-
-              {/* already-taken 분기 대안 carrier ("다른 사건 검색" button 단독). */}
-              {lookupStatus === "already-taken" && (
-                <div className="flex flex-wrap gap-2 pl-8">
-                  <button
-                    type="button"
-                    onClick={handleRetry}
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-white/20 bg-white/5 px-4 py-2 text-sm font-bold text-white transition-colors duration-150 hover:bg-white/10 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/40"
-                  >
-                    다른 사건 검색
-                  </button>
-                </div>
+              {lookupStatus === "fetch-failed" ||
+              lookupStatus === "already-taken" ? (
+                <AlertTriangle
+                  size={20}
+                  strokeWidth={2.2}
+                  className="mt-0.5 shrink-0 text-amber-400"
+                  aria-hidden="true"
+                />
+              ) : (
+                <AlertCircle
+                  size={20}
+                  strokeWidth={2.2}
+                  className="mt-0.5 shrink-0 text-red-400"
+                  aria-hidden="true"
+                />
               )}
+              <p className="text-sm font-medium leading-6 text-white">
+                {errorMessage}
+              </p>
             </div>
           )}
 
@@ -463,26 +455,86 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
 // ─────────────────────────────────────────────────────────────────────────────
 // inline 결과 카드.
 
+/**
+ * 사진 1장 representative 선택 paradigm (work-008 정정 2).
+ * 우선순위: 전경사진 (000241) → 외부 (000242 감정평가/000243 현황조사) → 첫 항목 fallback.
+ * 빈 배열 시점 = null 회신 = SingleListingCard 안 ImageOff placeholder paradigm.
+ */
+function pickRepresentative(photos: Photo[]): Photo | null {
+  if (photos.length === 0) return null;
+  const byCategory = (code: string) =>
+    photos.find((p) => p.categoryCode === code);
+  return (
+    byCategory("000241") ??
+    byCategory("000242") ??
+    byCategory("000243") ??
+    photos[0] ??
+    null
+  );
+}
+
 function SingleListingCard({ listing }: { listing: CourtListingSummary }) {
-  // cycle 1-G-γ-α-θ 정정 1 = η 정정 9 (Card image render) 폐기.
-  // Hero 안 사진 표기 = fetch duration NG + 사용자 체감 NG 직접 source = placeholder 단독 단계 영구 보존.
-  // DB photos column 광역 paradigm (η 정정 6+7+8) 광역 = 사후 별개 page (분석 + 카드 상세) 광역 사용 paradigm 영구 보존.
+  // work-008 정정 1+2 = 사진 1장 representative 비동기 fetch + render.
+  //   - paradigm: PhotoGallery 정합 (client side async fetch / lookup endpoint 영향 0).
+  //   - cycle 1-G-γ-α-θ 정정 1 폐기 사유 (동기 fetch duration NG) 회피 paradigm.
+  //   - listing.photos 사전 시드 사실 시점 (seed-photos.mjs) = fetch skip + 즉시 render.
+  //   - 사진 회수 NG 시점 = ImageOff placeholder fallback 영구 보존.
+  const seeded = (listing.photos ?? []).filter((p) => p && p.url);
+  const [photo, setPhoto] = useState<Photo | null>(
+    pickRepresentative(seeded),
+  );
+
+  useEffect(() => {
+    if (seeded.length > 0) return; // 사전 시드 cache hit = fetch skip.
+
+    const controller = new AbortController();
+    let cancelled = false;
+
+    (async () => {
+      try {
+        const res = await fetch(
+          `/api/court-listings/${encodeURIComponent(listing.docid)}/photos`,
+          { signal: controller.signal },
+        );
+        const json = (await res.json()) as { photos?: Photo[] };
+        if (cancelled) return;
+        const fetched = (json.photos ?? []).filter((p) => p && p.url);
+        const pick = pickRepresentative(fetched);
+        if (pick) setPhoto(pick);
+      } catch {
+        // silent fallback = placeholder 단독 유지 paradigm.
+      }
+    })();
+
+    return () => {
+      cancelled = true;
+      controller.abort();
+    };
+  }, [listing.docid, seeded.length]);
+
   return (
     <article className="rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-sm">
       <span className="inline-flex items-center rounded-full bg-[var(--brand-green)] px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
         조회 완료
       </span>
       <div className="mt-4 grid grid-cols-[88px_1fr] gap-4 lg:grid-cols-[120px_1fr]">
-        <div
-          aria-hidden="true"
-          className="flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-white/5"
-        >
-          <ImageOff
-            size={32}
-            className="text-white/40"
-            strokeWidth={1.5}
-            aria-hidden="true"
-          />
+        <div className="flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-white/5">
+          {photo ? (
+            // eslint-disable-next-line @next/next/no-img-element -- Supabase Storage public URL / Next/Image lg:120px ↔ mobile:88px 분기 + remotePatterns 추가 부담 회피.
+            <img
+              src={photo.url}
+              alt={photo.caption || listing.address_display || "사건 사진"}
+              loading="lazy"
+              className="h-full w-full object-cover"
+            />
+          ) : (
+            <ImageOff
+              size={32}
+              className="text-white/40"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            />
+          )}
         </div>
         <div className="flex flex-col gap-2 text-left">
           {listing.usage_name && (
