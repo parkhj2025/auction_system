@@ -1,13 +1,11 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import Image from "next/image";
 import { useState } from "react";
 import { motion } from "motion/react";
 import {
   Building2,
   FileText,
-  Lock,
   AlertCircle,
   AlertTriangle,
   Loader2,
@@ -208,6 +206,18 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
           }}
         >
           법원에 가지 않고,<br />
+          {/* cycle 1-G-γ-α-θ 정정 5+6 = green 본문 + yellow 마침표 단독 paradigm (textShadow 옵션 D).
+              h2 강조 단계 (Pricing + Insight + Reviews + TrustCTA) 통일 정합:
+              - green 본문 = brand primary 직접 노출 + flat (textShadow 광역 = 그림자 단독 / glow 영역 0)
+              - yellow 마침표 단독 강조 = 사전 yellow glow 광역 paradigm 보존 (사용자 시각 흐름 자연 유도). */}
+          <span
+            style={{
+              color: "var(--brand-green)",
+              textShadow: "0 4px 16px rgba(0, 0, 0, 0.5)",
+            }}
+          >
+            경매를 시작하세요
+          </span>
           <span
             style={{
               color: "#FFD43B",
@@ -215,7 +225,7 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
                 "0 0 16px rgba(255, 212, 59, 0.4), 0 0 32px rgba(255, 212, 59, 0.25), 0 4px 16px rgba(0, 0, 0, 0.5)",
             }}
           >
-            경매를 시작하세요.
+            .
           </span>
         </h1>
 
@@ -385,20 +395,11 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
             </div>
           )}
 
-          {/* 모바일 보증금 caption. */}
-          {lookupStatus === "idle" && (
-            <div className="lg:hidden flex items-center justify-center gap-2">
-              <Lock
-                strokeWidth={2.2}
-                className="w-4 h-4 flex-shrink-0 text-green-400"
-              />
-              <span className="text-[14px] text-white/80 font-medium whitespace-nowrap">
-                보증금 전용계좌로 분리 보관
-              </span>
-            </div>
-          )}
+          {/* cycle 1-G-γ-α-θ 정정 2 = 데스크탑 chip 광역 Lock (보증금 전용계좌) 폐기 + chip 2건 양측 통일 paradigm.
+              사전 모바일 chip 2건 (L233-259 / 박스 사전) 광역 paradigm 정합 + handoff_v64 사실 정합.
+              모바일 Lock caption "보증금 전용계좌로 분리 보관" 영구 폐기 (chip 2건 양측 통일 단단 정합). */}
 
-          {/* 데스크탑 강점 3건. */}
+          {/* 데스크탑 강점 2건. */}
           {lookupStatus === "idle" && (
             <div className="hidden lg:flex items-center justify-center gap-6">
               <div className="flex items-center gap-2">
@@ -420,16 +421,6 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
                   서류 비대면
                 </span>
               </div>
-              <div className="h-5 w-px flex-shrink-0 bg-white/30" />
-              <div className="flex items-center gap-2">
-                <Lock
-                  strokeWidth={2}
-                  className="h-5 w-5 flex-shrink-0 text-green-400"
-                />
-                <span className="whitespace-nowrap text-[15px] font-semibold text-white/95">
-                  보증금 전용계좌
-                </span>
-              </div>
             </div>
           )}
         </div>
@@ -442,36 +433,25 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
 // inline 결과 카드.
 
 function SingleListingCard({ listing }: { listing: CourtListingSummary }) {
-  // cycle 1-G-γ-α-η 정정 9 = photos 광역 첫 사진 광역 image render (photos NULL 시점 = placeholder fallback).
-  // 광역 source = court_listings.photos JSONB (seed-photos.mjs 광역 수동 호출 광역 사후 적재).
-  const firstPhoto =
-    listing.photos && listing.photos.length > 0 ? listing.photos[0] : null;
-  const photoUrl = firstPhoto?.thumbnailUrl ?? firstPhoto?.url ?? null;
-  const photoAlt = firstPhoto?.caption ?? listing.address_display ?? "물건 사진";
-
+  // cycle 1-G-γ-α-θ 정정 1 = η 정정 9 (Card image render) 폐기.
+  // Hero 안 사진 표기 = fetch duration NG + 사용자 체감 NG 직접 source = placeholder 단독 단계 영구 보존.
+  // DB photos column 광역 paradigm (η 정정 6+7+8) 광역 = 사후 별개 page (분석 + 카드 상세) 광역 사용 paradigm 영구 보존.
   return (
     <article className="rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-sm">
       <span className="inline-flex items-center rounded-full bg-[var(--brand-green)] px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
         조회 완료
       </span>
       <div className="mt-4 grid grid-cols-[88px_1fr] gap-4 lg:grid-cols-[120px_1fr]">
-        <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-white/5">
-          {photoUrl ? (
-            <Image
-              src={photoUrl}
-              alt={photoAlt}
-              fill
-              sizes="(min-width: 1024px) 120px, 88px"
-              className="object-cover"
-            />
-          ) : (
-            <ImageOff
-              size={32}
-              className="text-white/40"
-              strokeWidth={1.5}
-              aria-hidden="true"
-            />
-          )}
+        <div
+          aria-hidden="true"
+          className="flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-white/5"
+        >
+          <ImageOff
+            size={32}
+            className="text-white/40"
+            strokeWidth={1.5}
+            aria-hidden="true"
+          />
         </div>
         <div className="flex flex-col gap-2 text-left">
           {listing.usage_name && (
@@ -521,12 +501,7 @@ function ListingPickerCard({
   selected: boolean;
   onClick: () => void;
 }) {
-  // cycle 1-G-γ-α-η 정정 9 = thumbnail 광역 image render (w-12 h-12 / photos NULL 시점 = placeholder fallback).
-  const firstPhoto =
-    listing.photos && listing.photos.length > 0 ? listing.photos[0] : null;
-  const photoUrl = firstPhoto?.thumbnailUrl ?? firstPhoto?.url ?? null;
-  const photoAlt = firstPhoto?.caption ?? listing.address_display ?? "물건 사진";
-
+  // cycle 1-G-γ-α-θ 정정 1 = η 정정 9 (신규 image 영역) 폐기. 사전 사실 영역 0 paradigm 영구 회복 (text 단독 paradigm).
   return (
     <button
       type="button"
@@ -547,24 +522,6 @@ function ListingPickerCard({
             : "h-2 w-2 shrink-0 rounded-full bg-white/30"
         }
       />
-      <span className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white/5">
-        {photoUrl ? (
-          <Image
-            src={photoUrl}
-            alt={photoAlt}
-            fill
-            sizes="48px"
-            className="object-cover"
-          />
-        ) : (
-          <ImageOff
-            size={18}
-            className="text-white/30"
-            strokeWidth={1.5}
-            aria-hidden="true"
-          />
-        )}
-      </span>
       <span className="flex-1 text-sm text-white/90 tabular-nums">
         <span className="font-bold text-white">#{listing.item_sequence}</span>
         {listing.usage_name && (
@@ -592,19 +549,22 @@ function HeroFlowBackground() {
       aria-hidden="true"
       className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
     >
+      {/* cycle 1-G-γ-α-θ 정정 3+4 = 가시성 강화 (opacity + fade overlay + glow 강화) + 모바일 비율 조정.
+          모바일 viewport (375px + 430px 양측) 광역 = SVG scale 1.4배 paradigm + transform-origin center
+          → element 광역 크기 + 움직임 직접 인지 강화 paradigm. 데스크탑 (lg:) = scale 1.0 보존. */}
       <svg
         viewBox="0 0 1600 900"
         preserveAspectRatio="xMidYMid slice"
-        className="h-full w-full"
+        className="h-full w-full origin-center scale-[1.4] lg:scale-100"
       >
         <defs>
           <linearGradient id="hero-fade" x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor="#111418" stopOpacity="0.15" />
-            <stop offset="50%" stopColor="#111418" stopOpacity="0.35" />
-            <stop offset="100%" stopColor="#111418" stopOpacity="0.5" />
+            <stop offset="0%" stopColor="#111418" stopOpacity="0.10" />
+            <stop offset="50%" stopColor="#111418" stopOpacity="0.20" />
+            <stop offset="100%" stopColor="#111418" stopOpacity="0.32" />
           </linearGradient>
           <radialGradient id="hero-glow" cx="50%" cy="50%" r="50%">
-            <stop offset="0%" stopColor="#00C853" stopOpacity="0.28" />
+            <stop offset="0%" stopColor="#00C853" stopOpacity="0.42" />
             <stop offset="100%" stopColor="#00C853" stopOpacity="0" />
           </radialGradient>
         </defs>
@@ -614,17 +574,17 @@ function HeroFlowBackground() {
           cy="450"
           r="500"
           fill="url(#hero-glow)"
-          animate={{ scale: [1, 1.15, 1], opacity: [0.6, 1, 0.6] }}
+          animate={{ scale: [1, 1.15, 1], opacity: [0.7, 1, 0.7] }}
           transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
           style={{ transformOrigin: "800px 450px" }}
         />
 
-        <g opacity="0.5">
-          <rect x="120" y="640" width="80" height="160" fill="none" stroke="#00C853" strokeWidth="1.5" />
-          <rect x="220" y="580" width="100" height="220" fill="none" stroke="#00C853" strokeWidth="1.5" />
-          <rect x="340" y="620" width="70" height="180" fill="none" stroke="#00C853" strokeWidth="1.5" />
+        <g opacity="0.72">
+          <rect x="120" y="640" width="80" height="160" fill="none" stroke="#00C853" strokeWidth="2" />
+          <rect x="220" y="580" width="100" height="220" fill="none" stroke="#00C853" strokeWidth="2" />
+          <rect x="340" y="620" width="70" height="180" fill="none" stroke="#00C853" strokeWidth="2" />
           <g>
-            <rect x="700" y="500" width="200" height="300" fill="none" stroke="#00C853" strokeWidth="2" />
+            <rect x="700" y="500" width="200" height="300" fill="none" stroke="#00C853" strokeWidth="2.5" />
             {[0, 1, 2, 3, 4, 5].map((i) => (
               <line
                 key={i}
@@ -633,21 +593,21 @@ function HeroFlowBackground() {
                 x2={720 + i * 32}
                 y2="780"
                 stroke="#00C853"
-                strokeWidth="1.5"
+                strokeWidth="2"
               />
             ))}
             <path
               d="M 690 500 L 800 440 L 910 500 Z"
               fill="none"
               stroke="#00C853"
-              strokeWidth="2"
+              strokeWidth="2.5"
             />
             <circle cx="800" cy="470" r="6" fill="#FFD43B" />
           </g>
-          <rect x="1000" y="600" width="90" height="200" fill="none" stroke="#00C853" strokeWidth="1.5" />
-          <rect x="1110" y="640" width="80" height="160" fill="none" stroke="#00C853" strokeWidth="1.5" />
-          <rect x="1210" y="580" width="100" height="220" fill="none" stroke="#00C853" strokeWidth="1.5" />
-          <rect x="1330" y="620" width="70" height="180" fill="none" stroke="#00C853" strokeWidth="1.5" />
+          <rect x="1000" y="600" width="90" height="200" fill="none" stroke="#00C853" strokeWidth="2" />
+          <rect x="1110" y="640" width="80" height="160" fill="none" stroke="#00C853" strokeWidth="2" />
+          <rect x="1210" y="580" width="100" height="220" fill="none" stroke="#00C853" strokeWidth="2" />
+          <rect x="1330" y="620" width="70" height="180" fill="none" stroke="#00C853" strokeWidth="2" />
         </g>
 
         <motion.line
@@ -656,9 +616,9 @@ function HeroFlowBackground() {
           x2="1500"
           y2="180"
           stroke="#00C853"
-          strokeWidth="1"
+          strokeWidth="1.5"
           strokeDasharray="8 12"
-          opacity="0.5"
+          opacity="0.7"
           animate={{ strokeDashoffset: [-20, 0] }}
           transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
         />
@@ -668,26 +628,26 @@ function HeroFlowBackground() {
           x2="1500"
           y2="720"
           stroke="#00C853"
-          strokeWidth="1"
+          strokeWidth="1.5"
           strokeDasharray="8 12"
-          opacity="0.5"
+          opacity="0.7"
           animate={{ strokeDashoffset: [0, -20] }}
           transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
         />
 
         <motion.g
-          opacity="0.55"
+          opacity="0.75"
           animate={{ rotate: [0, -8, 0] }}
           transition={{ duration: 2.4, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }}
           style={{ transformOrigin: "1380px 220px" }}
         >
-          <rect x="1320" y="160" width="120" height="40" rx="6" fill="none" stroke="#00C853" strokeWidth="2" />
-          <rect x="1370" y="200" width="20" height="80" rx="3" fill="none" stroke="#00C853" strokeWidth="2" />
+          <rect x="1320" y="160" width="120" height="40" rx="6" fill="none" stroke="#00C853" strokeWidth="2.5" />
+          <rect x="1370" y="200" width="20" height="80" rx="3" fill="none" stroke="#00C853" strokeWidth="2.5" />
           <circle cx="1380" cy="180" r="5" fill="#FFD43B" />
         </motion.g>
 
-        <g opacity="0.55">
-          <rect x="160" y="160" width="260" height="56" rx="14" fill="none" stroke="#00C853" strokeWidth="2" />
+        <g opacity="0.75">
+          <rect x="160" y="160" width="260" height="56" rx="14" fill="none" stroke="#00C853" strokeWidth="2.5" />
           <motion.rect
             x="180"
             y="180"
@@ -698,15 +658,15 @@ function HeroFlowBackground() {
             animate={{ width: [120, 180, 120] }}
             transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
           />
-          <rect x="180" y="196" width="80" height="3" rx="1.5" fill="#00C853" opacity="0.6" />
+          <rect x="180" y="196" width="80" height="3" rx="1.5" fill="#00C853" opacity="0.7" />
         </g>
 
         {[
-          { cx: 280, cy: 380, r: 3, delay: 0 },
-          { cx: 520, cy: 280, r: 4, delay: 0.4 },
-          { cx: 1120, cy: 340, r: 3, delay: 0.8 },
-          { cx: 1280, cy: 480, r: 5, delay: 1.2 },
-          { cx: 460, cy: 540, r: 3, delay: 1.6 },
+          { cx: 280, cy: 380, r: 4, delay: 0 },
+          { cx: 520, cy: 280, r: 5, delay: 0.4 },
+          { cx: 1120, cy: 340, r: 4, delay: 0.8 },
+          { cx: 1280, cy: 480, r: 6, delay: 1.2 },
+          { cx: 460, cy: 540, r: 4, delay: 1.6 },
         ].map((dot, i) => (
           <motion.circle
             key={i}
@@ -714,8 +674,8 @@ function HeroFlowBackground() {
             cy={dot.cy}
             r={dot.r}
             fill="#FFD43B"
-            opacity="0.7"
-            animate={{ opacity: [0.4, 0.8, 0.4], scale: [1, 1.4, 1] }}
+            opacity="0.9"
+            animate={{ opacity: [0.6, 1, 0.6], scale: [1, 1.5, 1] }}
             transition={{
               duration: 3,
               repeat: Infinity,
