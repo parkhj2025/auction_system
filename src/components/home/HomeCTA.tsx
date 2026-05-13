@@ -93,7 +93,9 @@ export function HomeCTA() {
           <span style={{ color: "#FFD43B" }}>.</span>
         </motion.h2>
 
-        {/* Liquid Glass 박스. */}
+        {/* cycle 1-G-γ-α-ι-1 정정 2 = Liquid Glass 박스 불투명 약화 paradigm (HomeHero 양측 통일).
+            사전 (0.35/0.20 + blur 40px + border 0.3 + shadow inset 0.5 + 32px/80px/0.35) →
+            신규 (0.15/0.08 + blur 20px + border 0.20 + shadow inset 0.30 + 24px/60px/0.25). */}
         <motion.div
           variants={boxVariants}
           initial="hidden"
@@ -101,12 +103,12 @@ export function HomeCTA() {
           className="mx-auto flex w-full max-w-2xl flex-col items-center gap-5 rounded-[28px] px-6 py-7 lg:gap-8 lg:px-10 lg:py-8"
           style={{
             background:
-              "linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.20) 100%)",
-            backdropFilter: "blur(40px) saturate(180%)",
-            WebkitBackdropFilter: "blur(40px) saturate(180%)",
-            border: "1px solid rgba(255, 255, 255, 0.3)",
+              "linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            border: "1px solid rgba(255, 255, 255, 0.20)",
             boxShadow:
-              "inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 32px 80px -16px rgba(0, 0, 0, 0.35)",
+              "inset 0 1px 0 rgba(255, 255, 255, 0.30), 0 24px 60px -16px rgba(0, 0, 0, 0.25)",
           }}
         >
           {/* 3 trust 카드 (Briefcase + Shield + Lock / line1·line2 SoT). */}

@@ -193,7 +193,8 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
 
   return (
     <section className="relative isolate flex min-h-[calc(100dvh-64px)] flex-col items-center justify-center overflow-hidden bg-[#111418] px-6 lg:min-h-[calc(100dvh-80px)]">
-      <HeroFlowBackground />
+      <HeroFlowBackgroundDesktop />
+      <HeroFlowBackgroundMobile />
 
       <div className="relative z-10 flex w-full max-w-[800px] flex-col items-center gap-6 text-center lg:gap-14">
         {/* h1. */}
@@ -268,17 +269,20 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
           </div>
         </div>
 
-        {/* Apple Liquid Glass 박스. */}
+        {/* cycle 1-G-γ-α-ι-1 정정 2 = Liquid Glass 박스 불투명 약화 paradigm.
+            사전 (0.35/0.20 + blur 40px + border 0.3 + shadow inset 0.5 + 32px/80px/0.35) →
+            신규 (0.15/0.08 + blur 20px + border 0.20 + shadow inset 0.30 + 24px/60px/0.25).
+            사용자 시각 단계 = 박스 자체 가벼움 + 백그라운드 일러스트 직접 노출 paradigm 회복. */}
         <div
           className="flex w-full flex-col items-center gap-5 rounded-[28px] px-6 py-7 lg:gap-8 lg:px-10 lg:py-8"
           style={{
             background:
-              "linear-gradient(135deg, rgba(255, 255, 255, 0.35) 0%, rgba(255, 255, 255, 0.20) 100%)",
-            backdropFilter: "blur(40px) saturate(180%)",
-            WebkitBackdropFilter: "blur(40px) saturate(180%)",
-            border: "1px solid rgba(255, 255, 255, 0.3)",
+              "linear-gradient(135deg, rgba(255, 255, 255, 0.15) 0%, rgba(255, 255, 255, 0.08) 100%)",
+            backdropFilter: "blur(20px) saturate(180%)",
+            WebkitBackdropFilter: "blur(20px) saturate(180%)",
+            border: "1px solid rgba(255, 255, 255, 0.20)",
             boxShadow:
-              "inset 0 1px 0 rgba(255, 255, 255, 0.5), 0 32px 80px -16px rgba(0, 0, 0, 0.35)",
+              "inset 0 1px 0 rgba(255, 255, 255, 0.30), 0 24px 60px -16px rgba(0, 0, 0, 0.25)",
           }}
         >
           {/* 데스크탑 박스 안 subtext. */}
@@ -395,34 +399,32 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
             </div>
           )}
 
-          {/* cycle 1-G-γ-α-θ 정정 2 = 데스크탑 chip 광역 Lock (보증금 전용계좌) 폐기 + chip 2건 양측 통일 paradigm.
-              사전 모바일 chip 2건 (L233-259 / 박스 사전) 광역 paradigm 정합 + handoff_v64 사실 정합.
-              모바일 Lock caption "보증금 전용계좌로 분리 보관" 영구 폐기 (chip 2건 양측 통일 단단 정합). */}
+          {/* cycle 1-G-γ-α-ι-1 정정 3 = chip 2건 데스크탑 회복 paradigm.
+              사전 `lookupStatus === "idle"` 분기 광역 폐기 → 광역 상태 (idle + loading + active + error)
+              광역 데스크탑 chip 광역 광역 표시 paradigm. 모바일 chip 2건 (L233-259) 광역 정합 통일. */}
 
           {/* 데스크탑 강점 2건. */}
-          {lookupStatus === "idle" && (
-            <div className="hidden lg:flex items-center justify-center gap-6">
-              <div className="flex items-center gap-2">
-                <Building2
-                  strokeWidth={2}
-                  className="h-5 w-5 flex-shrink-0 text-green-400"
-                />
-                <span className="whitespace-nowrap text-[15px] font-semibold text-white/95">
-                  법원 방문 없음
-                </span>
-              </div>
-              <div className="h-5 w-px flex-shrink-0 bg-white/30" />
-              <div className="flex items-center gap-2">
-                <FileText
-                  strokeWidth={2}
-                  className="h-5 w-5 flex-shrink-0 text-green-400"
-                />
-                <span className="whitespace-nowrap text-[15px] font-semibold text-white/95">
-                  서류 비대면
-                </span>
-              </div>
+          <div className="hidden lg:flex items-center justify-center gap-6">
+            <div className="flex items-center gap-2">
+              <Building2
+                strokeWidth={2}
+                className="h-5 w-5 flex-shrink-0 text-green-400"
+              />
+              <span className="whitespace-nowrap text-[15px] font-semibold text-white/95">
+                법원 방문 없음
+              </span>
             </div>
-          )}
+            <div className="h-5 w-px flex-shrink-0 bg-white/30" />
+            <div className="flex items-center gap-2">
+              <FileText
+                strokeWidth={2}
+                className="h-5 w-5 flex-shrink-0 text-green-400"
+              />
+              <span className="whitespace-nowrap text-[15px] font-semibold text-white/95">
+                서류 비대면
+              </span>
+            </div>
+          </div>
         </div>
       </div>
     </section>
@@ -541,21 +543,21 @@ function ListingPickerCard({
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
-// 자체 SVG 백그라운드 (continuous loop / cycle 1-G-γ-α-β + γ paradigm).
+// 자체 SVG 백그라운드 (continuous loop / cycle 1-G-γ-α-β + γ + θ + ι-1 paradigm).
+// cycle 1-G-γ-α-ι-1 정정 1 = 모바일 SVG 광역 별개 컴포넌트 분기 paradigm (옵션 A 채택).
+// HeroFlowBackgroundDesktop = 사전 1600x900 광역 lg:block (cycle θ scale 1.4 광역 폐기).
+// HeroFlowBackgroundMobile = 신규 800x1200 viewBox + element 광역 재배치 paradigm.
 
-function HeroFlowBackground() {
+function HeroFlowBackgroundDesktop() {
   return (
     <div
       aria-hidden="true"
-      className="pointer-events-none absolute inset-0 z-0 overflow-hidden"
+      className="pointer-events-none absolute inset-0 z-0 hidden overflow-hidden lg:block"
     >
-      {/* cycle 1-G-γ-α-θ 정정 3+4 = 가시성 강화 (opacity + fade overlay + glow 강화) + 모바일 비율 조정.
-          모바일 viewport (375px + 430px 양측) 광역 = SVG scale 1.4배 paradigm + transform-origin center
-          → element 광역 크기 + 움직임 직접 인지 강화 paradigm. 데스크탑 (lg:) = scale 1.0 보존. */}
       <svg
         viewBox="0 0 1600 900"
         preserveAspectRatio="xMidYMid slice"
-        className="h-full w-full origin-center scale-[1.4] lg:scale-100"
+        className="h-full w-full"
       >
         <defs>
           <linearGradient id="hero-fade" x1="0" y1="0" x2="0" y2="1">
@@ -687,6 +689,158 @@ function HeroFlowBackground() {
         ))}
 
         <rect width="1600" height="900" fill="url(#hero-fade)" />
+      </svg>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// HeroFlowBackgroundMobile — cycle 1-G-γ-α-ι-1 정정 1 신규.
+// viewBox 800x1200 (3:4.5 광역 모바일 viewport 광역 광역 paradigm) + element 광역 재배치 +
+// 광역 element 광역 크기 광역 (skyline + chart bar + dot + search bar + laptop) + center 광역 paradigm.
+// 모바일 viewport (375px + 430px 양측) 광역 광역 element 자체 직접 인지 + 움직임 직접 인지 paradigm 정합.
+
+function HeroFlowBackgroundMobile() {
+  return (
+    <div
+      aria-hidden="true"
+      className="pointer-events-none absolute inset-0 z-0 overflow-hidden lg:hidden"
+    >
+      <svg
+        viewBox="0 0 800 1200"
+        preserveAspectRatio="xMidYMid slice"
+        className="h-full w-full"
+      >
+        <defs>
+          <linearGradient id="hero-fade-mobile" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#111418" stopOpacity="0.10" />
+            <stop offset="50%" stopColor="#111418" stopOpacity="0.20" />
+            <stop offset="100%" stopColor="#111418" stopOpacity="0.32" />
+          </linearGradient>
+          <radialGradient id="hero-glow-mobile" cx="50%" cy="50%" r="50%">
+            <stop offset="0%" stopColor="#00C853" stopOpacity="0.42" />
+            <stop offset="100%" stopColor="#00C853" stopOpacity="0" />
+          </radialGradient>
+        </defs>
+
+        <motion.circle
+          cx="400"
+          cy="600"
+          r="400"
+          fill="url(#hero-glow-mobile)"
+          animate={{ scale: [1, 1.15, 1], opacity: [0.7, 1, 0.7] }}
+          transition={{ duration: 6, repeat: Infinity, ease: "easeInOut" }}
+          style={{ transformOrigin: "400px 600px" }}
+        />
+
+        {/* skyline 광역 = 광역 4 building paradigm (광역 광역 광역 + center 광역 광역). */}
+        <g opacity="0.72">
+          <rect x="60" y="850" width="120" height="350" fill="none" stroke="#00C853" strokeWidth="2.5" />
+          <rect x="220" y="780" width="140" height="420" fill="none" stroke="#00C853" strokeWidth="2.5" />
+          <g>
+            {/* center 광역 광역 = court building paradigm (광역 광역 광역 광역). */}
+            <rect x="400" y="700" width="200" height="500" fill="none" stroke="#00C853" strokeWidth="3" />
+            {[0, 1, 2, 3, 4, 5].map((i) => (
+              <line
+                key={i}
+                x1={420 + i * 30}
+                y1="780"
+                x2={420 + i * 30}
+                y2="1180"
+                stroke="#00C853"
+                strokeWidth="2"
+              />
+            ))}
+            <path
+              d="M 390 700 L 500 620 L 610 700 Z"
+              fill="none"
+              stroke="#00C853"
+              strokeWidth="3"
+            />
+            <circle cx="500" cy="660" r="8" fill="#FFD43B" />
+          </g>
+          <rect x="640" y="820" width="120" height="380" fill="none" stroke="#00C853" strokeWidth="2.5" />
+        </g>
+
+        <motion.line
+          x1="40"
+          y1="240"
+          x2="760"
+          y2="240"
+          stroke="#00C853"
+          strokeWidth="2"
+          strokeDasharray="10 14"
+          opacity="0.7"
+          animate={{ strokeDashoffset: [-24, 0] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+        />
+        <motion.line
+          x1="40"
+          y1="980"
+          x2="760"
+          y2="980"
+          stroke="#00C853"
+          strokeWidth="2"
+          strokeDasharray="10 14"
+          opacity="0.7"
+          animate={{ strokeDashoffset: [0, -24] }}
+          transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
+        />
+
+        {/* laptop motion.g (광역 광역 광역 광역 광역). */}
+        <motion.g
+          opacity="0.75"
+          animate={{ rotate: [0, -8, 0] }}
+          transition={{ duration: 2.4, repeat: Infinity, repeatDelay: 2, ease: "easeInOut" }}
+          style={{ transformOrigin: "600px 320px" }}
+        >
+          <rect x="520" y="240" width="160" height="56" rx="8" fill="none" stroke="#00C853" strokeWidth="3" />
+          <rect x="590" y="296" width="28" height="100" rx="4" fill="none" stroke="#00C853" strokeWidth="3" />
+          <circle cx="600" cy="268" r="7" fill="#FFD43B" />
+        </motion.g>
+
+        {/* search bar (광역 광역 광역). */}
+        <g opacity="0.75">
+          <rect x="60" y="60" width="340" height="80" rx="20" fill="none" stroke="#00C853" strokeWidth="3" />
+          <motion.rect
+            x="84"
+            y="88"
+            width="160"
+            height="8"
+            rx="4"
+            fill="#FFD43B"
+            animate={{ width: [160, 240, 160] }}
+            transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+          />
+          <rect x="84" y="108" width="110" height="4" rx="2" fill="#00C853" opacity="0.7" />
+        </g>
+
+        {[
+          { cx: 120, cy: 480, r: 5, delay: 0 },
+          { cx: 280, cy: 380, r: 6, delay: 0.4 },
+          { cx: 560, cy: 460, r: 5, delay: 0.8 },
+          { cx: 680, cy: 540, r: 7, delay: 1.2 },
+          { cx: 200, cy: 660, r: 5, delay: 1.6 },
+        ].map((dot, i) => (
+          <motion.circle
+            key={i}
+            cx={dot.cx}
+            cy={dot.cy}
+            r={dot.r}
+            fill="#FFD43B"
+            opacity="0.9"
+            animate={{ opacity: [0.6, 1, 0.6], scale: [1, 1.5, 1] }}
+            transition={{
+              duration: 3,
+              repeat: Infinity,
+              ease: "easeInOut",
+              delay: dot.delay,
+            }}
+            style={{ transformOrigin: `${dot.cx}px ${dot.cy}px` }}
+          />
+        ))}
+
+        <rect width="800" height="1200" fill="url(#hero-fade-mobile)" />
       </svg>
     </div>
   );
