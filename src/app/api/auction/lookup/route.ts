@@ -4,16 +4,19 @@
  * paradigm:
  * - GET /api/auction/lookup?caseNumber=2024타경569067&courtCode=B000240
  * - auth = 비로그인 진입 가능 (조회 단독 / 중복 체크 + form prefill = /api/orders/check 단독)
- * - cache lookup (court_listings table / TTL 24h) → cache MISS → fetchSingleCase 대법원 fetch + upsert
+ * - cache lookup (court_listings table / TTL 24h) → cache MISS → fetchCaseDetail 대법원 fetch + upsert
  * - rate limit = IP 단위 1분당 10건 (메모리 단독 / production 단독 / dev 영역 검수 약화)
  * - 회신 status = "active" / "closed" / "not_found" + listings array.
+ *
+ * work-007 (2026-05-13): fetchSingleCase (search API / 매각일 2주 윈도우 제약) →
+ *   fetchCaseDetail (detail API / 윈도우 무관 단일 사건 detail) 함수 교체.
+ *   work-005 흐름 (cache → fetch → records 분기 → is_case_active → already_taken) 영구 보존.
  */
 
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { CourtListingSummary } from "@/types/apply";
-import { fetchSingleCase } from "@/lib/courtAuction/search";
-import { mapRecordToRow } from "@/lib/courtAuction/mapper";
+import { fetchCaseDetail } from "@/lib/courtAuction/detail";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -188,9 +191,12 @@ export async function GET(req: Request) {
     let fetchError: unknown = null;
     if (!cacheHit) {
       try {
-        const records = await fetchSingleCase({ courtCode, caseNumber });
-        if (records.length > 0) {
-          const rows = records.map((r) => mapRecordToRow(r, "인천지방법원"));
+        const rows = await fetchCaseDetail({
+          courtCode,
+          caseNumber,
+          courtNameFallback: "인천지방법원",
+        });
+        if (rows.length > 0) {
           const { error: upsertError } = await admin
             .from("court_listings")
             .upsert(rows, {

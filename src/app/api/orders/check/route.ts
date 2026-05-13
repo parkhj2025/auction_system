@@ -1,24 +1,28 @@
 /**
- * cycle 1-D-A-3-2 = 크롤링 paradigm 광역 전환 (mass 수집 → on-demand 단일 fetch).
+ * cycle 1-D-A-3-2 = 크롤링 paradigm 전환 (mass 수집 → on-demand 단일 fetch).
  *
- * 흐름 광역:
- *   1. auth 광역 (login 의무)
- *   2. round 명시 시 = is_case_active RPC 광역 중복 체크
- *   3. court_listings cache lookup (TTL 24h 광역 = `last_seen_at >= NOW() - 24h`)
+ * 흐름:
+ *   1. auth (login 의무)
+ *   2. round 명시 시 = is_case_active RPC 중복 체크
+ *   3. court_listings cache lookup (TTL 24h = `last_seen_at >= NOW() - 24h`)
  *   4. cache HIT = 즉시 회신
- *   5. cache MISS = 대법원 광역 fetch (search.ts) + mapper + upsert + 즉시 회신
+ *   5. cache MISS = 대법원 fetch (detail.ts) + upsert + 즉시 회신
  *   6. fetch NG = listings [] + case_status="not_found" 회신 (client amber alert + 사건번호 input focus 자동 paradigm / cycle 1-D-A-4-2)
  *
- * bid_date filter 광역 폐기 (cycle 1-D-A-4 영역 통합 사전 정합).
- * is_active filter 광역 보존 (종결 사건 광역 분기 = cycle 1-D-A-4 영역).
+ * bid_date filter 폐기 (cycle 1-D-A-4 통합 사전 정합).
+ * is_active filter 보존 (종결 사건 분기 = cycle 1-D-A-4 영역).
+ *
+ * work-007 (2026-05-13): fetchSingleCase (search API / 매각일 2주 윈도우 제약) →
+ *   fetchCaseDetail (detail API / 윈도우 무관 단일 사건 detail) 함수 교체.
+ *   work-005 흐름 (cache → fetch → records 분기 → is_case_active → already_taken / closed / active / not_found) 영구 보존.
+ *   Step1 paradigm (round 명시 호출 + is_case_active) 영구 보존.
  */
 
 import { NextResponse } from "next/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import type { CourtListingSummary } from "@/types/apply";
-import { fetchSingleCase } from "@/lib/courtAuction/search";
-import { mapRecordToRow } from "@/lib/courtAuction/mapper";
+import { fetchCaseDetail } from "@/lib/courtAuction/detail";
 
 export const dynamic = "force-dynamic";
 export const runtime = "nodejs";
@@ -209,13 +213,16 @@ export async function POST(req: Request) {
     let fetchAttempted = false;
     let fetchError: string | null = null;
 
-    // 3. cache MISS = 대법원 광역 on-demand fetch (work-005 정정 1 = closedStale 분기 폐기).
+    // 3. cache MISS = 대법원 on-demand fetch (work-005 정정 1 = closedStale 분기 폐기 / work-007 함수 교체).
     if (!cacheHit && courtCode) {
       fetchAttempted = true;
       try {
-        const records = await fetchSingleCase({ courtCode, caseNumber });
-        if (records.length > 0) {
-          const rows = records.map((r) => mapRecordToRow(r, courtName));
+        const rows = await fetchCaseDetail({
+          courtCode,
+          caseNumber,
+          courtNameFallback: courtName,
+        });
+        if (rows.length > 0) {
           const { error: upsertError } = await admin
             .from("court_listings")
             .upsert(rows, {
