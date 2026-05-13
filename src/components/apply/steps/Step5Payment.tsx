@@ -18,7 +18,7 @@ import { DISPLAY_BANK, COURTS_ALL } from "@/lib/constants";
  *
  * cycle 1-D-A-4-7 신규 정정:
  * - "입금 사후" → "입금이 확인되면" 정정 (직역 → 자연 paradigm)
- * - "카카오톡으로 알림" → "알림을 보내드립니다" 단독 (channel 명시 영역 0)
+ * - 알림 채널 명시 영역 0 paradigm ("알림을 보내드립니다" 단독)
  * - 입금 금액 dd = red color → ink-900 + font-black + text-2xl 정정 (영구 룰 §9 정합 / 정보 paradigm)
  * - 입찰 희망 금액 = red 보존 (가격 한정 paradigm 정수 정합)
  */

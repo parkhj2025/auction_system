@@ -211,7 +211,7 @@ export function PrivacyContent() {
             <strong className="font-black text-[var(--color-ink-900)]">
               알림 발송
             </strong>
-            : 카카오톡 채널 운영사 (접수 확인·결과 통보)
+            : 통신 사업자 (접수 확인·결과 통보 / 전화·이메일 채널)
           </li>
           <li>
             위탁 업체는 향후 정식 시행 시점에 본 방침에 구체적으로 명시됩니다.
@@ -258,7 +258,7 @@ export function PrivacyContent() {
           <li>처리 정지 요구</li>
         </Clauses>
         <p>
-          권리 행사는 문의하기 페이지 또는 카카오톡 채널을 통해 요청하실 수
+          권리 행사는 문의하기 페이지의 전화·이메일 채널을 통해 요청하실 수
           있으며, 회사는 지체 없이 조치합니다.
         </p>
       </Article>
@@ -290,7 +290,7 @@ export function PrivacyContent() {
         <Clauses>
           <li>성명: {COMPANY.ceo}</li>
           <li>직책: 대표</li>
-          <li>연락처: 문의하기 페이지 또는 카카오톡 채널</li>
+          <li>연락처: 문의하기 페이지 (전화·이메일)</li>
         </Clauses>
       </Article>
 

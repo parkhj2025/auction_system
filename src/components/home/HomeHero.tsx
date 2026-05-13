@@ -10,10 +10,8 @@ import {
   AlertTriangle,
   Loader2,
   ImageOff,
-  MessageCircle,
 } from "lucide-react";
 import type { CourtListingSummary } from "@/types/apply";
-import { COMPANY } from "@/lib/constants";
 
 /* cycle 1-G-γ-α-δ — Hero 사건 조회 + 물건 선택 + 자동 진입 paradigm:
  * - input 형식 검증 (CASE_NUMBER_PATTERN) + CTA "조회하기" → /api/auction/lookup GET fetch
@@ -383,7 +381,7 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
           )}
 
           {/* NG 안내: closed + not-found + invalid + error = red / fetch-failed + already-taken = amber.
-              work-005 정정 3 = already-taken 분기 = amber alert + 대안 carrier (카카오톡 + 다른 사건 button). */}
+              work-006 정정 1 = 카카오톡 상담 link 영구 폐기. "다른 사건 검색" button 단독 carrier 보존. */}
           {hasError && errorMessage && (
             <div
               className={
@@ -415,18 +413,9 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
                 </p>
               </div>
 
-              {/* work-005 정정 3 = already-taken 분기 대안 carrier (카카오톡 + 다른 사건 button). */}
+              {/* already-taken 분기 대안 carrier ("다른 사건 검색" button 단독). */}
               {lookupStatus === "already-taken" && (
                 <div className="flex flex-wrap gap-2 pl-8">
-                  <a
-                    href={COMPANY.kakaoChannelUrl}
-                    target="_blank"
-                    rel="noreferrer noopener"
-                    className="inline-flex items-center gap-1.5 rounded-xl border border-amber-400/40 bg-amber-500/10 px-4 py-2 text-sm font-bold text-amber-100 transition-colors duration-150 hover:bg-amber-500/20 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-amber-300/50"
-                  >
-                    <MessageCircle size={16} strokeWidth={2.2} aria-hidden="true" />
-                    카카오톡 상담
-                  </a>
                   <button
                     type="button"
                     onClick={handleRetry}

@@ -1,12 +1,12 @@
 import Link from "next/link";
-import { ShieldCheck, Clock, ArrowRight, MessageCircle } from "lucide-react";
+import { ShieldCheck, Clock, ArrowRight } from "lucide-react";
 import type { AnalysisFrontmatter } from "@/types/content";
 import { FEES } from "@/lib/constants";
 
 /**
  * 본문 하단 다크 CTA — preview prototype 패턴.
  *  - 헤드라인 + 사건번호 자동 prefill 안내
- *  - 신청 / 카카오 상담 2-CTA
+ *  - 신청 단독 CTA (work-006 = 카카오톡 상담 버튼 영구 폐기)
  *  - 하단 3분할 그리드 (수수료 / 성공보수 / 패찰 시)
  */
 export function ApplyCTA({ fm }: { fm: AnalysisFrontmatter }) {
@@ -64,8 +64,7 @@ export function ApplyCTA({ fm }: { fm: AnalysisFrontmatter }) {
             href="/contact"
             className="inline-flex min-h-12 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-white/25 bg-white/10 px-6 text-sm font-bold text-white transition duration-150 ease-out hover:bg-white/20"
           >
-            <MessageCircle size={16} aria-hidden="true" />
-            카카오톡 상담
+            문의하기
           </Link>
         </div>
 

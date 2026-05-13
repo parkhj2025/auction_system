@@ -1,21 +1,26 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import {
-  MessageCircle,
+  Phone,
   Mail,
   Clock,
   MapPin,
   ArrowRight,
   Info,
 } from "lucide-react";
-import { COMPANY } from "@/lib/constants";
+import { COMPANY, SUPPORT_PHONE, SUPPORT_EMAIL } from "@/lib/constants";
 
 export const metadata: Metadata = {
   title: "문의하기",
-  description: `${COMPANY.name} 상담 채널 안내. 접수는 웹 신청 페이지에서, 상담은 카카오톡 채널로 진행됩니다.`,
+  description: `${COMPANY.name} 고객센터 안내. 접수는 웹 신청 페이지에서, 상담은 전화·이메일로 진행됩니다.`,
 };
 
 export default function ContactPage() {
+  // work-006 = 카카오톡 채널 영구 폐기 → 전화/이메일 대체 paradigm.
+  // SUPPORT_PHONE + SUPPORT_EMAIL 환경변수 패턴 (사업자등록 사후 실제 값 교체).
+  const telHref = `tel:${SUPPORT_PHONE.replace(/[^\d+]/g, "")}`;
+  const mailHref = `mailto:${SUPPORT_EMAIL}`;
+
   return (
     <main className="flex flex-1 flex-col">
       {/* Hero */}
@@ -72,24 +77,25 @@ export default function ContactPage() {
         <div className="mt-10 grid gap-4 sm:grid-cols-2">
           <article className="flex flex-col gap-4 rounded-[var(--radius-xl)] border border-[var(--color-border)] bg-white p-6 shadow-[var(--shadow-card)]">
             <span className="flex h-11 w-11 items-center justify-center rounded-[var(--radius-md)] bg-[var(--color-ink-50)] text-[var(--color-ink-900)]">
-              <MessageCircle size={22} aria-hidden="true" />
+              <Phone size={22} aria-hidden="true" />
             </span>
             <div>
               <h3 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
-                카카오톡 채널
+                전화 상담
               </h3>
               <p className="mt-2 text-sm leading-6 text-[var(--color-ink-500)]">
-                접수 후 확인·결과 통보를 포함해 가장 빠르게 응답드립니다.
-                운영 시간 내 평균 30분 이내 응답.
+                운영 시간 내 직접 통화로 가장 빠르게 응답드립니다. 사건번호와
+                간단한 사정만 알려주세요.
+              </p>
+              <p className="mt-3 text-base font-black tracking-tight text-[var(--color-ink-900)] tabular-nums">
+                {SUPPORT_PHONE}
               </p>
             </div>
             <a
-              href={COMPANY.kakaoChannelUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-kakao)] px-5 text-sm font-black text-[var(--color-ink-900)] hover:brightness-95"
+              href={telHref}
+              className="mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] bg-[var(--color-ink-900)] px-5 text-sm font-black text-white hover:bg-black"
             >
-              카카오톡 채널 열기
+              지금 전화하기
               <ArrowRight size={14} aria-hidden="true" />
             </a>
           </article>
@@ -106,15 +112,22 @@ export default function ContactPage() {
                 장문 설명이나 첨부 자료가 있는 문의는 이메일이 편합니다.
                 영업일 기준 1~2일 내 회신.
               </p>
+              <p className="mt-3 text-base font-black tracking-tight text-[var(--color-ink-900)]">
+                {SUPPORT_EMAIL}
+              </p>
             </div>
             <a
-              href="mailto:contact@example.com"
+              href={mailHref}
               className="mt-auto inline-flex min-h-11 items-center justify-center gap-2 rounded-[var(--radius-md)] border border-[var(--color-border)] bg-white px-5 text-sm font-bold text-[var(--color-ink-900)] hover:border-[var(--color-ink-900)] hover:text-black"
             >
               메일 보내기
             </a>
           </article>
         </div>
+
+        <p className="mt-6 text-xs leading-5 text-[var(--color-ink-500)]">
+          추후 다양한 소통 채널을 추가할 예정입니다.
+        </p>
       </section>
 
       {/* 회사 정보 */}

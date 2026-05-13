@@ -52,18 +52,26 @@ export const PRIVACY_CONTACT =
 
 /**
  * 고객지원 이메일. cycle 1-E-A 신규 = 마이페이지 "고객지원" mailto link paradigm.
- * 사업자등록 후 NEXT_PUBLIC_SUPPORT_EMAIL 환경변수로 실제 값 교체 (코드 영역 0).
+ * 사업자등록 후 NEXT_PUBLIC_SUPPORT_EMAIL 환경변수로 실제 값 교체 (코드 변경 0).
  */
 export const MOCKUP_SUPPORT_EMAIL = "support@auctionquick.kr";
 export const SUPPORT_EMAIL =
   process.env.NEXT_PUBLIC_SUPPORT_EMAIL ?? MOCKUP_SUPPORT_EMAIL;
+
+/**
+ * 고객지원 전화번호. work-006 신규 = /contact 페이지 카카오톡 채널 폐기 사후 대체 paradigm.
+ * 사업자등록 + 대표번호 확보 사후 NEXT_PUBLIC_SUPPORT_PHONE 환경변수로 실제 값 교체.
+ */
+export const MOCKUP_SUPPORT_PHONE = "1588-0000";
+export const SUPPORT_PHONE =
+  process.env.NEXT_PUBLIC_SUPPORT_PHONE ?? MOCKUP_SUPPORT_PHONE;
 
 export const COMPANY = {
   name: BRAND_NAME,
   ceo: "박형준",
   court: "인천지방법원",
   comingSoonRegions: ["수원지방법원", "대전지방법원", "부산지방법원", "대구지방법원"] as const,
-  kakaoChannelUrl: "#", // TODO: 실채널 URL — 향후 NEXT_PUBLIC_KAKAO_CHANNEL_URL env 후보
+  // work-006 = kakaoChannelUrl 영구 폐기. 카카오톡 채널 운영 방식 폐기 사실 정합.
   // address, phone 필드는 AGENT_INFO로 단일 출처화 (Phase 1-FINAL 2026-04-18)
 } as const;
 

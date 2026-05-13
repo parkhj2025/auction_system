@@ -93,7 +93,7 @@ export function LegalLayout({
             >
               문의하기
             </Link>{" "}
-            또는 카카오톡 채널로 연락해주세요.
+            페이지의 전화·이메일로 연락해주세요.
           </p>
         </div>
       </article>

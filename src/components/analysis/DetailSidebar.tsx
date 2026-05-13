@@ -1,5 +1,4 @@
 import Link from "next/link";
-import { MessageCircle } from "lucide-react";
 import type { AnalysisFrontmatter } from "@/types/content";
 import { formatKoreanWon } from "@/lib/utils";
 import { FEES } from "@/lib/constants";
@@ -7,7 +6,7 @@ import { FEES } from "@/lib/constants";
 /**
  * 분석 상세 사이드바 — 데스크톱 전용 sticky 4 block.
  *  block 1: 핵심 수치 MiniStat (감정가/최저가 ink-50 강조/보증금/기일/면적)
- *  block 2: CTA (입찰 대리 신청 + 카카오 상담)
+ *  block 2: CTA (입찰 대리 신청 + 문의하기 / work-006 = 카카오톡 상담 영구 폐기)
  *  block 3: TOC 7섹션 (#section-NN 앵커, scroll-mt-24)
  *  block 4: 근거자료 mini list (대법원 / 네○○ / 국토부)
  *
@@ -76,8 +75,7 @@ export function DetailSidebar({ fm }: { fm: AnalysisFrontmatter }) {
               href="/contact"
               className="flex min-h-10 items-center justify-center gap-1.5 rounded-[var(--radius-md)] border border-[var(--color-border)] text-xs font-bold text-[var(--color-ink-700)] transition duration-150 ease-out hover:bg-[var(--color-ink-100)]"
             >
-              <MessageCircle size={14} aria-hidden="true" />
-              카카오톡 상담
+              문의하기
             </Link>
             <p className="pt-1 text-center text-[11px] text-[var(--color-ink-500)] tabular-nums">
               얼리버드 {(FEES.earlybird / 10_000).toLocaleString("ko-KR")}만원부터 ·

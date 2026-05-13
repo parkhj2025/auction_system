@@ -106,12 +106,10 @@
   --color-info: #1d4ed8;          /* on white ≈ 8.4:1 */
   --color-info-soft: #eff6ff;     /* 배경용 soft */
 
-  /* 1-4. 카카오 토큰 (sub-phase 8.1 신규) — 카카오 브랜드색.
-   * 사용 영역: 카카오톡 채널 버튼 한정 (contact 페이지). */
-  --color-kakao: #fee500;
+  /* 1-4. 카카오 토큰 = work-006 영구 폐기 (카카오톡 채널 운영 방식 폐기). */
 
   /* 1-5. accent 3종 — 표현 강조용.
-   * sub-phase 8.1: accent-yellow / accent-yellow-soft 폐기 (사용 영역 = 카카오 토큰 + ink 톤 전환). */
+   * sub-phase 8.1: accent-yellow / accent-yellow-soft 폐기 (사용 영역 = ink 톤 전환). */
   --color-accent-red: #dc2626;
   --color-accent-red-soft: #fee2e2;
   --color-accent-green: #16a34a;

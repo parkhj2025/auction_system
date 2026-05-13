@@ -14,7 +14,6 @@ import { DocumentList } from "@/components/my/DocumentList";
 import { StatusChanger } from "@/components/admin/StatusChanger";
 import { SsnDeleteButton } from "@/components/admin/SsnDeleteButton";
 import { StatusLogHistory } from "@/components/admin/StatusLogHistory";
-import { KakaoNotifyButton } from "@/components/admin/KakaoNotifyButton";
 import { OrderDeleteButton } from "@/components/admin/OrderDeleteButton";
 import { formatKoreanWon, formatKoreanDate, cn } from "@/lib/utils";
 
@@ -175,17 +174,12 @@ export default async function AdminOrderDetailPage({
       <div className="mt-8 grid gap-6 lg:grid-cols-[1.4fr_1fr]">
         {/* 왼쪽: 상세 정보 */}
         <div className="flex flex-col gap-6">
-          {/* 고객 정보 (cycle 1-E-B 정정: 시각 토큰 정합 + KakaoNotifyButton 신규) */}
+          {/* 고객 정보 (work-006 = KakaoNotifyButton 영구 폐기. 향후 알림 채널 도입 시 별개 정리.) */}
           <div className="rounded-2xl border border-gray-200 bg-white p-5">
             <div className="flex items-center justify-between gap-3">
               <h2 className="text-lg font-black tracking-tight text-[var(--color-ink-900)]">
                 고객 정보
               </h2>
-              <KakaoNotifyButton
-                applicantName={row.applicant_name}
-                applicationId={row.application_id}
-                phone={row.phone}
-              />
             </div>
             <dl className="mt-4 grid grid-cols-2 gap-x-6 gap-y-3 text-sm">
               <Field label="이름" value={customer?.display_name ?? "-"} />
