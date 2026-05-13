@@ -1,6 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { useState } from "react";
 import { motion } from "motion/react";
 import {
@@ -293,6 +294,10 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
               type="text"
               inputMode="text"
               autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="off"
+              spellCheck={false}
+              disabled={isLoading}
               value={value}
               onChange={(e) => {
                 setValue(e.target.value);
@@ -304,13 +309,13 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
                 }
               }}
               placeholder="사건번호 입력 (예: 2024타경569067)"
-              className="w-full h-16 rounded-2xl bg-white px-5 text-[16px] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] outline-none shadow-md lg:h-16 lg:flex-1 lg:bg-transparent lg:px-6 lg:text-[18px] lg:shadow-none"
+              className="w-full h-16 rounded-2xl bg-white px-5 text-[16px] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] outline-none shadow-md transition-shadow duration-150 focus:ring-2 focus:ring-[var(--brand-green)]/30 focus:shadow-[0_0_0_3px_rgba(0,200,83,0.2)] disabled:cursor-not-allowed disabled:opacity-60 lg:h-16 lg:flex-1 lg:bg-transparent lg:px-6 lg:text-[18px] lg:shadow-none lg:focus:shadow-none"
             />
             <button
               type={hasResult || hasError ? "button" : "submit"}
               onClick={hasResult || hasError ? handleCtaClick : undefined}
               disabled={ctaDisabled}
-              className="inline-flex h-16 w-full items-center justify-center gap-2 rounded-2xl bg-[var(--brand-green)] px-8 text-[16px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 lg:w-auto lg:rounded-xl lg:px-12 lg:text-[18px]"
+              className="inline-flex h-16 w-full items-center justify-center gap-2 rounded-2xl bg-[var(--brand-green)] px-8 text-[16px] font-bold text-white transition-colors duration-150 hover:bg-[var(--brand-green-deep)] active:scale-[0.98] active:bg-[var(--brand-green-deep)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/50 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100 lg:w-auto lg:rounded-xl lg:px-12 lg:text-[18px]"
             >
               {isLoading && <Loader2 size={18} className="animate-spin" aria-hidden="true" />}
               {ctaLabel}
@@ -437,22 +442,36 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
 // inline 결과 카드.
 
 function SingleListingCard({ listing }: { listing: CourtListingSummary }) {
+  // cycle 1-G-γ-α-η 정정 9 = photos 광역 첫 사진 광역 image render (photos NULL 시점 = placeholder fallback).
+  // 광역 source = court_listings.photos JSONB (seed-photos.mjs 광역 수동 호출 광역 사후 적재).
+  const firstPhoto =
+    listing.photos && listing.photos.length > 0 ? listing.photos[0] : null;
+  const photoUrl = firstPhoto?.thumbnailUrl ?? firstPhoto?.url ?? null;
+  const photoAlt = firstPhoto?.caption ?? listing.address_display ?? "물건 사진";
+
   return (
     <article className="rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-sm">
       <span className="inline-flex items-center rounded-full bg-[var(--brand-green)] px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
         조회 완료
       </span>
       <div className="mt-4 grid grid-cols-[88px_1fr] gap-4 lg:grid-cols-[120px_1fr]">
-        <div
-          aria-hidden="true"
-          className="flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-white/5"
-        >
-          <ImageOff
-            size={32}
-            className="text-white/40"
-            strokeWidth={1.5}
-            aria-hidden="true"
-          />
+        <div className="relative flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-white/5">
+          {photoUrl ? (
+            <Image
+              src={photoUrl}
+              alt={photoAlt}
+              fill
+              sizes="(min-width: 1024px) 120px, 88px"
+              className="object-cover"
+            />
+          ) : (
+            <ImageOff
+              size={32}
+              className="text-white/40"
+              strokeWidth={1.5}
+              aria-hidden="true"
+            />
+          )}
         </div>
         <div className="flex flex-col gap-2 text-left">
           {listing.usage_name && (
@@ -502,6 +521,12 @@ function ListingPickerCard({
   selected: boolean;
   onClick: () => void;
 }) {
+  // cycle 1-G-γ-α-η 정정 9 = thumbnail 광역 image render (w-12 h-12 / photos NULL 시점 = placeholder fallback).
+  const firstPhoto =
+    listing.photos && listing.photos.length > 0 ? listing.photos[0] : null;
+  const photoUrl = firstPhoto?.thumbnailUrl ?? firstPhoto?.url ?? null;
+  const photoAlt = firstPhoto?.caption ?? listing.address_display ?? "물건 사진";
+
   return (
     <button
       type="button"
@@ -522,6 +547,24 @@ function ListingPickerCard({
             : "h-2 w-2 shrink-0 rounded-full bg-white/30"
         }
       />
+      <span className="relative flex h-12 w-12 shrink-0 items-center justify-center overflow-hidden rounded-lg bg-white/5">
+        {photoUrl ? (
+          <Image
+            src={photoUrl}
+            alt={photoAlt}
+            fill
+            sizes="48px"
+            className="object-cover"
+          />
+        ) : (
+          <ImageOff
+            size={18}
+            className="text-white/30"
+            strokeWidth={1.5}
+            aria-hidden="true"
+          />
+        )}
+      </span>
       <span className="flex-1 text-sm text-white/90 tabular-nums">
         <span className="font-bold text-white">#{listing.item_sequence}</span>
         {listing.usage_name && (

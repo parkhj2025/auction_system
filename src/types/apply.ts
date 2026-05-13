@@ -1,4 +1,23 @@
 
+/**
+ * 사진 단일 row paradigm.
+ * cycle 1-G-γ-α-η = Hero Card 안 photos render 광역 신규 추가.
+ * 광역 source = court_listings.photos JSONB column (supabase/schema.sql L524) +
+ * scripts/seed-photos.mjs 광역 광역 paradigm (자택 IP 단독 수동 호출).
+ */
+export interface Photo {
+  /** seed-photos.mjs 광역 INSERT index (0 ~ N-1). */
+  seq: number;
+  /** Supabase Storage public URL (court-photos bucket). */
+  url: string;
+  /** 사진 카테고리 한글 (전경사진 / 내부사진 등). */
+  caption: string;
+  /** 대법원 광역 카테고리 코드 (000241 전경 / 000245 내부 등). schema.sql 광역 광역 'category' 광역 사실. */
+  categoryCode?: string;
+  /** 광역 추후 광역 광역 thumbnail URL (schema.sql L524 광역 광역 / 현재 seed-photos 광역 광역 영역 0 단독). */
+  thumbnailUrl?: string;
+}
+
 /** 매각물건(item) 단위 요약 — 같은 item 내의 mokmul을 통합한 결과 */
 export interface CourtListingSummary {
   /** 대표 docid (item 내 첫 번째 mokmul) */
@@ -17,6 +36,14 @@ export interface CourtListingSummary {
   item_sequence: number;
   mokmul_sequence: number;
   photos_fetched_at: string | null;
+  /**
+   * 사진 광역 (cycle 1-G-γ-α-η 신규).
+   * null = 사진 광역 미수집 (Hero Card 안 placeholder 단독 paradigm).
+   * length > 0 = Hero Card 안 첫 사진 광역 image render paradigm.
+   */
+  photos: Photo[] | null;
+  /** 사진 광역 광역 개수 (cycle 1-G-γ-α-η 신규 / photos NULL 시점 = 0). */
+  photos_count: number;
   /** 같은 item 내 구성 부동산 수 (토지+건물 등). 1이면 단독, 2+이면 일괄 */
   component_count: number;
   /** 매각회차 — failed_count + 1 (서버 주입). 신건은 1. Phase 6.7.6. */

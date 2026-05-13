@@ -133,9 +133,12 @@ export function mapRecordToRow(
     wgs84_lon: toNumeric(r.wgs84Xcordi),
     wgs84_lat: toNumeric(r.wgs84Ycordi),
 
-    photos: null,
-    photos_fetched_at: null,
-    photos_count: 0,
+    // cycle 1-G-γ-α-η 정정 6 = photos + photos_fetched_at + photos_count 3 column 영구 제외.
+    // 사유: upsert 광역 onConflict='docid' + ignoreDuplicates=false 광역 = payload 안 column
+    //   부재 시점 기존 column 광역 NULL overwrite 회피 = seed-photos.mjs 광역 수동 호출
+    //   결과 광역 photos JSONB 광역 영구 보존 paradigm.
+    // 광역 ζ-1 정정 5 (seed-photos.mjs --docid 단독 paradigm) 광역 정합 + cycle ζ-1 정정 6+7
+    //   safety check 광역 광역 정합.
 
     case_title:
       r.csTit || r.csTitNm || r.caseHisNm || r.dpslGdsCsNm || null,

@@ -26,6 +26,8 @@ export const maxDuration = 30;
 
 const CACHE_TTL_HOURS = 24;
 
+import type { Photo } from "@/types/apply";
+
 interface RawListing {
   docid: string;
   court_name: string;
@@ -41,6 +43,9 @@ interface RawListing {
   item_sequence: number;
   mokmul_sequence: number;
   photos_fetched_at: string | null;
+  /** cycle 1-G-γ-α-η = Hero Card 안 image render 광역 신규 추가 column. */
+  photos: Photo[] | null;
+  photos_count: number;
   sido: string | null;
   sigungu: string | null;
   dong: string | null;
@@ -48,7 +53,7 @@ interface RawListing {
 }
 
 const LISTING_SELECT =
-  "docid, court_name, case_number, address_display, appraisal_amount, min_bid_amount, bid_date, bid_time, usage_name, area_display, failed_count, item_sequence, mokmul_sequence, photos_fetched_at, sido, sigungu, dong, case_title";
+  "docid, court_name, case_number, address_display, appraisal_amount, min_bid_amount, bid_date, bid_time, usage_name, area_display, failed_count, item_sequence, mokmul_sequence, photos_fetched_at, photos, photos_count, sido, sigungu, dong, case_title";
 
 /**
  * mokmul 단위 row → item 단위로 그룹핑.
