@@ -128,15 +128,6 @@ docid는 ASCII-only여야 함 (Supabase Storage key 제약).
 `);
 }
 
-function makeDocid(courtCode, caseNumber, itemSeq) {
-  // 연도(\d+) + 구분자(타경 등 non-digit) + 사건번호 순번(\d+) 을 분리해 순번만 사용.
-  // 과거 버그: slice(-6)으로 잘라 5자리 사건(예: 2024타경49993)이
-  // "449993"으로 잘못 추출되던 문제를 정규식 분리로 해결.
-  const match = caseNumber.match(/(\d+)[^\d]+(\d+)/);
-  if (!match) throw new Error(`invalid caseNumber: ${caseNumber}`);
-  return `${courtCode}-${match[2]}-${itemSeq}`;
-}
-
 function cookieHeader(jar) {
   return [...jar].map(([k, v]) => `${k}=${v}`).join("; ");
 }
@@ -350,69 +341,47 @@ async function main() {
     { auth: { persistSession: false, autoRefreshToken: false } }
   );
 
-  // 식별자 결정
-  let docid = args.docid;
-  let caseNumber = args.case;
-  let courtCode = args.court;
-  let itemSeq = args.item || 1;
+  // 식별자 결정 — cycle 1-G-γ-α-ζ-1 = 신규 court_listings INSERT 단계 영구 폐기.
+  // 사진 캐시 paradigm 정수 = 기존 row (lookup/orders 경로 광역 사전 적재) 광역 단독 갱신.
+  // makeDocid + court_listings upsert 광역 = closed 잘못 판정 source 영구 차단.
+  const docid = args.docid;
+  if (!docid) {
+    console.error(
+      "--docid 광역 단독 사용 의무 (cycle 1-G-γ-α-ζ-1 신규 INSERT paradigm 영구 폐기).\n사건 광역 사전 적재 paradigm = lookup API 또는 orders/check 광역 호출 단독."
+    );
+    process.exit(1);
+  }
 
-  if (docid) {
-    const { data, error } = await admin
-      .from("court_listings")
-      .select(
-        "docid, case_number, court_code, item_sequence, photos_fetched_at, photos_count"
-      )
-      .eq("docid", docid)
-      .maybeSingle();
-    if (error) {
-      console.error("DB 조회 실패:", error.message);
-      process.exit(1);
-    }
-    if (data) {
-      caseNumber = data.case_number;
-      courtCode = data.court_code;
-      itemSeq = data.item_sequence;
-      if (!args.force && data.photos_fetched_at && data.photos_count > 0) {
-        console.log(
-          `이미 캐시됨 (photos_count=${data.photos_count}). 강제 재시드는 --force.`
-        );
-        process.exit(0);
-      }
-    } else {
-      console.error(
-        `docid=${docid} 행이 court_listings에 없습니다. --case/--court/--item로 호출하세요.`
+  let caseNumber;
+  let courtCode;
+  let itemSeq;
+
+  const { data, error } = await admin
+    .from("court_listings")
+    .select(
+      "docid, case_number, court_code, item_sequence, photos_fetched_at, photos_count"
+    )
+    .eq("docid", docid)
+    .maybeSingle();
+  if (error) {
+    console.error("DB 조회 실패:", error.message);
+    process.exit(1);
+  }
+  if (data) {
+    caseNumber = data.case_number;
+    courtCode = data.court_code;
+    itemSeq = data.item_sequence;
+    if (!args.force && data.photos_fetched_at && data.photos_count > 0) {
+      console.log(
+        `이미 캐시됨 (photos_count=${data.photos_count}). 강제 재시드는 --force.`
       );
-      process.exit(1);
+      process.exit(0);
     }
   } else {
-    if (!caseNumber || !courtCode) {
-      console.error("--docid 또는 (--case + --court) 필수. --help 참조.");
-      process.exit(1);
-    }
-    docid = makeDocid(courtCode, caseNumber, itemSeq);
-    console.log(`생성된 docid: ${docid}`);
-    const { error: upsertErr } = await admin.from("court_listings").upsert(
-      {
-        docid,
-        court_code: courtCode,
-        court_name: `${courtCode} (seed-photos)`,
-        case_number: caseNumber,
-        item_sequence: itemSeq,
-        mokmul_sequence: 1,
-        is_active: false,
-        raw_snapshot: {
-          __manual_insert: true,
-          reason: "seed-photos CLI",
-          inserted_at: new Date().toISOString(),
-          inserted_by: "seed-photos.mjs",
-        },
-      },
-      { onConflict: "docid", ignoreDuplicates: true }
+    console.error(
+      `docid=${docid} 행이 court_listings에 없습니다. lookup API 또는 orders/check 경로로 먼저 적재한 뒤 --docid로 호출하세요.`
     );
-    if (upsertErr) {
-      console.error("court_listings INSERT 실패:", upsertErr.message);
-      process.exit(1);
-    }
+    process.exit(1);
   }
 
   if (!/^[\x20-\x7e]+$/.test(docid)) {
