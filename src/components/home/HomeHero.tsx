@@ -303,12 +303,14 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
             사건번호만 주시면, 법원은 저희가 갑니다.
           </p>
 
-          {/* form (모바일 vertical + 데스크탑 horizontal). */}
+          {/* form (모바일 vertical + 데스크탑 horizontal).
+              work-009 정정 = lg:shadow-md 영구 폐기 (form parent 검은 shadow 외곽 source).
+              Liquid Glass 박스 자체 shadow paradigm 단독 (L295 inset + 24px/60px outer). */}
           <form
             onSubmit={handleLookup}
             role="search"
             aria-label="사건번호 조회"
-            className="flex w-full flex-col gap-3 lg:flex-row lg:max-w-[600px] lg:items-center lg:rounded-2xl lg:bg-white lg:p-1.5 lg:shadow-md"
+            className="flex w-full flex-col gap-3 lg:flex-row lg:max-w-[600px] lg:items-center lg:rounded-2xl lg:bg-white lg:p-1.5"
           >
             <label htmlFor="hero-case" className="sr-only">
               사건번호
@@ -334,26 +336,26 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
               }}
               placeholder="사건번호 입력 (예: 2024타경569067)"
               /**
-               * work-008 hotfix 정정 6 = 데스크탑 검은 outline 제거 paradigm 보강.
+               * work-008 hotfix 정정 6 + work-009 정정 단단 paradigm.
                *
-               * 사전 NG source 식별 사실:
-               *   - 데스크탑 `lg:focus:shadow-none` paradigm = focus shadow 0 + focus:ring-2 단독 잔존 → ring 광역 단단 강한 line 사용자 시각 NG.
-               *   - 사용자 photo 광역 검은 1~2px line 사실 = ring paradigm 광역 사용자 시각 단단 강한 paradigm 사실.
-               *   - 모바일 paradigm (focus:shadow halo) = PASS / 데스크탑 paradigm 영구 정합 의무.
-               *
-               * 정정 paradigm:
-               *   - focus:ring-2 영구 폐기 → focus:shadow halo 단독 paradigm 단단 (모바일 + 데스크탑 양쪽 정합).
+               * work-008 hotfix 사후 사실 (영구 보존):
+               *   - focus:ring-2 영구 폐기 → focus:shadow halo 단독 paradigm (양 viewport 정합).
                *   - lg:focus:shadow-none 영구 폐기 → focus:shadow 양 viewport 적용 paradigm.
-               *   - border-0 명시 추가 (Tailwind preflight 보강 + Chrome user-agent default border 광역 제거 보장).
-               *   - autofill border 광역 inline style 광역 box-shadow 광역 명시 (Chrome autofill 시점 노란 border 제거).
+               *   - border-0 + focus:border-0 (Chrome user-agent default border 제거).
                *
-               * 모바일 paradigm 영구 보존:
+               * work-009 정정 = input wrapper 검은 외곽 ~10-15px 단단 NG 제거.
+               *   - 단단 NG source = shadow-md (양 viewport 광역 box-shadow rgba(0,0,0,0.1) spread 4-10px 검은 띠 paradigm).
+               *   - 정정 = shadow-md 영구 폐기 + Liquid Glass 박스 자체 shadow 단독 paradigm (L295 inset + 24px/60px outer).
+               *   - transition-shadow duration-150 영구 보존 (focus halo 광역 부드러운 transition paradigm).
+               *   - focus:shadow-[0_0_0_3px_rgba(0,200,83,0.3)] 영구 보존 (focus halo green paradigm).
+               *
+               * 모바일 4중 안전망 영구 보존:
                *   - WebkitTapHighlightColor: transparent (iOS Safari tap 회색 highlight 제거)
                *   - appearance-none (browser form widget inner outline 제거)
-               *   - focus:outline-none + focus-visible:outline-none (4중 안전망 mouse + keyboard 단단)
+               *   - focus:outline-none + focus-visible:outline-none (mouse + keyboard 동등)
                */
               style={{ WebkitTapHighlightColor: "transparent" }}
-              className="w-full h-16 appearance-none rounded-2xl border-0 bg-white px-5 text-[16px] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] outline-none shadow-md transition-shadow duration-150 focus:border-0 focus:outline-none focus:shadow-[0_0_0_3px_rgba(0,200,83,0.3)] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 lg:h-16 lg:flex-1 lg:bg-transparent lg:px-6 lg:text-[18px] lg:shadow-none"
+              className="w-full h-16 appearance-none rounded-2xl border-0 bg-white px-5 text-[16px] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] outline-none transition-shadow duration-150 focus:border-0 focus:outline-none focus:shadow-[0_0_0_3px_rgba(0,200,83,0.3)] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 lg:h-16 lg:flex-1 lg:bg-transparent lg:px-6 lg:text-[18px]"
             />
             <button
               type={hasResult || hasError ? "button" : "submit"}
