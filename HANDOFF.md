@@ -1,291 +1,378 @@
 # 경매퀵 웹사이트 핸드오프 문서
 
-> **용도**: 다음 세션 진입 시 본 문서 단일 영역 광역 컨텍스트 영역.
-> **최종 업데이트**: 2026-05-12 (cycle 1-G-γ-α-ε 종료 / fetch_failed 신규 status + closed 판정 단계 정정 push 정합)
-> **현재 빌드 상태**: HEAD = `9802285` (cycle 1-G-γ-α-ε / fetch_failed 신규 status + closed 판정 단계 정정)
-> **production URL**: https://auctionsystem-auctionq.vercel.app (alias: auctionsystem-green.vercel.app)
-> **production 광역 deployment**: `dpl_BjX2D7DxKouVAhxEPyG7dwqoC3de` (READY 정합 / 1778563815772)
-> **다음 세션 진입 트리거**: **2024타경569067 closed 잘못 판정 잔존 NG → seed-photos 12 row 광역 정리 paradigm 결정 의뢰**
-> **함께 읽을 문서**: `CLAUDE.md` section 27~30 (Step2~6 + 관리자 paradigm 광역 명문화)
+> **용도**: 다음 세션 진입 시 본 문서 단일 진입점 paradigm. 본 문서 안 사실 + CLAUDE.md 영구 룰 양측 합쳐서 단일 컨텍스트 영역.
+> **최종 업데이트**: 2026-05-13 (work-007 사전 조사 종료 / 532249 사실 회수 완료 / 형준님 결정 의무 단계)
+> **현재 빌드 상태**: HEAD = `6676de5` (work-006: 카카오톡 전체 폐기 + /contact 목업 연락처 대체)
+> **production URL**: https://auctionsystem-green.vercel.app
+> **다음 세션 진입 트리거**: **work-007 형준님 결정 회수** (532249 = 대법원 official 부재 사실 / 옵션 A 채택 추천 / 또는 추가 사실 검수 paradigm)
+> **함께 읽을 문서**: `CLAUDE.md` (사업 본질 + 영구 룰) + 본 HANDOFF.md (work history + 진입 트리거)
 
 ---
 
 ## 🔥 핫 스냅샷 — 다음 세션 시작 시 여기부터
 
-### 지금 어디인가
+### 본 세션 핵심 paradigm 변경 사실
 
-**cycle 1-G-γ-α-ε 종료** = fetch_failed 신규 status 광역 정정 paradigm 정합. **2024타경582718 fetch_failed 회복** ✓ / **2024타경569067 closed 잔존 NG** (seed-photos row 광역 단독).
+**1. cycle/그리스 문자/sub-cycle 명명 paradigm 영구 폐기 + `work-NNN` sequential paradigm 영구 채택** (2026-05-13 형준님 직접 명시):
+- 파일명 = `work_NNN_정정.md` + `work_NNN_사전조사.md`
+- handoff + commit message + comment 안 paradigm 정합 의무
+- 사전 cycle history 보존 (history 추적 paradigm)
 
-광역 진행 history (현재 세션 / cycle 1-G 광역):
-- cycle 1-G-α (TopNav 신청하기 메뉴 안 재추가) ✅ `dd47ec8`
-- cycle 1-G-α-α (TopNav 시각 위계 정리) ✅ `5619cc7`
-- cycle 1-G-β (/about What 섹션 + 일러스트 2건 / 사후 광역 회수) ✅ `af247c8`
-- cycle 1-G-β-α (/about 일러스트 2건 재산출) ✅ `4546f09`
-- cycle 1-G-β 재시작 (/about 광역 재산출) ✅ `9905bd9`
-- cycle 1-G-β-β (/about 광역 재산출 / Bottom CTA 폐기 + pastel 폐기) ✅ `88473a5`
-- cycle 1-G-β-γ (/about 제로베이스 / Apple-style Bento Grid) ✅ `4e2e6bc`
-- cycle 1-G-β-γ-β (/about 광역 재설계 / 자체 SVG 5건 + asymmetric) ✅ `936b163`
-- cycle 1-G-β-γ-γ (/about 5 섹션 정정 / Problems + Trust System + Office·Regions·Credentials 폐기) ✅ `911147e`
-- cycle 1-G-γ (/service 광역 재설계) ✅ `2d2601e`
-- cycle 1-G-γ-α (메인 광역 재구성 + /service 페이지 영구 폐기) ✅ `f553608`
-- cycle 1-G-γ-α-α (메인 광역 정정 / 섹션 순서 + Hero SoT + Compare 신규 + Process 압축 + Pricing 회복 + Scope 위치 + Insight aspect) ✅ `c0f8a10`
-- cycle 1-G-γ-α-β (Hero + Pricing 사전 paradigm 회복 + Hero bg SVG) ✅ `784c8ee`
-- cycle 1-G-γ-α-γ (HomeCTA → TrustCTA 회복 + Pricing eyebrow + Process h2 + Hero glow/bg) ✅ `111adfb`
-- cycle 1-G-γ-α-δ (Hero 사건 조회 + 물건 선택 + sessionStorage + Step1 prefill) ✅ `fd3dad6`
-- **cycle 1-G-γ-α-ε (fetch_failed 신규 status + closed 판정 단계 정정)** ✅ `9802285` 🔥
-- 다음 = **seed-photos 12 row 정리 paradigm 결정 → cycle 1-G-δ (/faq) 또는 별개 sub-cycle 진입**
+**2. "광역" 단어 회신문/commit/comment 안 엄격 금지** (2026-05-13 형준님 직접 명시):
+- 무의미 chain 누적 오류 사실 식별 → 영구 룰 채택
+- 대체 어휘 = "전체" / "전반" / "양측" / "각" / "사이트 전체" / "통합" / "단계" 등 의미 정확 단어
+- 형준님 정정 송부 안 "광역" 사용 시점 = 인용 paradigm 정합 (Code 산출 회신 사용 금지)
+- 자가 검증 의무 = 회신 산출 사전 `grep "광역"` 0건 정합
 
----
+### 본 세션 진행 history (work-001 ~ work-007)
 
-## ⚠ 잔존 NG 사실 (다음 세션 진입 우선)
-
-### NG #1: 2024타경569067 closed 잘못 판정 잔존 (cycle 1-G-γ-α-ε 사후 검수)
-
-**production 직접 호출 결과** (commit `9802285` 사후):
-| 사건번호 | 회신 status | 결과 |
-|---|---|---|
-| 2024타경582718 | `fetch_failed` ✓ | 정정 정상 회복 (사전 closed 잘못 판정 회피) |
-| 2024타경569067 | **`closed`** ⚠ | 잔존 NG (실제 = 진행 중 사건) |
-
-**NG 원인 식별**:
-- DB 안 2024타경569067 = 2 row 광역
-  - `"인천지방법원"` court_name / `is_active=false` / `last_seen_at 2026-04-15` (stale)
-  - **`"B000240 (seed-photos)"` court_name / `is_active=false` / `last_seen_at 2026-05-11` (within 24h)** ← NG 식별 source
-- 정정 후 closed 판정 흐름 = `closedFresh` query → seed-photos row within 24h is_active=false 검수 → closed 회신 paradigm
-- seed-photos row 광역 = cycle 안 photo seed 작업 paradigm (사전 cycle 광역 산출)
-
-**seed-photos 광역 사실**:
-- 12 row 광역 (`court_name = "B000240 (seed-photos)"`)
-- last_seen_at 2026-04-24 ~ 2026-05-11 (within 24h = 일부 / stale = 일부)
-- 광역 잠재 NG = 12 사건 광역 closed 잘못 판정 잠재 paradigm
-
-### NG #2: 대법원 fetch 자체 광역 NG 잠재
-
-- 2024타경582718 = fetch_failed 회신 = records.length 0 (대법원 fetch 실패 또는 응답 0건)
-- production runtime logs 직접 회수 NG (`get_runtime_logs` "No logs found" 회신 / Vercel dashboard 직접 조회 의무)
-- console.error 광역 보존 paradigm (정정 사후 영구)
-
-### NG #3: mapper.ts `is_active` hardcoded (별개 cycle 영역)
-
-- 현재 = `is_active: true` hardcoded (mapper.ts line 145)
-- 검수 = `is_active: r.mulJinYn === "Y"` 동적 매핑 paradigm 검수 의무
-- 사전 검수 = 광역 records 광역 mulJinYn 광역 값 회수 (dev 환경 fetch 단독)
-- cycle 1-G-γ-α-ε 의도 안 별개 cycle 진입 영역 명시
+| work | 의도 | commit | 상태 |
+|---|---|---|---|
+| work-001 | seed-photos 22 row cleanup + script INSERT 단계 폐기 + lookup/orders-check safety check | `fcb6f71` + `7108681` | ✅ |
+| work-002 | Hero NG 3건 (button click feedback + input spellCheck/focus + photos paradigm) | `d5a38f6` | ✅ |
+| work-003 | Hero 정정 통합 (Card image render 폐기 + chip + 일러스트 + h1 강조 단계 통일) | `8331877` | ✅ |
+| work-004 | Hero 시각 정정 (모바일 SVG 분리 + Liquid Glass 약화 + chip 데스크탑 회복) | `44441fb` | ✅ |
+| work-005 | 사건 조회 NG + 회차 분기 (1물건 1고객 race 회피 4단계 paradigm 완성) | `cfdfaf0` | ✅ |
+| work-006 | 카카오톡 전체 폐기 + /contact 목업 연락처 대체 | `6676de5` | ✅ |
+| **work-007** | **사건 조회 NG 532249 사전 조사 (정정 진입 영역 0 / 형준님 결정 의무)** | — | ⏳ 결정 대기 |
 
 ---
 
-## 📋 결정 의뢰 영역 (다음 세션 진입 사전)
+## ⚠ 다음 세션 진입 우선 단계 — work-007 형준님 결정
 
-### 결정 #1: seed-photos 12 row 광역 정리 paradigm
+### 사건 2024타경532249 사실 정합
+
+| 항목 | 사실 |
+|---|---|
+| **dev IP fetchSingleCase 결과** | records=0 / status=200 / ipcheck=true / duration=140ms / errors=null |
+| **production endpoint 결과** | `{"status":"not_found","listings":[]}` / duration=7.9초 |
+| **Supabase DB 안 row** | 0건 (cache 영역 부재 = 대법원 fetch 단계 진입 paradigm 정합) |
+| **분기 판정** | (c) 대법원 DB 자체 사건 부재 확정 |
+| **lookup route 흐름 정합성** | cache miss → 대법원 fetch → records=0 → closedFresh 0 → not_found 회신 paradigm 정상 동작 ✓ |
+| **production NG 판정** | **NG 아님** = directive 핵심 원칙 "대법원 = 진실의 원천 / 우리 DB = 24h 캐시 단독" 정수 정합 |
+
+### 비교 검증 사건 (work-005 사실 정합)
+
+- 559336: records=1 / yuchalCnt=6 / mulStatcd=01 / jpDeptNm="경매11계" / maeGiil=20260515 (active 정상)
+- 540431: records=1 / yuchalCnt=1 / jpDeptNm 사실 확인 의무 (active 정상)
+
+### 의심 source 전체 (532249 = 외부 자료에는 존재하지만 대법원 official 부재 사실)
+
+1. 사건 자체 매각취하 / 매각연기 / 별개 사유 → 대법원 official search 결과 records 0건 paradigm
+2. 두인옥션 등 외부 자료 = 대법원 가공 사후 별개 데이터베이스 paradigm (대법원 vs 외부 차이 사실)
+3. search API parameter (`cortAuctnSrchCondCd: "0004601"`) 필터링 조건 차이 가능 paradigm
+4. 대법원 API 외 별개 endpoint 검수 (`selectAuctnCsSrchRslt.on` 등)
+
+### 결정 옵션 (Code 추천 = 옵션 A)
 
 | 옵션 | 내용 | 정수 |
 |---|---|---|
-| (a) cache lookup query 정정 = `court_name ILIKE '%seed%'` 광역 제외 | 임시 paradigm + 코드 단독 | △ 임시 |
-| (b) seed-photos row 광역 DB 수동 정정 | Code 자율 진입 NG / 형준님 수동 SQL 의무 | 형준님 결정 의뢰 |
-| (c) court_name 광역 cleanup = "B000240 (seed-photos)" → "인천지방법원" 광역 정정 | 정합 + 일회성 SQL | ✓ |
-| (d) closedFresh + not_found 검수 단계 = court_name 광역 분기 추가 | 광역 코드 정정 + 정합 | ✓ |
+| **A (Code 추천)** | 현재 paradigm 유지 (정정 영역 0) | directive 핵심 원칙 정수 정합 / 532249 = 대법원 부재 사실 = not_found 정상 회신 |
+| B | search API parameter 확장 검수 (cortAuctnSrchCondCd / bidBgngYmd 범위 확장) | 추가 사실 회수 의무 / fetch duration 영향 검수 |
+| C | 사용자 직접 입력 paradigm 신규 (manualEntry 회복) | **NG paradigm** = cycle 1-D-A-4-2 paradigm 영구 폐기 사실 충돌 |
 
-### 결정 #2: 대법원 fetch 검수 paradigm
+### 형준님 단독 가능 사실 검수 의무
 
-- production 단계 fetchSingleCase 직접 호출 검수 의뢰
-- mulJinYn + status_code 광역 records 광역 값 회수 의뢰
-- mapper is_active 동적 매핑 결정 의뢰
-
-### 결정 #3: cycle 1-G-δ /faq 광역 정정 진입 timing
-
-- (a) NG #1 정정 사후 진입 (안정 paradigm)
-- (b) NG #1 + 1-G-δ 광역 분기 진입
+1. 532249 = 대법원 공식 사이트 (https://www.courtauction.go.kr) 직접 검색 → 실제 records 사실 확인 (사건 자체 부재 사실 잠재 검수)
+2. 이미지 3 source = 두인옥션 또는 별개 외부 자료 paradigm 확인 (대법원 official vs 외부 가공 차이 사실)
+3. Vercel logs 직접 회수 (https://vercel.com/auctionq/auction_system/?selectedTab=logs / `[auction/lookup]` console.error grep / duration 확인 / 추가 NG paradigm 진단)
 
 ---
 
-## 📂 영역 광역 paradigm
+## 📂 work-005 사실 정합 — 1물건 1고객 race 회피 4단계 paradigm 완성
 
-### 메인 페이지 (cycle 1-G-γ-α-ε 정합)
+| 단계 | 위치 | 분기 | 영향 파일 |
+|---|---|---|---|
+| **1차** | Hero (비로그인 시점) | already-taken amber alert + "다른 사건 검색" 버튼 | `src/components/home/HomeHero.tsx` + `src/app/api/auction/lookup/route.ts` |
+| **2차** | Step1 (로그인 사후 입력 단계) | caseTaken red alert + 차단 | `src/components/apply/steps/Step1Property.tsx` (POST body round 명시) |
+| **3차** | Step5 (결제 submit 직전) | raceBlocked alert + 차단 | `src/components/apply/steps/Step5Payment.tsx` (handlePreSubmitCheck) |
+| **4차** | DB INSERT | orders_unique_active_case_round constraint (최종 안전망) | `supabase/schema.sql` (영구 보존) |
 
-**8 섹션 광역 순서**:
-1. Hero (charcoal 풀스크린 / 사건번호 폼 + Liquid Glass 박스 + 자체 SVG 일러스트 / 카피 SoT 영구 회복)
-2. Process (brand-green 풀스크린 / 5-col horizontal + horizontal step flow SVG)
-3. Compare (surface-muted / 2-col 비교 카드 / 5시간·5단계 vs 10분·2단계)
-4. Pricing (surface-muted 풀스크린 / 3-tier green·orange·red + timeline + NumberFlow + button selected)
-5. Scope (surface-muted / DO + DON'T 2-col)
-6. Reviews (charcoal / ReviewsMarquee)
-7. Insight (white / 4 magazine card aspect-[4/1])
-8. CTA (TrustCTA 회복 / trust-bg.jpg + Liquid Glass + 3 trust 카드 + CTA + 캡션)
+### closedStale 분기 영구 폐기 paradigm (work-005 정정 1)
 
-**Hero 사건 조회 paradigm (cycle 1-G-γ-α-δ)**:
-- input 형식 검증 `/^\d{4}타경\d+$/`
-- CTA → `/api/auction/lookup` GET fetch
-- listings 1건 = SingleListingCard inline / 다건 = ListingPickerCard radio
-- 신청하기 click = sessionStorage 보존 + `/apply?case=XXX&prefill=1` 진입
-- ApplyClient sessionStorage 회수 + matchedListing 자동 prefill
+- 사전 cycle 1-G-γ-α-ε paradigm: closedStale + records 0 → fetch_failed 회신 (사건 사라짐 case에서 NG)
+- 사후 work-005 paradigm: closedFresh (within 24h closed) → closed / 그 외 → not_found 단독 회신
+- 영향 양측: `src/app/api/auction/lookup/route.ts` + `src/app/api/orders/check/route.ts`
 
-### /about (cycle 1-G-β-γ-γ 정합 / `911147e`)
+### LookupStatus 10 status paradigm
 
-**5 섹션 광역** (영구 보존):
-1. Hero (charcoal / 시계·번개·궤도 SVG continuous loop)
-2. Problems (white / 4 카드 / 고객 problem 직접 표현)
-3. Values (brand-green 풀스크린 / 시간·이동·집중 SVG + "법원은 저희가" + "시간은 그대로" + "처음이어도")
-4. Trust System (surface-muted / lucide 96px Users·Award·ShieldCheck 3 카드)
-5. Company (charcoal / phone mockup floating SVG)
+```
+idle | loading | active-single | active-multi | closed | not-found
+| invalid | error | fetch-failed | already-taken
+```
 
-**폐기 영구**: Office (인천 사무실) + Regions (한국 지도) + Credentials 별개 섹션 + "당일·직접·거품 0" 카피
+- `already-taken` = work-005 정정 3 신규 추가 (amber alert / red NG = "행동 차단" paradigm 단단 NG)
+- 사후 work-006 정정 = 카카오톡 link carrier 영구 폐기 + "다른 사건 검색" 버튼 단독 보존
 
-### 사건 조회 API paradigm (cycle 1-G-γ-α-ε 정합)
+---
 
-**/api/auction/lookup** (GET / 비로그인 / Hero 단독):
-- rate limit IP 단위 1분당 10건
-- caseNumber `/^\d{4}타경\d+$/` 검증
-- courtCode 검증 (Phase 1 = B000240 단독)
-- cache lookup (`is_active=true + TTL 24h`)
-- cache MISS = fetchSingleCase + upsert + 재조회
-- status 분기 = active / closed / not_found / **fetch_failed** (신규) / invalid_input / invalid_court / rate_limited / server_error
+## 📂 work-006 사실 정합 — 카카오톡 전체 폐기
 
-**/api/orders/check** (POST / login 의무 / Step1 단독):
-- 동일 paradigm + 중복 체크 (1물건 1고객) + form prefill
-- 동일 fetch_failed 신규 status 광역
+### 폐기 사실 (Code link 4건 + 텍스트 6개소 + 컴포넌트 1건 + config 2건)
 
-**closed 판정 단계 정정 (cycle 1-G-γ-α-ε)**:
-- TTL within 24h + is_active=false → closed 회신
-- TTL 만료 + fetch records 0 + is_active=false → **fetch_failed** 회신 (stale closed NG 회피)
-- 종결 record 부재 → not_found
+| 분류 | 항목 | 사실 |
+|---|---|---|
+| Link 폐기 | HomeHero already-taken 카카오톡 link | "다른 사건 검색" 버튼 단독 보존 |
+| Link 폐기 | /contact 페이지 카카오톡 채널 버튼 | 전화 상담 카드 대체 |
+| Link 폐기 | ApplyCTA 카카오톡 상담 button | "문의하기" 카피 대체 |
+| Link 폐기 | DetailSidebar 카카오톡 상담 link | "문의하기" 카피 대체 |
+| Text 대체 | PrivacyContent 3개소 | "전화·이메일" 대체 |
+| Text 대체 | LegalLayout L96 | "전화·이메일" 대체 |
+| Text 대체 | refund/page.tsx L189 | "전화·이메일" 대체 |
+| Text 대체 | faq-data.ts L36 | "문의하기 페이지의 전화·이메일" 대체 |
+| Comment 정리 | Step5Payment + Step5Complete + constants comment | 알림 채널 명시 영역 0 paradigm |
+| 컴포넌트 삭제 | `src/components/admin/KakaoNotifyButton.tsx` | 파일 자체 삭제 (159 line) + admin orders/[id] page import + render 정리 |
+| Config 폐기 | `COMPANY.kakaoChannelUrl` 필드 | constants.ts |
+| CSS 폐기 | `--color-kakao: #fee500` | globals.css |
+| 신규 추가 | `MOCKUP_SUPPORT_PHONE` + `SUPPORT_PHONE` 환경변수 패턴 | constants.ts (MOCKUP_SUPPORT_EMAIL 패턴 정합) |
 
-### TopNav 메뉴 (cycle 1-G-α + α-α 정합)
+### 보존 사실
 
-- 사전 4 메뉴 = 서비스 소개 / 이용 절차 / 자주 묻는 질문 / 경매 인사이트
-- 정정 3 메뉴 = **서비스 소개 / 자주 묻는 질문 / 경매 인사이트** (이용 절차 영구 폐기 / 메인 통합)
-- 데스크탑 = "신청하기" primary brand-green solid + "로그인" 회색 텍스트 링크
-- 모바일 = Logo + hamburger 2 column (신청하기 모바일 상단 영역 0)
+- **LoginButton Kakao OAuth provider 정의** = `DISABLED` 상태 영구 보존 (work-008 진입 시점 검토 paradigm)
+- text mention comment paradigm = work-006 폐기 명시 history 추적 (사용자 노출 0)
+
+### /contact 페이지 신규 paradigm
+
+- Phone 카드 (Phone icon + SUPPORT_PHONE "1588-0000" + `tel:` link + "지금 전화하기" CTA)
+- Mail 카드 (Mail icon + SUPPORT_EMAIL "support@auctionquick.kr" + `mailto:` link + "메일 보내기")
+- 하단 안내 = "추후 다양한 소통 채널을 추가할 예정입니다"
+- metadata description = "고객센터 안내. 접수는 웹 신청 페이지에서, 상담은 전화·이메일로 진행됩니다"
+
+---
+
+## 📂 work-002 ~ work-004 사실 정합 (Hero + photos paradigm)
+
+### work-002 (Hero NG 3건)
+
+- input `spellCheck={false}` + `autoCorrect="off"` + `autoCapitalize="off"` (빨간 dotted underline 영구 차단)
+- input `focus:ring-2 focus:ring-[var(--brand-green)]/30 focus:shadow-[0_0_0_3px_rgba(0,200,83,0.2)]` (Liquid Glass + WCAG focus-visible)
+- input `disabled={isLoading}` (loading 시점 typing 차단)
+- button `active:scale-[0.98] active:bg-[var(--brand-green-deep)] disabled:active:scale-100` (click 즉시 visual feedback)
+- mapper.ts L136-138 photos 3 column 영구 제외 (upsert payload 안 NULL overwrite 차단)
+- LISTING_SELECT 양측 (lookup + orders/check) photos + photos_count 추가
+- CourtListingSummary 안 `photos: Photo[] | null` + `photos_count: number` + 신규 Photo type (seq + url + caption + categoryCode? + thumbnailUrl?)
+
+### work-003 (Hero 정정 통합)
+
+- η 정정 9 (Card image render) 폐기 → ImageOff placeholder 단독 단계 영구 보존
+- chip 2건 (Building2 + FileText) 양측 통일 + 보증금 전용계좌 chip 폐기
+- 일러스트 가시성 강화 (opacity 전체 + fade overlay 약화 + radial glow 강화 + strokeWidth 강화 + dot 크기 강화)
+- 모바일 SVG `scale-[1.4] lg:scale-100` (사후 work-004 paradigm 영구 폐기)
+- h1 강조 단계 yellow 1-span → green 본문 "경매를 시작하세요" + yellow 마침표 단독 (h2 강조 단계 통일)
+- textShadow 옵션 D = 마침표 단독 yellow glow + green 본문 flat (그림자 단독)
+
+### work-004 (Hero 시각 정정)
+
+- HeroFlowBackground 단일 컴포넌트 → **HeroFlowBackgroundDesktop** (hidden lg:block / 사전 1600x900 viewBox 영구 보존) + **HeroFlowBackgroundMobile** (lg:hidden / 신규 800x1200 viewBox + element 전체 재배치)
+- Liquid Glass 박스 불투명 약화 양측 통일 (HomeHero + HomeCTA):
+  - bg 0.35/0.20 → 0.15/0.08
+  - blur 40px → 20px
+  - border 0.3 → 0.20
+  - shadow inset 0.5 → 0.30 + 32px/80px/0.35 → 24px/60px/0.25
+- chip `{lookupStatus === "idle" && (...)}` 분기 영구 폐기 → 사이트 전체 상태 (idle + loading + active + error 전체) chip 표시 paradigm
+
+---
+
+## 📂 work-001 사실 정합 (seed-photos cleanup)
+
+### DB cleanup (Supabase MCP 직접 실행 사실)
+
+- seed-photos 22 row 영구 삭제 (B000212 2 + B000240 12 + B000241 8)
+- 540431 정상 row 영구 보존 (docid=B0002402024013054043111 / is_active=true)
+- 559336 + 그 외 11 사건 = 사후 lookup endpoint 호출 시점 자연 fetch + mapper UPSERT 진입 paradigm
+
+### Code 정정
+
+- `scripts/seed-photos.mjs` INSERT 단계 (L387-416 else block + makeDocid 함수) 영구 폐기 → `--docid` 옵션 단독 paradigm (기존 row 사후 적재 시점 photos 단독 갱신 paradigm)
+- lookup endpoint L229-247 + orders/check route L264-279 양측 closed 검수 단계 safety check 추가: `.not("court_name", "ilike", "%(seed-photos)%")`
 
 ---
 
 ## 🔧 영구 룰 + 보존 paradigm
 
-### 사업 핵심 가치 v62
+### 사업 핵심 가치 (CLAUDE.md 영구 정합)
 
 - **투자자의 시간적·물리적 병목 해소** 단독
 - 차별화 축 = 신속 + 신뢰 + 경제적 (가격 메인 강조 NG)
 - 폐기 어휘 영구 = "카톡" 메인 노출 + "5만원" 큰 숫자 강조 + "박형준" 개인 색 + 사진·자격증·등록증 메인 노출
 
-### 영구 룰 §1~§33 광역 정합
+### 신규 영구 룰 (본 세션 채택)
 
-- §1: 신규 npm 광역 0 (motion v12.38.0 + lucide-react + NumberFlow 사전 사용 광역)
-- §8: yellow 색감 영역 0 (마침표 + 강조 단어 단독 paradigm)
-- §9: red 색감 paradigm (가격 한정 + required + error / 정보 영역 NG)
-- §10: PG 도입 영역 0 (Phase 10 사후 paradigm)
-- §13 (CLAUDE.md): 오렌지 사용 금지 + 컬러 3색 이상 NG (단 Pricing 3-tier green·orange·red = 영구 회복 paradigm 임시 예외)
-- §22: sidebar 영역 0 (/apply 단독 paradigm)
-- §29: 토큰 단독 사용 (literal hex = Hero source-of-truth #FFD43B + #00C853 + #111418 단독 / 그 외 var 광역)
+1. **work-NNN sequential paradigm 영구 채택** (cycle/그리스 문자/sub-cycle 영구 폐기 / 2026-05-13)
+2. **"광역" 단어 회신문/commit/comment 엄격 금지** (2026-05-13)
+3. **카카오톡 채널 운영 방식 영구 폐기** (work-006 / 향후 유선·이메일·신규 채널 paradigm)
+4. **directive 핵심 원칙**: 대법원 = 진실의 원천 / 우리 DB = 24h 캐시 단독 / 우리 DB만 보고 not_found 회신 paradigm 절대 금지 (work-007 명시)
+
+### CLAUDE.md 영구 룰 §1 ~ §A-26 정합 보존
+
+- §1: 신규 npm 0 (motion + lucide-react + NumberFlow 단독)
+- §8: yellow 색감 = 마침표 + 강조 단어 단독 (Hero h1 yellow 마침표 단독 paradigm 정합)
+- §9: red 색감 = 가격 한정 + required + error (정보 영역 NG / Step5Payment 입금 금액 = ink-900 정합)
+- §13 룰 33 #1: focus-visible 의무 (input focus:ring 정합)
+- §13 룰 33 #6: Next/Image 사용 의무 (work-003 사후 Hero Card = placeholder 단독 paradigm = Image 사용 영역 0)
+- §29: 토큰 단독 사용 (Hero source-of-truth #FFD43B + #00C853 + #111418 + 사용자 안내 amber 단독)
 - §31: 모달 분류 (강제 vs 정보)
 - §32: 합니다체 단독 (요체 ~예요/~돼요/~해요 영역 0 / quote paradigm 예외)
-- §36: 광역 시각 토큰 보존 (메인 = cycle 1-G-γ-α 광역 재구성 영역 / /apply + 마이페이지 영구 보존)
-- §A-2: production hex 추정 NG (var 단독)
-- §A-11: /apply = 매수신청 대리 단독 (분석·자문·투자 어휘 영역 0)
-- §A-12: 데스크탑 = 모바일 동일 paradigm
 
-### 영구 보존 paradigm 광역
+### 영구 보존 paradigm
 
-- cycle 1-D-A-3-2 paradigm = on-demand fetch + 광역 cron 폐기 영구
+- cycle 1-D-A-3-2 paradigm = on-demand fetch + cron 폐기 영구
 - court_listings DB + TTL 24h + cache paradigm 영구
 - /apply Step1 caseConfirmedByUser 사용자 직접 확인 단계 영구
 - /api/orders/check + login 의무 + 중복 체크 + form prefill 영구
-- mapper.ts is_active hardcoded true (별개 cycle 검수 영역 / 본 cycle 영역 0)
-- console.error 광역 보존 (Vercel logs 회수 단독)
-
-### 자가 검증 paradigm
-
-- tsc = 0 error
-- lint = 신규 0 (ReviewsMarquee 사전 1 error 영구 보존)
-- §32 합니다체 grep = 0건 (요체 어미 ~예요/~돼요/~해요)
-- §A-2 production hex 추정 grep = 0건 (var 단독 / Hero source-of-truth + Pricing 3-tier 예외)
+- mapper.ts is_active hardcoded true (별개 work 검수 영역 / 본 세션 영역 0)
+- console.error 보존 (Vercel logs 회수 단독)
+- closedFresh (within 24h closed) → closed 회신 paradigm 영구 (정상 종결 사건 단일 source)
+- is_case_active 사전 함수 + DB unique constraint 영구 보존 (anyround 신규 함수 NG)
+- Hero h1 카피 SoT "법원에 가지 않고, / 경매를 시작하세요." + 강조 (green 본문 + yellow 마침표) 영구
+- Hero subtitle "사건번호만 주시면, 법원은 저희가 갑니다." 영구
+- HeroFlowBackgroundDesktop + HeroFlowBackgroundMobile 분리 paradigm 영구
+- Liquid Glass 약화 단계 양측 통일 (HomeHero + HomeCTA) 영구
+- chip 2건 양측 통일 (Building2 + FileText) + idle 분기 폐기 영구
+- LookupStatus 10 status paradigm 영구
+- Step1Property auctionRound POST body 명시 paradigm 영구
+- Step5Payment handlePreSubmitCheck race 회피 paradigm 영구
 
 ---
 
 ## 📁 핵심 파일 + 컴포넌트 영역
 
-### 메인 8 섹션 (src/components/home/)
-- HomePageClient.tsx (광역 client wrapper)
-- HomeHero.tsx (Hero + 사건 조회 + sessionStorage / cycle 1-G-γ-α-δ + ε)
-- HomeProcess.tsx (5 step + horizontal step flow SVG)
-- HomeCompare.tsx (2-col 비교 카드 / 5시간 vs 10분)
-- HomePricing.tsx (3-tier + NumberFlow + timeline / cycle 1-G-γ-α-β 회복)
-- HomeScope.tsx (DO + DON'T 2-col / surface-muted)
-- HomeReviews.tsx + ReviewsMarquee.tsx (charcoal)
-- HomeInsight.tsx (4 magazine card / aspect-[4/1])
-- HomeCTA.tsx (TrustCTA 회복 / cycle 1-G-γ-α-γ)
+### Hero + 메인 8 섹션 (`src/components/home/`)
 
-### /about 5 섹션 (src/components/about/)
-- AboutPageClient.tsx
-- AboutHero.tsx (시계·번개·궤도 SVG)
-- AboutProblems.tsx (4 카드 / problem 직접 표현)
-- AboutValues.tsx (brand-green 풀스크린 / 시간·이동·집중 SVG)
-- AboutTrust.tsx (lucide 96px / Users·Award·ShieldCheck)
-- AboutCompany.tsx (phone mockup floating)
+- `HomeHero.tsx` (input + button + already-taken + HeroFlowBackgroundDesktop + HeroFlowBackgroundMobile + SingleListingCard + ListingPickerCard inline)
+- `HomeProcess.tsx`
+- `HomeCompare.tsx`
+- `HomePricing.tsx`
+- `HomeScope.tsx`
+- `HomeReviews.tsx` + `ReviewsMarquee.tsx` (사전 main lint error 1건 잔존 / 본 세션 외)
+- `HomeInsight.tsx`
+- `HomeCTA.tsx` (TrustCTA / Liquid Glass 약화 정합)
 
-### 사건 조회 API
-- src/app/api/auction/lookup/route.ts (GET / 비로그인 / Hero 단독)
-- src/app/api/orders/check/route.ts (POST / login / Step1 + 중복 체크)
-- src/lib/courtAuction/search.ts (`fetchSingleCase` 대법원 fetch)
-- src/lib/courtAuction/mapper.ts (`mapRecordToRow` / is_active hardcoded true)
+### 사건 조회 API (`src/app/api/`)
+
+- `auction/lookup/route.ts` = GET / 비로그인 / Hero 단독 / **closedStale 분기 영구 폐기** + already_taken RPC 호출
+- `orders/check/route.ts` = POST / 로그인 의무 / Step1 + 중복 체크 / **closedStale 분기 영구 폐기**
+
+### 대법원 fetch (`src/lib/courtAuction/`)
+
+- `search.ts` = `fetchSingleCase` (bidBgngYmd 20200101 / bidEndYmd 20301231)
+- `session.ts` = STEP1 GET / + STEP2 GET /pgj/index.on (WMONID + JSESSIONID 발급)
+- `mapper.ts` = `mapRecordToRow` / **photos 3 column 영구 제외** / is_active hardcoded true (별개 work 검수 영역)
+- `codes.ts` = endpoint 상수 + SEARCH_PGM_ID + USER_AGENT
+
+### /apply Step (`src/components/apply/steps/`)
+
+- `Step1Property.tsx` = caseTaken state + matchedListing prefill + **auctionRound POST body 명시**
+- `Step2BidInfo.tsx`
+- `Step3Documents.tsx`
+- `Step4Confirm.tsx` (서명 + 위임 계약)
+- `Step5Payment.tsx` = **handlePreSubmitCheck** (race 회피 3차 단계 / raceChecking + raceBlocked state)
+- `Step5Complete.tsx`
+
+### Type 정의
+
+- `src/types/apply.ts` = `Photo` (신규) + `CourtListingSummary.photos` + `photos_count`
+
+### Config + DB
+
+- `src/lib/constants.ts` = FEES + BRAND_NAME + AGENT_INFO + PRIVACY_CONTACT + MOCKUP_SUPPORT_EMAIL + **MOCKUP_SUPPORT_PHONE** (신규) + COMPANY (kakaoChannelUrl 영구 폐기)
+- `supabase/schema.sql` = is_case_active(case_no, round_no) + orders_unique_active_case_round + court_listings (photos JSONB column)
+
+### /contact + 분석 page
+
+- `src/app/contact/page.tsx` = 전화 + 이메일 2 카드 paradigm (work-006 재산출)
+- `src/components/analysis/ApplyCTA.tsx` = "문의하기" 단독 (카카오톡 폐기)
+- `src/components/analysis/DetailSidebar.tsx` = "문의하기" 단독 (카카오톡 폐기)
 
 ### 영역 외 보존
-- src/components/apply/ (Step1 + Step2 + ... / 영구 보존)
-- src/app/apply/ (영구 보존)
-- src/app/my/ + src/components/my/ (영구 보존)
+
+- `src/components/admin/` (KakaoNotifyButton 파일 삭제 / 그 외 영구 보존)
+- `src/components/auth/LoginButton.tsx` (Kakao OAuth DISABLED 보존 / work-008 진입 시점 검토)
 
 ---
 
 ## 🚀 다음 세션 진입 순서 추천
 
-1. **잔존 NG #1 결정 의뢰 회수** = seed-photos 12 row 광역 정리 paradigm
-   - 옵션 (a/b/c/d) 결정 사후 진입
-   - 채택 = (c) court_name cleanup 또는 (d) lookup 분기 추가 단단함
-2. **production 검수 자동화 paradigm**
-   - Vercel dashboard logs 직접 회수 paradigm (Code 자율 진입 NG)
-   - 또는 endpoint 직접 호출 paradigm 정합 (cycle 1-G-γ-α-ε 검수 paradigm 일치)
-3. **mapper.ts is_active 동적 매핑 검수** (별개 cycle 영역)
-4. **cycle 1-G-δ (/faq) 광역 정정 진입**
-   - persona-aware + two-column + search bar + 아코디언 paradigm
-5. **cycle 1-G-ε (/insight) 광역 정정 진입**
-   - v53 보존 + shadow token 정정 + subtitle 정정
-6. **cycle 1-G 종료 사후** = 도메인 결정 (auctionquick.kr / 가비아 1.5만원/년)
+### 1순위: work-007 형준님 결정 회수
+
+- 532249 = 대법원 official 부재 사실 확정 (Code 사전 조사 완료)
+- 옵션 A 채택 = 정정 영역 0 / directive 핵심 원칙 정수 정합 (Code 추천)
+- 옵션 B 채택 = search API parameter 확장 검수 단계 (추가 사실 회수)
+- 형준님 사전 검수 의무:
+  - 대법원 공식 사이트 (https://www.courtauction.go.kr) 직접 검색 → 532249 사실 확인
+  - Vercel logs 회수 (https://vercel.com/auctionq/auction_system/?selectedTab=logs)
+
+### 2순위: work-008 진입 — 카카오톡 인앱 브라우저 Google OAuth 차단 해결
+
+- 사전 형준님 의뢰 사실 (handoff 사전 cycle ζ-3 의도 회복)
+- KakaoTalk WebView 안 Google OAuth = 403 disallowed_useragent 차단 paradigm 잠재
+- 가능 옵션:
+  - (a) userAgent 검수 + 외부 브라우저 진입 안내 모달 paradigm (`kakaotalk://web/openExternal?url=`)
+  - (b) Kakao OAuth 직접 활성화 (LoginButton DISABLED 사실 회수 paradigm 검토)
+  - (c) Magic Link 또는 Email OTP 신규 paradigm 도입
+
+### 3순위: 기술부채 항목 (별개 work paradigm)
+
+- mapper.ts is_active hardcoded → 동적 매핑 검수 (`r.mulJinYn === "Y"` paradigm)
+- ReviewsMarquee.tsx L66 사전 main lint error 1건 정리
+- Lighthouse 측정 재개 (Phase 9 의도)
 
 ---
 
-## 🗂 cycle history 요약 (현재 세션 광역)
+## 🗂 사전 cycle → work 명명 mapping history
 
-### 시각 + UX paradigm 정정 (cycle 1-G-α ~ 1-G-γ-α-γ)
-- TopNav 메뉴 정리 + 시각 위계 분리 (cycle 1-G-α + α-α)
-- /about 광역 재설계 광역 (cycle 1-G-β 광역 → γ-γ 최종 / 5 섹션 영구 보존)
-- /service 영구 폐기 + 메인 통합 (cycle 1-G-γ-α 광역)
-- 메인 8 섹션 광역 정리 (Hero SoT + Process + Compare + Pricing + Scope + Reviews + Insight + CTA)
-- Pricing + Hero 사전 paradigm 회복 + bg SVG (cycle 1-G-γ-α-β)
-- HomeCTA → TrustCTA 회복 + Pricing eyebrow + Process h2 + Hero glow 약화 (cycle 1-G-γ-α-γ)
+본 세션 사전 cycle paradigm history (참고용 / 영구 폐기 사실 정합):
 
-### 사건 조회 paradigm 정정 (cycle 1-G-γ-α-δ + ε)
-- Hero 사건 조회 + 물건 선택 + sessionStorage + /apply prefill (cycle 1-G-γ-α-δ)
-- fetch_failed 신규 status + closed 판정 단계 정정 (cycle 1-G-γ-α-ε)
+| 사전 cycle 명명 | 신규 work 매핑 | 의도 |
+|---|---|---|
+| cycle 1-G-γ-α-ζ-1 | work-001 | seed-photos cleanup |
+| cycle 1-G-γ-α-η | work-002 | Hero NG 3건 |
+| cycle 1-G-γ-α-θ | work-003 | Hero 통합 정정 |
+| cycle 1-G-γ-α-ι-1 | work-004 | Hero 시각 정정 |
+| cycle 1-G-γ-α-ι-2 | work-005 | 사건 조회 NG + 회차 분기 |
+| (사전 cycle 명명 없음) | work-006 | 카카오톡 전체 폐기 + /contact |
+| (사전 cycle 명명 없음) | work-007 | 532249 사전 조사 |
+
+사후 paradigm = **work-NNN sequential 단독** (cycle/그리스 문자/sub-cycle 영역 0).
+
+---
+
+## 📝 자가 검증 paradigm (다음 세션 진입 사전 의무)
+
+| # | 검증 | 도구 |
+|---|---|---|
+| 1 | TypeScript 0 error | `pnpm exec tsc --noEmit` |
+| 2 | lint 신규 0 (ReviewsMarquee 사전 1 error 영구 보존) | `pnpm lint` |
+| 3 | production endpoint 직접 호출 | `curl https://auctionsystem-green.vercel.app/api/auction/lookup?caseNumber=...` |
+| 4 | 회신문 "광역" 어휘 0건 | `grep "광역" <회신 markdown>` |
+| 5 | 영구 룰 §32 합니다체 grep | `grep "예요\|돼요\|해요" src/components/` |
+| 6 | 카카오톡 link/button 0건 검수 | `git grep "kakao\|카카오톡\|MessageCircle"` (LoginButton DISABLED + comment 단독 잔존 허용) |
 
 ---
 
 ## 📝 명문화 source 영역
 
-- `CLAUDE.md` = 사업 본질 + 영구 룰 + Phase 설계 + cycle 광역 명문화
+- `CLAUDE.md` = 사업 본질 + 영구 룰 + Phase 설계 + cycle/work 단계 명문화
 - `HANDOFF.md` = 본 문서 (다음 세션 진입 컨텍스트 단독)
 - `docs/roadmap.md` = Phase 7~10 + v2 패키지
 - `docs/content-source-v2.md` = Cowork 원천 자료 규격
+- `~/.claude/projects/-Users-parkhj-Projects-website/memory/MEMORY.md` = 형준님 영구 feedback (존댓말 + "광역" 단어 금지)
 
 ---
 
-## 자가 검증 paradigm (다음 세션 진입 사전 의무)
+## 🔗 commit history (본 세션 전체)
 
-| # | 검증 |
-|---|---|
-| 1 | tsc 0 error (`pnpm tsc --noEmit`) |
-| 2 | lint 0 신규 (`pnpm lint` / ReviewsMarquee 사전 1 error 보존) |
-| 3 | production endpoint 직접 호출 (`/api/auction/lookup?caseNumber=2024타경569067&courtCode=B000240`) |
-| 4 | DB seed-photos row 광역 count (`SELECT court_name, COUNT(*) FROM court_listings WHERE court_name LIKE '%seed%'`) |
-| 5 | 영구 룰 §32 합니다체 + §A-2 hex + §29 토큰 광역 grep |
+```
+6676de5 work-006: 카카오톡 전체 폐기 + /contact 목업 연락처 대체
+cfdfaf0 work-005: 사건 조회 NG + 회차 분기 paradigm (1물건 1고객 race 회피 4단계)
+44441fb cycle 1-G-γ-α-ι-1: Hero 시각 정정 3건 (모바일 SVG + Liquid Glass + chip)  ← work-004 매핑
+8331877 cycle 1-G-γ-α-θ: Hero 정정 통합 (η 정정 9 폐기 + 추가 정정 5건)  ← work-003 매핑
+d5a38f6 cycle 1-G-γ-α-η: Hero NG 3건 통합 정정 (button + input + photos)  ← work-002 매핑
+7108681 cycle 1-G-γ-α-ζ-1 정정 6+7: lookup + orders/check safety check 추가  ← work-001 매핑
+fcb6f71 cycle 1-G-γ-α-ζ-1 정정 5: scripts/seed-photos.mjs INSERT 단계 영구 폐기  ← work-001 매핑
+8679af2 HANDOFF.md 갱신: cycle 1-G-γ-α-ε 종료 paradigm + 다음 세션 진입 트리거
+```
 
 ---
 
-**End of HANDOFF.md (cycle 1-G-γ-α-ε 종료 paradigm 정합)**
+**End of HANDOFF.md (work-007 사전 조사 종료 / work-NNN paradigm 영구 채택 / 2026-05-13)**
