@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { motion } from "motion/react";
 import {
   Building2,
@@ -9,9 +9,8 @@ import {
   AlertCircle,
   AlertTriangle,
   Loader2,
-  ImageOff,
 } from "lucide-react";
-import type { CourtListingSummary, Photo } from "@/types/apply";
+import type { CourtListingSummary } from "@/types/apply";
 
 /* cycle 1-G-γ-α-δ — Hero 사건 조회 + 물건 선택 + 자동 진입 paradigm:
  * - input 형식 검증 (CASE_NUMBER_PATTERN) + CTA "조회하기" → /api/auction/lookup GET fetch
@@ -304,13 +303,15 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
           </p>
 
           {/* form (모바일 vertical + 데스크탑 horizontal).
-              work-009 정정 = lg:shadow-md 영구 폐기 (form parent 검은 shadow 외곽 source).
-              Liquid Glass 박스 자체 shadow paradigm 단독 (L295 inset + 24px/60px outer). */}
+              work-009 정정 = lg:shadow-md 영구 폐기.
+              work-010 정정 1 = lg:bg-white + lg:p-1.5 + lg:rounded-2xl wrapper paradigm 영구 폐기.
+                source = wrapper bg-white + p-1.5 padding = 데스크탑 input 광역 외곽 검은 1-2px 잔존 source.
+                정정 = input 광역 자체 paradigm 단독 (양 viewport 동일 bg-white) + button 광역 직접 horizontal flex. */}
           <form
             onSubmit={handleLookup}
             role="search"
             aria-label="사건번호 조회"
-            className="flex w-full flex-col gap-3 lg:flex-row lg:max-w-[600px] lg:items-center lg:rounded-2xl lg:bg-white lg:p-1.5"
+            className="flex w-full flex-col gap-3 lg:flex-row lg:max-w-[600px] lg:items-center"
           >
             <label htmlFor="hero-case" className="sr-only">
               사건번호
@@ -355,7 +356,7 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
                *   - focus:outline-none + focus-visible:outline-none (mouse + keyboard 동등)
                */
               style={{ WebkitTapHighlightColor: "transparent" }}
-              className="w-full h-16 appearance-none rounded-2xl border-0 bg-white px-5 text-[16px] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] outline-none transition-shadow duration-150 focus:border-0 focus:outline-none focus:shadow-[0_0_0_3px_rgba(0,200,83,0.3)] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 lg:h-16 lg:flex-1 lg:bg-transparent lg:px-6 lg:text-[18px]"
+              className="w-full h-16 appearance-none rounded-2xl border-0 bg-white px-5 text-[16px] text-[var(--color-ink-900)] placeholder:text-[var(--color-ink-500)] outline-none transition-shadow duration-150 focus:border-0 focus:outline-none focus:shadow-[0_0_0_3px_rgba(0,200,83,0.3)] focus-visible:outline-none disabled:cursor-not-allowed disabled:opacity-60 lg:h-16 lg:flex-1 lg:px-6 lg:text-[18px]"
             />
             <button
               type={hasResult || hasError ? "button" : "submit"}
@@ -469,119 +470,49 @@ export function HomeHero({ caseNumbers: _caseNumbers }: { caseNumbers: string[] 
 // ─────────────────────────────────────────────────────────────────────────────
 // inline 결과 카드.
 
-/**
- * 사진 1장 representative 선택 paradigm (work-008 정정 2).
- * 우선순위: 전경사진 (000241) → 외부 (000242 감정평가/000243 현황조사) → 첫 항목 fallback.
- * 빈 배열 시점 = null 회신 = SingleListingCard 안 ImageOff placeholder paradigm.
- */
-function pickRepresentative(photos: Photo[]): Photo | null {
-  if (photos.length === 0) return null;
-  const byCategory = (code: string) =>
-    photos.find((p) => p.categoryCode === code);
-  return (
-    byCategory("000241") ??
-    byCategory("000242") ??
-    byCategory("000243") ??
-    photos[0] ??
-    null
-  );
-}
-
 function SingleListingCard({ listing }: { listing: CourtListingSummary }) {
-  // work-008 정정 1+2 = 사진 1장 representative 비동기 fetch + render.
-  //   - paradigm: PhotoGallery 정합 (client side async fetch / lookup endpoint 영향 0).
-  //   - cycle 1-G-γ-α-θ 정정 1 폐기 사유 (동기 fetch duration NG) 회피 paradigm.
-  //   - listing.photos 사전 시드 사실 시점 (seed-photos.mjs) = fetch skip + 즉시 render.
-  //   - 사진 회수 NG 시점 = ImageOff placeholder fallback 영구 보존.
-  const seeded = (listing.photos ?? []).filter((p) => p && p.url);
-  const [photo, setPhoto] = useState<Photo | null>(
-    pickRepresentative(seeded),
-  );
-
-  useEffect(() => {
-    if (seeded.length > 0) return; // 사전 시드 cache hit = fetch skip.
-
-    const controller = new AbortController();
-    let cancelled = false;
-
-    (async () => {
-      try {
-        const res = await fetch(
-          `/api/court-listings/${encodeURIComponent(listing.docid)}/photos`,
-          { signal: controller.signal },
-        );
-        const json = (await res.json()) as { photos?: Photo[] };
-        if (cancelled) return;
-        const fetched = (json.photos ?? []).filter((p) => p && p.url);
-        const pick = pickRepresentative(fetched);
-        if (pick) setPhoto(pick);
-      } catch {
-        // silent fallback = placeholder 단독 유지 paradigm.
-      }
-    })();
-
-    return () => {
-      cancelled = true;
-      controller.abort();
-    };
-  }, [listing.docid, seeded.length]);
-
+  // work-010 정정 2+3 = 사진 영역 영구 폐기 paradigm.
+  //   - source = ~10초 사진 fetch + ImageOff placeholder 잠시 표시 = 사용자 시각 NG.
+  //   - 폐기: useEffect + AbortController + pickRepresentative + img + ImageOff fallback.
+  //   - 신규 = 텍스트 단독 카드 paradigm (조회 완료 뱃지 + 용도 + 주소 + 4-grid 정보).
+  //   - photos.ts + /api/court-listings/[docid]/photos endpoint 자체 영구 보존 (분석 페이지 PhotoGallery 사용 잔존).
+  //   - work-008 정정 1+2 = 폐기 paradigm 전환 (사용자 의도 정수 = 핵심 정보 직접 포착 외관).
   return (
     <article className="rounded-2xl border border-white/20 bg-white/10 p-5 backdrop-blur-sm">
       <span className="inline-flex items-center rounded-full bg-[var(--brand-green)] px-3 py-1 text-xs font-bold uppercase tracking-wider text-white">
         조회 완료
       </span>
-      <div className="mt-4 grid grid-cols-[88px_1fr] gap-4 lg:grid-cols-[120px_1fr]">
-        <div className="flex aspect-square items-center justify-center overflow-hidden rounded-xl bg-white/5">
-          {photo ? (
-            // eslint-disable-next-line @next/next/no-img-element -- Supabase Storage public URL / Next/Image lg:120px ↔ mobile:88px 분기 + remotePatterns 추가 부담 회피.
-            <img
-              src={photo.url}
-              alt={photo.caption || listing.address_display || "사건 사진"}
-              loading="lazy"
-              className="h-full w-full object-cover"
-            />
-          ) : (
-            <ImageOff
-              size={32}
-              className="text-white/40"
-              strokeWidth={1.5}
-              aria-hidden="true"
-            />
-          )}
-        </div>
-        <div className="flex flex-col gap-2 text-left">
-          {listing.usage_name && (
-            <p className="text-xs font-bold uppercase tracking-wider text-[var(--brand-green)]">
-              {listing.usage_name}
-            </p>
-          )}
-          <p className="text-base font-medium leading-snug text-white">
-            {listing.address_display ?? listing.case_title ?? "주소 정보 미수신"}
+      <div className="mt-4 flex flex-col gap-2 text-left">
+        {listing.usage_name && (
+          <p className="text-xs font-bold uppercase tracking-wider text-[var(--brand-green)]">
+            {listing.usage_name}
           </p>
-          <div className="mt-1 grid grid-cols-2 gap-2 text-xs text-white/80 sm:text-sm">
-            <div>
-              <p className="text-white/60">감정가</p>
-              <p className="tabular-nums text-white">
-                {formatWon(listing.appraisal_amount)}
-              </p>
-            </div>
-            <div>
-              <p className="text-white/60">최저가</p>
-              <p className="tabular-nums text-white">
-                {formatWon(listing.min_bid_amount)}
-              </p>
-            </div>
-            <div>
-              <p className="text-white/60">입찰일</p>
-              <p className="tabular-nums text-white">
-                {formatBidDate(listing.bid_date)}
-              </p>
-            </div>
-            <div>
-              <p className="text-white/60">유찰 횟수</p>
-              <p className="tabular-nums text-white">{listing.failed_count}회</p>
-            </div>
+        )}
+        <p className="text-base font-medium leading-snug text-white">
+          {listing.address_display ?? listing.case_title ?? "주소 정보 미수신"}
+        </p>
+        <div className="mt-1 grid grid-cols-2 gap-x-6 gap-y-3 text-xs text-white/80 sm:text-sm">
+          <div>
+            <p className="text-white/60">감정가</p>
+            <p className="tabular-nums text-white">
+              {formatWon(listing.appraisal_amount)}
+            </p>
+          </div>
+          <div>
+            <p className="text-white/60">최저가</p>
+            <p className="tabular-nums text-white">
+              {formatWon(listing.min_bid_amount)}
+            </p>
+          </div>
+          <div>
+            <p className="text-white/60">입찰일</p>
+            <p className="tabular-nums text-white">
+              {formatBidDate(listing.bid_date)}
+            </p>
+          </div>
+          <div>
+            <p className="text-white/60">유찰 횟수</p>
+            <p className="tabular-nums text-white">{listing.failed_count}회</p>
           </div>
         </div>
       </div>
