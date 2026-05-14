@@ -1,31 +1,51 @@
 "use client";
 
+import Image from "next/image";
+import { AnimatePresence, motion } from "motion/react";
 import {
-  BarChart3,
-  BookOpen,
-  Building2,
-  ChevronRight,
-  Compass,
-  FileSearch,
-  Route,
-  type LucideIcon,
-} from "lucide-react";
-import { INSIGHT_CATEGORIES, type InsightCategorySlug } from "@/lib/insightMock";
+  INSIGHT_NAV,
+  isAnalysisSub,
+  iconPath,
+  type NavSelection,
+} from "@/lib/insightMock";
+import { ChevronRightIcon } from "@/components/insight/icons";
 
-/* work-012 — /insight 카테고리 nav (정정 영역 2).
- * 6 카테고리 + "전체보기" 우측 끝. 아이콘 = placeholder (사후 Gemini PNG 일러스트 교체).
- * 카테고리 클릭 = 해당 list 단독 노출 (별개 page 진입 0). */
+/* work-012 정정 2 — /insight 카테고리 nav.
+ * 정정 영역 3: 4 독립 + 1 그룹("무료 물건분석") + 그룹 클릭 = sub nav 펼침 (하위 8건).
+ * 아이콘 = Gemini PNG (next/image / 아이콘 라이브러리 미사용). "전체보기" 우측 끝. */
 
-export const CATEGORY_ICON: Record<InsightCategorySlug, LucideIcon> = {
-  process: Route,
-  glossary: BookOpen,
-  usage: Building2,
-  analysis: FileSearch,
-  data: BarChart3,
-  guide: Compass,
-};
-
-export type NavSelection = InsightCategorySlug | "all";
+function IconTile({
+  slug,
+  label,
+  size,
+  active,
+}: {
+  slug: string;
+  label: string;
+  size: number;
+  active: boolean;
+}) {
+  return (
+    <span
+      className={
+        "flex items-center justify-center overflow-hidden rounded-2xl border bg-white transition-all " +
+        (active
+          ? "border-[var(--brand-green)] ring-2 ring-[var(--brand-green)]/35"
+          : "border-[var(--color-border)] group-hover:border-[var(--brand-green)]/45")
+      }
+      style={{ width: size, height: size }}
+    >
+      <Image
+        src={iconPath(slug)}
+        alt=""
+        width={size}
+        height={size}
+        className="h-full w-full object-cover"
+      />
+      <span className="sr-only">{label}</span>
+    </span>
+  );
+}
 
 export function InsightCategoryNav({
   active,
@@ -34,46 +54,58 @@ export function InsightCategoryNav({
   active: NavSelection;
   onSelect: (next: NavSelection) => void;
 }) {
+  const expanded = active === "analysis" || isAnalysisSub(active);
+  const group = INSIGHT_NAV.find((n) => n.kind === "group");
+
   return (
     <nav
       aria-label="인사이트 카테고리"
       className="border-b border-[var(--color-border)] bg-white"
     >
-      <div className="container-app w-full">
+      <div className="mx-auto w-full max-w-7xl px-5">
+        {/* 메인 nav: 그룹 1 + 독립 4 + 전체보기. */}
         <div className="flex items-center gap-5 overflow-x-auto py-6 lg:justify-between lg:gap-2">
-          <ul className="flex shrink-0 items-start gap-5 lg:gap-2">
-            {INSIGHT_CATEGORIES.map((cat) => {
-              const Icon = CATEGORY_ICON[cat.slug];
-              const isActive = active === cat.slug;
+          <ul className="flex shrink-0 items-start gap-5 lg:gap-3">
+            {INSIGHT_NAV.map((item) => {
+              const isGroup = item.kind === "group";
+              const isActive = isGroup ? expanded : active === item.slug;
               return (
-                <li key={cat.slug}>
+                <li key={item.slug}>
                   <button
                     type="button"
-                    onClick={() => onSelect(cat.slug)}
+                    onClick={() =>
+                      isGroup
+                        ? onSelect(expanded ? "all" : "analysis")
+                        : onSelect(item.slug)
+                    }
                     aria-pressed={isActive}
-                    className="group flex w-[68px] flex-col items-center gap-2 rounded-xl py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/45 focus-visible:ring-offset-2 lg:w-[88px]"
+                    aria-expanded={isGroup ? expanded : undefined}
+                    className="group flex w-[76px] flex-col items-center gap-2 rounded-xl py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/45 focus-visible:ring-offset-2 lg:w-[88px]"
                   >
+                    <IconTile
+                      slug={item.slug}
+                      label={item.label}
+                      size={64}
+                      active={isActive}
+                    />
                     <span
                       className={
-                        "flex h-14 w-14 items-center justify-center rounded-full transition-colors lg:h-16 lg:w-16 " +
+                        "flex items-center gap-0.5 text-center text-[12px] font-semibold leading-tight lg:text-[13px] " +
                         (isActive
-                          ? "bg-[var(--brand-green)] text-white"
-                          : "bg-[var(--color-ink-100)] text-[#111418] group-hover:bg-[var(--brand-green-soft)]")
+                          ? "text-[#111418]"
+                          : "text-[var(--color-ink-500)]")
                       }
                     >
-                      <Icon
-                        size={26}
-                        strokeWidth={1.9}
-                        aria-hidden="true"
-                      />
-                    </span>
-                    <span
-                      className={
-                        "text-center text-[12px] font-semibold leading-tight lg:text-[13px] " +
-                        (isActive ? "text-[#111418]" : "text-[var(--color-ink-500)]")
-                      }
-                    >
-                      {cat.label}
+                      {item.label}
+                      {isGroup && (
+                        <ChevronRightIcon
+                          size={13}
+                          className={
+                            "transition-transform " +
+                            (expanded ? "rotate-90" : "")
+                          }
+                        />
+                      )}
                     </span>
                   </button>
                 </li>
@@ -94,9 +126,55 @@ export function InsightCategoryNav({
             }
           >
             전체보기
-            <ChevronRight size={16} strokeWidth={2.4} aria-hidden="true" />
+            <ChevronRightIcon size={16} />
           </button>
         </div>
+
+        {/* sub nav: "무료 물건분석" 그룹 하위 8 종류 (펼침 시 단독 노출). */}
+        <AnimatePresence initial={false}>
+          {expanded && group && group.kind === "group" && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: "auto", opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
+              className="overflow-hidden"
+            >
+              <ul className="flex items-start gap-4 overflow-x-auto border-t border-[var(--color-border)] py-5 lg:gap-5">
+                {group.children.map((sub) => {
+                  const isActive = active === sub.slug;
+                  return (
+                    <li key={sub.slug}>
+                      <button
+                        type="button"
+                        onClick={() => onSelect(sub.slug)}
+                        aria-pressed={isActive}
+                        className="group flex w-[64px] flex-col items-center gap-1.5 rounded-lg py-1 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/45 focus-visible:ring-offset-2 lg:w-[72px]"
+                      >
+                        <IconTile
+                          slug={sub.slug}
+                          label={sub.label}
+                          size={48}
+                          active={isActive}
+                        />
+                        <span
+                          className={
+                            "text-center text-[11px] font-semibold leading-tight lg:text-[12px] " +
+                            (isActive
+                              ? "text-[#111418]"
+                              : "text-[var(--color-ink-500)]")
+                          }
+                        >
+                          {sub.label}
+                        </span>
+                      </button>
+                    </li>
+                  );
+                })}
+              </ul>
+            </motion.div>
+          )}
+        </AnimatePresence>
       </div>
     </nav>
   );

@@ -1,32 +1,29 @@
 "use client";
 
 import { useCallback, useMemo, useRef, useState } from "react";
+import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
-import { ArrowRight } from "lucide-react";
 import {
-  INSIGHT_CATEGORIES,
+  ALL_CAT_SLUGS,
   INSIGHT_MOCK_POSTS,
   categoryLabel,
   getEditorsPick,
+  iconPath,
+  isAnalysisSub,
   sortedPosts,
-  type InsightCategorySlug,
   type InsightMockPost,
   type InsightSlideCta,
+  type NavSelection,
 } from "@/lib/insightMock";
 import { InsightHero } from "@/components/insight/InsightHero";
-import {
-  CATEGORY_ICON,
-  InsightCategoryNav,
-  type NavSelection,
-} from "@/components/insight/InsightCategoryNav";
+import { InsightCategoryNav } from "@/components/insight/InsightCategoryNav";
+import { ArrowRightIcon } from "@/components/insight/icons";
 
-/* work-012 — /insight 풀 신규 재제작 orchestrator.
- * Hero 자동 슬라이드 + 카테고리 nav + 1-col 콘텐츠 list + Editor's Pick.
+/* work-012 정정 2 — /insight orchestrator.
+ * Hero(Liquid Glass 박스) + 카테고리 nav(5 + sub nav) + 1-col 콘텐츠 list + Editor's Pick.
  * 카테고리 클릭 = ?cat= 쿼리 (별개 page 진입 0) / mock 진입 = "준비 중" toast.
- * carousel 라이브러리 미사용 / 신규 npm 0 / INSIGHT 색 토큰 0 / chip 패턴 0. */
-
-const VALID_SLUGS = new Set<string>(INSIGHT_CATEGORIES.map((c) => c.slug));
+ * carousel 라이브러리 미사용 / 신규 npm 0 / INSIGHT 색 토큰 0 / chip 패턴 0 / 아이콘 라이브러리 미사용. */
 
 function formatDate(iso: string): string {
   const d = new Date(iso);
@@ -36,15 +33,14 @@ function formatDate(iso: string): string {
   ).padStart(2, "0")}`;
 }
 
-/* 썸네일 placeholder (120×80 / gray + 카테고리 아이콘 / 사후 일러스트 교체). */
+/* 썸네일 placeholder (120×80 / gray + 카테고리 Gemini PNG). */
 function Thumbnail({
   category,
   large,
 }: {
-  category: InsightCategorySlug;
+  category: string;
   large?: boolean;
 }) {
-  const Icon = CATEGORY_ICON[category];
   return (
     <div
       aria-hidden="true"
@@ -55,10 +51,12 @@ function Thumbnail({
           : "h-[80px] w-[120px]")
       }
     >
-      <Icon
-        size={large ? 56 : 32}
-        strokeWidth={1.6}
-        className="text-[var(--color-ink-500)] opacity-35"
+      <Image
+        src={iconPath(category)}
+        alt=""
+        width={large ? 200 : 120}
+        height={large ? 200 : 120}
+        className={large ? "h-[78%] w-auto object-contain" : "h-[78%] w-auto object-contain"}
       />
     </div>
   );
@@ -70,8 +68,8 @@ export function InsightHubLayout() {
   const listRef = useRef<HTMLElement>(null);
 
   const rawCat = searchParams.get("cat") ?? "all";
-  const active: NavSelection = VALID_SLUGS.has(rawCat)
-    ? (rawCat as InsightCategorySlug)
+  const active: NavSelection = ALL_CAT_SLUGS.has(rawCat)
+    ? (rawCat as NavSelection)
     : "all";
 
   const [toast, setToast] = useState<string | null>(null);
@@ -113,22 +111,23 @@ export function InsightHubLayout() {
 
   const editorsPick = useMemo(() => getEditorsPick(), []);
 
-  const listPosts = useMemo(() => {
-    if (active === "all") {
-      return sortedPosts(
-        INSIGHT_MOCK_POSTS.filter((p) => p.id !== editorsPick.id)
-      );
+  const filteredPosts = useMemo(() => {
+    if (active === "all") return INSIGHT_MOCK_POSTS;
+    if (active === "analysis") {
+      return INSIGHT_MOCK_POSTS.filter((p) => isAnalysisSub(p.category));
     }
-    return sortedPosts(
-      INSIGHT_MOCK_POSTS.filter((p) => p.category === active)
-    );
-  }, [active, editorsPick.id]);
+    return INSIGHT_MOCK_POSTS.filter((p) => p.category === active);
+  }, [active]);
 
-  const totalCount =
-    active === "all"
-      ? INSIGHT_MOCK_POSTS.length
-      : INSIGHT_MOCK_POSTS.filter((p) => p.category === active).length;
+  const listPosts = useMemo(() => {
+    const base =
+      active === "all"
+        ? filteredPosts.filter((p) => p.id !== editorsPick.id)
+        : filteredPosts;
+    return sortedPosts(base);
+  }, [active, filteredPosts, editorsPick.id]);
 
+  const totalCount = filteredPosts.length;
   const sectionTitle =
     active === "all" ? "전체 인사이트" : categoryLabel(active);
 
@@ -138,8 +137,8 @@ export function InsightHubLayout() {
 
       <InsightCategoryNav active={active} onSelect={selectCategory} />
 
-      <section ref={listRef} className="scroll-mt-4 bg-white">
-        <div className="container-app w-full py-12 lg:py-16">
+      <section ref={listRef} className="scroll-mt-20 bg-white">
+        <div className="mx-auto w-full max-w-7xl px-5 py-12 lg:py-16">
           <div className="flex items-baseline justify-between gap-3">
             <h2 className="text-[22px] font-extrabold tracking-[-0.01em] text-[#111418] lg:text-[28px]">
               {sectionTitle}
@@ -184,11 +183,9 @@ export function InsightHubLayout() {
                   </span>
                   <span className="inline-flex items-center gap-1 text-[13px] font-bold text-[var(--brand-green)]">
                     자세히 보기
-                    <ArrowRight
+                    <ArrowRightIcon
                       size={16}
-                      strokeWidth={2.4}
                       className="transition-transform group-hover:translate-x-1"
-                      aria-hidden="true"
                     />
                   </span>
                 </div>
@@ -196,12 +193,17 @@ export function InsightHubLayout() {
             </button>
           )}
 
-          {/* 콘텐츠 list = 1-col 세로 list (정정 영역 3). */}
+          {/* 콘텐츠 list = 1-col 세로 list (정정 영역 3 보존). */}
           {listPosts.length > 0 ? (
             <ul className="mt-8 flex flex-col divide-y divide-[var(--color-border)] border-y border-[var(--color-border)]">
               {listPosts.map((post) => (
                 <li key={post.id}>
-                  <PostRow post={post} onClick={() => showToast("준비 중입니다. 콘텐츠가 곧 공개됩니다.")} />
+                  <PostRow
+                    post={post}
+                    onClick={() =>
+                      showToast("준비 중입니다. 콘텐츠가 곧 공개됩니다.")
+                    }
+                  />
                 </li>
               ))}
             </ul>
@@ -261,10 +263,8 @@ function PostRow({
           {formatDate(post.publishedAt)}
         </span>
       </div>
-      <ArrowRight
+      <ArrowRightIcon
         size={18}
-        strokeWidth={2.2}
-        aria-hidden="true"
         className="shrink-0 text-[var(--color-ink-500)] transition-all group-hover:translate-x-1 group-hover:text-[var(--brand-green)]"
       />
     </button>

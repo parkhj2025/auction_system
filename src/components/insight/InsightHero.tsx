@@ -2,91 +2,79 @@
 
 import { useCallback, useEffect, useRef, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
-import { ArrowRight } from "lucide-react";
 import { INSIGHT_SLIDES, type InsightSlideCta } from "@/lib/insightMock";
+import { ArrowRightIcon } from "@/components/insight/icons";
 
-/* work-012 — /insight Hero 자동 슬라이드 banner (정정 영역 1).
- * 3 슬라이드 / sub 카피 0 / motion + setInterval 단독 (carousel 라이브러리 미사용).
- * 자동 전환 5초 default / hover·focus 시 일시정지 / dot indicator 하단 3개. */
+/* work-012 정정 2 — /insight Hero 자동 슬라이드 banner.
+ * 정정 영역 1: 박스화 (Liquid Glass) + 가운데 정렬 + max-w-7xl (page 전체 width NG).
+ * 보존: 3 슬라이드 / 카피 SoT / sub 카피 0 / motion + setInterval 5초 / dot indicator 3개.
+ * carousel 라이브러리 미사용 / 아이콘 라이브러리 미사용 (inline SVG). */
 
 const AUTO_MS = 5000;
 
-const THEME: Record<
-  string,
-  { bg: string; text: string; ctaBg: string; ctaText: string; deco: string }
-> = {
-  charcoal: {
-    bg: "#111418",
-    text: "#FFFFFF",
-    ctaBg: "var(--brand-green)",
-    ctaText: "#FFFFFF",
-    deco: "#00C853",
-  },
-  green: {
-    bg: "var(--brand-green)",
-    text: "#FFFFFF",
-    ctaBg: "#FFFFFF",
-    ctaText: "#111418",
-    deco: "#FFFFFF",
-  },
-  surface: {
-    bg: "var(--color-surface-muted)",
-    text: "#111418",
-    ctaBg: "var(--brand-green)",
-    ctaText: "#FFFFFF",
-    deco: "#00C853",
-  },
+/* Liquid Glass 박스 paradigm (사전 메인 Hero + TrustCTA 일관). */
+const GLASS_DARK = {
+  background:
+    "linear-gradient(135deg, rgba(255,255,255,0.10), rgba(255,255,255,0.05))",
+  backdropFilter: "blur(40px) saturate(180%)",
+  WebkitBackdropFilter: "blur(40px) saturate(180%)",
+  border: "1px solid rgba(255,255,255,0.18)",
+  boxShadow:
+    "inset 0 1px 0 rgba(255,255,255,0.25), 0 32px 80px -16px rgba(0,0,0,0.35)",
+};
+const GLASS_LIGHT = {
+  background:
+    "linear-gradient(135deg, rgba(255,255,255,0.55), rgba(255,255,255,0.30))",
+  backdropFilter: "blur(40px) saturate(180%)",
+  WebkitBackdropFilter: "blur(40px) saturate(180%)",
+  border: "1px solid rgba(255,255,255,0.6)",
+  boxShadow:
+    "inset 0 1px 0 rgba(255,255,255,0.7), 0 32px 80px -16px rgba(0,0,0,0.18)",
 };
 
-/* 슬라이드별 placeholder 일러스트 (단순 도형 / 사후 Gemini PNG 교체 paradigm). */
+/* 슬라이드별 placeholder 일러스트 (단순 도형 / 박스 안 가운데). */
 function SlideDecoration({ slideId, color }: { slideId: number; color: string }) {
   return (
-    <svg
-      viewBox="0 0 200 200"
-      className="h-full w-full"
-      aria-hidden="true"
-      fill="none"
-    >
+    <svg viewBox="0 0 200 200" className="h-full w-full" aria-hidden="true" fill="none">
       {slideId === 1 && (
         <>
-          <rect x="34" y="50" width="92" height="118" rx="8" stroke={color} strokeWidth="6" />
-          <line x1="52" y1="78" x2="108" y2="78" stroke={color} strokeWidth="6" strokeLinecap="round" />
-          <line x1="52" y1="100" x2="108" y2="100" stroke={color} strokeWidth="6" strokeLinecap="round" />
-          <line x1="52" y1="122" x2="88" y2="122" stroke={color} strokeWidth="6" strokeLinecap="round" />
-          <circle cx="140" cy="62" r="30" fill={color} opacity="0.18" />
+          <rect x="46" y="42" width="92" height="118" rx="8" stroke={color} strokeWidth="6" />
+          <line x1="64" y1="72" x2="120" y2="72" stroke={color} strokeWidth="6" strokeLinecap="round" />
+          <line x1="64" y1="96" x2="120" y2="96" stroke={color} strokeWidth="6" strokeLinecap="round" />
+          <line x1="64" y1="120" x2="100" y2="120" stroke={color} strokeWidth="6" strokeLinecap="round" />
+          <circle cx="146" cy="150" r="22" fill={color} opacity="0.22" />
         </>
       )}
       {slideId === 2 && (
         <>
           <circle cx="100" cy="100" r="58" stroke={color} strokeWidth="6" />
-          <path d="M84 100l12 12 24-28" stroke={color} strokeWidth="8" strokeLinecap="round" strokeLinejoin="round" />
-          <rect x="30" y="30" width="26" height="26" rx="6" fill={color} opacity="0.2" />
-          <rect x="148" y="146" width="34" height="34" rx="8" fill={color} opacity="0.2" />
+          <path d="M82 100l13 13 26-30" stroke={color} strokeWidth="9" strokeLinecap="round" strokeLinejoin="round" />
+          <rect x="28" y="30" width="24" height="24" rx="6" fill={color} opacity="0.22" />
+          <rect x="150" y="148" width="30" height="30" rx="7" fill={color} opacity="0.22" />
         </>
       )}
       {slideId === 3 && (
         <>
-          <circle cx="84" cy="84" r="40" stroke={color} strokeWidth="6" />
-          <line x1="112" y1="112" x2="156" y2="156" stroke={color} strokeWidth="8" strokeLinecap="round" />
-          <line x1="68" y1="84" x2="100" y2="84" stroke={color} strokeWidth="6" strokeLinecap="round" />
-          <line x1="84" y1="68" x2="84" y2="100" stroke={color} strokeWidth="6" strokeLinecap="round" />
+          <circle cx="88" cy="88" r="42" stroke={color} strokeWidth="6" />
+          <line x1="118" y1="118" x2="160" y2="160" stroke={color} strokeWidth="9" strokeLinecap="round" />
+          <line x1="70" y1="88" x2="106" y2="88" stroke={color} strokeWidth="6" strokeLinecap="round" />
+          <line x1="88" y1="70" x2="88" y2="106" stroke={color} strokeWidth="6" strokeLinecap="round" />
         </>
       )}
     </svg>
   );
 }
 
-export function InsightHero({
-  onCta,
-}: {
-  onCta: (cta: InsightSlideCta) => void;
-}) {
+export function InsightHero({ onCta }: { onCta: (cta: InsightSlideCta) => void }) {
   const reduced = useReducedMotion();
   const [index, setIndex] = useState(0);
   const [paused, setPaused] = useState(false);
   const len = INSIGHT_SLIDES.length;
 
-  const go = useCallback((next: number) => setIndex(((next % len) + len) % len), [len]);
+  const go = useCallback(
+    (next: number) => setIndex(((next % len) + len) % len),
+    [len]
+  );
 
   useEffect(() => {
     if (paused || reduced) return;
@@ -97,14 +85,18 @@ export function InsightHero({
   const touchStartX = useRef<number | null>(null);
 
   const slide = INSIGHT_SLIDES[index];
-  const theme = THEME[slide.theme];
+  const isDark = slide.tone === "dark";
+  const textColor = isDark ? "#FFFFFF" : "#111418";
+  const decoColor = isDark ? "#FFFFFF" : "#00C853";
+  const ctaBg = isDark ? "#FFFFFF" : "var(--brand-green)";
+  const ctaText = isDark ? "#111418" : "#FFFFFF";
 
   return (
     <section
       aria-label="경매 인사이트 주요 안내"
       aria-roledescription="carousel"
-      className="relative overflow-hidden"
-      style={{ backgroundColor: theme.bg }}
+      className="overflow-hidden transition-colors duration-500"
+      style={{ backgroundColor: slide.bg }}
       onMouseEnter={() => setPaused(true)}
       onMouseLeave={() => setPaused(false)}
       onFocusCapture={() => setPaused(true)}
@@ -122,74 +114,75 @@ export function InsightHero({
     >
       <h1 className="sr-only">경매 인사이트</h1>
 
-      <div className="container-app w-full">
+      <div className="mx-auto w-full max-w-7xl px-5 py-8 lg:py-12">
+        {/* Liquid Glass 박스 (page 전체 width NG / 좌우 margin). */}
         <AnimatePresence mode="wait">
           <motion.div
             key={slide.id}
-            initial={reduced ? false : { opacity: 0, x: 24 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={reduced ? { opacity: 0 } : { opacity: 0, x: -24 }}
+            initial={reduced ? false : { opacity: 0, y: 16 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={reduced ? { opacity: 0 } : { opacity: 0, y: -16 }}
             transition={{ duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
-            className="flex min-h-[280px] flex-col items-start justify-center gap-6 py-14 lg:min-h-[360px] lg:flex-row lg:items-center lg:justify-between lg:py-20"
+            style={isDark ? GLASS_DARK : GLASS_LIGHT}
+            className="flex min-h-[260px] flex-col items-center justify-center gap-5 rounded-[28px] px-6 py-7 text-center lg:min-h-[300px] lg:gap-6 lg:px-10 lg:py-8"
           >
-            <div className="max-w-xl">
-              <p
-                className="text-[28px] font-extrabold leading-[1.25] tracking-[-0.015em] [text-wrap:balance] lg:text-[44px]"
-                style={{ color: theme.text }}
-              >
-                {slide.copy}
-              </p>
-              <button
-                type="button"
-                onClick={() => onCta(slide.cta)}
-                className="mt-7 inline-flex items-center gap-2 rounded-xl px-6 py-3 text-[15px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 lg:text-[16px]"
-                style={{
-                  backgroundColor: theme.ctaBg,
-                  color: theme.ctaText,
-                  // ring offset 색 = 현재 슬라이드 bg 정합
-                  ["--tw-ring-offset-color" as string]: theme.bg,
-                }}
-              >
-                {slide.ctaLabel}
-                <ArrowRight size={18} strokeWidth={2.4} aria-hidden="true" />
-              </button>
-            </div>
-
             <div
               aria-hidden="true"
-              className="h-[120px] w-[120px] shrink-0 lg:h-[200px] lg:w-[200px]"
+              className="h-[88px] w-[88px] shrink-0 lg:h-[112px] lg:w-[112px]"
             >
-              <SlideDecoration slideId={slide.id} color={theme.deco} />
+              <SlideDecoration slideId={slide.id} color={decoColor} />
             </div>
+
+            <p
+              className="max-w-2xl text-[26px] font-extrabold leading-[1.25] tracking-[-0.015em] [text-wrap:balance] lg:text-[40px]"
+              style={{ color: textColor }}
+            >
+              {slide.copy}
+            </p>
+
+            <button
+              type="button"
+              onClick={() => onCta(slide.cta)}
+              className="inline-flex items-center gap-2 rounded-xl px-6 py-3 text-[15px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 lg:text-[16px]"
+              style={{
+                backgroundColor: ctaBg,
+                color: ctaText,
+                ["--tw-ring-offset-color" as string]: slide.bg,
+                ["--tw-ring-color" as string]: isDark ? "#FFFFFF" : "#00C853",
+              }}
+            >
+              {slide.ctaLabel}
+              <ArrowRightIcon size={18} />
+            </button>
           </motion.div>
         </AnimatePresence>
-      </div>
 
-      {/* dot indicator 하단 3개 + 현재 슬라이드 강조. */}
-      <div className="absolute bottom-5 left-0 right-0 flex justify-center gap-2.5 lg:bottom-7">
-        {INSIGHT_SLIDES.map((s, i) => {
-          const isActive = i === index;
-          return (
-            <button
-              key={s.id}
-              type="button"
-              onClick={() => go(i)}
-              aria-label={`${i + 1}번 슬라이드로 이동`}
-              aria-current={isActive ? "true" : undefined}
-              className="h-2.5 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
-              style={{
-                width: isActive ? 28 : 10,
-                backgroundColor: isActive
-                  ? theme.text
-                  : slide.theme === "surface"
-                    ? "rgba(17,20,24,0.25)"
-                    : "rgba(255,255,255,0.4)",
-                ["--tw-ring-offset-color" as string]: theme.bg,
-                ["--tw-ring-color" as string]: theme.text,
-              }}
-            />
-          );
-        })}
+        {/* dot indicator 하단 3개 + 현재 슬라이드 강조. */}
+        <div className="mt-5 flex justify-center gap-2.5">
+          {INSIGHT_SLIDES.map((s, i) => {
+            const isActive = i === index;
+            return (
+              <button
+                key={s.id}
+                type="button"
+                onClick={() => go(i)}
+                aria-label={`${i + 1}번 슬라이드로 이동`}
+                aria-current={isActive ? "true" : undefined}
+                className="h-2.5 rounded-full transition-all focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2"
+                style={{
+                  width: isActive ? 28 : 10,
+                  backgroundColor: isActive
+                    ? textColor
+                    : isDark
+                      ? "rgba(255,255,255,0.4)"
+                      : "rgba(17,20,24,0.25)",
+                  ["--tw-ring-offset-color" as string]: slide.bg,
+                  ["--tw-ring-color" as string]: textColor,
+                }}
+              />
+            );
+          })}
+        </div>
       </div>
     </section>
   );
