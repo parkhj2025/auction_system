@@ -1,5 +1,4 @@
 import {
-  INSIGHT_HERO_COPY,
   categoryLabel,
   formatDate,
   type InsightMockPost,
@@ -7,10 +6,12 @@ import {
 import { Thumbnail } from "@/components/insight/Thumbnail";
 import { ArrowRightIcon } from "@/components/insight/icons";
 
-/* work-012 정정 4 — /insight Hero 영역.
- * Liquid Glass 박스 + 가운데 정렬 폐기 → green primary bg + 좌우 분기 paradigm.
- * bg = green primary 단독 (그라데이션 0) / 데스크탑 grid 2-col / 모바일 flex-col.
- * 좌 = Hero 문구 (white / Insight h2 SoT v42.4) / 우 = Editor's Pick 카드 (외관 보존). */
+/* work-012 정정 5 — /insight Hero 영역.
+ * 정정 4 paradigm 보존 (green primary bg + 좌우 분기 + 우측 카드).
+ * 정정 5: Hero 높이 절반 축소 + 좌측 = 칩 2건 + 메인타이틀 + 서브타이틀 + 마침표 yellow.
+ * 칩 = §A-24 권한 = Hero eyebrow 칩 단독 예외 (콘텐츠 list + 카드 안 chip 영구 폐기 일관). */
+
+const ACCENT_YELLOW = "#FFD43B";
 
 export function InsightHero({
   editorsPick,
@@ -21,12 +22,34 @@ export function InsightHero({
 }) {
   return (
     <section className="bg-[var(--brand-green)]">
-      <div className="mx-auto w-full max-w-7xl px-5 py-10 lg:py-14">
-        <div className="flex flex-col gap-8 lg:grid lg:grid-cols-2 lg:items-center lg:gap-12">
-          {/* 좌측 = Hero 문구 (white / CTA 0). */}
-          <h1 className="max-w-xl text-[28px] font-extrabold leading-[1.25] tracking-[-0.015em] text-white [text-wrap:balance] lg:text-[44px]">
-            {INSIGHT_HERO_COPY}
-          </h1>
+      <div className="mx-auto w-full max-w-7xl px-5 py-6 lg:py-8">
+        <div className="flex flex-col gap-7 lg:grid lg:grid-cols-2 lg:items-center lg:gap-12">
+          {/* 좌측 = 칩 2건 + 메인타이틀 + 서브타이틀 (white / CTA 0). */}
+          <div className="flex max-w-xl flex-col gap-3.5 lg:gap-4">
+            <div className="flex flex-wrap gap-2">
+              <span
+                className="rounded-full px-3 py-1 text-xs font-semibold text-[#111418]"
+                style={{ backgroundColor: ACCENT_YELLOW }}
+              >
+                Editor&apos;s Pick
+              </span>
+              <span
+                className="rounded-full px-3 py-1 text-xs font-semibold text-[#111418]"
+                style={{ backgroundColor: ACCENT_YELLOW }}
+              >
+                매주 업데이트
+              </span>
+            </div>
+
+            <h1 className="text-[28px] font-extrabold leading-[1.25] tracking-[-0.015em] text-white [text-wrap:balance] lg:text-[44px]">
+              분석 자료까지,{" "}
+              <span style={{ color: ACCENT_YELLOW }}>무료로 드립니다.</span>
+            </h1>
+
+            <p className="text-[15px] leading-relaxed text-white lg:text-[18px]">
+              경매 입찰 전 알아야 할 모든 자료를 한 곳에 모았습니다.
+            </p>
+          </div>
 
           {/* 우측 = Editor's Pick 대표 article 카드 (featured:true 단독 / 외관 보존). */}
           <button

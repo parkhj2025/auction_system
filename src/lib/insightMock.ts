@@ -364,8 +364,5 @@ export function getEditorsPick(): InsightMockPost {
   );
 }
 
-/* Hero 고정 카피 (정정 3 영역 1): 메인 Insight h2 SoT v42.4 직접 사용. */
-export const INSIGHT_HERO_COPY = "분석 자료까지, 무료로 드립니다.";
-
 /* 콘텐츠 list 페이지네이션 (정정 3 영역 4): 10건 / 페이지. */
 export const INSIGHT_PAGE_SIZE = 10;
