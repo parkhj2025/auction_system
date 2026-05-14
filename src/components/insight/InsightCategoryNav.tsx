@@ -10,9 +10,10 @@ import {
 } from "@/lib/insightMock";
 import { ChevronRightIcon } from "@/components/insight/icons";
 
-/* work-012 정정 2 — /insight 카테고리 nav.
- * 정정 영역 3: 4 독립 + 1 그룹("무료 물건분석") + 그룹 클릭 = sub nav 펼침 (하위 8건).
- * 아이콘 = Gemini PNG (next/image / 아이콘 라이브러리 미사용). "전체보기" 우측 끝. */
+/* work-012 정정 3 — /insight 카테고리 nav.
+ * 정정 영역 3: 5 카테고리 가운데 정렬 + "전체보기" 우측 끝.
+ * 구조 보존: 4 독립 + 1 그룹("무료 물건분석") + 그룹 클릭 = sub nav 펼침 (하위 8건).
+ * 아이콘 = Gemini PNG 풀컬러 (next/image / 아이콘 라이브러리 미사용). */
 
 function IconTile({
   slug,
@@ -63,9 +64,9 @@ export function InsightCategoryNav({
       className="border-b border-[var(--color-border)] bg-white"
     >
       <div className="mx-auto w-full max-w-7xl px-5">
-        {/* 메인 nav: 그룹 1 + 독립 4 + 전체보기. */}
-        <div className="flex items-center gap-5 overflow-x-auto py-6 lg:justify-between lg:gap-2">
-          <ul className="flex shrink-0 items-start gap-5 lg:gap-3">
+        {/* 메인 nav: 5 카테고리 가운데 정렬 + 전체보기 우측 끝. */}
+        <div className="relative">
+          <ul className="flex justify-start gap-5 overflow-x-auto py-6 pr-24 lg:justify-center lg:gap-4">
             {INSIGHT_NAV.map((item) => {
               const isGroup = item.kind === "group";
               const isActive = isGroup ? expanded : active === item.slug;
@@ -119,7 +120,7 @@ export function InsightCategoryNav({
             onClick={() => onSelect("all")}
             aria-pressed={active === "all"}
             className={
-              "flex shrink-0 items-center gap-1 self-center rounded-lg px-3 py-2 text-[13px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/45 focus-visible:ring-offset-2 lg:text-[14px] " +
+              "absolute right-0 top-1/2 flex -translate-y-1/2 items-center gap-1 rounded-lg bg-white px-3 py-2 text-[13px] font-bold transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/45 focus-visible:ring-offset-2 lg:text-[14px] " +
               (active === "all"
                 ? "text-[var(--brand-green)]"
                 : "text-[var(--color-ink-500)] hover:text-[#111418]")
@@ -140,7 +141,7 @@ export function InsightCategoryNav({
               transition={{ duration: 0.32, ease: [0.16, 1, 0.3, 1] }}
               className="overflow-hidden"
             >
-              <ul className="flex items-start gap-4 overflow-x-auto border-t border-[var(--color-border)] py-5 lg:gap-5">
+              <ul className="flex justify-start gap-4 overflow-x-auto border-t border-[var(--color-border)] py-5 lg:justify-center lg:gap-5">
                 {group.children.map((sub) => {
                   const isActive = active === sub.slug;
                   return (

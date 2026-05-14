@@ -1,65 +1,39 @@
 "use client";
 
 import { useCallback, useMemo, useRef, useState } from "react";
-import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
 import { AnimatePresence, motion } from "motion/react";
 import {
   ALL_CAT_SLUGS,
   INSIGHT_MOCK_POSTS,
+  INSIGHT_PAGE_SIZE,
   categoryLabel,
+  formatDate,
   getEditorsPick,
-  iconPath,
   isAnalysisSub,
   sortedPosts,
   type InsightMockPost,
-  type InsightSlideCta,
   type NavSelection,
 } from "@/lib/insightMock";
 import { InsightHero } from "@/components/insight/InsightHero";
 import { InsightCategoryNav } from "@/components/insight/InsightCategoryNav";
-import { ArrowRightIcon } from "@/components/insight/icons";
+import { Thumbnail } from "@/components/insight/Thumbnail";
+import { ArrowRightIcon, ChevronRightIcon } from "@/components/insight/icons";
 
-/* work-012 정정 2 — /insight orchestrator.
- * Hero(Liquid Glass 박스) + 카테고리 nav(5 + sub nav) + 1-col 콘텐츠 list + Editor's Pick.
- * 카테고리 클릭 = ?cat= 쿼리 (별개 page 진입 0) / mock 진입 = "준비 중" toast.
+/* work-012 정정 3 — /insight orchestrator.
+ * Hero(고정 paradigm / Editor's Pick 카드) + 카테고리 nav(가운데 정렬 + sub nav)
+ *   + 1-col 콘텐츠 list + 페이지네이션(10건/페이지).
+ * 카테고리 클릭 = ?cat= / 페이지 = ?page= / mock 진입 = "준비 중" toast.
  * carousel 라이브러리 미사용 / 신규 npm 0 / INSIGHT 색 토큰 0 / chip 패턴 0 / 아이콘 라이브러리 미사용. */
 
-function formatDate(iso: string): string {
-  const d = new Date(iso);
-  if (Number.isNaN(d.getTime())) return iso;
-  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(
-    d.getDate()
-  ).padStart(2, "0")}`;
-}
+const TOAST_MSG = "준비 중입니다. 콘텐츠가 곧 공개됩니다.";
 
-/* 썸네일 placeholder (120×80 / gray + 카테고리 Gemini PNG). */
-function Thumbnail({
-  category,
-  large,
-}: {
-  category: string;
-  large?: boolean;
-}) {
-  return (
-    <div
-      aria-hidden="true"
-      className={
-        "flex shrink-0 items-center justify-center overflow-hidden rounded-lg bg-[var(--color-ink-100)] " +
-        (large
-          ? "aspect-[16/9] w-full lg:aspect-auto lg:h-[200px] lg:w-[320px]"
-          : "h-[80px] w-[120px]")
-      }
-    >
-      <Image
-        src={iconPath(category)}
-        alt=""
-        width={large ? 200 : 120}
-        height={large ? 200 : 120}
-        className={large ? "h-[78%] w-auto object-contain" : "h-[78%] w-auto object-contain"}
-      />
-    </div>
-  );
+function buildUrl(cat: NavSelection, page: number): string {
+  const params = new URLSearchParams();
+  if (cat !== "all") params.set("cat", cat);
+  if (page > 1) params.set("page", String(page));
+  const qs = params.toString();
+  return qs ? `/insight?${qs}` : "/insight";
 }
 
 export function InsightHubLayout() {
@@ -87,28 +61,6 @@ export function InsightHubLayout() {
     });
   }, []);
 
-  const selectCategory = useCallback(
-    (next: NavSelection) => {
-      const target = next === "all" ? "/insight" : `/insight?cat=${next}`;
-      router.push(target, { scroll: false });
-    },
-    [router]
-  );
-
-  const onHeroCta = useCallback(
-    (cta: InsightSlideCta) => {
-      if (cta === "scroll-list") {
-        scrollToList();
-      } else if (cta === "featured") {
-        showToast("준비 중입니다. 콘텐츠가 곧 공개됩니다.");
-      } else if (cta === "cat-glossary") {
-        selectCategory("glossary");
-        scrollToList();
-      }
-    },
-    [scrollToList, showToast, selectCategory]
-  );
-
   const editorsPick = useMemo(() => getEditorsPick(), []);
 
   const filteredPosts = useMemo(() => {
@@ -119,21 +71,42 @@ export function InsightHubLayout() {
     return INSIGHT_MOCK_POSTS.filter((p) => p.category === active);
   }, [active]);
 
-  const listPosts = useMemo(() => {
-    const base =
-      active === "all"
-        ? filteredPosts.filter((p) => p.id !== editorsPick.id)
-        : filteredPosts;
-    return sortedPosts(base);
-  }, [active, filteredPosts, editorsPick.id]);
+  const sorted = useMemo(() => sortedPosts(filteredPosts), [filteredPosts]);
+  const totalCount = sorted.length;
+  const totalPages = Math.max(1, Math.ceil(totalCount / INSIGHT_PAGE_SIZE));
 
-  const totalCount = filteredPosts.length;
+  const rawPage = Number(searchParams.get("page")) || 1;
+  const page = Math.min(Math.max(1, rawPage), totalPages);
+
+  const pagePosts = sorted.slice(
+    (page - 1) * INSIGHT_PAGE_SIZE,
+    page * INSIGHT_PAGE_SIZE
+  );
+
+  const selectCategory = useCallback(
+    (next: NavSelection) => {
+      router.push(buildUrl(next, 1), { scroll: false });
+    },
+    [router]
+  );
+
+  const selectPage = useCallback(
+    (next: number) => {
+      router.push(buildUrl(active, next), { scroll: false });
+      scrollToList();
+    },
+    [router, active, scrollToList]
+  );
+
   const sectionTitle =
     active === "all" ? "전체 인사이트" : categoryLabel(active);
 
   return (
     <main className="flex flex-1 flex-col">
-      <InsightHero onCta={onHeroCta} />
+      <InsightHero
+        editorsPick={editorsPick}
+        onCardClick={() => showToast(TOAST_MSG)}
+      />
 
       <InsightCategoryNav active={active} onSelect={selectCategory} />
 
@@ -152,58 +125,12 @@ export function InsightHubLayout() {
             </p>
           </div>
 
-          {/* Editor's Pick (전체 보기 시 단독 / featured:true article). */}
-          {active === "all" && (
-            <button
-              type="button"
-              onClick={() =>
-                showToast("준비 중입니다. 콘텐츠가 곧 공개됩니다.")
-              }
-              className="group mt-7 flex w-full flex-col gap-5 overflow-hidden rounded-2xl border border-[var(--color-border)] bg-white p-4 text-left transition-colors hover:border-[var(--brand-green)]/40 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/45 focus-visible:ring-offset-2 lg:flex-row lg:items-center lg:gap-7 lg:p-6"
-            >
-              <Thumbnail category={editorsPick.category} large />
-              <div className="flex flex-1 flex-col gap-2.5">
-                <div className="flex items-center gap-2">
-                  <span className="rounded-md bg-[var(--brand-green)] px-2.5 py-1 text-[11px] font-bold text-white">
-                    Editor&apos;s Pick
-                  </span>
-                  <span className="text-[12px] font-semibold text-[var(--color-ink-500)] lg:text-[13px]">
-                    {categoryLabel(editorsPick.category)}
-                  </span>
-                </div>
-                <h3 className="text-[20px] font-extrabold leading-snug tracking-[-0.01em] text-[#111418] lg:text-[26px]">
-                  {editorsPick.title}
-                </h3>
-                <p className="text-[14px] leading-relaxed text-[var(--color-ink-500)] lg:text-[16px]">
-                  {editorsPick.preview}
-                </p>
-                <div className="mt-1 flex items-center justify-between gap-3">
-                  <span className="text-[12px] font-medium text-[var(--color-ink-500)] lg:text-[13px]">
-                    {formatDate(editorsPick.publishedAt)}
-                  </span>
-                  <span className="inline-flex items-center gap-1 text-[13px] font-bold text-[var(--brand-green)]">
-                    자세히 보기
-                    <ArrowRightIcon
-                      size={16}
-                      className="transition-transform group-hover:translate-x-1"
-                    />
-                  </span>
-                </div>
-              </div>
-            </button>
-          )}
-
-          {/* 콘텐츠 list = 1-col 세로 list (정정 영역 3 보존). */}
-          {listPosts.length > 0 ? (
+          {/* 콘텐츠 list = 1-col 세로 list. */}
+          {pagePosts.length > 0 ? (
             <ul className="mt-8 flex flex-col divide-y divide-[var(--color-border)] border-y border-[var(--color-border)]">
-              {listPosts.map((post) => (
+              {pagePosts.map((post) => (
                 <li key={post.id}>
-                  <PostRow
-                    post={post}
-                    onClick={() =>
-                      showToast("준비 중입니다. 콘텐츠가 곧 공개됩니다.")
-                    }
-                  />
+                  <PostRow post={post} onClick={() => showToast(TOAST_MSG)} />
                 </li>
               ))}
             </ul>
@@ -212,10 +139,45 @@ export function InsightHubLayout() {
               아직 콘텐츠가 없습니다.
             </p>
           )}
+
+          {/* 페이지네이션 (10건/페이지 / 페이지 번호 단독 / 무한 scroll·더 보기 0). */}
+          {totalPages > 1 && (
+            <div className="mt-10 flex items-center justify-center gap-1.5">
+              <PageButton
+                label="이전"
+                disabled={page === 1}
+                onClick={() => selectPage(page - 1)}
+                direction="prev"
+              />
+              {Array.from({ length: totalPages }, (_, i) => i + 1).map((n) => (
+                <button
+                  key={n}
+                  type="button"
+                  onClick={() => selectPage(n)}
+                  aria-label={`${n}페이지`}
+                  aria-current={n === page ? "page" : undefined}
+                  className={
+                    "h-9 min-w-9 rounded-lg px-2 text-[14px] font-bold tabular-nums transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/45 focus-visible:ring-offset-2 " +
+                    (n === page
+                      ? "bg-[var(--brand-green)] text-white"
+                      : "text-[var(--color-ink-500)] hover:bg-[var(--color-surface-muted)] hover:text-[#111418]")
+                  }
+                >
+                  {n}
+                </button>
+              ))}
+              <PageButton
+                label="다음"
+                disabled={page === totalPages}
+                onClick={() => selectPage(page + 1)}
+                direction="next"
+              />
+            </div>
+          )}
         </div>
       </section>
 
-      {/* mock 진입 toast (정정 영역 5 / "준비 중"). */}
+      {/* mock 진입 toast ("준비 중"). */}
       <AnimatePresence>
         {toast && (
           <motion.div
@@ -232,6 +194,34 @@ export function InsightHubLayout() {
         )}
       </AnimatePresence>
     </main>
+  );
+}
+
+function PageButton({
+  label,
+  disabled,
+  onClick,
+  direction,
+}: {
+  label: string;
+  disabled: boolean;
+  onClick: () => void;
+  direction: "prev" | "next";
+}) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      disabled={disabled}
+      aria-label={`${label} 페이지`}
+      className="flex h-9 items-center gap-0.5 rounded-lg px-2.5 text-[13px] font-bold text-[var(--color-ink-500)] transition-colors hover:bg-[var(--color-surface-muted)] hover:text-[#111418] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/45 focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-35 disabled:hover:bg-transparent disabled:hover:text-[var(--color-ink-500)]"
+    >
+      {direction === "prev" && (
+        <ChevronRightIcon size={15} className="rotate-180" />
+      )}
+      {label}
+      {direction === "next" && <ChevronRightIcon size={15} />}
+    </button>
   );
 }
 

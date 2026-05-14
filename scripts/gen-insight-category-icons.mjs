@@ -1,8 +1,8 @@
-/* work-012 정정 2 — /insight 카테고리 아이콘 13건 Gemini PNG 산출.
+/* work-012 정정 3 — /insight 카테고리 아이콘 13건 Gemini PNG 풀컬러 재산출.
  * 4 독립 + 1 그룹 + 8 하위 = 13건. 출력 = public/illustrations/insight/{slug}.png.
  * 실행: node --env-file=.env.local scripts/gen-insight-category-icons.mjs
- * 색 = 브랜드 팔레트 단독 (green primary / yellow accent / charcoal / white / grey).
- *      오렌지·레드·퍼플·블루 금지 (CLAUDE.md §13 절대 규칙 정합). */
+ * 색 = 풀컬러 (네이버 가격비교 사진 일관 / 선명 컬러 + 플랫 일러스트).
+ *      일러스트 자체 색 ≠ 페이지 색 토큰 = 분리 paradigm (형준님 정정 3 직접 의뢰). */
 
 import { GoogleGenAI } from "@google/genai";
 import { mkdir, writeFile } from "node:fs/promises";
@@ -17,13 +17,12 @@ if (!apiKey) {
 const ai = new GoogleGenAI({ apiKey });
 
 const STYLE = [
-  "flat 3D minimalist icon illustration, single centered object, square 1:1 composition",
+  "vibrant full-color flat 3D illustration, single centered object, square 1:1 composition",
+  "rich saturated cheerful colors — blues, greens, oranges, yellows, reds, warm neutrals all welcome where they look natural",
   "pure white background",
-  "brand color palette ONLY: vibrant green #00C853 as the dominant color, deep green #009640 for shadows and depth, small yellow #FFD43B accents only, dark charcoal #111418 for fine details and outlines, plus white and neutral grey",
-  "solid flat colors, soft cast shadow underneath the object",
-  "friendly clean shapes, Naver-shopping-style cute icon aesthetic",
-  "NO gradient background, NO text, NO letters, NO numbers, NO logos",
-  "absolutely NO orange, NO red, NO coral, NO purple, NO blue, NO pink",
+  "clean solid flat colors, smooth rounded shapes, soft cast shadow underneath the object",
+  "Naver-shopping-style cute friendly icon illustration, consistent rendering style across the whole set",
+  "NO gradient background, NO text, NO letters, NO numbers, NO logos, NO photographic realism",
 ].join(", ");
 
 const ITEMS = [
@@ -31,69 +30,68 @@ const ITEMS = [
   {
     slug: "analysis",
     subject:
-      "a green magnifying glass examining a small white house with a tiny yellow price tag attached",
+      "a magnifying glass examining a small cute house with a price tag attached to it",
   },
   // ── 독립 4건 ──
   {
     slug: "process",
     subject:
-      "three ascending green steps with a small yellow flag planted on the top step",
+      "three ascending steps with a small flag planted on the top step",
   },
   {
     slug: "glossary",
     subject:
-      "an open green book lying flat with a yellow bookmark ribbon and a tiny white house resting on the pages",
+      "an open book lying flat with a bookmark ribbon and a tiny cute house resting on the pages",
   },
   {
     slug: "data",
     subject:
-      "a simple green bar chart of four rising bars with a small yellow upward arrow above them",
+      "a simple bar chart of four rising bars with a small upward arrow above them",
   },
   {
     slug: "guide",
-    subject:
-      "a green compass with a yellow needle pointing to the upper right",
+    subject: "a classic compass with the needle pointing to the upper right",
   },
   // ── 하위 8건 ──
   {
     slug: "apartment",
     subject:
-      "a tall modern green high-rise apartment tower with many small white windows",
+      "a tall modern high-rise apartment tower with many small windows",
   },
   {
     slug: "officetel",
     subject:
-      "a sleek narrow modern mixed-use building, green facade with white window grid, slightly glossy",
+      "a sleek narrow modern mixed-use officetel building with a glossy window grid facade",
   },
   {
     slug: "villa",
     subject:
-      "a low-rise four-storey green multi-unit residential building with a small white entrance",
+      "a low-rise four-storey multi-unit residential villa building with a small entrance",
   },
   {
     slug: "house",
     subject:
-      "a single detached green house with a triangular roof, one chimney and a small yard",
+      "a single detached house with a triangular roof, one chimney and a small front yard",
   },
   {
     slug: "dagagu",
     subject:
-      "a medium green house building with three separate white doors at street level showing multiple households",
+      "a medium house building with three separate doors at street level showing multiple households",
   },
   {
     slug: "dasedae",
     subject:
-      "a compact green three-storey small apartment block with white balconies on each floor",
+      "a compact three-storey small apartment block with a balcony on each floor",
   },
   {
     slug: "store",
     subject:
-      "a green storefront shop with a striped white-and-grey awning and a wide white display window",
+      "a cheerful storefront shop with a striped awning and a wide display window",
   },
   {
     slug: "etc",
     subject:
-      "a green open folder containing three small white building shapes of different kinds",
+      "an open folder containing three small building shapes of different kinds",
   },
 ];
 

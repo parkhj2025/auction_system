@@ -346,7 +346,17 @@ export function sortedPosts(posts: InsightMockPost[]): InsightMockPost[] {
   return [...posts].sort((a, b) => b.publishedAt.localeCompare(a.publishedAt));
 }
 
-/* Editor's Pick (정정 영역 4): featured:true 단독 → fallback = 최신. */
+/* 날짜 표기 = YYYY.MM.DD. */
+export function formatDate(iso: string): string {
+  const d = new Date(iso);
+  if (Number.isNaN(d.getTime())) return iso;
+  return `${d.getFullYear()}.${String(d.getMonth() + 1).padStart(2, "0")}.${String(
+    d.getDate()
+  ).padStart(2, "0")}`;
+}
+
+/* Editor's Pick (정정 3 영역 1): featured:true 단독 → fallback = 최신.
+ * Hero 안 대표 article 카드로 직접 노출. 사전 정정 2 villa-01 채택 보존. */
 export function getEditorsPick(): InsightMockPost {
   return (
     INSIGHT_MOCK_POSTS.find((p) => p.featured) ??
@@ -354,42 +364,8 @@ export function getEditorsPick(): InsightMockPost {
   );
 }
 
-/* Hero 자동 슬라이드 (정정 영역 1 보존). sub 카피 0. CTA 진입 대상 정확. */
-export type InsightSlideCta = "scroll-list" | "featured" | "cat-glossary";
+/* Hero 고정 카피 (정정 3 영역 1): 메인 Insight h2 SoT v42.4 직접 사용. */
+export const INSIGHT_HERO_COPY = "분석 자료까지, 무료로 드립니다.";
 
-export type InsightSlide = {
-  id: number;
-  copy: string;
-  ctaLabel: string;
-  cta: InsightSlideCta;
-  /* dark = 슬라이드 bg 어두움 (charcoal/green) / light = 밝음 (surface). */
-  tone: "dark" | "light";
-  bg: string;
-};
-
-export const INSIGHT_SLIDES: InsightSlide[] = [
-  {
-    id: 1,
-    copy: "필요한 분석 자료, 모두 무료입니다.",
-    ctaLabel: "분석 자료 둘러보기",
-    cta: "scroll-list",
-    tone: "dark",
-    bg: "#111418",
-  },
-  {
-    id: 2,
-    copy: "지금 봐야 할 분석 자료.",
-    ctaLabel: "지금 보러 가기",
-    cta: "featured",
-    tone: "dark",
-    bg: "var(--brand-green)",
-  },
-  {
-    id: 3,
-    copy: "헷갈리는 경매 용어, 정확하게 정리했습니다.",
-    ctaLabel: "용어 정리 보기",
-    cta: "cat-glossary",
-    tone: "light",
-    bg: "var(--color-surface-muted)",
-  },
-];
+/* 콘텐츠 list 페이지네이션 (정정 3 영역 4): 10건 / 페이지. */
+export const INSIGHT_PAGE_SIZE = 10;
