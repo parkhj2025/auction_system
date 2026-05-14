@@ -1,23 +1,21 @@
 import type { Metadata } from "next";
 import { Suspense } from "react";
-import { InsightHubLayout } from "@/components/home/InsightHubLayout";
-import { getActiveInsightPosts } from "@/lib/content";
+import { InsightHubLayout } from "@/components/insight/InsightHubLayout";
 
-/* Phase 1.2 (A-1-2) v38 — /insight Topic Gateway hub (Hybrid paradigm).
- * paradigm: Hero (gray) + 본문 (white) + URL 쿼리 ?cat={slug} + Editor's Pick + 콘텐츠 list.
- * Suspense 광역 (useSearchParams CSR 광역 정합). */
+/* work-012 — /insight 풀 신규 재제작.
+ * Hero 자동 슬라이드 + 6 카테고리 nav + 1-col 콘텐츠 list + Editor's Pick.
+ * mock 데이터 단독 (Phase 1 = 콘텐츠 부재). Suspense = useSearchParams CSR 정합. */
 
 export const metadata: Metadata = {
   title: "경매 인사이트",
   description:
-    "물건분석 · 가이드 · 용어 · 뉴스 — 경매 가이드부터 시장 동향까지, 한 페이지에서.",
+    "경매 과정·용어·물건 분석·빅데이터 — 헷갈리는 경매를 정확하게 정리했습니다.",
 };
 
 export default function InsightHubPage() {
-  const allPosts = getActiveInsightPosts();
   return (
     <Suspense fallback={null}>
-      <InsightHubLayout allPosts={allPosts} />
+      <InsightHubLayout />
     </Suspense>
   );
 }
