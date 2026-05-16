@@ -1437,63 +1437,57 @@ async function publishOne(caseNumber, args) {
  *  출력: content/guide/<slug>.mdx 단독 (meta.json/audit.json 부재 사실)
  * ════════════════════════════════════════════════════════════════════════════ */
 
-const GUIDE_SUPERVISOR_SYSTEM_PROMPT = `당신은 부동산 경매 가이드 콘텐츠의 2차 감시자입니다.
+/* 단계 2 정정 (work-012) — Cowork 시작점 무결성 룰 정합.
+ *  책임 3 (어휘 순화) = 가이드 분기 영구 폐기 (본문 자동 변경 NG).
+ *  책임 5 (금지 어휘) = 검출 단독 + 자동 치환 NG.
+ *  검출 시점 = CLI stdout 명시 + 종료 코드 2 (룰 위반).
+ *  raw-content 안 본문 정정 = 형준님 단독 영역 (Cowork 산출 변경 = 형준님 의뢰 단독).
+ */
+const GUIDE_SUPERVISOR_SYSTEM_PROMPT = `당신은 부동산 경매 가이드 콘텐츠의 금지 어휘 검출기입니다.
 
 입력으로 콘텐츠 본문 전체 + 라우트 컨텍스트 (slug)가 주어집니다.
 
-판단 책임 2건:
+판단 책임 1건:
 
-[책임 3 — 어휘 순화]
-- 부동산 일반 투자자가 잘 사용하지 않는 비표준 전문용어 식별
-- 일반어로 치환 또는 자연스럽게 삭제
-- 허용 어휘 (변경 금지): LTV, DSR, 갭투자, 매각가율, 근저당권, 말소기준등기, 임의경매, 강제경매, 공유자 우선매수권, 가처분, 임차인 대항력, 권리분석, 매수신청, 매각기일, 매각공고, 최저매각가격, 매각물건명세서, 현황조사서, 감정평가서, 인도명령, 배당요구 종기, 경매개시결정, 사건번호, 물건번호
+[책임 5 — 금지 어휘 검출 단독]
+- 분류·판정 어휘 (위험·매력·함정·교훈·안전·적합한·교보재·투자매력·추천·꿀매물) 본문 잔존 사실 검출
+- 데이터 처리 어휘 (PDF 첨부·두인옥션·추출한·파싱한·원천 자료·data 폴더·백엔드·파이프라인) 잔존 사실 검출
+- 검출 단독. 본문 정정·치환 영구 NG.
 
-[책임 5 — 금지 어휘 검증]
-- 분류·판정 어휘 (위험·매력·함정·교훈·안전·적합한·교보재·투자매력·추천·꿀매물) 본문 잔존 시 자연스럽게 삭제 또는 사실 기반 표현으로 교체
-- 데이터 처리 어휘 (PDF 첨부·두인옥션·추출한·파싱한·원천 자료·data 폴더·백엔드·파이프라인) 잔존 시 삭제
-- 위 어휘 신규 도입 절대 금지
-
-산문 톤·문장 구조 유지. 단어만 교체.
+본문 변경 paradigm 영구 폐기 사실. adjustedBody 필드 영구 부재. raw-content 본문 = 형준님 단독 정정 영역.
 
 반환 형식 (JSON 단일 객체. 다른 텍스트·코드블록 0):
 {
-  "status": "pass" | "adjusted",
-  "adjustedBody": "전체 본문 (수정 반영, status=adjusted 일 때만. status=pass 시 빈 문자열)",
-  "adjustments": [
+  "status": "pass" | "violations",
+  "violations": [
     {
-      "category": "vocabulary" | "forbidden_term",
-      "before": "...",
-      "after": "...",
-      "reason": "..."
+      "term": "검출 어휘",
+      "context": "어휘 전후 30자 본문 발췌",
+      "reason": "검출 사유"
     }
   ]
 }
 
-조정 0 건이면 status=pass, adjustedBody="", adjustments=[].`;
+검출 0 건이면 status=pass, violations=[].`;
 
 const GUIDE_SUPERVISOR_RESPONSE_SCHEMA = {
   type: "object",
   properties: {
-    status: { type: "string", enum: ["pass", "adjusted"] },
-    adjustedBody: { type: "string" },
-    adjustments: {
+    status: { type: "string", enum: ["pass", "violations"] },
+    violations: {
       type: "array",
       items: {
         type: "object",
         properties: {
-          category: {
-            type: "string",
-            enum: ["vocabulary", "forbidden_term"],
-          },
-          before: { type: "string" },
-          after: { type: "string" },
+          term: { type: "string" },
+          context: { type: "string" },
           reason: { type: "string" },
         },
-        required: ["category", "before", "after", "reason"],
+        required: ["term", "context", "reason"],
       },
     },
   },
-  required: ["status", "adjustedBody", "adjustments"],
+  required: ["status", "violations"],
 };
 
 async function supervisorGuideContent({ body, slug }) {
@@ -1511,8 +1505,8 @@ async function supervisorGuideContent({ body, slug }) {
     `본문 (post.md body):\n` +
     `${body}\n\n` +
     `[출력 형식 강제]\n` +
-    `- adjustments 배열에 변경 항목 기록.\n` +
-    `- 본문 톤·문장 구조 유지. 단어 단독 교체.`;
+    `- violations 배열에 검출 항목 기록.\n` +
+    `- 본문 정정·치환 영구 NG. 검출 단독.`;
 
   const reqBody = {
     systemInstruction: {
@@ -1570,21 +1564,18 @@ async function supervisorGuideContent({ body, slug }) {
     );
   }
 
-  const status = parsed.status === "adjusted" ? "adjusted" : "pass";
-  const adjustedBody =
-    typeof parsed.adjustedBody === "string" ? parsed.adjustedBody : "";
-  const adjustments = Array.isArray(parsed.adjustments)
-    ? parsed.adjustments
-        .filter((a) => a && typeof a === "object")
-        .map((a) => ({
-          category: String(a.category ?? ""),
-          before: String(a.before ?? ""),
-          after: String(a.after ?? ""),
-          reason: String(a.reason ?? ""),
+  const status = parsed.status === "violations" ? "violations" : "pass";
+  const violations = Array.isArray(parsed.violations)
+    ? parsed.violations
+        .filter((v) => v && typeof v === "object")
+        .map((v) => ({
+          term: String(v.term ?? ""),
+          context: String(v.context ?? ""),
+          reason: String(v.reason ?? ""),
         }))
     : [];
 
-  return { status, adjustedBody, adjustments };
+  return { status, violations };
 }
 
 /* H1 추출 — post.md 첫 줄 "^# " 정규식 매칭. */
@@ -1672,33 +1663,33 @@ async function handleGuidePublish(args) {
   }
   if (args.verbose) console.log(`  ✓ FORBIDDEN_WORDS 통과`);
 
-  // [5] Gemini 감수 (책임 3 + 5 단독)
-  console.log(`[5] 콘텐츠 2차 감시 (Gemini 3.1 Pro — 가이드 분기)`);
-  let bodyForOutput = originalBody;
-  let adjustments = [];
+  // [5] Gemini 금지 어휘 검출 (책임 5 단독 / 본문 변경 paradigm 영구 폐기)
+  // 검출 시점 = stdout 명시 + 종료 코드 2 (룰 위반). 본문 = originalBody 단독 사용.
+  // raw-content 본문 정정 = 형준님 단독 영역 (Cowork 산출 변경 = 형준님 의뢰 단독).
+  console.log(`[5] 금지 어휘 검출 (Gemini 3.1 Pro — 가이드 분기 / 검출 단독)`);
+  let violations = [];
   try {
     const r = await supervisorGuideContent({ body: originalBody, slug: args.slug });
-    if (r.status === "adjusted" && r.adjustedBody && r.adjustedBody.length > 0) {
-      bodyForOutput = r.adjustedBody;
-    }
-    adjustments = r.adjustments;
+    violations = r.violations;
   } catch (e) {
     console.error(`  ✗ ${e.message}`);
     return { status: "fail-supervisor", code: 1, slug: args.slug };
   }
-  const byCat = { vocabulary: 0, forbidden_term: 0 };
-  for (const a of adjustments) {
-    if (a.category in byCat) byCat[a.category]++;
-  }
-  if (adjustments.length === 0) {
-    console.log(`  · PASS (조정 없음)`);
+  if (violations.length === 0) {
+    console.log(`  · PASS (금지 어휘 검출 0건)`);
   } else {
-    console.log(`  · 어휘 순화 ${byCat.vocabulary}건 / 금지 어휘 ${byCat.forbidden_term}건`);
-    for (const a of adjustments) {
-      const before = a.before.length > 60 ? a.before.slice(0, 57) + "..." : a.before;
-      const after = a.after.length > 60 ? a.after.slice(0, 57) + "..." : a.after;
-      console.log(`    - [${a.category}] "${before}" → "${after}" (${a.reason})`);
+    console.log(`  ✗ 금지 어휘 검출 ${violations.length}건:`);
+    for (const v of violations) {
+      const ctx = v.context.length > 60 ? v.context.slice(0, 57) + "..." : v.context;
+      console.log(`    - "${v.term}" / 맥락: "${ctx}" / 사유: ${v.reason}`);
     }
+    console.error(
+      `\n  → raw-content/guide/${args.caseNumber}/post.md 본문 정정 의뢰 (형준님 단독 영역).`
+    );
+    console.error(
+      `  → 자동 치환 영구 NG. 정정 사후 재 publish 진입.\n`
+    );
+    return { status: "fail-rules", code: 2, slug: args.slug };
   }
 
   // [6] frontmatter 산출 (GuideFrontmatter 타입 정합)
@@ -1739,8 +1730,8 @@ async function handleGuidePublish(args) {
     status: "published",
   };
 
-  // [7] mdx 직렬화 + 출력 분기
-  const mdxContent = serializeMdx(frontmatter, bodyForOutput);
+  // [7] mdx 직렬화 + 출력 분기 (본문 = originalBody 단독 / 변경 paradigm 영구 폐기)
+  const mdxContent = serializeMdx(frontmatter, originalBody);
 
   if (args.dryRun) {
     if (outExists) {
