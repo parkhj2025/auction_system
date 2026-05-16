@@ -1,26 +1,24 @@
 import type { Metadata } from "next";
-import { Suspense } from "react";
-import { InsightHubLayout } from "@/components/insight/InsightHubLayout";
 import { getAllInsightCards } from "@/lib/content";
+import { InsightHeader } from "@/components/insight/InsightHeader";
+import { InsightFeed } from "@/components/insight/InsightFeed";
 
-/* 단계 2.5 (work-012) — /insight server reader 진입 paradigm.
- * server component 안 getAllInsightCards() 호출 + InsightHubLayout 안 props drilling.
- * mock 폐기 사후 실 content/{analysis,guide,data}/ reader 단독 정합.
- * 첫 카드 자동 featured = publishedAt desc 정렬 최상단 (별개 featured 필드 영역 0).
- * Suspense = InsightHubLayout 안 useSearchParams CSR 정합 보존. */
+/* /insight 라우트 진입점 (work-012 제로베이스 재구축).
+ * server component 단독 + getAllInsightCards() 호출 + props drilling.
+ * 잡지 paradigm + 단일 컬럼 영구 + 카드 분기 (미디어 카드 + 텍스트 카드) + 모노톤 + 미세 그린 포인트.
+ * 폐기 광역: Hero + 카테고리 nav + 페이지네이션 + 일러스트 + ?cat=/?page= URL query + toast. */
 
 export const metadata: Metadata = {
-  title: "경매 인사이트",
-  description:
-    "경매 과정·용어·물건 분석·빅데이터 — 헷갈리는 경매를 정확하게 정리했습니다.",
+  title: "경매 자료",
+  description: "인천법원 경매 자료를 직접 정리하여 무료로 드립니다.",
 };
 
-export default function InsightHubPage() {
+export default function InsightPage() {
   const cards = getAllInsightCards();
-  const editorsPick = cards[0] ?? null;
   return (
-    <Suspense fallback={null}>
-      <InsightHubLayout cards={cards} editorsPick={editorsPick} />
-    </Suspense>
+    <main className="mx-auto max-w-2xl px-5 lg:px-0">
+      <InsightHeader />
+      <InsightFeed cards={cards} />
+    </main>
   );
 }

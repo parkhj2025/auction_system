@@ -14,7 +14,6 @@ import type {
   NoticeFrontmatter,
   NoticePost,
 } from "@/types/content";
-import type { InsightLeafSlug, InsightPostStats } from "@/lib/insightMock";
 
 const CONTENT_ROOT = path.join(process.cwd(), "content");
 
@@ -210,105 +209,77 @@ export type InsightItem = {
 };
 
 /* ════════════════════════════════════════════════════════════════════════════
- *  단계 2.5 (work-012) — /insight reader 연결 paradigm
- *  paradigm: mock 폐기 + 실 content/{analysis,guide,data}/ reader 호출 통합
- *  매핑: propertyType (한국어) → InsightLeafSlug (영문) 자동 매핑
- *  Hero 호환: analysis 안 stats 산출 (round/appraisal/minPrice/percent 사실 source)
+ *  /insight 제로베이스 재구축 (work-012)
+ *  paradigm: 잡지 + 단일 컬럼 + 카드 분기 (미디어 카드 + 텍스트 카드)
+ *  reader 통합: analysis + guide + news + data 광역 / notice 제외
+ *  카테고리 분류 paradigm 영구 폐기 (InsightLeafSlug + mapAnalysisToInsightSlug 광역 폐기)
+ *  Hero stats paradigm 영구 폐기 (buildAnalysisStats 폐기)
+ *  카드 분기 트리거 = coverImage 사실 (정의 = 미디어 카드 / undefined = 텍스트 카드)
  * ════════════════════════════════════════════════════════════════════════════ */
 
-/* propertyType (한국어 enum) → InsightLeafSlug (영문 enum) 매핑.
- *  PROPERTY_TYPE_VALID (analysis publish CLI 정합 사실): 아파트·다세대주택·빌라·
- *  오피스텔·단독주택·토지·상가·공장·기타. ANALYSIS_SUB (insightMock 정합):
- *  apartment·officetel·villa·house·dagagu·dasedae·store·etc. */
-const ANALYSIS_PROPERTY_TYPE_TO_INSIGHT_SLUG: Record<string, InsightLeafSlug> = {
-  "아파트": "apartment",
-  "오피스텔": "officetel",
-  "빌라": "villa",
-  "다세대주택": "dasedae",
-  "다가구주택": "dagagu",
-  "단독주택": "house",
-  "상가": "store",
-  "토지": "etc",
-  "공장": "etc",
-  "기타": "etc",
+export type InsightCardType = "analysis" | "guide" | "news" | "data";
+
+const INSIGHT_TYPE_LABEL: Record<InsightCardType, string> = {
+  analysis: "분석",
+  guide: "가이드",
+  news: "뉴스",
+  data: "데이터",
 };
 
-export function mapAnalysisToInsightSlug(propertyType: string): InsightLeafSlug {
-  return ANALYSIS_PROPERTY_TYPE_TO_INSIGHT_SLUG[propertyType] ?? "etc";
-}
-
-/* /insight 카드 통합 데이터. mock 폐기 사후 InsightMockPost 대체 paradigm. */
 export type InsightCardData = {
   id: string;
-  insightSlug: InsightLeafSlug;
+  type: InsightCardType;
+  typeLabel: string;
   title: string;
-  preview: string;
+  subtitle: string;
   publishedAt: string;
   href: string;
-  /* Hero Live Data Panel 호환 (analysis 단독 산출 / guide+data 부재 정합). */
-  stats?: InsightPostStats;
+  /* analysis 단독 사실 (frontmatter.coverImage 사실 source).
+   *  undefined = 텍스트 카드 분기 트리거. */
+  coverImage?: string;
 };
 
-/* analysis frontmatter 안 round/appraisal/minPrice/percent 사실 source → InsightPostStats 산출.
- *  단계별 가격 = 감정가 + (round-1) 단계 (회차별 70% 가정 paradigm / 단순 추정).
- *  사후 사이클 안 marketData 또는 별개 stats 산출 paradigm 결정 의뢰 영역. */
-function buildAnalysisStats(
-  appraisal: number,
-  minPrice: number,
-  round: number,
-  percent: number
-): InsightPostStats | undefined {
-  if (!appraisal || !minPrice || !round || round < 1) return undefined;
-  const stages: number[] = [appraisal];
-  for (let i = 1; i < round; i++) {
-    const r = round === 1 ? minPrice : appraisal - ((appraisal - minPrice) * i) / Math.max(1, round - 1);
-    stages.push(Math.round(r));
-  }
-  if (stages[stages.length - 1] !== minPrice) {
-    stages[stages.length - 1] = minPrice;
-  }
-  return {
-    appraisedPrice: appraisal,
-    minimumPrice: minPrice,
-    failureCount: Math.max(0, round - 1),
-    stagePrices: stages,
-    appraisedRatio: percent,
-  };
-}
-
-/* 통합 reader. analysis + guide + data 광역 + publishedAt desc 정렬. */
+/* 통합 reader. analysis + guide + news + data 광역 + publishedAt desc 정렬.
+ *  notice 제외 (서비스 공지 = 콘텐츠 허브 부정합). */
 export function getAllInsightCards(): InsightCardData[] {
   const analysis: InsightCardData[] = getAllAnalysisPosts().map((p) => ({
     id: `analysis:${p.frontmatter.slug}`,
-    insightSlug: mapAnalysisToInsightSlug(p.frontmatter.propertyType),
+    type: "analysis",
+    typeLabel: INSIGHT_TYPE_LABEL.analysis,
     title: p.frontmatter.title,
-    preview: p.frontmatter.summary ?? "",
+    subtitle: p.frontmatter.summary ?? "",
     publishedAt: p.frontmatter.publishedAt,
     href: `/analysis/${p.frontmatter.slug}`,
-    stats: buildAnalysisStats(
-      p.frontmatter.appraisal,
-      p.frontmatter.minPrice,
-      p.frontmatter.round,
-      p.frontmatter.percent
-    ),
+    ...(p.frontmatter.coverImage ? { coverImage: p.frontmatter.coverImage } : {}),
   }));
   const guides: InsightCardData[] = getAllGuidePosts().map((p) => ({
     id: `guide:${p.frontmatter.slug}`,
-    insightSlug: "guide" as InsightLeafSlug,
+    type: "guide",
+    typeLabel: INSIGHT_TYPE_LABEL.guide,
     title: p.frontmatter.title,
-    preview: p.frontmatter.subtitle ?? "",
+    subtitle: p.frontmatter.subtitle ?? "",
     publishedAt: p.frontmatter.publishedAt,
     href: `/guide/${p.frontmatter.slug}`,
   }));
+  const news: InsightCardData[] = getAllNewsPosts().map((p) => ({
+    id: `news:${p.frontmatter.slug}`,
+    type: "news",
+    typeLabel: INSIGHT_TYPE_LABEL.news,
+    title: p.frontmatter.title,
+    subtitle: p.frontmatter.subtitle ?? "",
+    publishedAt: p.frontmatter.publishedAt,
+    href: `/news/${p.frontmatter.slug}`,
+  }));
   const data: InsightCardData[] = getAllDataPosts().map((p) => ({
     id: `data:${p.frontmatter.slug}`,
-    insightSlug: "data" as InsightLeafSlug,
+    type: "data",
+    typeLabel: INSIGHT_TYPE_LABEL.data,
     title: p.frontmatter.title,
-    preview: p.frontmatter.subtitle ?? "",
+    subtitle: p.frontmatter.subtitle ?? "",
     publishedAt: p.frontmatter.publishedAt,
     href: `/data/${p.frontmatter.slug}`,
   }));
-  return [...analysis, ...guides, ...data].sort((a, b) =>
+  return [...analysis, ...guides, ...news, ...data].sort((a, b) =>
     String(b.publishedAt).localeCompare(String(a.publishedAt))
   );
 }
