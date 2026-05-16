@@ -1,32 +1,29 @@
 "use client";
 
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useMemo, useRef } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { AnimatePresence, motion } from "motion/react";
 import {
   ALL_CAT_SLUGS,
-  INSIGHT_MOCK_POSTS,
   INSIGHT_PAGE_SIZE,
   categoryLabel,
   formatDate,
-  getEditorsPick,
   isAnalysisSub,
-  sortedPosts,
-  type InsightMockPost,
   type NavSelection,
 } from "@/lib/insightMock";
+import type { InsightCardData } from "@/lib/content";
 import { InsightHero } from "@/components/insight/InsightHero";
 import { InsightCategoryNav } from "@/components/insight/InsightCategoryNav";
 import { Thumbnail } from "@/components/insight/Thumbnail";
 import { ArrowRightIcon, ChevronRightIcon } from "@/components/insight/icons";
 
-/* work-012 정정 3 — /insight orchestrator.
- * Hero(고정 paradigm / Editor's Pick 카드) + 카테고리 nav(가운데 정렬 + sub nav)
- *   + 1-col 콘텐츠 list + 페이지네이션(10건/페이지).
- * 카테고리 클릭 = ?cat= / 페이지 = ?page= / mock 진입 = "준비 중" toast.
+/* 단계 2.5 (work-012) — /insight orchestrator.
+ * mock 폐기 + 실 content/{analysis,guide,data}/ reader 연결 paradigm.
+ * Hero (첫 카드 자동 featured) + 카테고리 nav (가운데 정렬 + sub nav)
+ *   + 1-col 콘텐츠 list + 페이지네이션 (10건/페이지) + Link 진입 정합.
+ * 카테고리 클릭 = ?cat= / 페이지 = ?page= / 카드 click = href 진입.
+ * server component (page.tsx) 안 getAllInsightCards() 호출 + props drilling.
  * carousel 라이브러리 미사용 / 신규 npm 0 / INSIGHT 색 토큰 0 / chip 패턴 0 / 아이콘 라이브러리 미사용. */
-
-const TOAST_MSG = "준비 중입니다. 콘텐츠가 곧 공개됩니다.";
 
 function buildUrl(cat: NavSelection, page: number): string {
   const params = new URLSearchParams();
@@ -36,7 +33,13 @@ function buildUrl(cat: NavSelection, page: number): string {
   return qs ? `/insight?${qs}` : "/insight";
 }
 
-export function InsightHubLayout() {
+export function InsightHubLayout({
+  cards,
+  editorsPick,
+}: {
+  cards: InsightCardData[];
+  editorsPick: InsightCardData | null;
+}) {
   const router = useRouter();
   const searchParams = useSearchParams();
   const listRef = useRef<HTMLElement>(null);
@@ -46,39 +49,28 @@ export function InsightHubLayout() {
     ? (rawCat as NavSelection)
     : "all";
 
-  const [toast, setToast] = useState<string | null>(null);
-  const toastTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-  const showToast = useCallback((msg: string) => {
-    setToast(msg);
-    if (toastTimer.current) clearTimeout(toastTimer.current);
-    toastTimer.current = setTimeout(() => setToast(null), 2200);
-  }, []);
-
   const scrollToList = useCallback(() => {
     requestAnimationFrame(() => {
       listRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
     });
   }, []);
 
-  const editorsPick = useMemo(() => getEditorsPick(), []);
-
   const filteredPosts = useMemo(() => {
-    if (active === "all") return INSIGHT_MOCK_POSTS;
+    if (active === "all") return cards;
     if (active === "analysis") {
-      return INSIGHT_MOCK_POSTS.filter((p) => isAnalysisSub(p.category));
+      return cards.filter((p) => isAnalysisSub(p.insightSlug));
     }
-    return INSIGHT_MOCK_POSTS.filter((p) => p.category === active);
-  }, [active]);
+    return cards.filter((p) => p.insightSlug === active);
+  }, [active, cards]);
 
-  const sorted = useMemo(() => sortedPosts(filteredPosts), [filteredPosts]);
-  const totalCount = sorted.length;
+  /* cards = server 안 이미 publishedAt desc 정렬 사실 → 추가 정렬 NG. */
+  const totalCount = filteredPosts.length;
   const totalPages = Math.max(1, Math.ceil(totalCount / INSIGHT_PAGE_SIZE));
 
   const rawPage = Number(searchParams.get("page")) || 1;
   const page = Math.min(Math.max(1, rawPage), totalPages);
 
-  const pagePosts = sorted.slice(
+  const pagePosts = filteredPosts.slice(
     (page - 1) * INSIGHT_PAGE_SIZE,
     page * INSIGHT_PAGE_SIZE
   );
@@ -103,10 +95,7 @@ export function InsightHubLayout() {
 
   return (
     <main className="flex flex-1 flex-col">
-      <InsightHero
-        editorsPick={editorsPick}
-        onCardClick={() => showToast(TOAST_MSG)}
-      />
+      {editorsPick && <InsightHero editorsPick={editorsPick} />}
 
       <InsightCategoryNav active={active} onSelect={selectCategory} />
 
@@ -130,7 +119,7 @@ export function InsightHubLayout() {
             <ul className="mt-8 flex flex-col divide-y divide-[var(--color-border)] border-y border-[var(--color-border)]">
               {pagePosts.map((post) => (
                 <li key={post.id}>
-                  <PostRow post={post} onClick={() => showToast(TOAST_MSG)} />
+                  <PostRow post={post} />
                 </li>
               ))}
             </ul>
@@ -176,23 +165,6 @@ export function InsightHubLayout() {
           )}
         </div>
       </section>
-
-      {/* mock 진입 toast ("준비 중"). */}
-      <AnimatePresence>
-        {toast && (
-          <motion.div
-            role="status"
-            aria-live="polite"
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 16 }}
-            transition={{ duration: 0.25, ease: [0.16, 1, 0.3, 1] }}
-            className="fixed bottom-6 left-1/2 z-50 -translate-x-1/2 rounded-xl bg-[#111418] px-5 py-3 text-[14px] font-semibold text-white shadow-lg"
-          >
-            {toast}
-          </motion.div>
-        )}
-      </AnimatePresence>
     </main>
   );
 }
@@ -225,23 +197,16 @@ function PageButton({
   );
 }
 
-function PostRow({
-  post,
-  onClick,
-}: {
-  post: InsightMockPost;
-  onClick: () => void;
-}) {
+function PostRow({ post }: { post: InsightCardData }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
+    <Link
+      href={post.href}
       className="group flex w-full items-center gap-4 py-4 text-left transition-colors hover:bg-[var(--color-surface-muted)] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-green)]/45 focus-visible:ring-offset-2 lg:gap-5 lg:py-5"
     >
-      <Thumbnail category={post.category} />
+      <Thumbnail category={post.insightSlug} />
       <div className="flex flex-1 flex-col gap-1.5">
         <span className="text-[12px] font-bold text-[var(--brand-green)]">
-          {categoryLabel(post.category)}
+          {categoryLabel(post.insightSlug)}
         </span>
         <h3 className="line-clamp-2 text-[15px] font-bold leading-snug text-[#111418] group-hover:underline lg:text-[17px]">
           {post.title}
@@ -257,6 +222,6 @@ function PostRow({
         size={18}
         className="shrink-0 text-[var(--color-ink-500)] transition-all group-hover:translate-x-1 group-hover:text-[var(--brand-green)]"
       />
-    </button>
+    </Link>
   );
 }

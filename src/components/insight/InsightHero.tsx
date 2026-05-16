@@ -1,20 +1,21 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import { motion } from "motion/react";
 import NumberFlow from "@number-flow/react";
 import {
   categoryLabel,
-  type InsightMockPost,
   type InsightPostStats,
 } from "@/lib/insightMock";
+import type { InsightCardData } from "@/lib/content";
 import { ArrowRightIcon } from "@/components/insight/icons";
 
-/* work-012 정정 6 — /insight Live Data Hero.
- * Code 추천 1 채택 (사전 논의 4 사후 Opus ◎ + 형준님 채택).
- * 우측 = 데이터 시각 패널 (썸네일 PNG 폐기 → 큰 숫자 count-up + 단계 trend line SVG line draw).
+/* 단계 2.5 (work-012) — /insight Live Data Hero.
+ * mock 폐기 사후 paradigm: 첫 카드 자동 featured (publishedAt desc 정렬 최상단 / server 안 결정).
+ * 우측 = 데이터 시각 패널 (큰 숫자 count-up + 단계 trend line SVG line draw / stats 부재 시점 fallback).
  * 좌측 = 정정 5 보존 (칩 2건 + 메인 + 서브 + 마침표 yellow + CTA 0).
- * Hero 외 영역 = 정정 1~5 보존 광역. */
+ * Hero 외 영역 = 정정 1~5 보존. 카드 click = Link href 진입 paradigm. */
 
 const ACCENT_YELLOW = "#FFD43B";
 const STAGE_LABELS = ["감정가", "1차", "2차", "3차", "최저가"];
@@ -26,10 +27,8 @@ function formatPriceKR(won: number): string {
 
 export function InsightHero({
   editorsPick,
-  onCardClick,
 }: {
-  editorsPick: InsightMockPost;
-  onCardClick: () => void;
+  editorsPick: InsightCardData;
 }) {
   return (
     <section className="relative overflow-hidden bg-[var(--brand-green)]">
@@ -73,13 +72,13 @@ export function InsightHero({
             </p>
           </motion.div>
 
-          {/* 우측 = Live Data Panel (featured villa-01 stats 직접 시각). */}
+          {/* 우측 = Live Data Panel (첫 카드 stats 직접 시각 / stats 부재 시점 fallback). */}
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1], delay: 0.4 }}
           >
-            <DataPanel post={editorsPick} onClick={onCardClick} />
+            <DataPanel post={editorsPick} />
           </motion.div>
         </div>
       </div>
@@ -87,17 +86,10 @@ export function InsightHero({
   );
 }
 
-function DataPanel({
-  post,
-  onClick,
-}: {
-  post: InsightMockPost;
-  onClick: () => void;
-}) {
+function DataPanel({ post }: { post: InsightCardData }) {
   return (
-    <button
-      type="button"
-      onClick={onClick}
+    <Link
+      href={post.href}
       className="group block w-full overflow-hidden rounded-2xl border border-[var(--color-border)] bg-white p-5 text-left shadow-[0_20px_50px_-12px_rgba(0,0,0,0.30)] transition-colors hover:border-[var(--brand-green)]/45 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-white/70 focus-visible:ring-offset-2 focus-visible:ring-offset-[var(--brand-green)] lg:p-6"
     >
       {/* Top label. */}
@@ -106,7 +98,7 @@ function DataPanel({
           Editor&apos;s Pick
         </span>
         <span className="text-[12px] font-semibold text-[var(--color-ink-500)]">
-          · {categoryLabel(post.category)}
+          · {categoryLabel(post.insightSlug)}
         </span>
       </div>
 
@@ -135,7 +127,7 @@ function DataPanel({
           className="transition-transform group-hover:translate-x-1"
         />
       </span>
-    </button>
+    </Link>
   );
 }
 
