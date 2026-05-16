@@ -1,14 +1,17 @@
-/* /insight 헤더 (work-012 제로베이스 재구축).
- * 좌측 정렬 단독 + H1 + 보조 카피 paradigm. 잡지 paradigm 안 시각 임팩트 = 사이즈 + 여백 강조 정수. */
+/* /insight v2 헤더 (work-012 재구축 v2).
+ * 좌측 정렬 단독 + H1 "자료실" + 보조 카피 paradigm.
+ * 사이트 광역 헤더 섹션 정합 (bg-surface-muted + border-b + max-w-c-base). */
 export function InsightHeader() {
   return (
-    <header className="pt-16 pb-12 md:pt-20 md:pb-14 lg:pt-28 lg:pb-20">
-      <h1 className="text-[36px] font-bold leading-[1.1] tracking-[-0.02em] text-[#111418] md:text-[48px] lg:text-[64px]">
-        경매 자료
-      </h1>
-      <p className="mt-5 text-[17px] leading-[1.55] text-gray-600 lg:mt-7 lg:text-[20px]">
-        인천법원 경매 자료를 직접 정리하여 무료로 드립니다.
-      </p>
-    </header>
+    <section className="border-b border-[var(--color-border)] bg-[var(--color-surface-muted)]">
+      <div className="mx-auto w-full max-w-[var(--c-base)] px-5 pt-10 pb-6 sm:px-8 lg:pt-14 lg:pb-8">
+        <h1 className="text-[28px] font-black tracking-[-0.02em] leading-[1.15] text-[var(--color-ink-900)] lg:text-[40px]">
+          자료실
+        </h1>
+        <p className="mt-3 max-w-2xl text-[16px] font-medium leading-[1.55] text-[var(--color-ink-500)] lg:text-[18px]">
+          경매 자료, 직접 정리하여 무료로 드립니다.
+        </p>
+      </div>
+    </section>
   );
 }

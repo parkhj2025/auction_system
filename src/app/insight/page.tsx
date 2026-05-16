@@ -1,24 +1,24 @@
 import type { Metadata } from "next";
 import { getAllInsightCards } from "@/lib/content";
 import { InsightHeader } from "@/components/insight/InsightHeader";
-import { InsightFeed } from "@/components/insight/InsightFeed";
+import { InsightArchive } from "@/components/insight/InsightArchive";
 
-/* /insight 라우트 진입점 (work-012 제로베이스 재구축).
- * server component 단독 + getAllInsightCards() 호출 + props drilling.
- * 잡지 paradigm + 단일 컬럼 영구 + 카드 분기 (미디어 카드 + 텍스트 카드) + 모노톤 + 미세 그린 포인트.
- * 폐기 광역: Hero + 카테고리 nav + 페이지네이션 + 일러스트 + ?cat=/?page= URL query + toast. */
+/* /insight v2 라우트 진입점 (work-012 재구축 v2).
+ * server component + getAllInsightCards 호출 + InsightHeader + InsightArchive props drilling.
+ * 사이트 광역 일관 paradigm (ContentCard + sm:grid-cols-2 + lg:grid-cols-3 + max-w-c-base).
+ * 검색 + type tab + AND filter = InsightArchive client component 단독. */
 
 export const metadata: Metadata = {
-  title: "경매 자료",
-  description: "인천법원 경매 자료를 직접 정리하여 무료로 드립니다.",
+  title: "자료실",
+  description: "경매 자료, 직접 정리하여 무료로 드립니다.",
 };
 
 export default function InsightPage() {
   const cards = getAllInsightCards();
   return (
-    <main className="mx-auto max-w-2xl px-5 lg:px-0">
+    <main className="flex flex-1 flex-col">
       <InsightHeader />
-      <InsightFeed cards={cards} />
+      <InsightArchive cards={cards} />
     </main>
   );
 }
