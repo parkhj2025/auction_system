@@ -31,6 +31,12 @@ const REPO_ROOT = path.resolve(__dirname, "..", "..");
 const RAW_ROOT = path.join(REPO_ROOT, "raw-content");
 const OUT_DIR = path.join(REPO_ROOT, "content/analysis");
 
+/* ─── 단계 2 (work-012) — 가이드 분기 OUT_DIR. analysis 회귀 NG 사실 정합.
+ *  handleGuidePublish 단독 사용 (publishOne 영향 0). */
+const OUT_DIR_GUIDE = path.join(REPO_ROOT, "content/guide");
+const RAW_GUIDE_ROOT = path.join(RAW_ROOT, "guide");
+const GUIDE_DIFFICULTY_VALID = new Set(["beginner", "intermediate", "advanced"]);
+
 /* ─── α: 시·도 → region 매핑 (CLI 내부 const) ─── */
 const SIDO_TO_REGION = {
   "인천광역시": "incheon",
@@ -101,6 +107,12 @@ function parseArgs(argv) {
     force: false,
     dryRun: false,
     verbose: false,
+    /* 단계 2 (work-012) — guide 분기 인자. type 부재 시점 analysis 단독 정합 (회귀 NG). */
+    type: null,
+    slug: null,
+    difficulty: null,
+    tags: [],
+    subtitle: null,
   };
   for (let i = 2; i < argv.length; i++) {
     const v = argv[i];
@@ -109,6 +121,14 @@ function parseArgs(argv) {
     else if (v === "--dry-run") a.dryRun = true;
     else if (v === "--verbose" || v === "-v") a.verbose = true;
     else if (v === "--help" || v === "-h") { printHelp(); process.exit(0); }
+    else if (v === "--type") a.type = argv[++i] ?? null;
+    else if (v === "--slug") a.slug = argv[++i] ?? null;
+    else if (v === "--difficulty") a.difficulty = argv[++i] ?? null;
+    else if (v === "--tag") {
+      const t = argv[++i];
+      if (typeof t === "string" && t.length > 0) a.tags.push(t);
+    }
+    else if (v === "--subtitle") a.subtitle = argv[++i] ?? null;
     else if (!v.startsWith("--") && !a.caseNumber) a.caseNumber = v;
   }
   return a;
@@ -136,7 +156,17 @@ slug = raw-content 디렉토리명 그대로 (단계 3-5-fix). 분류 부호 가
   --all       raw-content 하위 사건 디렉토리 전부 일괄 publish
   --force     기존 mdx 덮어쓰기 + updatedAt today (정합성과 무관)
   --dry-run   파일 쓰지 않음 (검증·매핑만)
-  --verbose   상세 로그`);
+  --verbose   상세 로그
+
+단계 2 (work-012) — 가이드 분기:
+  pnpm publish:guide <rawDir> --slug <slug> --difficulty <beginner|intermediate|advanced> \\
+    --tag "<태그>" [--tag "<태그>" ...] [--subtitle "<서브타이틀>"]
+  입력: raw-content/guide/<rawDir>/post.md (frontmatter 부재 사실 정합)
+  출력: content/guide/<slug>.mdx
+  자동 산출: title (post.md 첫 H1) + publishedAt/updatedAt (today)
+  필수 인자: --slug + --difficulty + --tag 1건 이상
+  선택 인자: --subtitle
+  Gemini 감수: 책임 3 (어휘 순화) + 책임 5 (금지 어휘) 단독 적용 (책임 1·2·4 = analysis 전용)`);
 }
 
 /* ─── §2-2: raw-content 하위 사건 디렉토리 스캔 (단계 3-5-fix) ─── */
@@ -1399,9 +1429,377 @@ async function publishOne(caseNumber, args) {
   return { status: "success", code: 0, slug, adjustedCount };
 }
 
+/* ════════════════════════════════════════════════════════════════════════════
+ *  단계 2 (work-012) — 가이드 publishing 분기
+ *  paradigm: 자동 추출 (H1 → title) + CLI arg 입력 (slug + difficulty + tag + subtitle)
+ *  분리 사실: analysis publishOne / buildFrontmatter / supervisorContent 영향 0
+ *  Gemini 감수: 책임 3 + 5 단독 (책임 1·2·4 = analysis 전용 정합)
+ *  출력: content/guide/<slug>.mdx 단독 (meta.json/audit.json 부재 사실)
+ * ════════════════════════════════════════════════════════════════════════════ */
+
+const GUIDE_SUPERVISOR_SYSTEM_PROMPT = `당신은 부동산 경매 가이드 콘텐츠의 2차 감시자입니다.
+
+입력으로 콘텐츠 본문 전체 + 라우트 컨텍스트 (slug)가 주어집니다.
+
+판단 책임 2건:
+
+[책임 3 — 어휘 순화]
+- 부동산 일반 투자자가 잘 사용하지 않는 비표준 전문용어 식별
+- 일반어로 치환 또는 자연스럽게 삭제
+- 허용 어휘 (변경 금지): LTV, DSR, 갭투자, 매각가율, 근저당권, 말소기준등기, 임의경매, 강제경매, 공유자 우선매수권, 가처분, 임차인 대항력, 권리분석, 매수신청, 매각기일, 매각공고, 최저매각가격, 매각물건명세서, 현황조사서, 감정평가서, 인도명령, 배당요구 종기, 경매개시결정, 사건번호, 물건번호
+
+[책임 5 — 금지 어휘 검증]
+- 분류·판정 어휘 (위험·매력·함정·교훈·안전·적합한·교보재·투자매력·추천·꿀매물) 본문 잔존 시 자연스럽게 삭제 또는 사실 기반 표현으로 교체
+- 데이터 처리 어휘 (PDF 첨부·두인옥션·추출한·파싱한·원천 자료·data 폴더·백엔드·파이프라인) 잔존 시 삭제
+- 위 어휘 신규 도입 절대 금지
+
+산문 톤·문장 구조 유지. 단어만 교체.
+
+반환 형식 (JSON 단일 객체. 다른 텍스트·코드블록 0):
+{
+  "status": "pass" | "adjusted",
+  "adjustedBody": "전체 본문 (수정 반영, status=adjusted 일 때만. status=pass 시 빈 문자열)",
+  "adjustments": [
+    {
+      "category": "vocabulary" | "forbidden_term",
+      "before": "...",
+      "after": "...",
+      "reason": "..."
+    }
+  ]
+}
+
+조정 0 건이면 status=pass, adjustedBody="", adjustments=[].`;
+
+const GUIDE_SUPERVISOR_RESPONSE_SCHEMA = {
+  type: "object",
+  properties: {
+    status: { type: "string", enum: ["pass", "adjusted"] },
+    adjustedBody: { type: "string" },
+    adjustments: {
+      type: "array",
+      items: {
+        type: "object",
+        properties: {
+          category: {
+            type: "string",
+            enum: ["vocabulary", "forbidden_term"],
+          },
+          before: { type: "string" },
+          after: { type: "string" },
+          reason: { type: "string" },
+        },
+        required: ["category", "before", "after", "reason"],
+      },
+    },
+  },
+  required: ["status", "adjustedBody", "adjustments"],
+};
+
+async function supervisorGuideContent({ body, slug }) {
+  const apiKey = process.env.GEMINI_API_KEY;
+  if (!apiKey) {
+    throw new Error(
+      "GEMINI_API_KEY 환경변수가 설정되지 않았습니다. .env.local 에 추가하세요."
+    );
+  }
+
+  const userMessage =
+    `라우트 컨텍스트:\n` +
+    `  slug: ${slug}\n` +
+    `  type: guide\n\n` +
+    `본문 (post.md body):\n` +
+    `${body}\n\n` +
+    `[출력 형식 강제]\n` +
+    `- adjustments 배열에 변경 항목 기록.\n` +
+    `- 본문 톤·문장 구조 유지. 단어 단독 교체.`;
+
+  const reqBody = {
+    systemInstruction: {
+      parts: [{ text: GUIDE_SUPERVISOR_SYSTEM_PROMPT }],
+    },
+    contents: [{ role: "user", parts: [{ text: userMessage }] }],
+    generationConfig: {
+      thinkingConfig: { thinkingLevel: "high" },
+      responseMimeType: "application/json",
+      responseSchema: GUIDE_SUPERVISOR_RESPONSE_SCHEMA,
+    },
+  };
+
+  let res;
+  try {
+    res = await fetch(GEMINI_API_URL, {
+      method: "POST",
+      headers: {
+        "x-goog-api-key": apiKey,
+        "content-type": "application/json",
+      },
+      body: JSON.stringify(reqBody),
+    });
+  } catch (e) {
+    throw new Error(`Gemini guide supervisor 네트워크 오류: ${e.message}`);
+  }
+
+  if (!res.ok) {
+    const text = await res.text().catch(() => "");
+    throw new Error(
+      `Gemini guide supervisor 호출 실패 (HTTP ${res.status}): ${text.slice(0, 500)}`
+    );
+  }
+
+  const json = await res.json();
+  const text = json?.candidates?.[0]?.content?.parts?.[0]?.text;
+  if (typeof text !== "string") {
+    throw new Error(
+      `Gemini guide supervisor 응답 형식 비정상: candidates[0].content.parts[0].text 누락`
+    );
+  }
+
+  const jsonMatch = text.match(/\{[\s\S]*\}/);
+  if (!jsonMatch) {
+    throw new Error(
+      `Gemini guide supervisor 응답에서 JSON 블록 0건: ${text.slice(0, 300)}`
+    );
+  }
+  let parsed;
+  try {
+    parsed = JSON.parse(jsonMatch[0]);
+  } catch (e) {
+    throw new Error(
+      `Gemini guide supervisor JSON 파싱 실패 (${e.message}): ${jsonMatch[0].slice(0, 300)}`
+    );
+  }
+
+  const status = parsed.status === "adjusted" ? "adjusted" : "pass";
+  const adjustedBody =
+    typeof parsed.adjustedBody === "string" ? parsed.adjustedBody : "";
+  const adjustments = Array.isArray(parsed.adjustments)
+    ? parsed.adjustments
+        .filter((a) => a && typeof a === "object")
+        .map((a) => ({
+          category: String(a.category ?? ""),
+          before: String(a.before ?? ""),
+          after: String(a.after ?? ""),
+          reason: String(a.reason ?? ""),
+        }))
+    : [];
+
+  return { status, adjustedBody, adjustments };
+}
+
+/* H1 추출 — post.md 첫 줄 "^# " 정규식 매칭. */
+function extractH1Title(body) {
+  const lines = body.split(/\r?\n/);
+  for (const line of lines) {
+    const m = line.match(/^#\s+(.+?)\s*$/);
+    if (m) return m[1].trim();
+    if (line.trim().length > 0) break; // 첫 비-빈 줄이 H1 아니면 중단
+  }
+  return "";
+}
+
+/* 가이드 콘텐츠 룰 검증 (FORBIDDEN_WORDS + 본문 단독). */
+function runGuideContentChecks(body, title) {
+  const errors = [];
+  const stringsToCheck = [title, body].filter((s) => typeof s === "string");
+  for (const s of stringsToCheck) {
+    for (const w of FORBIDDEN_WORDS) {
+      if (s.includes(w)) errors.push(`forbidden word "${w}"`);
+    }
+  }
+  return [...new Set(errors)];
+}
+
+async function handleGuidePublish(args) {
+  // [1] CLI 인자 검증
+  if (!args.caseNumber) {
+    console.error("✗ 첫 인자 (raw 디렉토리명 / 예: guide_01) 누락");
+    return { status: "fail-input", code: 1 };
+  }
+  if (!args.slug || typeof args.slug !== "string") {
+    console.error("✗ --slug <value> 인자 누락");
+    return { status: "fail-input", code: 1 };
+  }
+  if (!/^[a-z0-9-]+$/.test(args.slug)) {
+    console.error(`✗ --slug "${args.slug}" — 소문자·숫자·하이픈 단독 허용 (영문 의미 단어 paradigm)`);
+    return { status: "fail-input", code: 1 };
+  }
+  if (!args.difficulty || !GUIDE_DIFFICULTY_VALID.has(args.difficulty)) {
+    console.error(
+      `✗ --difficulty <beginner|intermediate|advanced> 누락 또는 비정합 ("${args.difficulty ?? ""}")`
+    );
+    return { status: "fail-input", code: 1 };
+  }
+  if (!Array.isArray(args.tags) || args.tags.length === 0) {
+    console.error("✗ --tag <value> 인자 최소 1건 필수 (반복 가능)");
+    return { status: "fail-input", code: 1 };
+  }
+
+  const rawDir = path.join(RAW_GUIDE_ROOT, args.caseNumber);
+  if (!fs.existsSync(rawDir)) {
+    console.error(`✗ raw 디렉토리 부재: ${path.relative(REPO_ROOT, rawDir)}`);
+    return { status: "fail-input", code: 1 };
+  }
+
+  const postPath = path.join(rawDir, "post.md");
+  if (!fs.existsSync(postPath)) {
+    console.error(`✗ post.md 부재: ${path.relative(REPO_ROOT, postPath)}`);
+    return { status: "fail-input", code: 1 };
+  }
+  console.log(`[1] 입력 검증 PASS: ${path.relative(REPO_ROOT, rawDir)}`);
+
+  // [2] post.md 파싱 (frontmatter 부재 사실 정합 — body 단독 사용)
+  const postRaw = fs.readFileSync(postPath, "utf8");
+  const matterParsed = matter(postRaw);
+  const originalBody = matterParsed.content || postRaw;
+
+  // [3] H1 추출 → title 자동 산출
+  const title = extractH1Title(originalBody);
+  if (!title) {
+    console.error("✗ post.md 안 H1 (^# ) 추출 0건 — title 자동 산출 NG");
+    return { status: "fail-input", code: 1 };
+  }
+  console.log(`[2] title 자동 추출: "${title}"`);
+  console.log(`[3] slug: ${args.slug}  difficulty: ${args.difficulty}  tags: [${args.tags.join(", ")}]`);
+
+  // [4] 콘텐츠 룰 검증 (FORBIDDEN_WORDS)
+  console.log(`[4] 콘텐츠 룰 검증`);
+  const checkErrors = runGuideContentChecks(originalBody, title);
+  if (checkErrors.length > 0) {
+    console.error(`  ✗ ${checkErrors.length}개 위반:`);
+    for (const e of checkErrors) console.error(`    - ${e}`);
+    return { status: "fail-rules", code: 2, slug: args.slug };
+  }
+  if (args.verbose) console.log(`  ✓ FORBIDDEN_WORDS 통과`);
+
+  // [5] Gemini 감수 (책임 3 + 5 단독)
+  console.log(`[5] 콘텐츠 2차 감시 (Gemini 3.1 Pro — 가이드 분기)`);
+  let bodyForOutput = originalBody;
+  let adjustments = [];
+  try {
+    const r = await supervisorGuideContent({ body: originalBody, slug: args.slug });
+    if (r.status === "adjusted" && r.adjustedBody && r.adjustedBody.length > 0) {
+      bodyForOutput = r.adjustedBody;
+    }
+    adjustments = r.adjustments;
+  } catch (e) {
+    console.error(`  ✗ ${e.message}`);
+    return { status: "fail-supervisor", code: 1, slug: args.slug };
+  }
+  const byCat = { vocabulary: 0, forbidden_term: 0 };
+  for (const a of adjustments) {
+    if (a.category in byCat) byCat[a.category]++;
+  }
+  if (adjustments.length === 0) {
+    console.log(`  · PASS (조정 없음)`);
+  } else {
+    console.log(`  · 어휘 순화 ${byCat.vocabulary}건 / 금지 어휘 ${byCat.forbidden_term}건`);
+    for (const a of adjustments) {
+      const before = a.before.length > 60 ? a.before.slice(0, 57) + "..." : a.before;
+      const after = a.after.length > 60 ? a.after.slice(0, 57) + "..." : a.after;
+      console.log(`    - [${a.category}] "${before}" → "${after}" (${a.reason})`);
+    }
+  }
+
+  // [6] frontmatter 산출 (GuideFrontmatter 타입 정합)
+  const today = new Date().toISOString().slice(0, 10);
+  const outPath = path.join(OUT_DIR_GUIDE, `${args.slug}.mdx`);
+  const outExists = fs.existsSync(outPath);
+  let publishedAt = today;
+  let updatedAt = today;
+  if (outExists && !args.force) {
+    // 기존 mdx 안 publishedAt 보존, updatedAt = 기존 사실 보존
+    try {
+      const existingFm = matter(fs.readFileSync(outPath, "utf8")).data;
+      if (typeof existingFm.publishedAt === "string") publishedAt = normalizeDate(existingFm.publishedAt);
+      if (typeof existingFm.updatedAt === "string") updatedAt = normalizeDate(existingFm.updatedAt);
+    } catch {
+      // ignore
+    }
+  } else if (outExists && args.force) {
+    // --force: publishedAt 보존, updatedAt = today
+    try {
+      const existingFm = matter(fs.readFileSync(outPath, "utf8")).data;
+      if (typeof existingFm.publishedAt === "string") publishedAt = normalizeDate(existingFm.publishedAt);
+    } catch {
+      // ignore
+    }
+    updatedAt = today;
+  }
+
+  const frontmatter = {
+    type: "guide",
+    slug: args.slug,
+    title,
+    ...(args.subtitle ? { subtitle: args.subtitle } : {}),
+    difficulty: args.difficulty,
+    tags: args.tags,
+    publishedAt,
+    updatedAt,
+    status: "published",
+  };
+
+  // [7] mdx 직렬화 + 출력 분기
+  const mdxContent = serializeMdx(frontmatter, bodyForOutput);
+
+  if (args.dryRun) {
+    if (outExists) {
+      const existing = fs.readFileSync(outPath, "utf8");
+      if (existing === mdxContent) {
+        console.log(`[6] dry-run — 기존 파일과 byte-identical (no-op 예상)`);
+      } else {
+        console.log(
+          `[6] dry-run — 기존과 차이: 기존 ${existing.length}B / 신규 ${mdxContent.length}B`
+        );
+      }
+    } else {
+      console.log(`[6] dry-run — 신규 파일 (${mdxContent.length}B)`);
+    }
+    if (args.verbose) {
+      console.log("\n--- frontmatter preview ---");
+      console.log(matter.stringify("", frontmatter));
+    }
+    return { status: "success", code: 0, slug: args.slug, dryRun: true };
+  }
+
+  if (outExists) {
+    const existing = fs.readFileSync(outPath, "utf8");
+    if (existing === mdxContent) {
+      console.log(`[7] mdx — 기존 파일과 byte-identical → no-op`);
+      return { status: "success", code: 0, slug: args.slug };
+    }
+    if (!args.force) {
+      console.error(
+        `[7] 기존 ${path.relative(REPO_ROOT, outPath)}과 차이 발생.\n   --force로 덮어쓰기 또는 --dry-run으로 검토.`
+      );
+      console.error(`   기존 ${existing.length}B / 신규 ${mdxContent.length}B`);
+      return { status: "fail-conflict", code: 3, slug: args.slug };
+    }
+  }
+
+  fs.mkdirSync(path.dirname(outPath), { recursive: true });
+  try {
+    fs.writeFileSync(outPath, mdxContent, "utf8");
+  } catch (e) {
+    console.error(`[7] mdx 쓰기 실패: ${e.message}`);
+    return { status: "fail-write", code: 4, slug: args.slug };
+  }
+  console.log(
+    `[7] mdx 쓰기 완료: ${path.relative(REPO_ROOT, outPath)}  ${mdxContent.length}B  publishedAt=${publishedAt}  updatedAt=${updatedAt}`
+  );
+
+  return { status: "success", code: 0, slug: args.slug };
+}
+
 /* ─── main dispatcher ─── */
 async function main() {
   const args = parseArgs(process.argv);
+
+  // 단계 2 (work-012) — type=guide 분기 단독 진입 (analysis 영향 0)
+  if (args.type === "guide") {
+    const r = await handleGuidePublish(args);
+    process.exit(r.code);
+  }
 
   // --all 모드 — raw-content/ 하위 사건 디렉토리 전체 일괄 publish
   // 단계 4-2-fix-6: raw-content/완성/ 하위는 자동 제외 (PASS 시연 완료 사건)
