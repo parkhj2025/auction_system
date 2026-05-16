@@ -1,10 +1,10 @@
 # 경매퀵 웹사이트 핸드오프 문서
 
 > **용도**: 다음 세션 진입 시 본 문서 단일 진입점 paradigm. 본 문서 안 사실 + CLAUDE.md 영구 룰 양측 합쳐서 단일 컨텍스트 영역.
-> **최종 업데이트**: 2026-05-14 (work-008 ~ work-011 통합 종료 / Hero 사진 폐기 + 검은 테두리 정정 + /insight 카드 후보 5 + chip 폐기 완료)
-> **현재 빌드 상태**: HEAD = `dce068e` (work-011: /insight 카드 후보 5 Premium Editorial++ + chip 폐기 통합)
+> **최종 업데이트**: 2026-05-16 (work-012 진행 중 / 정정 1~6 통합 + Live Data Hero 산출 + 형준님 검수 NG + paradigm 리셋 + 콘텐츠 우선 paradigm 전환 + Code 자율 조사 종료 / 결정 의뢰 8건 형준님 회신 대기)
+> **현재 빌드 상태**: HEAD = `059b93a` (work-012 정정 6: Live Data Hero — 단 paradigm 리셋 결정 사실 / mock 단독 / 단계 3 진입 시점 사전 산출물 정리 의무)
 > **production URL**: https://auctionsystem-green.vercel.app
-> **다음 세션 진입 트리거**: **클로드 채팅 요구서 전달 사전 paradigm 단단** — 사용자 직접 의뢰 우선 진입 + work-012 (/faq 정정) + work-013 (/about 정정) 잠재 paradigm 영구 보존
+> **다음 세션 진입 트리거**: **형준님 결정 의뢰 8건 회신 사후 Opus 단계 2 진입** — Cowork 콘텐츠 우선 paradigm (mock 폐기 + 실 콘텐츠 1개씩 publishing + 디자인 사후 자연 도출) + Code 단계 3 (사전 산출물 일괄 정리 + 신규 디자인 정정)
 > **함께 읽을 문서**: `CLAUDE.md` (사업 본질 + 영구 룰) + 본 HANDOFF.md (work history + 진입 트리거)
 
 ---
@@ -13,15 +13,16 @@
 
 ### 다음 세션 진입 단단 paradigm
 
-**1순위 = 클로드 채팅 요구서 전달 사전 paradigm**:
-- 사용자 직접 명시 = "다음 세션에서는 클로드 채팅에서 요구서를 전달해줄거야. 그것부터 시작하자."
-- 진입 단단 = 요구서 회수 사후 본 핸드오프 컨텍스트 단단 활용 paradigm
-- 잠재 영역 = work-012 (/faq) 또는 work-013 (/about) 또는 신규 paradigm (요구서 의도 사실 단단)
+**1순위 = 형준님 결정 의뢰 8건 회신 회수**:
+- 본 세션 마지막 산출 = Code 자율 조사 + 결정 의뢰 8건 (raw-content 사실 + publish 파이프라인 사실 + 의뢰서 v1.1 충돌 사실 + 가이드 publishing paradigm 미정)
+- 회신 사후 진입 = Opus 단계 2 (Cowork 의뢰 v1.1 정정 + 디자인 사전 논의 5_1 산출)
+- 그 사후 진입 = Code 단계 3 (사전 산출물 일괄 정리 + 신규 디자인 정정 + /insight reader 연결)
 
-**2순위 = work-012 + work-013 잠재 paradigm 영구 보존**:
-- work-012 = /faq 페이지 정정 (sentiment + 항목 검수 + 검색 기능 검토 사전 의뢰 사실)
-- work-013 = /about 페이지 정정 (5 섹션 외관 + 카피 sentiment + 사업 사실 정합)
-- Cowork chat 분리 paradigm = 콘텐츠 풍성 + /data + /glossary chip 회복 검토 (별개 진입)
+**2순위 = work-012 paradigm 리셋 사실 회수**:
+- 본 세션 전반 = work-012 정정 1~6 (Live Data Hero 종료 / commit `059b93a`)
+- 본 세션 후반 = 형준님 검수 "전체적 별로 + 허브 샘플 디자인 paradigm 회피 + mock 폐기 + 실 콘텐츠 단독" → 사전 논의 5 = paradigm 전체 리셋 채택
+- 신규 paradigm = 콘텐츠 우선 (Cowork 산출) + 디자인 사후 자연 도출 + 1개씩 publishing 사이클
+- 사전 산출물 (`src/lib/insightMock.ts` + `public/illustrations/insight/*.png` 13건 + Live Data Hero + Thumbnail + gen-script + 2026타경500459 published mdx) = 단계 3 일괄 정리 paradigm
 
 ### 본 세션 핵심 paradigm 변경 사실 (work-001 ~ work-011 통합)
 
@@ -48,7 +49,7 @@
 
 **6. §A-23 Opus 추측 NG / Code 사실 파악 사후 진입** (work-007 ~ work-011 일관)
 
-### 본 세션 진행 history (work-001 ~ work-011)
+### 본 세션 진행 history (work-001 ~ work-012)
 
 | work | 의도 | commit | 상태 |
 |---|---|---|---|
@@ -58,16 +59,150 @@
 | work-004 | Hero 시각 정정 (모바일 SVG + Liquid Glass + chip) | `44441fb` | ✅ |
 | work-005 | 사건 조회 NG + 회차 분기 (1물건 1고객 race 회피 4단계) | `cfdfaf0` | ✅ |
 | work-006 | 카카오톡 전체 폐기 + /contact 목업 연락처 | `6676de5` | ✅ |
-| **work-007** | **fetchSingleCase → fetchCaseDetail 함수 교체 (detail endpoint)** | `8a04de3` | ✅ |
-| **work-008** | **사진 비동기 fetch + UX 개선 3건 (ctaLabel + focus outline + already-taken)** | `3d03668` | ✅ |
-| **work-008 hotfix** | **데스크탑 input focus 검은 outline 제거 (정정 6)** | `c3c91ce` | ✅ |
-| **work-009** | **HomeHero input wrapper 검은 외곽 제거 (shadow-md 폐기)** | `ecb1d09` | ✅ |
-| **work-010** | **데스크탑 검은 테두리 정정 + 사진 영역 폐기** | `1062497` | ✅ |
-| **work-011** | **/insight 카드 후보 5 Premium Editorial++ + chip 폐기 통합** | `dce068e` | ✅ |
+| work-007 | fetchSingleCase → fetchCaseDetail 함수 교체 (detail endpoint) | `8a04de3` | ✅ |
+| work-008 | 사진 비동기 fetch + UX 개선 3건 (ctaLabel + focus outline + already-taken) | `3d03668` | ✅ |
+| work-008 hotfix | 데스크탑 input focus 검은 outline 제거 (정정 6) | `c3c91ce` | ✅ |
+| work-009 | HomeHero input wrapper 검은 외곽 제거 (shadow-md 폐기) | `ecb1d09` | ✅ |
+| work-010 | 데스크탑 검은 테두리 정정 + 사진 영역 폐기 | `1062497` | ✅ |
+| work-011 | /insight 카드 후보 5 Premium Editorial++ + chip 폐기 통합 | `dce068e` | ✅ |
+| work-012 정정 1 | /insight 풀 신규 재제작 (Hero 자동 슬라이드 + 6 카테고리 + 1-col list + mock 24건) | `b2ef69f` | ✅ commit (paradigm 리셋 사실) |
+| work-012 정정 2 | Hero 박스화(Liquid Glass) + 4독립+1그룹+8하위 + Gemini PNG 13건 | `f3e5298` | ✅ commit (paradigm 리셋 사실) |
+| work-012 정정 3 | Hero 고정 paradigm + 아이콘 풀컬러 재산출 + 페이지네이션 10건/페이지 | `6502a30` | ✅ commit (paradigm 리셋 사실) |
+| work-012 정정 4 | Hero 박스 폐기 + green primary bg + 좌우 분기 | `59c8c2d` | ✅ commit (paradigm 리셋 사실) |
+| work-012 정정 5 | Hero 높이 축소 + 칩 2건(Editor's Pick + 매주 업데이트) + 마침표 yellow | `eb7998d` | ✅ commit (paradigm 리셋 사실) |
+| **work-012 정정 6** | **Live Data Hero (썸네일 PNG → NumberFlow 49% + SVG line draw 단계 trend)** | **`059b93a`** | 🔄 commit + 형준님 검수 NG → 사전 논의 5 paradigm 리셋 |
+| **work-012 단계 2·3 대기** | **Cowork 콘텐츠 산출 + Opus 사전 논의 5_1 + Code 단계 3 일괄 정리** | — | ⏳ 결정 의뢰 8건 회신 대기 |
 
 ---
 
-## 📂 work-011 사실 정합 (최신 / 2026-05-14)
+## 📂 work-012 사실 정합 (최신 / 2026-05-15 ~ 2026-05-16 / 진행 중)
+
+### 진입 의도 사실
+
+- 사전 work-011 = /insight 카드 hover 단독 정정 → 형준님 검수 "쓰레기 결과물. 완전 리셋." → 풀 신규 재제작 의무
+- 본 work = /insight 페이지 단독 정정 (메인 + 분석 + /apply + /faq + /about 영구 변경 0)
+
+### 진행 단계 (정정 1~6 + 리셋)
+
+| 정정 | 의도 정수 | 핵심 변경 | commit |
+|---|---|---|---|
+| 1 | mock 데이터 + Hero 자동 슬라이드 + 6 카테고리 nav + 1-col list 신규 재제작 | InsightHero(motion+setInterval 5초+3 슬라이드+dot indicator) + InsightCategoryNav(6 카테고리+전체보기) + InsightHubLayout(orchestrator+toast) + insightMock.ts(mock 24건) + 구 home/InsightHubLayout 폐기 | `b2ef69f` |
+| 2 | Hero 박스화(Liquid Glass) + 카테고리 구조 4독립+1그룹+8하위 + Gemini PNG 13건 | Hero Liquid Glass 박스(blur 40px+inset shadow+rounded-[28px]) + 카테고리 구조 정정(아파트·오피스텔·빌라·단독주택·다가구·다세대·상가·기타 8 하위) + Gemini PNG 13건 1차 산출(브랜드 팔레트 단독 / 초록 모노톤) + sub nav 펼침 paradigm | `f3e5298` |
+| 3 | Hero 고정 paradigm + 아이콘 풀컬러 재산출 + 페이지네이션 10건/페이지 | Hero 슬라이드 폐기 → 간단 헤더 + Editor's Pick 카드 + PNG 13건 2차 산출(브랜드 팔레트 폐기 → 풀컬러 free) + 페이지네이션 신규(`?page=N` URL + 이전·다음 + 1·2·3) + 카테고리 nav 가운데 정렬 | `6502a30` |
+| 4 | Hero 박스 폐기 + green primary bg + 좌우 분기 | Liquid Glass 폐기 + bg `var(--brand-green)` 단독 + `grid lg:grid-cols-2`(좌 문구 / 우 카드) + soft shadow 카드 paradigm | `59c8c2d` |
+| 5 | Hero 높이 축소 + 칩 2건 + 마침표 yellow | 높이 `py-10 lg:py-14` → `py-6 lg:py-8` + 좌측 영역 확장(칩 2건 "Editor's Pick" + "매주 업데이트" + 메인 + 서브) + 마침표 + "무료로 드립니다" yellow `#FFD43B` + §A-24 권한 Hero eyebrow 칩 단독 예외 | `eb7998d` |
+| **6** | **Live Data Hero (Code 추천 1 채택 / "와" 정수 paradigm)** | **우측 카드 = 썸네일 PNG 폐기 → 데이터 시각 패널 (NumberFlow 49% count-up + SVG `motion.path pathLength` 단계 trend line + 동작 sequence 200/400/600/800ms) + Hero 높이 `py-8 lg:py-12` 환원 + 우상단 미세 도형 alpha 0.08 원 + villa-01 mock stats 확장 (감정가 2.8억 / 최저가 1.37억 / 5단 stagePrices)** | **`059b93a`** |
+
+### 본 세션 paradigm 리셋 사실 (2026-05-16)
+
+**형준님 production 검수 회신 (정정 6 사후)**:
+- "전체적 별로 + 허브 샘플 디자인 paradigm 회피"
+- "정제 기사 허브 paradigm + 모노톤 + 포인트 색 단독"
+- "mock → 실 콘텐츠 paradigm"
+- "기존 방식 얽매일 필요 0"
+- "Code와 함께 논의 + 창의적 + 업계 표준 맥락"
+
+**사전 논의 4 (Code 자율 paradigm 추천)**:
+- Opus 후보 3건 (a 매거진 / b 데이터 시각 / c 카드 모자이크)
+- Code 추천 3건 (1 Live Data Hero / 2 Editorial Statement / 3 Stat-tile)
+- 형준님 채택 = Code 추천 1 (Live Data Hero) → 정정 6 산출
+
+**사전 논의 5 (paradigm 전체 리셋)**:
+- 정정 1~6 산출 일괄 폐기 (Opus 단독 추천 + mock 단독 paradigm 영구 폐기)
+- 신규 paradigm = 콘텐츠 우선 + Cowork 실 콘텐츠 산출 단독 + 디자인 사후 자연 도출
+- 외관 정수 = 정제 기사 허브 + 모노톤 + green 포인트 단독 (yellow 폐기 / chip 영구 폐기 / Gemini PNG 13건 영구 폐기 / 정적 paradigm 단독)
+- 단계 분리 paradigm: 단계 1 Cowork 콘텐츠 산출 / 단계 2 Opus + Code 사전 논의 5_1 / 단계 3 Code 일괄 정정
+
+### Cowork 의뢰서 history
+
+- v1 (Opus 산출) → Code 사전 점검 6건 + 결정 의뢰 2건 회신 → v1 폐기
+- v1.1 (통합본 / 형준님 채택) = 카테고리 4 분기 + 디렉토리 분포 + frontmatter 사양 + Cowork 자율 영역 + 사전 디자인 paradigm 참고
+- **단 v1.1 자체 충돌 사실** (결정 의뢰 4 영역) = frontmatter `category: 'analysis' | ...' ↔ 현 publish CLI `meta.category` forbidden + 기존 convention `type: ...` 단독
+
+### Code 자율 조사 결과 (2026-05-16 / 본 세션 마지막 산출)
+
+**raw-content 폴더 사실**:
+- 가이드 = `raw-content/guide/guide_01 ~ guide_06` (6편 / 형준님 명시 7편 ↔ 실제 6편 불일치)
+- 아카이브 = `raw-content/archive/2024타경540431 + 527667 + 580569` (3건 / publish 완료 사실)
+- 루트 = `raw-content/2026타경500459` (publish 대기 analysis 1건 / post.md + meta.json + data/{crawler_summary, parsed, photos_meta}.json)
+- glossary 디렉토리 부재 (Cowork 산출 0)
+- guide post.md 안 frontmatter 부재 + `[시각화 A/B/C]` placeholder + ` ` 백틱 마킹 11건(툴팁 후보)
+- guide_01 단독 = code_brief.md + figures/(SVG 3종) (1편만 빌드 사양 완비)
+
+**publish CLI 사실** (`scripts/content-publish/index.mjs` 55KB):
+- **analysis 전용 단독** (OUT_DIR = `content/analysis` 하드코딩 / guide·glossary·data 분기 0)
+- 1차 원소스 meta.json + 2차 post.md frontmatter overlay
+- 필수 입력: meta.json + post.md + data/crawler_summary.json + data/photos_meta.json
+- 단건 paradigm 직접 지원 + `--all` + `--force` + `--dry-run` + `--verbose`
+- Gemini 3.1 Pro 자체 감수 (5 책임: 정합성 / 누락 / 어휘 / 일관성 / 금지어휘)
+- `pnpm publish` ↔ pnpm 자체 npm publish 명령 충돌 (`ERR_PNPM_GIT_UNCLEAN`) → `pnpm content:publish` 또는 node 직접 호출 의무
+- 본 세션 직접 dry-run 검증 PASS (2026타경500459 / Gemini 3건 자동 보강 suggest)
+- `meta.category` 필드 forbidden (line 404) ↔ Cowork v1.1 frontmatter `category` 명시 충돌
+
+**현 라이브 콘텐츠 사실**:
+- `content/analysis/2026타경500459.mdx` + `.meta.json` + `.audit.json` (publish 완료 / 단계 3 일괄 정리 list 포함)
+- `content/analysis/archive/` 2024 3건
+- `content/guide/` = `what-is-auction.mdx` + `how-to-bid-price.mdx` (이전 짧은 placeholder / raw-content/guide와 매칭 0)
+- `content/data/` = `.gitkeep` 단독 (콘텐츠 0)
+- `content/news/2026-04-w3-incheon.mdx` + `content/notice/service-launch.mdx`
+- `content/glossary/` 부재
+
+**/insight 현 상태 사실**:
+- HEAD `059b93a` Live Data Hero 작동
+- InsightHubLayout = `INSIGHT_MOCK_POSTS` 단독 사용 / 실 content/ reader 호출 0
+- raw-content publish 사후 → 자동 /insight 노출 0 (단계 3 안 reader 연결 의무)
+- featured = villa-01 (mock hardcoded)
+
+**sitemap 사실**:
+- `src/app/sitemap.ts` = `/analysis/{slug}` + `/guide/{slug}` + `/news/{slug}` + `/notice/{slug}` 동적 sitemap 포함
+- `2026타경500459.mdx` 삭제 시 sitemap 결손 + 외부 인덱싱 404
+
+### 형준님 결정 의뢰 8건 (다음 세션 진입 trigger)
+
+| # | 결정 영역 | 의뢰 정수 |
+|---|---|---|
+| 1 | 가이드 publishing 파이프라인 | (a) Code 수동 빌드 / (b) 가이드용 별개 CLI / (c) 기존 CLI 확장 |
+| 2 | 가이드 6편 ↔ 7편 사실 확인 | 형준님 명시 7편 ↔ 실제 6편 / 누락 1편 사실 |
+| 3 | 기존 `content/guide/` 2건 처리 | 덮어쓰기 / 신규 slug / 사전 삭제 |
+| 4 | 의뢰서 v1.1 `category` 필드 ↔ 현 CLI 충돌 | 의뢰서 정정(기존 convention) 또는 CLI 확장(category 허용) |
+| 5 | 1개씩 검수 paradigm 정수 | (a) dev 서버 / (b) preview deploy / (c) dry-run + git diff |
+| 6 | /insight reader 연결 시점 | 단계 3 또는 단계 2.5(사전 reader + 검수 분리) |
+| 7 | 2026타경500459 처리 사실 (의뢰서 v1.1 재확인) | 사전 삭제 명시 ↔ Cowork 재산출 보존 paradigm 잠재 |
+| 8 | 가이드 상세 페이지 디자인 시스템 적용 | code_brief.md 안 Phase 8 Aurora Calm + 툴팁 11건 + SVG 매핑 적용 의무 |
+
+### 영구 보존 (work-012 종료 사후 단계 3 정리 대상 제외)
+
+- 308 redirect 5건 (analysis + guide + glossary + news + data → /insight 308)
+- 메인 페이지 HomeInsight.tsx INSIGHT_TILES 4 slug (analysis + guide + glossary + data) 호환
+- 분석 페이지 + /apply + Hero + Compare + Pricing + Reviews + HomeCTA + TopNav + /about + /faq 변경 0
+- 페르소나 어휘 ("헷갈리는" + "정확하게" + "정리" / "초보자" 0)
+- Insight h2 SoT v42.4 "분석 자료까지, 무료로 드립니다." (단 yellow paradigm = 사전 논의 5 안 정정 잠재 / Cowork 산출 사후 결정)
+- 인천지방법원 본원 단독 (Phase 1)
+
+### 단계 3 사전 산출물 일괄 정리 list (다음 세션 진입 시점)
+
+| 폐기 영역 | 사유 |
+|---|---|
+| `src/lib/insightMock.ts` (mock 29건 + INSIGHT_PAGE_SIZE) | mock paradigm 폐기 / 실 콘텐츠 단독 |
+| `public/illustrations/insight/*.png` 13건 | Gemini PNG 폐기 / 모노톤 paradigm |
+| `src/components/insight/InsightHero.tsx` (Live Data Hero) | NumberFlow + SVG line draw 폐기 / 정적 paradigm |
+| `src/components/insight/Thumbnail.tsx` | PNG 썸네일 폐기 |
+| `src/components/insight/InsightCategoryNav.tsx` | 4독립+1그룹+8하위 nav 폐기 잠재 (정수 보존 또는 단순화 결정) |
+| `scripts/gen-insight-category-icons.mjs` | Gemini 산출 스크립트 폐기 |
+| `content/analysis/2026타경500459.mdx + .meta.json + .audit.json` | Cowork 재산출 paradigm 일관 (의뢰서 v1.1) |
+
+### 단계 3 신규 산출 의무 list
+
+- `src/types/content.ts` 안 `GlossaryFrontmatter` + `GlossaryPost` 타입 추가
+- `src/lib/content.ts` 안 `getAllGlossaryPosts()` reader 추가
+- `content/glossary/` 디렉토리 + `.gitkeep` 신규
+- `scripts/content-publish/index.mjs` glossary 분기 추가 (또는 별개 CLI / 결정 의뢰 1 사실 정합)
+- InsightHubLayout reader 연결 (mock 폐기 + `getAllAnalysisPosts` + `getAllGuidePosts` + `getAllGlossaryPosts` + `getAllDataPosts` 통합)
+- 신규 디자인 paradigm 정정 (정제 기사 허브 + 모노톤 + green 포인트)
+
+---
+
+## 📂 work-011 사실 정합 (2026-05-14)
 
 ### 정정 7건
 
@@ -398,34 +533,42 @@
 
 ## 🚀 다음 세션 진입 순서 추천
 
-### 1순위: 클로드 채팅 요구서 회수 + 진입
+### 1순위: 형준님 결정 의뢰 8건 회신 회수 (work-012 단계 2·3 진입 trigger)
 
-- 사용자 직접 명시 = "다음 세션에서는 클로드 채팅에서 요구서를 전달해줄거야. 그것부터 시작하자."
-- 요구서 의도 사실 단단 회수 사후 진입 paradigm 결정
-- 본 핸드오프 컨텍스트 단단 활용
+- 본 세션 마지막 산출 = Code 자율 조사 + 결정 의뢰 8건 (위 work-012 섹션 안 표 참조)
+- 회신 사후 = Opus 단계 2 진입 (Cowork 의뢰서 v1.1 정정 + 디자인 사전 논의 5_1 산출)
+- 그 사후 = Code 단계 3 진입 (사전 산출물 일괄 정리 + 신규 디자인 정정 + reader 연결)
+- 결정 의뢰 8건 정수 (중복 회피 / 위 work-012 섹션 안 표 단독 참조):
+  1. 가이드 publishing 파이프라인 (수동 빌드 / 별개 CLI / 기존 CLI 확장)
+  2. 가이드 6편 ↔ 7편 사실 확인
+  3. 기존 content/guide/ 2건 처리
+  4. v1.1 category 필드 ↔ 현 CLI 충돌 해결 방향
+  5. 1개씩 검수 paradigm (dev / preview / dry-run)
+  6. /insight reader 연결 시점 (단계 3 / 단계 2.5)
+  7. 2026타경500459 처리 재확인
+  8. 가이드 상세 페이지 디자인 시스템 적용 사실
 
-### 2순위 (잠재): work-012 — /faq 페이지 정정
+### 2순위: 단계 3 진입 시점 사전 준비 (결정 8건 회신 사후 자동 진입)
 
-- 사전 풀 구현 사실 (5 카테고리 × 19 항목 + PageHero + JSON-LD + Bottom CTA)
-- 잠재 정정 영역:
- - 카피 sentiment 검수 (담백 + 사실 + 숫자 / AI 슬롭 NG)
- - 항목 누락 검수 (사용자 의도 추가 사실)
- - 검색 기능 추가 검토 (19 항목 단단)
- - 외관 톤 정합 (앱스타일 + 프로 디자이너 차용)
+- 사전 산출물 일괄 정리 (위 work-012 섹션 안 list 정합)
+- `src/app/sitemap.ts` 안 `2026타경500459` 삭제 사실 정합 (외부 인덱싱 404 영향 사전 점검)
+- 신규 reader + 타입 + content-publish glossary 분기 추가
+- 신규 디자인 paradigm 정정 (정제 기사 허브 + 모노톤 + green 포인트)
+- 신규 commit + push + 회신 + 형준님 production 검수
 
-### 3순위 (잠재): work-013 — /about 페이지 정정
+### 3순위 (잠재 / work-013 + work-014): /faq + /about 페이지 정정
 
-- 사전 풀 구현 사실 (5 섹션 + AboutPageClient + 자체 SVG)
-- 잠재 정정 영역:
- - 5 섹션 외관 정합 검수 (현 코드 직접 검수 의무)
- - 카피 sentiment 검수
- - 사업 사실 정합 검수 (수수료 5/7/10만 + 낙찰 성공보수 5만 + 패찰 시 보증금 전액 반환)
- - 사진 / SVG 외관 정합
+- 사전 본 핸드오프 안 work-012 = /faq 정정 잠재 paradigm 명시 사실 → work-012 안 /insight 정정 진입으로 우선순위 회수
+- 잠재 paradigm 영구 보존:
+  - /faq 페이지 정정 (5 카테고리 × 19 항목 + PageHero + JSON-LD + Bottom CTA 사전 구현 사실 / 카피 sentiment + 항목 누락 + 검색 기능 + 외관 톤 검수)
+  - /about 페이지 정정 (5 섹션 + AboutPageClient + 자체 SVG 사전 구현 사실 / 외관 + 카피 + 사업 사실 정합 검수)
 
-### 4순위: Cowork chat 분리 (별개 진입)
+### 4순위: Cowork chat 분리 (work-012 단계 1 진입 / 형준님 직접 영역)
 
-- 콘텐츠 풍성 paradigm (analysis + guide + data + glossary mdx 추가)
-- /data + /glossary chip 회복 검토 (콘텐츠 추가 사후 별개 work)
+- 형준님 직접 의뢰 사실 = Cowork chat 분리 진입 + 콘텐츠 1개씩 publishing
+- 진입 trigger = Opus 단계 2 안 Cowork 의뢰서 v1.1 정정 사후 형준님 → Cowork chat 송부
+- Cowork = 콘텐츠 1개씩 산출 + 형준님 검수 + 다음 1개 paradigm
+- 콘텐츠 완성 시점 = analysis + guide + glossary + data 단계 3 reader 자연 흡수
 
 ### 5순위 (기술부채): 별개 work paradigm
 
@@ -433,6 +576,7 @@
 - ReviewsMarquee.tsx L66 사전 main lint error 1건 정리
 - Lighthouse 측정 재개 (Phase 9 의도)
 - 카카오톡 인앱 브라우저 Google OAuth 차단 해결 (LoginButton DISABLED 사실 회수 검토)
+- `pnpm publish` ↔ npm publish 명령 충돌 영구 해결 (package.json scripts.publish 이름 재고)
 
 ---
 
@@ -451,8 +595,13 @@
 | (사전 cycle 없음) | work-009 | HomeHero shadow-md 폐기 |
 | (사전 cycle 없음) | work-010 | Hero 사진 영역 폐기 + 검은 테두리 정정 |
 | (사전 cycle 없음) | work-011 | /insight 후보 5 + chip 폐기 |
+| (사전 cycle 없음) | work-012 | /insight 풀 신규 재제작 (정정 1~6) + 사전 논의 5 리셋 + 단계 2·3 대기 |
 
 사후 paradigm = **work-NNN sequential 단독**.
+
+### work-012 안 정정 → 단계 paradigm 추가 사실
+
+work-012 안 = 정정 1~6 (외관 sequential 정정) + 사전 논의 4 (Code 추천) + 사전 논의 5 (paradigm 리셋) + Cowork 의뢰서 v1 → v1.1 (통합본) + Code 자율 조사 + 결정 의뢰 8건 → 사후 = 단계 2 (Opus 사전 논의 5_1) + 단계 3 (Code 일괄 정정).
 
 ---
 
@@ -481,9 +630,16 @@
 
 ---
 
-## 🔗 commit history (본 세션 전체 / work-001 ~ work-011)
+## 🔗 commit history (본 세션 전체 / work-001 ~ work-012)
 
 ```
+059b93a work-012 정정 6: /insight Live Data Hero (썸네일 PNG → 데이터 시각 패널)
+eb7998d work-012 정정 5: /insight Hero 높이 축소 + 칩 2건 + 서브타이틀 + 마침표 yellow
+59c8c2d work-012 정정 4: /insight Hero 박스 폐기 + green bg + 좌우 분기
+6502a30 work-012 정정 3: /insight Hero 고정 paradigm + 아이콘 풀컬러 + 페이지네이션
+f3e5298 work-012 정정 2: /insight Hero 박스화 + 카테고리 4독립+1그룹 구조 + Gemini PNG 13건
+b2ef69f work-012: /insight 풀 신규 재제작 — Hero 자동 슬라이드 + 6 카테고리 nav + 1-col list
+f9678fa HANDOFF.md 갱신: work-008 ~ work-011 통합 + 다음 세션 진입 트리거 = 클로드 채팅 요구서
 dce068e work-011: /insight 카드 후보 5 Premium Editorial++ + chip 폐기 통합
 1062497 work-010: 데스크탑 검은 테두리 정정 + 사진 영역 폐기
 ecb1d09 work-009: HomeHero input wrapper 검은 외곽 제거
@@ -504,11 +660,15 @@ fcb6f71 cycle 1-G-γ-α-ζ-1 정정 5: scripts/seed-photos.mjs INSERT 단계 영
 
 ## 🔥 핵심 영구 단단 사실 (다음 세션 진입 시 의식 의무)
 
-1. **클로드 채팅 요구서 우선 paradigm** = 다음 세션 진입 단단 trigger
-2. **work-011 종료 사실** = HEAD `dce068e` / production deploy 사후 형준님 검수 의무 (정적 image NG / 사용자 직접 hover 확인)
-3. **work-012 + work-013 잠재 paradigm 영구 보존** (/faq + /about 정정 사전 의뢰 사실)
-4. **분석 페이지 + /apply + Hero + Pricing + Compare + Reviews + HomeCTA + TopNav 영구 변경 0** (§A-24 예외 단독)
-5. **detail endpoint paradigm** = 대법원 official 단독 source (우리 DB = 24h 캐시 / not_found 회신 시점 = DB only NG / detail endpoint fetch 의무)
-6. **photos.ts + /api/court-listings/[docid]/photos route 영구 보존** = 분석 페이지 PhotoGallery 사용 / Hero 영역 0
-7. **신규 npm 영구 0** (motion + lucide-react + NumberFlow + sharp + @google/genai + playwright 단독)
-8. **회신문 "광역" 어휘 0 의무** (자가 검증 `grep "광역"` 0건 정합)
+1. **형준님 결정 의뢰 8건 회신 우선 paradigm** = 다음 세션 진입 단단 trigger (위 work-012 섹션 안 표 단독 참조)
+2. **work-012 진행 중 사실** = HEAD `059b93a` Live Data Hero / 단 사전 논의 5 paradigm 리셋 채택 / 단계 2·3 진입 대기
+3. **work-012 사전 산출물 일괄 정리 list 영구 보존** (단계 3 진입 시점 폐기 의무 / 위 work-012 섹션 안 표 참조)
+4. **콘텐츠 우선 paradigm 영구 채택** (mock 폐기 + 실 콘텐츠 1개씩 publishing + 디자인 사후 자연 도출)
+5. **/faq + /about 잠재 paradigm 영구 보존** (work-013 + work-014 잠재 / 본 세션 진입 0)
+6. **분석 페이지 + /apply + Hero + Pricing + Compare + Reviews + HomeCTA + TopNav 영구 변경 0** (§A-24 예외 단독)
+7. **detail endpoint paradigm** = 대법원 official 단독 source (우리 DB = 24h 캐시 / not_found 회신 시점 = DB only NG / detail endpoint fetch 의무)
+8. **photos.ts + /api/court-listings/[docid]/photos route 영구 보존** = 분석 페이지 PhotoGallery 사용 / Hero 영역 0
+9. **신규 npm 영구 0** (motion + lucide-react + NumberFlow + sharp + @google/genai + playwright 단독)
+10. **회신문 "광역" 어휘 0 의무** (자가 검증 `grep "광역"` 0건 정합)
+11. **`pnpm publish` 명령 충돌 사실** = pnpm 자체 npm publish 명령 우선 → `pnpm content:publish` 또는 node 직접 호출 의무
+12. **`scripts/content-publish/index.mjs` = analysis 전용 사실** (guide·glossary·data 분기 0 / 단계 3 진입 시점 결정 의뢰 1 정합 의무)
