@@ -99,6 +99,16 @@ export function iconPath(slug: string): string {
   return `/illustrations/insight/${slug}.png`;
 }
 
+/* 정정 6 — featured article 데이터 시각 패널 source.
+ * optional 단독 (featured 외 mock 28건 = stats 0 / Phase 2 = 실 데이터 교체 paradigm). */
+export type InsightPostStats = {
+  appraisedPrice: number; // 감정가 (원)
+  minimumPrice: number; // 최저가 (원)
+  failureCount: number; // 유찰횟수
+  stagePrices: number[]; // 단계별 가격 (원 / 감정가 → 최저가 순)
+  appraisedRatio: number; // 감정가 대비 최저가율 (%)
+};
+
 export type InsightMockPost = {
   id: string;
   category: InsightLeafSlug;
@@ -106,6 +116,7 @@ export type InsightMockPost = {
   preview: string;
   publishedAt: string; // YYYY-MM-DD
   featured?: boolean;
+  stats?: InsightPostStats;
 };
 
 /* mock 데이터 = 4 독립 카테고리 + "무료 물건분석" 하위 8 종류 분포.
@@ -272,6 +283,19 @@ export const INSIGHT_MOCK_POSTS: InsightMockPost[] = [
     preview: "권리·시세·수익률을 숫자로 정리",
     publishedAt: "2026-05-13",
     featured: true,
+    stats: {
+      appraisedPrice: 280_000_000,
+      minimumPrice: 137_200_000,
+      failureCount: 3,
+      stagePrices: [
+        280_000_000, // 감정가
+        196_000_000, // 1차 (70%)
+        137_200_000, // 2차 (49%)
+        96_040_000, // 3차 (34.3%)
+        67_228_000, // 최저가 (24% / 4번째 유찰 시점 mock)
+      ],
+      appraisedRatio: 49,
+    },
   },
   {
     id: "villa-02",
